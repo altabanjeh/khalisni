@@ -29,6 +29,9 @@ services:
       POSTGRES_PORT:        "5432"
       FILE_UPLOAD_MAX_SIZE: ${FILE_UPLOAD_MAX_SIZE:-5242880}
       REDIS_URL:            ${REDIS_URL:-}
+      DJANGO_ADMIN_EMAIL:    ${DJANGO_ADMIN_EMAIL:-}
+      DJANGO_ADMIN_PASSWORD: ${DJANGO_ADMIN_PASSWORD:-}
+      DJANGO_ADMIN_NAME:     ${DJANGO_ADMIN_NAME:-Admin}
     volumes:
       - backend_media:/app/media
     depends_on:

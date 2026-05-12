@@ -1,0 +1,15 @@
+# Applied automatically by Docker Compose when running locally (docker compose up).
+# Coolify only reads docker-compose.yml and ignores this file.
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  backend:
+    ports:
+      - "8000:8000"
+
+  frontend:
+    ports:
+      - "4173:80"

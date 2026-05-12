@@ -25,6 +25,7 @@ echo "Database ready."
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 python manage.py setup_roles || true
+python manage.py create_admin || true
 
 exec gunicorn config.wsgi:application \
   --bind 0.0.0.0:8000 \
