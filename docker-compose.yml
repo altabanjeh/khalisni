@@ -11,12 +11,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - internal
-    healthcheck:
-      test: ["CMD", "pg_isready", "-q"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   backend:
     build:
@@ -38,8 +32,7 @@ services:
     volumes:
       - backend_media:/app/media
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - internal
     expose:
