@@ -1,0 +1,49 @@
+# ROLE PERMISSION MATRIX
+
+Notes:
+
+- `Employee` covers both `employee` and `support` where the backend groups them together.
+- `Super Admin` is not a separate business role; it is the Django `is_superuser` flag on top of `role="admin"`.
+
+| Module | Screen/API | Action | Client | Employee | Provider | Admin | Super Admin | Backend Enforced? | Frontend Enforced? | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Auth | `/api/auth/register/` | Register account | Yes | No | No | No | No | Yes | Yes | Public registration always creates `role="customer"`. Ref: `backend/accounts/views.py:33-47`, `backend/accounts/serializers.py:43-51` |
+| Services | `/api/services/`, `/api/services/<slug>/` | View active service catalog | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Public endpoints return only `is_active=True`. Ref: `backend/services/views.py:16-43` |
+| Orders | `/api/orders/` | Create service order | Yes | No | No | No | No | Yes | Yes | Public endpoint; requires online service and required docs when configured. Ref: `backend/orders/views.py:61-77`, `backend/orders/serializers.py:147-267` |
+| Orders | `/api/orders/track/` | Track order and view final docs | Limited | Limited | Limited | Limited | Limited | Limited | Yes | Public by `order_number + phone`; not role-based. Ref: `backend/orders/views.py:80-93`, `backend/documents/views.py:36-42` |
+| Orders | `/api/customer/orders/` | List own orders | Yes | No | No | No | No | Yes | Yes | Customer-only route. Ref: `backend/orders/views.py:96-101` |
+| Orders | `/api/customer/orders/<id>/` | View own order detail | Yes | No | No | No | No | Yes | Yes | Customer sees only customer-visible notes. Ref: `backend/orders/views.py:104-109`, `backend/orders/serializers.py:136-144` |
+| Documents | `/api/customer/orders/<id>/documents/` | Upload customer document | Limited | No | No | No | No | Yes | Yes | Allowed for own non-final orders; backend does not restrict to requested/required types. Ref: `backend/orders/views.py:112-139`, `backend/orders/services.py:93-127` |
+| Orders | `/api/customer/orders/<id>/cancel/` | Cancel order | Limited | No | No | No | No | Yes | Yes | Customer can cancel only own `NEW` orders. Ref: `backend/workflow/transition_permissions.py:65-73` |
+| Orders | `/api/customer/orders/<id>/rating/` | Rate completed order | Limited | No | No | No | No | Yes | Yes | Completed only, one rating per order. Ref: `backend/orders/services.py:130-141`, `backend/orders/models.py:703-719` |
+| Accounts | `/api/customer/profile/` | Edit own profile | Yes | No | No | No | No | Yes | Yes | Updates `CustomUser` fields only. Ref: `backend/accounts/views.py:84-99` |
+| Orders | `/api/admin/orders/` | View review queue | No | Yes | No | Yes | Yes | Yes | Yes | Employee/support uses admin namespace. Ref: `backend/orders/views.py:179-200` |
+| Orders | `/api/admin/orders/<id>/` | View reviewable order detail | No | Yes | No | Yes | Yes | Yes | Yes | Uses `OrderDetailSerializer`; exposes broad data. Ref: `backend/orders/views.py:248-253`, `backend/orders/serializers.py:105-145` |
+| Orders | `/api/admin/orders/<id>/status/` | Generic status change | No | Yes | No | Yes | Yes | Yes | Limited | Backend checks transition map, but business validations are incomplete for some statuses. Ref: `backend/orders/views.py:256-273`, `backend/orders/services.py:144-151` |
+| Orders | `/api/admin/orders/<id>/request-documents/` | Request missing docs | No | Yes | No | Yes | Yes | Yes | Employee only in UI | Requires permission and customer-facing note. Ref: `backend/orders/views.py:296-313`, `backend/orders/services.py:249-279` |
+| Orders | `/api/admin/orders/<id>/assign/` | Assign provider | No | Yes | No | Yes | Yes | Yes | Employee/Admin UI | Requires approved required docs, approved/available provider, service/category match. Ref: `backend/orders/views.py:276-293`, `backend/orders/services.py:193-239` |
+| Orders | `/api/admin/orders/<id>/notes/` | Add order note | No | Yes | No | Yes | Yes | Yes | Limited | UI exists for employee/admin only. Ref: `backend/orders/views.py:316-329` |
+| Documents | `/api/staff/documents/` | List reviewable documents | No | Yes | No | Yes | Yes | Yes | Employee UI only | Admin can call backend because admin has permission; no admin route in UI. Ref: `backend/documents/views.py:45-60` |
+| Documents | `/api/staff/documents/<id>/verify/` | Verify/reject document | No | Yes | No | Yes | Yes | Yes | Employee UI only | No backend lock against re-verifying already reviewed docs. Ref: `backend/documents/views.py:63-84`, `backend/documents/services.py:54-78` |
+| Providers | `/api/admin/providers/` | List providers | No | Limited | No | Yes | Yes | Yes | Limited | Employee can list/retrieve for assignment; admin can CRUD. UI only shows read-only list for admin. Ref: `backend/providers/views.py:19-55`, `frontend/src/pages/admin/ProvidersManagementPage.jsx:6-20` |
+| Providers | `/api/provider/dashboard/` | View provider dashboard | No | No | Yes | No | No | Yes | Yes | Provider-only route. Ref: `backend/providers/views.py:72-87` |
+| Providers | `/api/provider/orders/`, `/api/provider/orders/<id>/` | View assigned orders | No | No | Yes | No | No | Yes | Yes | Provider sees only assigned orders. Ref: `backend/providers/views.py:58-63`, `90-103` |
+| Providers | `/api/provider/orders/<id>/status/` | Update provider status | No | No | Limited | No | No | Yes | Yes | Provider may only set `IN_PROGRESS` or `WAITING_GOVERNMENT`. Ref: `backend/providers/views.py:106-121`, `backend/orders/services.py:426-440` |
+| Providers | `/api/provider/orders/<id>/notes/` | Add provider internal note | No | No | Yes | No | No | Yes | Yes | Internal-only note path. Ref: `backend/providers/views.py:124-135` |
+| Providers | `/api/provider/orders/<id>/final-document/` | Upload final document | No | No | Limited | No | No | Yes | Yes | Allowed only when backend returns `can_upload_final_document`. Ref: `backend/providers/views.py:138-166`, `backend/orders/services.py:456-471` |
+| Documents | `/api/documents/<id>/download/` | Download document | Limited | Yes | Limited | Yes | Yes | Yes | Limited | Providers can download only final docs and service-required docs, but serializer exposes more metadata than download policy. Ref: `backend/documents/views.py:23-42`, `backend/documents/services.py:81-110` |
+| Orders | `/api/admin/order-records/` | Direct order CRUD | No | No | No | Yes | Yes | Limited | Missing | High-risk bypass path; direct writes are not workflow-safe. Ref: `backend/orders/views.py:203-225`, `backend/orders/serializers.py:98-103` |
+| Documents | `/api/admin/documents/` | Direct document CRUD | No | No | No | Yes | Yes | Yes | Missing | Admin-only backend path, not surfaced in React UI. Hard delete is possible. Ref: `backend/documents/views.py:87-91` |
+| Accounts | `/api/admin/users/` | Manage users and roles | No | No | No | Yes | Yes | Yes | Yes | Can set role, `is_staff`, `is_verified`; no super-admin gate. Ref: `backend/accounts/views.py:102-106`, `backend/accounts/serializers.py:77-109` |
+| Accounts | `/api/admin/system-settings/` | Manage generic system settings | No | No | No | Yes | Yes | Yes | Yes | Free-form JSON settings. Ref: `backend/accounts/views.py:109-113`, `frontend/src/pages/admin/AdminCmsPage.jsx:511-551` |
+| Services | `/api/admin/services/`, `/api/admin/categories/` | Manage services/categories/pricing | No | No | No | Yes | Yes | Yes | Yes | Employee denied in tests. Ref: `backend/services/views.py:46-83`, `backend/services/tests.py:28-36` |
+| Services | `/api/admin/service-documents/` | Manage required docs per service | No | No | No | Yes | Yes | Yes | Missing | Backend exists, no React screen. Ref: `backend/services/urls.py:16-20` |
+| Services | `/api/admin/service-provider-assignments/` | Manage service-provider links | No | No | No | Yes | Yes | Yes | Missing | Backend exists, no React screen. Ref: `backend/services/urls.py:16-20` |
+| Notifications | `/api/notifications/` | Notification center | Limited | Limited | Limited | Yes | Yes | Yes | Limited | Employees/providers see notifications tied to accessible orders, not only notifications addressed to them. Ref: `backend/notifications/selectors.py:7-31` |
+| Notifications | `/api/admin/notifications/` | View/create/edit/delete notifications | No | No | No | Yes | Yes | Yes | Partial | Admin list page exists; create/edit/delete UI missing. Ref: `backend/notifications/views.py:17-34`, `frontend/src/pages/admin/NotificationsPage.jsx:8-39` |
+| Notifications | `/api/orders/<id>/manual-notification/` | Send manual customer notification | No | Yes | No | Yes | Yes | Yes | Missing | Employee has backend permission, but no screen. Ref: `backend/accounts/role_groups.py:44-45`, `backend/notifications/views.py:45-61` |
+| Notifications | `/api/admin/notification-templates/` | Manage templates | No | No | No | Yes | Yes | Yes | Missing | Model/UI gap; runtime sender ignores templates today. Ref: `backend/notifications/views.py:64-67`, `backend/notifications/utils.py:6-18` |
+| Reports | `/api/admin/dashboard/`, `/api/admin/reports/*` | View reports | No | Limited | No | Yes | Yes | Yes | Limited | Employees have backend permission but no route. Revenue is hidden from non-admins. Ref: `backend/reports/views.py:13-119` |
+| Audit | `/api/admin/audit-logs/` | View audit logs | No | No | No | Yes | Yes | Yes | Yes | Admin-only UI and API. Ref: `backend/audit/views.py:11-15`, `frontend/src/pages/admin/AuditLogPage.jsx:6-20` |
+| Payments | `/api/customer/payments/` | List/create own payments | Limited | No | No | No | No | Yes | Missing | Backend exists, no React route. Ref: `backend/payment/views.py:20-38` |
+| Payments | `/api/admin/payments/`, `/status/` | View/create/update payments | No | No | No | Yes | Yes | Yes | Missing | Backend exists, no React route; workflow does not consume payment state. Ref: `backend/payment/views.py:49-93` |

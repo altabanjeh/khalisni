@@ -1,0 +1,10 @@
+Django>=5,<5.3
+djangorestframework
+djangorestframework-simplejwt
+django-filter
+django-cors-headers
+psycopg[binary]
+pillow
+python-dotenv
+gunicorn
+whitenoise[brotli]

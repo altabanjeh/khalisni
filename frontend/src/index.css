@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --khalsni-blue: #0b67b2;
+  --khalsni-navy: #0f3554;
+  --background: #f4faff;
+  --card: #ffffff;
+  --border: #d7e7f5;
+  --accent: #eaf6ff;
+  --muted: #64748b;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --radius: 1rem;
+  --public-primary-color: #0b67b2;
+  --public-secondary-color: #147fd1;
+  --public-background-color: #f4faff;
+  --public-text-color: #0f3554;
+  --public-header-background-color: #ffffff;
+  --public-footer-background-color: #0f3554;
+  --public-header-text-color: #0f3554;
+  --public-footer-text-color: #ffffff;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-body text-ink antialiased;
+    background-image:
+      radial-gradient(circle at top right, rgba(20, 127, 209, 0.16), transparent 24%),
+      radial-gradient(circle at bottom left, rgba(11, 103, 178, 0.1), transparent 22%),
+      linear-gradient(180deg, #f7fbff 0%, #f4faff 100%);
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .container-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .glass-panel {
+    @apply rounded-[var(--radius)] border border-border bg-card shadow-panel;
+  }
+
+  .panel-muted {
+    @apply rounded-[var(--radius)] border border-border bg-brand-50/70;
+  }
+
+  .card-grid {
+    @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-border bg-card px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-5 py-3 text-sm font-semibold text-ink transition hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-brand-50;
+  }
+
+  .section-title {
+    @apply text-2xl font-extrabold text-ink md:text-3xl;
+  }
+
+  .page-section {
+    @apply space-y-6;
+  }
+
+  .icon-chip {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-brand-600;
+  }
+
+  .table-card {
+    @apply rounded-[var(--radius)] border border-border bg-card p-5 shadow-soft;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold;
+  }
+
+  .public-site-shell {
+    @apply min-h-screen;
+    color: var(--public-text-color);
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--public-secondary-color) 14%, transparent), transparent 24%),
+      radial-gradient(circle at bottom left, color-mix(in srgb, var(--public-primary-color) 12%, transparent), transparent 22%),
+      linear-gradient(180deg, color-mix(in srgb, var(--public-background-color) 92%, white) 0%, var(--public-background-color) 100%);
+  }
+
+  .public-primary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition;
+    background: linear-gradient(135deg, var(--public-primary-color), var(--public-secondary-color));
+  }
+
+  .public-primary-button:hover {
+    filter: brightness(1.03);
+  }
+
+  .public-secondary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border px-5 py-3 text-sm font-semibold transition;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    backdrop-filter: blur(8px);
+  }
+
+  .public-secondary-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .public-hero-section {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--public-primary-color) 92%, #081c2f) 0%, var(--public-secondary-color) 100%);
+  }
+}

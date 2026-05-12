@@ -1,0 +1,35 @@
+# ORDER WORKFLOW MATRIX
+
+Key source anchors:
+
+- Status list: `backend/core/choices.py:12-23`
+- Canonical transition map: `backend/workflow/rules.py:4-50`
+- Canonical role map and actor checks: `backend/workflow/transition_permissions.py:9-88`
+
+| From Status | To Status | Allowed Role | Validation Required | Notification Triggered | Reason Required | Source File | Notes |
+|---|---|---|---|---|---|---|---|
+| `NEW` | `UNDER_REVIEW` | Admin, Employee, Support | Transition role check; employee ownership is set when using `review_order()` | No | No | `backend/workflow/rules.py:5-8`, `backend/workflow/transition_permissions.py:10`, `backend/orders/services.py:167-190` | Employee UI can start review explicitly or implicitly |
+| `NEW` | `CANCELLED` | Admin, Customer | Customer must own the order; customer may cancel only `NEW` orders | Yes, client | Yes | `backend/workflow/transition_permissions.py:11`, `65-86`, `backend/orders/services.py:408-423` | Cancellation API enforces stricter rules than generic transition map |
+| `UNDER_REVIEW` | `WAITING_CUSTOMER` | Admin, Employee, Support | Note required by API serializer; `missing_document_types` stored; customer-visible note created | Yes, client | Yes, practical | `backend/workflow/rules.py:9-14`, `backend/orders/views.py:296-313`, `backend/orders/services.py:249-279` | `document_types` list is optional even though the note is required |
+| `UNDER_REVIEW` | `ASSIGNED` | Admin, Employee, Support | Required documents must be approved; provider must be available, approved, provider-linked, and service/category-linked | Yes, client and provider | No | `backend/orders/services.py:193-239`, `backend/orders/models.py:366-428` | This is one of the strongest validated transitions |
+| `UNDER_REVIEW` | `REJECTED` | Admin, Employee, Support | Transition allowed check only in service; reason comes from reject API | Yes, client | Yes | `backend/workflow/transition_permissions.py:14`, `backend/orders/services.py:390-405` | Generic direct order CRUD can bypass this path |
+| `UNDER_REVIEW` | `CANCELLED` | Admin, Employee, Support | Employee/support can cancel only review-stage orders and only if assigned when owner exists | Yes, client | Yes | `backend/workflow/transition_permissions.py:15`, `65-86`, `backend/orders/services.py:408-423` | |
+| `WAITING_CUSTOMER` | `UNDER_REVIEW` | Admin, Employee, Support, Customer | Customer upload path clears `missing_document_types` and reopens review | No | No | `backend/workflow/transition_permissions.py:16`, `backend/orders/services.py:110-118` | Current implementation reopens review after the first uploaded file, not after all missing files |
+| `WAITING_CUSTOMER` | `ASSIGNED` | Admin, Employee, Support | Same assignment checks as `UNDER_REVIEW -> ASSIGNED` | Yes, client and provider | No | `backend/workflow/transition_permissions.py:17`, `backend/orders/services.py:193-239` | Frontend does not expose this directly, but backend allows it |
+| `WAITING_CUSTOMER` | `CANCELLED` | Admin, Employee, Support | Same cancellation rules as review stage | Yes, client | Yes | `backend/workflow/transition_permissions.py:18`, `65-86`, `backend/orders/services.py:408-423` | |
+| `ASSIGNED` | `IN_PROGRESS` | Provider | Assigned provider only | No | No | `backend/workflow/transition_permissions.py:19`, `backend/orders/services.py:426-440` | Provider-only status move |
+| `ASSIGNED` | `CANCELLED` | Admin | Admin only | Yes, client | Yes | `backend/workflow/transition_permissions.py:20`, `backend/orders/services.py:408-423` | |
+| `IN_PROGRESS` | `WAITING_GOVERNMENT` | Provider | Assigned provider only | No | No | `backend/workflow/transition_permissions.py:21`, `backend/orders/services.py:426-440` | |
+| `IN_PROGRESS` | `READY_FOR_DELIVERY` | Admin, Employee, Support, Provider | Provider path should upload final document; generic internal `/status/` path does not require one | Provider path: Yes, client. Generic status path: No | No | `backend/workflow/transition_permissions.py:22`, `backend/orders/services.py:307-343`, `144-151` | High-risk inconsistency: validation depends on endpoint, not only on target status |
+| `IN_PROGRESS` | `REJECTED` | Admin, Employee, Support | Reject API requires reason | Yes, client | Yes | `backend/workflow/transition_permissions.py:23`, `backend/orders/services.py:390-405` | |
+| `IN_PROGRESS` | `CANCELLED` | Admin | Admin only | Yes, client | Yes | `backend/workflow/transition_permissions.py:24`, `backend/orders/services.py:408-423` | |
+| `WAITING_GOVERNMENT` | `IN_PROGRESS` | Provider | Assigned provider only | No | No | `backend/workflow/transition_permissions.py:25`, `backend/orders/services.py:426-440` | |
+| `WAITING_GOVERNMENT` | `READY_FOR_DELIVERY` | Admin, Employee, Support, Provider | Same endpoint split as `IN_PROGRESS -> READY_FOR_DELIVERY` | Provider path: Yes, client. Generic status path: No | No | `backend/workflow/transition_permissions.py:26`, `backend/orders/services.py:307-343`, `144-151` | High-risk inconsistency |
+| `WAITING_GOVERNMENT` | `CANCELLED` | Admin | Admin only | Yes, client | Yes | `backend/workflow/transition_permissions.py:27`, `backend/orders/services.py:408-423` | |
+| `READY_FOR_DELIVERY` | `UNDER_REVIEW` | Admin, Employee, Support | Generic status path has no reason requirement; final-doc rejection path may send back for rework | No | Only if caused by final-doc rejection | `backend/workflow/transition_permissions.py:28`, `backend/documents/services.py:71-77`, `backend/orders/services.py:144-151` | Transition behavior again depends on endpoint |
+| `READY_FOR_DELIVERY` | `IN_PROGRESS` | Admin, Employee, Support | Generic status path has no reason requirement; final-doc rejection path uses rejection note | No | Only if caused by final-doc rejection | `backend/workflow/transition_permissions.py:29`, `backend/documents/services.py:71-77`, `backend/orders/services.py:144-151` | |
+| `READY_FOR_DELIVERY` | `COMPLETED` | Admin, Employee, Support | Dedicated complete API requires final doc or `admin_confirmation`; generic `/status/` path does not | Yes, client, when using complete service | No | `backend/workflow/transition_permissions.py:30`, `backend/orders/services.py:346-373`, `144-151` | High-risk inconsistency: employee/admin status dropdown can bypass completion rules |
+| `READY_FOR_DELIVERY` | `CANCELLED` | Admin | Admin only | Yes, client | Yes | `backend/workflow/transition_permissions.py:31`, `backend/orders/services.py:408-423` | |
+| `COMPLETED` | `ARCHIVED` | Admin | Transition allowed check only | No | No | `backend/workflow/transition_permissions.py:32`, `backend/workflow/rules.py:40-42`, `backend/orders/services.py:144-151` | No dedicated archive service or notification |
+| `REJECTED` | `ARCHIVED` | Admin | Transition allowed check only | No | No | `backend/workflow/transition_permissions.py:33`, `backend/workflow/rules.py:43-45`, `backend/orders/services.py:144-151` | |
+| `CANCELLED` | `ARCHIVED` | Admin | Transition allowed check only | No | No | `backend/workflow/transition_permissions.py:34`, `backend/workflow/rules.py:46-48`, `backend/orders/services.py:144-151` | |

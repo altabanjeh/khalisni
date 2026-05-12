@@ -1,0 +1,683 @@
+{
+  "roles": [
+    {
+      "role": "customer",
+      "type": "business_role",
+      "source": [
+        {
+          "file": "backend/core/choices.py",
+          "class_or_function": "UserRole",
+          "line": 5,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "role": "employee",
+      "type": "business_role",
+      "source": [
+        {
+          "file": "backend/core/choices.py",
+          "class_or_function": "UserRole",
+          "line": 7,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "role": "support",
+      "type": "business_role",
+      "source": [
+        {
+          "file": "backend/core/choices.py",
+          "class_or_function": "UserRole",
+          "line": 9,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/accounts/role_groups.py",
+          "class_or_function": "ROLE_TO_GROUP_NAME",
+          "line": 10,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "role": "provider",
+      "type": "business_role",
+      "source": [
+        {
+          "file": "backend/core/choices.py",
+          "class_or_function": "UserRole",
+          "line": 8,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "role": "admin",
+      "type": "business_role",
+      "source": [
+        {
+          "file": "backend/core/choices.py",
+          "class_or_function": "UserRole",
+          "line": 6,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "role": "super_admin",
+      "type": "django_flag_on_admin_role",
+      "source": [
+        {
+          "file": "backend/accounts/models.py",
+          "class_or_function": "CustomUserManager.create_superuser",
+          "line": 26,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "name": "accounts",
+      "paths": ["backend/accounts", "frontend/src/context", "frontend/src/api/authApi.js"]
+    },
+    {
+      "name": "services",
+      "paths": ["backend/services", "frontend/src/api/servicesApi.js", "frontend/src/pages/admin/ServicesManagementPage.jsx"]
+    },
+    {
+      "name": "orders",
+      "paths": ["backend/orders", "frontend/src/api/ordersApi.js"]
+    },
+    {
+      "name": "workflow",
+      "paths": ["backend/workflow"]
+    },
+    {
+      "name": "documents",
+      "paths": ["backend/documents", "frontend/src/api/documentsApi.js"]
+    },
+    {
+      "name": "providers",
+      "paths": ["backend/providers", "frontend/src/api/providersApi.js"]
+    },
+    {
+      "name": "notifications",
+      "paths": ["backend/notifications", "frontend/src/api/notificationsApi.js"]
+    },
+    {
+      "name": "reports",
+      "paths": ["backend/reports", "frontend/src/pages/admin/ReportsPage.jsx"]
+    },
+    {
+      "name": "payment",
+      "paths": ["backend/payment"]
+    },
+    {
+      "name": "audit",
+      "paths": ["backend/audit", "frontend/src/pages/admin/AuditLogPage.jsx"]
+    }
+  ],
+  "permissions": [
+    {
+      "subject": "customer",
+      "resource": "order",
+      "action": "view_own_orders_only",
+      "backend_enforced": true,
+      "frontend_enforced": true,
+      "source": [
+        {
+          "file": "backend/orders/selectors.py",
+          "class_or_function": "get_orders_for_user",
+          "line": 31,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "frontend/src/routes/AppRoutes.jsx",
+          "class_or_function": "AppRoutes",
+          "line": 100,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "employee",
+      "resource": "order",
+      "action": "view_reviewable_orders_and_orders_assigned_or_historically_assigned",
+      "backend_enforced": true,
+      "frontend_enforced": true,
+      "source": [
+        {
+          "file": "backend/orders/selectors.py",
+          "class_or_function": "get_orders_for_user",
+          "line": 35,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "provider",
+      "resource": "order",
+      "action": "view_assigned_orders_only",
+      "backend_enforced": true,
+      "frontend_enforced": true,
+      "source": [
+        {
+          "file": "backend/providers/views.py",
+          "class_or_function": "provider_orders_queryset",
+          "line": 58,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "employee",
+      "resource": "document",
+      "action": "verify_documents",
+      "backend_enforced": true,
+      "frontend_enforced": true,
+      "source": [
+        {
+          "file": "backend/config/permissions.py",
+          "class_or_function": "CanVerifyDocuments",
+          "line": 139,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/accounts/role_groups.py",
+          "class_or_function": "GROUP_PERMISSION_MAP",
+          "line": 42,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "provider",
+      "resource": "document",
+      "action": "download_only_final_or_service_required_documents",
+      "backend_enforced": true,
+      "frontend_enforced": false,
+      "source": [
+        {
+          "file": "backend/documents/services.py",
+          "class_or_function": "can_user_download_document",
+          "line": 100,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "admin",
+      "resource": "user_role",
+      "action": "manage_users_and_roles",
+      "backend_enforced": true,
+      "frontend_enforced": true,
+      "source": [
+        {
+          "file": "backend/accounts/views.py",
+          "class_or_function": "AdminUserViewSet",
+          "line": 102,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "subject": "employee",
+      "resource": "reports",
+      "action": "view_limited_reports_payload",
+      "backend_enforced": true,
+      "frontend_enforced": false,
+      "source": [
+        {
+          "file": "backend/accounts/role_groups.py",
+          "class_or_function": "GROUP_PERMISSION_MAP",
+          "line": 41,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/reports/views.py",
+          "class_or_function": "AdminDashboardAPIView",
+          "line": 42,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    }
+  ],
+  "workflow_transitions": [
+    {
+      "from_status": "UNDER_REVIEW",
+      "to_status": "ASSIGNED",
+      "allowed_roles": ["admin", "employee", "support"],
+      "validation": [
+        "required service documents must be approved",
+        "provider must be available",
+        "provider must be approved",
+        "provider must be linked to service or service category"
+      ],
+      "notifications": ["client", "provider"],
+      "reason_required": false,
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "assign_provider_to_order",
+          "line": 193,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "from_status": "WAITING_CUSTOMER",
+      "to_status": "UNDER_REVIEW",
+      "allowed_roles": ["admin", "employee", "support", "customer"],
+      "validation": [
+        "customer upload path reopens review automatically"
+      ],
+      "notifications": [],
+      "reason_required": false,
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "upload_customer_document",
+          "line": 110,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "from_status": "IN_PROGRESS",
+      "to_status": "READY_FOR_DELIVERY",
+      "allowed_roles": ["admin", "employee", "support", "provider"],
+      "validation": [
+        "provider upload path creates final document",
+        "generic internal status path does not require final document"
+      ],
+      "notifications": ["client on provider final upload"],
+      "reason_required": false,
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "upload_final_document",
+          "line": 307,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "update_order_status",
+          "line": 144,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "from_status": "READY_FOR_DELIVERY",
+      "to_status": "COMPLETED",
+      "allowed_roles": ["admin", "employee", "support"],
+      "validation": [
+        "dedicated completion path requires final document or admin_confirmation",
+        "generic internal status path bypasses that rule"
+      ],
+      "notifications": ["client on dedicated complete path"],
+      "reason_required": false,
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "complete_order",
+          "line": 346,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "update_order_status",
+          "line": 144,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    }
+  ],
+  "document_rules": [
+    {
+      "rule": "global file extensions and mime types are hardcoded",
+      "details": {
+        "allowed_extensions": [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"],
+        "max_size_bytes": 10485760
+      },
+      "source": [
+        {
+          "file": "backend/config/settings.py",
+          "class_or_function": "settings",
+          "line": 175,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "public order creation enforces per-service required documents",
+      "source": [
+        {
+          "file": "backend/orders/serializers.py",
+          "class_or_function": "PublicOrderCreateSerializer.validate",
+          "line": 193,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "post-creation customer upload path does not restrict document_type to service requirements",
+      "source": [
+        {
+          "file": "backend/orders/views.py",
+          "class_or_function": "CustomerOrderDocumentUploadAPIView.post",
+          "line": 116,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/documents/serializers.py",
+          "class_or_function": "DocumentUploadSerializer",
+          "line": 35,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "document verification rejection note is mandatory when rejecting",
+      "source": [
+        {
+          "file": "backend/documents/services.py",
+          "class_or_function": "verify_document",
+          "line": 67,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "document verification action itself is not audited",
+      "source": [
+        {
+          "file": "backend/documents/services.py",
+          "class_or_function": "verify_document",
+          "line": 54,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/audit/utils.py",
+          "class_or_function": "create_audit_log",
+          "line": 4,
+          "explicit_or_inferred": "inferred"
+        }
+      ]
+    }
+  ],
+  "service_rules": [
+    {
+      "rule": "only active services and categories appear in public service APIs",
+      "source": [
+        {
+          "file": "backend/services/views.py",
+          "class_or_function": "ServiceListAPIView.get_queryset",
+          "line": 23,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/services/views.py",
+          "class_or_function": "ServiceCategoryListAPIView",
+          "line": 36,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "service flags control ordering availability and provider/manual-review requirements",
+      "source": [
+        {
+          "file": "backend/services/models.py",
+          "class_or_function": "Service",
+          "line": 150,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "required documents are data-driven per service",
+      "source": [
+        {
+          "file": "backend/services/models.py",
+          "class_or_function": "ServiceRequiredDocument",
+          "line": 326,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    }
+  ],
+  "pricing_rules": [
+    {
+      "rule": "service total fee is computed as base_price + government_fee + service_fee",
+      "source": [
+        {
+          "file": "backend/services/models.py",
+          "class_or_function": "Service.total_fee",
+          "line": 210,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "order final_price freezes to service.total_fee at order save when final_price is empty",
+      "source": [
+        {
+          "file": "backend/orders/models.py",
+          "class_or_function": "Order.save",
+          "line": 278,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "price management permission is admin-only in practice",
+      "source": [
+        {
+          "file": "backend/services/views.py",
+          "class_or_function": "ServiceAdminViewSet",
+          "line": 46,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/services/tests.py",
+          "class_or_function": "ServiceManagementPermissionTests",
+          "line": 28,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "service/category/price changes are not audited in the custom APIs",
+      "source": [
+        {
+          "file": "backend/services/views.py",
+          "class_or_function": "ServiceAdminViewSet",
+          "line": 46,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/audit/utils.py",
+          "class_or_function": "create_audit_log",
+          "line": 4,
+          "explicit_or_inferred": "inferred"
+        }
+      ]
+    }
+  ],
+  "notification_rules": [
+    {
+      "rule": "runtime notification sender creates system-channel notifications only",
+      "source": [
+        {
+          "file": "backend/notifications/utils.py",
+          "class_or_function": "create_notification",
+          "line": 6,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "assign provider notifies client and provider",
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "assign_provider_to_order",
+          "line": 227,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "request missing documents notifies client",
+      "source": [
+        {
+          "file": "backend/orders/services.py",
+          "class_or_function": "request_missing_documents",
+          "line": 273,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "rule": "notification templates exist but are not consumed by runtime send logic",
+      "source": [
+        {
+          "file": "backend/notifications/models.py",
+          "class_or_function": "Notification.template / NotificationTemplate",
+          "line": 95,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/notifications/utils.py",
+          "class_or_function": "create_notification",
+          "line": 6,
+          "explicit_or_inferred": "inferred"
+        }
+      ]
+    }
+  ],
+  "admin_configurable_rules": [
+    {
+      "rule": "generic system settings",
+      "current_location": "accounts.SystemSetting and /api/admin/system-settings/",
+      "editable_now": true,
+      "should_admin_edit": "limited",
+      "requires_super_admin": "sometimes",
+      "needs_audit": true
+    },
+    {
+      "rule": "services and categories",
+      "current_location": "/api/admin/services/ and /api/admin/categories/",
+      "editable_now": true,
+      "should_admin_edit": "yes",
+      "requires_super_admin": "no",
+      "needs_audit": true
+    },
+    {
+      "rule": "required documents and service-provider assignments",
+      "current_location": "/api/admin/service-documents/ and /api/admin/service-provider-assignments/",
+      "editable_now": true,
+      "should_admin_edit": "yes",
+      "requires_super_admin": "no",
+      "needs_audit": true
+    },
+    {
+      "rule": "workflow transition map",
+      "current_location": "backend/workflow/rules.py",
+      "editable_now": false,
+      "should_admin_edit": "usually_no",
+      "requires_super_admin": "yes",
+      "needs_audit": true
+    }
+  ],
+  "employee_issues": [
+    {
+      "issue": "employee has report permission but no report route in frontend",
+      "source": [
+        {
+          "file": "backend/accounts/role_groups.py",
+          "class_or_function": "GROUP_PERMISSION_MAP",
+          "line": 41,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "frontend/src/routes/AppRoutes.jsx",
+          "class_or_function": "AppRoutes",
+          "line": 111,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "issue": "employee can receive risky generic status transitions through allowed_actions",
+      "source": [
+        {
+          "file": "backend/orders/allowed_actions.py",
+          "class_or_function": "_allowed_status_transitions",
+          "line": 33,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "frontend/src/pages/employee/EmployeeOrderReviewPage.jsx",
+          "class_or_function": "EmployeeOrderReviewPage",
+          "line": 39,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    },
+    {
+      "issue": "employee can send manual notifications in backend permission map but has no screen",
+      "source": [
+        {
+          "file": "backend/accounts/role_groups.py",
+          "class_or_function": "GROUP_PERMISSION_MAP",
+          "line": 45,
+          "explicit_or_inferred": "explicit"
+        },
+        {
+          "file": "backend/notifications/views.py",
+          "class_or_function": "ManualOrderNotificationAPIView",
+          "line": 45,
+          "explicit_or_inferred": "explicit"
+        }
+      ]
+    }
+  ],
+  "missing_rules": [
+    {
+      "issue": "no super-admin gate for creating admins, changing is_staff, deleting orders, or deleting documents"
+    },
+    {
+      "issue": "no workflow rule requiring all requested missing documents before reopening review"
+    },
+    {
+      "issue": "no runtime use of notification templates"
+    },
+    {
+      "issue": "no payment-to-order workflow integration"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "predictable default passwords in admin and provider creation flows",
+      "severity": "high"
+    },
+    {
+      "risk": "provider API overexposes order/customer/document metadata",
+      "severity": "critical"
+    },
+    {
+      "risk": "direct order CRUD bypasses workflow safety",
+      "severity": "critical"
+    },
+    {
+      "risk": "document verification decisions are not audited",
+      "severity": "high"
+    }
+  ]
+}

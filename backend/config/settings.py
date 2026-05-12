@@ -1,0 +1,219 @@
+import os
+from importlib.util import find_spec
+from datetime import timedelta
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / ".env")
+except ImportError:  # pragma: no cover - fallback for minimal local environments
+    pass
+
+HAS_CORSHEADERS = find_spec("corsheaders") is not None
+HAS_DRF = find_spec("rest_framework") is not None
+HAS_DRF_AUTHTOKEN = find_spec("rest_framework.authtoken") is not None
+HAS_SIMPLEJWT = find_spec("rest_framework_simplejwt") is not None
+HAS_DJANGO_FILTERS = find_spec("django_filters") is not None
+
+_secret_key = os.getenv("DJANGO_SECRET_KEY")
+_debug = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+if not _secret_key:
+    if _debug:
+        _secret_key = "dev-only-insecure-key-not-for-production"
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production.")
+SECRET_KEY = _secret_key
+DEBUG = _debug
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
+    if origin.strip()
+]
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "core",
+    "accounts",
+    "services",
+    "orders",
+    "documents",
+    "workflow",
+    "providers",
+    "payment",
+    "notifications",
+    "reports",
+    "audit",
+    "public_site",
+]
+
+if HAS_CORSHEADERS:
+    INSTALLED_APPS.insert(6, "corsheaders")
+if HAS_DRF:
+    INSTALLED_APPS.insert(7 if HAS_CORSHEADERS else 6, "rest_framework")
+if HAS_DRF_AUTHTOKEN:
+    INSTALLED_APPS.append("rest_framework.authtoken")
+if HAS_SIMPLEJWT:
+    INSTALLED_APPS.append("rest_framework_simplejwt.token_blacklist")
+if HAS_DJANGO_FILTERS:
+    INSTALLED_APPS.append("django_filters")
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+if HAS_CORSHEADERS:
+    MIDDLEWARE.insert(2, "corsheaders.middleware.CorsMiddleware")
+
+ROOT_URLCONF = "config.urls"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    }
+]
+
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+
+if os.getenv("POSTGRES_DB"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": os.getenv("POSTGRES_HOST", "db"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+LANGUAGE_CODE = "ar"
+LANGUAGES = [("ar", "Arabic"), ("en", "English")]
+TIME_ZONE = os.getenv("DJANGO_TIME_ZONE", "Asia/Amman")
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# Trust Coolify's Traefik proxy for HTTPS detection
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {}
+
+if HAS_DRF:
+    authentication_classes = ["rest_framework.authentication.SessionAuthentication"]
+    if HAS_SIMPLEJWT:
+        authentication_classes.insert(0, "rest_framework_simplejwt.authentication.JWTAuthentication")
+
+    filter_backends = [
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ]
+    if HAS_DJANGO_FILTERS:
+        filter_backends.insert(0, "django_filters.rest_framework.DjangoFilterBackend")
+
+    REST_FRAMEWORK = {
+        "DEFAULT_AUTHENTICATION_CLASSES": tuple(authentication_classes),
+        "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
+        "DEFAULT_FILTER_BACKENDS": tuple(filter_backends),
+        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+        "PAGE_SIZE": 20,
+    }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "USER_ID_FIELD": "user_id",
+}
+
+_redis_url = os.getenv("REDIS_URL")
+if _redis_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": _redis_url,
+            "OPTIONS": {"db": "0"},
+            "TIMEOUT": 300,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "TIMEOUT": 300,
+        }
+    }
+
+ALLOWED_UPLOAD_EXTENSIONS = [
+    ".pdf",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".doc",
+    ".docx",
+]
+
+ALLOWED_UPLOAD_MIME_TYPES = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]
+
+FILE_UPLOAD_MAX_SIZE = int(os.getenv("FILE_UPLOAD_MAX_SIZE", str(10 * 1024 * 1024)))

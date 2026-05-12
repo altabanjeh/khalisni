@@ -1,0 +1,149 @@
+import { buildQuery, http, unwrapList, withId } from './client'
+
+function normalizeCategory(record) {
+  return withId(record, 'category_id')
+}
+
+function normalizeService(record) {
+  return withId(record, 'service_id')
+}
+
+function normalizeSetting(record) {
+  return withId(record, 'setting_id')
+}
+
+export const servicesApi = {
+  async getServices(params = {}) {
+    return unwrapList(await http.get(`/services/${buildQuery(params)}`))
+  },
+
+  async getCategories() {
+    return unwrapList(await http.get('/services/categories/'))
+  },
+
+  getService(slug) {
+    return http.get(`/services/${slug}/`)
+  },
+
+  async getAdminServices() {
+    return unwrapList(await http.get('/admin/services/')).map(normalizeService)
+  },
+
+  async getAdminCategories() {
+    return unwrapList(await http.get('/admin/categories/')).map(normalizeCategory)
+  },
+
+  async getAdminServiceDocuments(params = {}) {
+    return unwrapList(await http.get(`/admin/service-documents/${buildQuery(params)}`))
+  },
+
+  createAdminServiceDocument(payload) {
+    return http.post('/admin/service-documents/', payload)
+  },
+
+  updateAdminServiceDocument(id, payload) {
+    return http.patch(`/admin/service-documents/${id}/`, payload)
+  },
+
+  deleteAdminServiceDocument(id) {
+    return http.delete(`/admin/service-documents/${id}/`)
+  },
+
+  async getAdminServiceAssignments(params = {}) {
+    return unwrapList(await http.get(`/admin/service-provider-assignments/${buildQuery(params)}`))
+  },
+
+  createAdminServiceAssignment(payload) {
+    return http.post('/admin/service-provider-assignments/', payload)
+  },
+
+  updateAdminServiceAssignment(id, payload) {
+    return http.patch(`/admin/service-provider-assignments/${id}/`, payload)
+  },
+
+  deleteAdminServiceAssignment(id) {
+    return http.delete(`/admin/service-provider-assignments/${id}/`)
+  },
+
+  async createAdminCategory(payload) {
+    return normalizeCategory(await http.post('/admin/categories/', payload))
+  },
+
+  async updateAdminCategory(id, payload) {
+    return normalizeCategory(await http.patch(`/admin/categories/${id}/`, payload))
+  },
+
+  deleteAdminCategory(id) {
+    return http.delete(`/admin/categories/${id}/`)
+  },
+
+  async createAdminService(payload) {
+    return normalizeService(await http.post('/admin/services/', payload))
+  },
+
+  async updateAdminService(id, payload) {
+    return normalizeService(await http.patch(`/admin/services/${id}/`, payload))
+  },
+
+  deleteAdminService(id) {
+    return http.delete(`/admin/services/${id}/`)
+  },
+
+  async getAdminUsers() {
+    return unwrapList(await http.get('/admin/users/'))
+  },
+
+  createAdminUser(payload) {
+    return http.post('/admin/users/', payload)
+  },
+
+  updateAdminUser(id, payload) {
+    return http.patch(`/admin/users/${id}/`, payload)
+  },
+
+  deleteAdminUser(id) {
+    return http.delete(`/admin/users/${id}/`)
+  },
+
+  async getSystemSettings() {
+    return unwrapList(await http.get('/admin/system-settings/')).map(normalizeSetting)
+  },
+
+  async createSystemSetting(payload) {
+    return normalizeSetting(await http.post('/admin/system-settings/', payload))
+  },
+
+  async updateSystemSetting(id, payload) {
+    return normalizeSetting(await http.patch(`/admin/system-settings/${id}/`, payload))
+  },
+
+  deleteSystemSetting(id) {
+    return http.delete(`/admin/system-settings/${id}/`)
+  },
+
+  getDailyReport() {
+    return http.get('/admin/reports/daily/')
+  },
+
+  getWeeklyReport() {
+    return http.get('/admin/reports/weekly/')
+  },
+
+  async getWorkflowRules() {
+    return unwrapList(await http.get('/admin/workflow-rules/'))
+  },
+
+  getAvailablePermissions() {
+    return http.get('/admin/available-permissions/')
+  },
+
+  getUserPermissions(userId) {
+    return http.get(`/admin/users/${userId}/permissions/`)
+  },
+
+  setUserPermissions(userId, permissionFullCodenames) {
+    return http.patch(`/admin/users/${userId}/permissions/`, { permissions: permissionFullCodenames })
+  },
+}
+
+export default servicesApi

@@ -1,0 +1,2295 @@
+{
+  "routes": [
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 22,
+      "path": "auth/register/",
+      "raw": "path(\"auth/register/\", RegisterAPIView.as_view()),"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 23,
+      "path": "auth/login/",
+      "raw": "path(\"auth/login/\", LoginAPIView.as_view()),"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 24,
+      "path": "auth/logout/",
+      "raw": "path(\"auth/logout/\", LogoutAPIView.as_view()),"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 25,
+      "path": "auth/me/",
+      "raw": "path(\"auth/me/\", MeAPIView.as_view()),"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 26,
+      "path": "customer/profile/",
+      "raw": "path(\"customer/profile/\", CustomerProfileAPIView.as_view()),"
+    },
+    {
+      "file": "backend/audit/urls.py",
+      "line": 6,
+      "path": "admin/audit-logs/",
+      "raw": "path(\"admin/audit-logs/\", AuditLogListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/audit/urls.py",
+      "line": 7,
+      "path": "orders/<int:pk>/timeline/",
+      "raw": "path(\"orders/<int:pk>/timeline/\", OrderTimelineAPIView.as_view()),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 7,
+      "path": "admin/",
+      "raw": "path(\"admin/\", admin.site.urls),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 8,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"accounts.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 9,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"services.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 10,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"orders.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 11,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"providers.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 12,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"reports.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 13,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"audit.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 14,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"documents.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 15,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"notifications.urls\")),"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "line": 16,
+      "path": "api/",
+      "raw": "path(\"api/\", include(\"payment.urls\")),"
+    },
+    {
+      "file": "backend/documents/urls.py",
+      "line": 11,
+      "path": "documents/<int:pk>/download/",
+      "raw": "path(\"documents/<int:pk>/download/\", DocumentDownloadAPIView.as_view(), name=\"document-download\"),"
+    },
+    {
+      "file": "backend/documents/urls.py",
+      "line": 12,
+      "path": "staff/documents/",
+      "raw": "path(\"staff/documents/\", StaffDocumentListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/documents/urls.py",
+      "line": 13,
+      "path": "staff/documents/<int:pk>/verify/",
+      "raw": "path(\"staff/documents/<int:pk>/verify/\", StaffDocumentVerifyAPIView.as_view()),"
+    },
+    {
+      "file": "backend/notifications/urls.py",
+      "line": 17,
+      "path": "admin/notifications/",
+      "raw": "path(\"admin/notifications/\", AdminNotificationListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/notifications/urls.py",
+      "line": 18,
+      "path": "admin/notifications/<int:pk>/",
+      "raw": "path(\"admin/notifications/<int:pk>/\", AdminNotificationDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/notifications/urls.py",
+      "line": 19,
+      "path": "notifications/",
+      "raw": "path(\"notifications/\", NotificationCenterAPIView.as_view()),"
+    },
+    {
+      "file": "backend/notifications/urls.py",
+      "line": 20,
+      "path": "orders/<int:pk>/manual-notification/",
+      "raw": "path(\"orders/<int:pk>/manual-notification/\", ManualOrderNotificationAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 36,
+      "path": "orders/",
+      "raw": "path(\"orders/\", CreateOrderAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 37,
+      "path": "orders/track/",
+      "raw": "path(\"orders/track/\", TrackOrderAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 38,
+      "path": "customer/orders/",
+      "raw": "path(\"customer/orders/\", CustomerOrderListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 39,
+      "path": "customer/orders/<int:pk>/",
+      "raw": "path(\"customer/orders/<int:pk>/\", CustomerOrderDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 40,
+      "path": "customer/orders/<int:pk>/documents/",
+      "raw": "path(\"customer/orders/<int:pk>/documents/\", CustomerOrderDocumentUploadAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 41,
+      "path": "customer/orders/<int:pk>/cancel/",
+      "raw": "path(\"customer/orders/<int:pk>/cancel/\", CustomerOrderCancelAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 42,
+      "path": "customer/orders/<int:pk>/rating/",
+      "raw": "path(\"customer/orders/<int:pk>/rating/\", CustomerOrderRatingAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 43,
+      "path": "admin/orders/",
+      "raw": "path(\"admin/orders/\", AdminDashboardOrderListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 44,
+      "path": "admin/orders/<int:pk>/",
+      "raw": "path(\"admin/orders/<int:pk>/\", AdminOrderDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 45,
+      "path": "admin/orders/<int:pk>/status/",
+      "raw": "path(\"admin/orders/<int:pk>/status/\", AdminOrderStatusUpdateAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 46,
+      "path": "admin/orders/<int:pk>/assign/",
+      "raw": "path(\"admin/orders/<int:pk>/assign/\", AdminOrderAssignAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 47,
+      "path": "admin/orders/<int:pk>/request-documents/",
+      "raw": "path(\"admin/orders/<int:pk>/request-documents/\", AdminRequestDocumentsAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 48,
+      "path": "admin/orders/<int:pk>/notes/",
+      "raw": "path(\"admin/orders/<int:pk>/notes/\", AdminOrderNotesAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 49,
+      "path": "admin/orders/<int:pk>/final-document/",
+      "raw": "path(\"admin/orders/<int:pk>/final-document/\", AdminOrderFinalDocumentAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 50,
+      "path": "admin/orders/<int:pk>/complete/",
+      "raw": "path(\"admin/orders/<int:pk>/complete/\", AdminOrderCompleteAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 51,
+      "path": "admin/orders/<int:pk>/reject/",
+      "raw": "path(\"admin/orders/<int:pk>/reject/\", AdminOrderRejectAPIView.as_view()),"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 52,
+      "path": "admin/orders/<int:pk>/cancel/",
+      "raw": "path(\"admin/orders/<int:pk>/cancel/\", AdminOrderCancelAPIView.as_view()),"
+    },
+    {
+      "file": "backend/payment/urls.py",
+      "line": 12,
+      "path": "customer/payments/",
+      "raw": "path(\"customer/payments/\", CustomerPaymentListCreateAPIView.as_view()),"
+    },
+    {
+      "file": "backend/payment/urls.py",
+      "line": 13,
+      "path": "customer/payments/<int:pk>/",
+      "raw": "path(\"customer/payments/<int:pk>/\", CustomerPaymentDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/payment/urls.py",
+      "line": 14,
+      "path": "admin/payments/",
+      "raw": "path(\"admin/payments/\", AdminPaymentListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/payment/urls.py",
+      "line": 15,
+      "path": "admin/payments/<int:pk>/",
+      "raw": "path(\"admin/payments/<int:pk>/\", AdminPaymentDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/payment/urls.py",
+      "line": 16,
+      "path": "admin/payments/<int:pk>/status/",
+      "raw": "path(\"admin/payments/<int:pk>/status/\", AdminPaymentStatusAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 19,
+      "path": "provider/dashboard/",
+      "raw": "path(\"provider/dashboard/\", ProviderDashboardAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 20,
+      "path": "provider/orders/",
+      "raw": "path(\"provider/orders/\", ProviderOrderListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 21,
+      "path": "provider/orders/<int:pk>/",
+      "raw": "path(\"provider/orders/<int:pk>/\", ProviderOrderDetailAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 22,
+      "path": "provider/orders/<int:pk>/status/",
+      "raw": "path(\"provider/orders/<int:pk>/status/\", ProviderOrderStatusAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 23,
+      "path": "provider/orders/<int:pk>/notes/",
+      "raw": "path(\"provider/orders/<int:pk>/notes/\", ProviderOrderNoteAPIView.as_view()),"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 24,
+      "path": "provider/orders/<int:pk>/final-document/",
+      "raw": "path(\"provider/orders/<int:pk>/final-document/\", ProviderFinalDocumentAPIView.as_view()),"
+    },
+    {
+      "file": "backend/reports/urls.py",
+      "line": 6,
+      "path": "admin/dashboard/",
+      "raw": "path(\"admin/dashboard/\", AdminDashboardAPIView.as_view()),"
+    },
+    {
+      "file": "backend/reports/urls.py",
+      "line": 7,
+      "path": "admin/reports/daily/",
+      "raw": "path(\"admin/reports/daily/\", DailyReportAPIView.as_view()),"
+    },
+    {
+      "file": "backend/reports/urls.py",
+      "line": 8,
+      "path": "admin/reports/weekly/",
+      "raw": "path(\"admin/reports/weekly/\", WeeklyReportAPIView.as_view()),"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 23,
+      "path": "services/",
+      "raw": "path(\"services/\", ServiceListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 24,
+      "path": "services/categories/",
+      "raw": "path(\"services/categories/\", ServiceCategoryListAPIView.as_view()),"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 25,
+      "path": "services/<slug:slug>/",
+      "raw": "path(\"services/<slug:slug>/\", ServiceDetailAPIView.as_view()),"
+    }
+  ],
+  "router_registrations": [
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 16,
+      "prefix": "admin/users",
+      "raw": "router.register(\"admin/users\", AdminUserViewSet, basename=\"admin-users\")"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 17,
+      "prefix": "admin/customer-profiles",
+      "raw": "router.register(\"admin/customer-profiles\", CustomerProfileAdminViewSet, basename=\"admin-customer-profiles\")"
+    },
+    {
+      "file": "backend/accounts/urls.py",
+      "line": 18,
+      "prefix": "admin/system-settings",
+      "raw": "router.register(\"admin/system-settings\", SystemSettingViewSet, basename=\"admin-system-settings\")"
+    },
+    {
+      "file": "backend/documents/urls.py",
+      "line": 7,
+      "prefix": "admin/documents",
+      "raw": "router.register(\"admin/documents\", AdminDocumentViewSet, basename=\"admin-documents\")"
+    },
+    {
+      "file": "backend/notifications/urls.py",
+      "line": 13,
+      "prefix": "admin/notification-templates",
+      "raw": "router.register(\"admin/notification-templates\", NotificationTemplateAdminViewSet, basename=\"admin-notification-templates\")"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 29,
+      "prefix": "admin/order-records",
+      "raw": "router.register(\"admin/order-records\", AdminOrderRecordViewSet, basename=\"admin-order-records\")"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 30,
+      "prefix": "admin/order-notes",
+      "raw": "router.register(\"admin/order-notes\", AdminOrderNoteViewSet, basename=\"admin-order-notes\")"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 31,
+      "prefix": "admin/order-issues",
+      "raw": "router.register(\"admin/order-issues\", AdminOrderIssueViewSet, basename=\"admin-order-issues\")"
+    },
+    {
+      "file": "backend/orders/urls.py",
+      "line": 32,
+      "prefix": "admin/ratings",
+      "raw": "router.register(\"admin/ratings\", AdminRatingViewSet, basename=\"admin-ratings\")"
+    },
+    {
+      "file": "backend/providers/urls.py",
+      "line": 15,
+      "prefix": "admin/providers",
+      "raw": "router.register(\"admin/providers\", ProviderAdminViewSet, basename=\"admin-providers\")"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 16,
+      "prefix": "admin/services",
+      "raw": "router.register(\"admin/services\", ServiceAdminViewSet, basename=\"admin-services\")"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 17,
+      "prefix": "admin/categories",
+      "raw": "router.register(\"admin/categories\", CategoryAdminViewSet, basename=\"admin-categories\")"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 18,
+      "prefix": "admin/service-documents",
+      "raw": "router.register(\"admin/service-documents\", RequiredDocumentAdminViewSet, basename=\"admin-service-documents\")"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 19,
+      "prefix": "admin/service-provider-assignments",
+      "raw": "router.register(\"admin/service-provider-assignments\", ServiceProviderAssignmentAdminViewSet, basename=\"admin-service-provider-assignments\")"
+    },
+    {
+      "file": "backend/services/urls.py",
+      "line": 20,
+      "prefix": "admin/addresses",
+      "raw": "router.register(\"admin/addresses\", AddressAdminViewSet, basename=\"admin-addresses\")"
+    }
+  ],
+  "permission_blocks": [
+    {
+      "file": "backend/accounts/views.py",
+      "line": 24,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 36,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 51,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 56,
+      "permissions": [
+        "permissions.IsAuthenticated"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 78,
+      "permissions": [
+        "permissions.IsAuthenticated"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 86,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 105,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageUserRoles"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 112,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageUserRoles"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]"
+    },
+    {
+      "file": "backend/accounts/views.py",
+      "line": 118,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageUserRoles"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]"
+    },
+    {
+      "file": "backend/audit/views.py",
+      "line": 13,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/audit/views.py",
+      "line": 18,
+      "permissions": [
+        "permissions.IsAuthenticated"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated]"
+    },
+    {
+      "file": "backend/documents/views.py",
+      "line": 26,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/documents/views.py",
+      "line": 47,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanVerifyDocuments"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanVerifyDocuments]"
+    },
+    {
+      "file": "backend/documents/views.py",
+      "line": 64,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanVerifyDocuments"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanVerifyDocuments]"
+    },
+    {
+      "file": "backend/documents/views.py",
+      "line": 88,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/notifications/views.py",
+      "line": 18,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/notifications/views.py",
+      "line": 28,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/notifications/views.py",
+      "line": 39,
+      "permissions": [
+        "permissions.IsAuthenticated"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated]"
+    },
+    {
+      "file": "backend/notifications/views.py",
+      "line": 46,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanSendManualNotifications"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanSendManualNotifications]"
+    },
+    {
+      "file": "backend/notifications/views.py",
+      "line": 65,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 63,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 81,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 98,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 106,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 113,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 142,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 161,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 181,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanReviewOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanReviewOrders]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 204,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 228,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 235,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 242,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsAdminRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsAdminRole]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 250,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanReviewOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanReviewOrders]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 257,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageOrderWorkflow"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageOrderWorkflow]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 277,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanAssignOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanAssignOrders]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 297,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanRequestMissingDocuments"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanRequestMissingDocuments]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 317,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanReviewOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanReviewOrders]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 333,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanUploadFinalDocuments"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanUploadFinalDocuments]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 366,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageOrderWorkflow"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageOrderWorkflow]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 385,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanRejectOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanRejectOrders]"
+    },
+    {
+      "file": "backend/orders/views.py",
+      "line": 404,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanCancelOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanCancelOrders]"
+    },
+    {
+      "file": "backend/payment/views.py",
+      "line": 21,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/payment/views.py",
+      "line": 43,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsCustomerRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsCustomerRole]"
+    },
+    {
+      "file": "backend/payment/views.py",
+      "line": 70,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanViewPaymentStatus"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanViewPaymentStatus]"
+    },
+    {
+      "file": "backend/payment/views.py",
+      "line": 80,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanRefundPayment"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanRefundPayment]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 52,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanAssignOrders"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanAssignOrders]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 54,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageUserRoles"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 73,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 92,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 100,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 107,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 125,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/providers/views.py",
+      "line": 139,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "IsProviderRole"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, IsProviderRole]"
+    },
+    {
+      "file": "backend/reports/views.py",
+      "line": 14,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanViewReportsDashboard"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanViewReportsDashboard]"
+    },
+    {
+      "file": "backend/reports/views.py",
+      "line": 59,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanViewReportsDashboard"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanViewReportsDashboard]"
+    },
+    {
+      "file": "backend/reports/views.py",
+      "line": 84,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanViewReportsDashboard"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanViewReportsDashboard]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 18,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 35,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 41,
+      "permissions": [
+        "permissions.AllowAny"
+      ],
+      "raw": "permission_classes = [permissions.AllowAny]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 48,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageServicePrices"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 61,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageServicePrices"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 68,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageServicePrices"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 75,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageServicePrices"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]"
+    },
+    {
+      "file": "backend/services/views.py",
+      "line": 82,
+      "permissions": [
+        "permissions.IsAuthenticated",
+        "CanManageServicePrices"
+      ],
+      "raw": "permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]"
+    }
+  ],
+  "text_choices": [
+    {
+      "file": "backend/audit/models.py",
+      "class": "Action",
+      "line": 6,
+      "choices": [
+        {
+          "name": "CREATE",
+          "value": "create",
+          "line": 7
+        },
+        {
+          "name": "UPDATE",
+          "value": "update",
+          "line": 8
+        },
+        {
+          "name": "DELETE",
+          "value": "delete",
+          "line": 9
+        },
+        {
+          "name": "RESTORE",
+          "value": "restore",
+          "line": 10
+        },
+        {
+          "name": "REGISTER",
+          "value": "register",
+          "line": 11
+        },
+        {
+          "name": "UPDATE_PROFILE",
+          "value": "update_profile",
+          "line": 12
+        },
+        {
+          "name": "CREATE_ORDER",
+          "value": "create_order",
+          "line": 13
+        },
+        {
+          "name": "CUSTOMER_UPLOAD_DOCUMENT",
+          "value": "customer_upload_document",
+          "line": 14
+        },
+        {
+          "name": "RATE_ORDER",
+          "value": "rate_order",
+          "line": 15
+        },
+        {
+          "name": "CHANGE_ORDER_STATUS",
+          "value": "change_order_status",
+          "line": 16
+        },
+        {
+          "name": "LOGIN",
+          "value": "login",
+          "line": 18
+        },
+        {
+          "name": "LOGOUT",
+          "value": "logout",
+          "line": 19
+        },
+        {
+          "name": "STATUS_CHANGE",
+          "value": "status_change",
+          "line": 21
+        },
+        {
+          "name": "ASSIGN",
+          "value": "assign",
+          "line": 22
+        },
+        {
+          "name": "UNASSIGN",
+          "value": "unassign",
+          "line": 23
+        },
+        {
+          "name": "ASSIGN_PROVIDER",
+          "value": "assign_provider",
+          "line": 24
+        },
+        {
+          "name": "REQUEST_DOCUMENTS",
+          "value": "request_documents",
+          "line": 25
+        },
+        {
+          "name": "ADD_NOTE",
+          "value": "add_note",
+          "line": 26
+        },
+        {
+          "name": "COMPLETE_ORDER",
+          "value": "complete_order",
+          "line": 27
+        },
+        {
+          "name": "REJECT_ORDER",
+          "value": "reject_order",
+          "line": 28
+        },
+        {
+          "name": "PROVIDER_STATUS_UPDATE",
+          "value": "provider_status_update",
+          "line": 29
+        },
+        {
+          "name": "PROVIDER_ADD_NOTE",
+          "value": "provider_add_note",
+          "line": 30
+        },
+        {
+          "name": "UPLOAD_DOCUMENT",
+          "value": "upload_document",
+          "line": 32
+        },
+        {
+          "name": "UPLOAD_FINAL_DOCUMENT",
+          "value": "upload_final_document",
+          "line": 33
+        },
+        {
+          "name": "PROVIDER_UPLOAD_FINAL_DOCUMENT",
+          "value": "provider_upload_final_document",
+          "line": 34
+        },
+        {
+          "name": "DELETE_DOCUMENT",
+          "value": "delete_document",
+          "line": 35
+        },
+        {
+          "name": "PAYMENT_UPDATE",
+          "value": "payment_update",
+          "line": 37
+        },
+        {
+          "name": "COMMENT",
+          "value": "comment",
+          "line": 38
+        },
+        {
+          "name": "NOTIFICATION_SENT",
+          "value": "notification_sent",
+          "line": 40
+        },
+        {
+          "name": "SYSTEM_EVENT",
+          "value": "system_event",
+          "line": 41
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 44
+        },
+        {
+          "name": "CLIENT_PORTAL",
+          "value": "client_portal",
+          "line": 45
+        },
+        {
+          "name": "EMPLOYEE_PORTAL",
+          "value": "employee_portal",
+          "line": 46
+        },
+        {
+          "name": "PROVIDER_PORTAL",
+          "value": "provider_portal",
+          "line": 47
+        },
+        {
+          "name": "API",
+          "value": "api",
+          "line": 48
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 49
+        },
+        {
+          "name": "SUCCESS",
+          "value": "success",
+          "line": 52
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "file": "backend/audit/models.py",
+      "class": "Source",
+      "line": 43,
+      "choices": [
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 44
+        },
+        {
+          "name": "CLIENT_PORTAL",
+          "value": "client_portal",
+          "line": 45
+        },
+        {
+          "name": "EMPLOYEE_PORTAL",
+          "value": "employee_portal",
+          "line": 46
+        },
+        {
+          "name": "PROVIDER_PORTAL",
+          "value": "provider_portal",
+          "line": 47
+        },
+        {
+          "name": "API",
+          "value": "api",
+          "line": 48
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 49
+        },
+        {
+          "name": "SUCCESS",
+          "value": "success",
+          "line": 52
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "file": "backend/audit/models.py",
+      "class": "LogStatus",
+      "line": 51,
+      "choices": [
+        {
+          "name": "SUCCESS",
+          "value": "success",
+          "line": 52
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "UserRole",
+      "line": 4,
+      "choices": [
+        {
+          "name": "CUSTOMER",
+          "value": "customer",
+          "line": 5
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 6
+        },
+        {
+          "name": "EMPLOYEE",
+          "value": "employee",
+          "line": 7
+        },
+        {
+          "name": "PROVIDER",
+          "value": "provider",
+          "line": 8
+        },
+        {
+          "name": "SUPPORT",
+          "value": "support",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "OrderStatus",
+      "line": 12,
+      "choices": [
+        {
+          "name": "NEW",
+          "value": "NEW",
+          "line": 13
+        },
+        {
+          "name": "UNDER_REVIEW",
+          "value": "UNDER_REVIEW",
+          "line": 14
+        },
+        {
+          "name": "WAITING_CUSTOMER",
+          "value": "WAITING_CUSTOMER",
+          "line": 15
+        },
+        {
+          "name": "ASSIGNED",
+          "value": "ASSIGNED",
+          "line": 16
+        },
+        {
+          "name": "IN_PROGRESS",
+          "value": "IN_PROGRESS",
+          "line": 17
+        },
+        {
+          "name": "WAITING_GOVERNMENT",
+          "value": "WAITING_GOVERNMENT",
+          "line": 18
+        },
+        {
+          "name": "READY_FOR_DELIVERY",
+          "value": "READY_FOR_DELIVERY",
+          "line": 19
+        },
+        {
+          "name": "COMPLETED",
+          "value": "COMPLETED",
+          "line": 20
+        },
+        {
+          "name": "REJECTED",
+          "value": "REJECTED",
+          "line": 21
+        },
+        {
+          "name": "CANCELLED",
+          "value": "CANCELLED",
+          "line": 22
+        },
+        {
+          "name": "ARCHIVED",
+          "value": "ARCHIVED",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "OrderPriority",
+      "line": 26,
+      "choices": [
+        {
+          "name": "LOW",
+          "value": "LOW",
+          "line": 27
+        },
+        {
+          "name": "NORMAL",
+          "value": "NORMAL",
+          "line": 28
+        },
+        {
+          "name": "HIGH",
+          "value": "HIGH",
+          "line": 29
+        },
+        {
+          "name": "URGENT",
+          "value": "URGENT",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "DocumentType",
+      "line": 33,
+      "choices": [
+        {
+          "name": "CUSTOMER_UPLOAD",
+          "value": "CUSTOMER_UPLOAD",
+          "line": 34
+        },
+        {
+          "name": "NATIONAL_ID",
+          "value": "national_id",
+          "line": 35
+        },
+        {
+          "name": "PASSPORT_COPY",
+          "value": "passport_copy",
+          "line": 36
+        },
+        {
+          "name": "AUTHORIZATION_LETTER",
+          "value": "authorization_letter",
+          "line": 37
+        },
+        {
+          "name": "PAYMENT_RECEIPT",
+          "value": "payment_receipt",
+          "line": 38
+        },
+        {
+          "name": "FINAL_REPORT",
+          "value": "final_report",
+          "line": 39
+        },
+        {
+          "name": "OTHER",
+          "value": "other",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "NotificationType",
+      "line": 43,
+      "choices": [
+        {
+          "name": "ORDER",
+          "value": "order",
+          "line": 44
+        },
+        {
+          "name": "PAYMENT",
+          "value": "payment",
+          "line": 45
+        },
+        {
+          "name": "ACCOUNT",
+          "value": "account",
+          "line": 46
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 47
+        },
+        {
+          "name": "SUPPORT",
+          "value": "support",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "file": "backend/core/choices.py",
+      "class": "PaymentStatus",
+      "line": 51,
+      "choices": [
+        {
+          "name": "PENDING",
+          "value": "pending",
+          "line": 52
+        },
+        {
+          "name": "PROCESSING",
+          "value": "processing",
+          "line": 53
+        },
+        {
+          "name": "PAID",
+          "value": "paid",
+          "line": 54
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 55
+        },
+        {
+          "name": "CANCELLED",
+          "value": "cancelled",
+          "line": 56
+        },
+        {
+          "name": "REFUNDED",
+          "value": "refunded",
+          "line": 57
+        },
+        {
+          "name": "PARTIALLY_REFUNDED",
+          "value": "partially_refunded",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "file": "backend/documents/models.py",
+      "class": "DocumentStatus",
+      "line": 37,
+      "choices": [
+        {
+          "name": "UPLOADED",
+          "value": "uploaded",
+          "line": 38
+        },
+        {
+          "name": "PENDING_SCAN",
+          "value": "pending_scan",
+          "line": 39
+        },
+        {
+          "name": "SAFE",
+          "value": "safe",
+          "line": 40
+        },
+        {
+          "name": "UNSAFE",
+          "value": "unsafe",
+          "line": 41
+        },
+        {
+          "name": "PENDING_REVIEW",
+          "value": "pending_review",
+          "line": 42
+        },
+        {
+          "name": "APPROVED",
+          "value": "approved",
+          "line": 43
+        },
+        {
+          "name": "REJECTED",
+          "value": "rejected",
+          "line": 44
+        },
+        {
+          "name": "ARCHIVED",
+          "value": "archived",
+          "line": 45
+        },
+        {
+          "name": "NOT_SCANNED",
+          "value": "not_scanned",
+          "line": 48
+        },
+        {
+          "name": "PENDING",
+          "value": "pending",
+          "line": 49
+        },
+        {
+          "name": "CLEAN",
+          "value": "clean",
+          "line": 50
+        },
+        {
+          "name": "INFECTED",
+          "value": "infected",
+          "line": 51
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 52
+        },
+        {
+          "name": "CUSTOMER",
+          "value": "customer",
+          "line": 55
+        },
+        {
+          "name": "EMPLOYEE",
+          "value": "employee",
+          "line": 56
+        },
+        {
+          "name": "PROVIDER",
+          "value": "provider",
+          "line": 57
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 58
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "file": "backend/documents/models.py",
+      "class": "ScanStatus",
+      "line": 47,
+      "choices": [
+        {
+          "name": "NOT_SCANNED",
+          "value": "not_scanned",
+          "line": 48
+        },
+        {
+          "name": "PENDING",
+          "value": "pending",
+          "line": 49
+        },
+        {
+          "name": "CLEAN",
+          "value": "clean",
+          "line": 50
+        },
+        {
+          "name": "INFECTED",
+          "value": "infected",
+          "line": 51
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 52
+        },
+        {
+          "name": "CUSTOMER",
+          "value": "customer",
+          "line": 55
+        },
+        {
+          "name": "EMPLOYEE",
+          "value": "employee",
+          "line": 56
+        },
+        {
+          "name": "PROVIDER",
+          "value": "provider",
+          "line": 57
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 58
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "file": "backend/documents/models.py",
+      "class": "UploadedByRole",
+      "line": 54,
+      "choices": [
+        {
+          "name": "CUSTOMER",
+          "value": "customer",
+          "line": 55
+        },
+        {
+          "name": "EMPLOYEE",
+          "value": "employee",
+          "line": 56
+        },
+        {
+          "name": "PROVIDER",
+          "value": "provider",
+          "line": 57
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "line": 58
+        },
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "file": "backend/notifications/models.py",
+      "class": "Channel",
+      "line": 10,
+      "choices": [
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 11
+        },
+        {
+          "name": "EMAIL",
+          "value": "email",
+          "line": 12
+        },
+        {
+          "name": "SMS",
+          "value": "sms",
+          "line": 13
+        },
+        {
+          "name": "WHATSAPP",
+          "value": "whatsapp",
+          "line": 14
+        },
+        {
+          "name": "PENDING",
+          "value": "pending",
+          "line": 17
+        },
+        {
+          "name": "QUEUED",
+          "value": "queued",
+          "line": 18
+        },
+        {
+          "name": "SENT",
+          "value": "sent",
+          "line": 19
+        },
+        {
+          "name": "DELIVERED",
+          "value": "delivered",
+          "line": 20
+        },
+        {
+          "name": "READ",
+          "value": "read",
+          "line": 21
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 22
+        },
+        {
+          "name": "CANCELLED",
+          "value": "cancelled",
+          "line": 23
+        },
+        {
+          "name": "LOW",
+          "value": "low",
+          "line": 28
+        },
+        {
+          "name": "NORMAL",
+          "value": "normal",
+          "line": 29
+        },
+        {
+          "name": "HIGH",
+          "value": "high",
+          "line": 30
+        },
+        {
+          "name": "URGENT",
+          "value": "urgent",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "file": "backend/notifications/models.py",
+      "class": "Status",
+      "line": 16,
+      "choices": [
+        {
+          "name": "PENDING",
+          "value": "pending",
+          "line": 17
+        },
+        {
+          "name": "QUEUED",
+          "value": "queued",
+          "line": 18
+        },
+        {
+          "name": "SENT",
+          "value": "sent",
+          "line": 19
+        },
+        {
+          "name": "DELIVERED",
+          "value": "delivered",
+          "line": 20
+        },
+        {
+          "name": "READ",
+          "value": "read",
+          "line": 21
+        },
+        {
+          "name": "FAILED",
+          "value": "failed",
+          "line": 22
+        },
+        {
+          "name": "CANCELLED",
+          "value": "cancelled",
+          "line": 23
+        },
+        {
+          "name": "LOW",
+          "value": "low",
+          "line": 28
+        },
+        {
+          "name": "NORMAL",
+          "value": "normal",
+          "line": 29
+        },
+        {
+          "name": "HIGH",
+          "value": "high",
+          "line": 30
+        },
+        {
+          "name": "URGENT",
+          "value": "urgent",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "file": "backend/notifications/models.py",
+      "class": "Priority",
+      "line": 27,
+      "choices": [
+        {
+          "name": "LOW",
+          "value": "low",
+          "line": 28
+        },
+        {
+          "name": "NORMAL",
+          "value": "normal",
+          "line": 29
+        },
+        {
+          "name": "HIGH",
+          "value": "high",
+          "line": 30
+        },
+        {
+          "name": "URGENT",
+          "value": "urgent",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "file": "backend/notifications/models.py",
+      "class": "Channel",
+      "line": 264,
+      "choices": [
+        {
+          "name": "SYSTEM",
+          "value": "system",
+          "line": 265
+        },
+        {
+          "name": "EMAIL",
+          "value": "email",
+          "line": 266
+        },
+        {
+          "name": "SMS",
+          "value": "sms",
+          "line": 267
+        },
+        {
+          "name": "WHATSAPP",
+          "value": "whatsapp",
+          "line": 268
+        }
+      ]
+    },
+    {
+      "file": "backend/orders/models.py",
+      "class": "Visibility",
+      "line": 494,
+      "choices": [
+        {
+          "name": "INTERNAL",
+          "value": "INTERNAL",
+          "line": 495
+        },
+        {
+          "name": "CUSTOMER",
+          "value": "CUSTOMER",
+          "line": 496
+        },
+        {
+          "name": "PROVIDER",
+          "value": "PROVIDER",
+          "line": 497
+        }
+      ]
+    },
+    {
+      "file": "backend/payment/models.py",
+      "class": "PaymentMethod",
+      "line": 16,
+      "choices": [
+        {
+          "name": "CASH",
+          "value": "cash",
+          "line": 17
+        },
+        {
+          "name": "BANK_TRANSFER",
+          "value": "bank_transfer",
+          "line": 18
+        },
+        {
+          "name": "CARD",
+          "value": "card",
+          "line": 19
+        },
+        {
+          "name": "WALLET",
+          "value": "wallet",
+          "line": 20
+        },
+        {
+          "name": "ONLINE_GATEWAY",
+          "value": "online_gateway",
+          "line": 21
+        },
+        {
+          "name": "OTHER",
+          "value": "other",
+          "line": 22
+        },
+        {
+          "name": "FULL",
+          "value": "full",
+          "line": 25
+        },
+        {
+          "name": "DEPOSIT",
+          "value": "deposit",
+          "line": 26
+        },
+        {
+          "name": "REMAINING_BALANCE",
+          "value": "remaining_balance",
+          "line": 27
+        },
+        {
+          "name": "GOVERNMENT_FEE",
+          "value": "government_fee",
+          "line": 28
+        },
+        {
+          "name": "SERVICE_FEE",
+          "value": "service_fee",
+          "line": 29
+        },
+        {
+          "name": "REFUND",
+          "value": "refund",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "file": "backend/payment/models.py",
+      "class": "PaymentType",
+      "line": 24,
+      "choices": [
+        {
+          "name": "FULL",
+          "value": "full",
+          "line": 25
+        },
+        {
+          "name": "DEPOSIT",
+          "value": "deposit",
+          "line": 26
+        },
+        {
+          "name": "REMAINING_BALANCE",
+          "value": "remaining_balance",
+          "line": 27
+        },
+        {
+          "name": "GOVERNMENT_FEE",
+          "value": "government_fee",
+          "line": 28
+        },
+        {
+          "name": "SERVICE_FEE",
+          "value": "service_fee",
+          "line": 29
+        },
+        {
+          "name": "REFUND",
+          "value": "refund",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "file": "backend/services/models.py",
+      "class": "PriceType",
+      "line": 58,
+      "choices": [
+        {
+          "name": "FIXED",
+          "value": "fixed",
+          "line": 59
+        },
+        {
+          "name": "STARTS_FROM",
+          "value": "starts_from",
+          "line": 60
+        },
+        {
+          "name": "QUOTATION",
+          "value": "quotation",
+          "line": 61
+        },
+        {
+          "name": "FREE",
+          "value": "free",
+          "line": 62
+        },
+        {
+          "name": "HOURS",
+          "value": "hours",
+          "line": 65
+        },
+        {
+          "name": "DAYS",
+          "value": "days",
+          "line": 66
+        },
+        {
+          "name": "WEEKS",
+          "value": "weeks",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "file": "backend/services/models.py",
+      "class": "DurationUnit",
+      "line": 64,
+      "choices": [
+        {
+          "name": "HOURS",
+          "value": "hours",
+          "line": 65
+        },
+        {
+          "name": "DAYS",
+          "value": "days",
+          "line": 66
+        },
+        {
+          "name": "WEEKS",
+          "value": "weeks",
+          "line": 67
+        }
+      ]
+    }
+  ],
+  "role_checks": [
+    {
+      "file": "backend/accounts/role_groups.py",
+      "line": 9,
+      "raw": "UserRole.EMPLOYEE: \"employee\","
+    },
+    {
+      "file": "backend/accounts/role_groups.py",
+      "line": 10,
+      "raw": "UserRole.SUPPORT: \"employee\","
+    },
+    {
+      "file": "backend/accounts/role_groups.py",
+      "line": 11,
+      "raw": "UserRole.PROVIDER: \"provider\","
+    },
+    {
+      "file": "backend/accounts/role_groups.py",
+      "line": 12,
+      "raw": "UserRole.ADMIN: \"admin\","
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 13,
+      "raw": "return _normalized_role(user) == \"admin\""
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 17,
+      "raw": "return _normalized_role(user) in {\"employee\", \"support\"}"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 21,
+      "raw": "return _normalized_role(user) == \"provider\""
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 25,
+      "raw": "return _normalized_role(user) == \"customer\""
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 66,
+      "raw": "allowed_roles = {\"admin\"}"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 70,
+      "raw": "allowed_roles = {\"support\"}"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 74,
+      "raw": "allowed_roles = {\"provider\"}"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 78,
+      "raw": "allowed_roles = {\"customer\"}"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 86,
+      "raw": "if role == \"admin\":"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 88,
+      "raw": "return role == \"support\" and request.method in SAFE_METHODS"
+    },
+    {
+      "file": "backend/config/permissions.py",
+      "line": 96,
+      "raw": "and _normalized_role(request.user) in {\"admin\", \"support\"}"
+    },
+    {
+      "file": "backend/documents/services.py",
+      "line": 94,
+      "raw": "if role in {\"admin\", \"employee\", \"support\"}:"
+    },
+    {
+      "file": "backend/documents/services.py",
+      "line": 97,
+      "raw": "if role == \"customer\":"
+    },
+    {
+      "file": "backend/documents/services.py",
+      "line": 100,
+      "raw": "if role == \"provider\":"
+    },
+    {
+      "file": "backend/notifications/selectors.py",
+      "line": 21,
+      "raw": "if role == \"admin\":"
+    },
+    {
+      "file": "backend/notifications/selectors.py",
+      "line": 23,
+      "raw": "if role == \"customer\":"
+    },
+    {
+      "file": "backend/notifications/selectors.py",
+      "line": 25,
+      "raw": "if role in {\"employee\", \"support\"}:"
+    },
+    {
+      "file": "backend/notifications/selectors.py",
+      "line": 28,
+      "raw": "if role == \"provider\":"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 29,
+      "raw": "if role == \"admin\":"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 31,
+      "raw": "if role == \"customer\":"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 33,
+      "raw": "if role == \"provider\":"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 35,
+      "raw": "if role in {\"employee\", \"support\"}:"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 50,
+      "raw": "if role == \"admin\":"
+    },
+    {
+      "file": "backend/orders/selectors.py",
+      "line": 52,
+      "raw": "if role in {\"employee\", \"support\"}:"
+    },
+    {
+      "file": "frontend/src/api/services.js",
+      "line": 41,
+      "raw": "role: 'admin',"
+    },
+    {
+      "file": "frontend/src/api/services.js",
+      "line": 49,
+      "raw": "role: 'customer',"
+    },
+    {
+      "file": "frontend/src/api/services.js",
+      "line": 57,
+      "raw": "role: 'employee',"
+    },
+    {
+      "file": "frontend/src/api/services.js",
+      "line": 65,
+      "raw": "role: 'provider',"
+    },
+    {
+      "file": "frontend/src/routes/AppRoutes.jsx",
+      "line": 100,
+      "raw": "<Route element={<ProtectedRoute roles={['customer']} />}>"
+    },
+    {
+      "file": "frontend/src/routes/AppRoutes.jsx",
+      "line": 111,
+      "raw": "<Route element={<ProtectedRoute roles={['employee', 'support']} />}>"
+    },
+    {
+      "file": "frontend/src/routes/AppRoutes.jsx",
+      "line": 120,
+      "raw": "<Route element={<ProtectedRoute roles={['admin']} />}>"
+    },
+    {
+      "file": "frontend/src/routes/AppRoutes.jsx",
+      "line": 135,
+      "raw": "<Route element={<ProtectedRoute roles={['provider']} />}>"
+    },
+    {
+      "file": "frontend/src/utils/authz.js",
+      "line": 14,
+      "raw": "if (role === 'admin') return '/admin'"
+    },
+    {
+      "file": "frontend/src/utils/authz.js",
+      "line": 15,
+      "raw": "if (role === 'employee' || role === 'support') return '/employee'"
+    },
+    {
+      "file": "frontend/src/utils/authz.js",
+      "line": 16,
+      "raw": "if (role === 'provider') return '/provider'"
+    },
+    {
+      "file": "frontend/src/utils/authz.js",
+      "line": 17,
+      "raw": "if (role === 'customer') return '/customer'"
+    },
+    {
+      "file": "frontend/src/pages/admin/AdminCmsPage.jsx",
+      "line": 58,
+      "raw": "role: 'customer',"
+    },
+    {
+      "file": "frontend/src/pages/admin/AdminCmsPage.jsx",
+      "line": 220,
+      "raw": "role: selectedUser.role || 'customer',"
+    }
+  ]
+}
