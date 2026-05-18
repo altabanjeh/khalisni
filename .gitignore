@@ -37,3 +37,13 @@ logs/
 .DS_Store
 Thumbs.db
 /WhatsApp Image *.jpeg
+**/.vscode/
+
+# Root-level business documents and local design assets
+/*.pdf
+/*.docx
+/*.xlsx
+/*.jpeg
+/imges/
+/khalasni_design_system.html
+/docs/system_review.zip
