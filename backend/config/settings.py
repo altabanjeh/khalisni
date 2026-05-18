@@ -42,7 +42,14 @@ if not _secret_key:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production.")
 SECRET_KEY = _secret_key
 DEBUG = _debug
-ALLOWED_HOSTS = _get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = sorted(
+    {
+        *(_get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")),
+        "localhost",
+        "127.0.0.1",
+        "[::1]",
+    }
+)
 CORS_ALLOWED_ORIGINS = _get_list_env(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
