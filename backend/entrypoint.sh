@@ -26,10 +26,14 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 python manage.py setup_roles || true
 python manage.py create_admin || true
+python manage.py seed_initial_data || true
+
+GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}"
+GUNICORN_TIMEOUT="${GUNICORN_TIMEOUT:-120}"
 
 exec gunicorn config.wsgi:application \
   --bind 0.0.0.0:8000 \
-  --workers 2 \
-  --timeout 120 \
+  --workers "$GUNICORN_WORKERS" \
+  --timeout "$GUNICORN_TIMEOUT" \
   --access-logfile - \
   --error-logfile -

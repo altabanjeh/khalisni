@@ -9,6 +9,10 @@ services:
   backend:
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_media:/app/media
+      - backend_static:/app/staticfiles
 
   frontend:
     ports:

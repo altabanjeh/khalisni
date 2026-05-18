@@ -16,9 +16,24 @@ HAS_DRF = find_spec("rest_framework") is not None
 HAS_DRF_AUTHTOKEN = find_spec("rest_framework.authtoken") is not None
 HAS_SIMPLEJWT = find_spec("rest_framework_simplejwt") is not None
 HAS_DJANGO_FILTERS = find_spec("django_filters") is not None
+HAS_WHITENOISE = find_spec("whitenoise") is not None
+
+
+def _get_bool_env(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _get_list_env(name: str, default: str = "") -> list[str]:
+    raw_value = os.getenv(name)
+    if raw_value is None or not raw_value.strip():
+        raw_value = default
+    return [item.strip() for item in raw_value.split(",") if item.strip()]
 
 _secret_key = os.getenv("DJANGO_SECRET_KEY")
-_debug = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+_debug = _get_bool_env("DJANGO_DEBUG", True)
 if not _secret_key:
     if _debug:
         _secret_key = "dev-only-insecure-key-not-for-production"
@@ -27,12 +42,15 @@ if not _secret_key:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production.")
 SECRET_KEY = _secret_key
 DEBUG = _debug
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
-    if origin.strip()
-]
+ALLOWED_HOSTS = _get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+CORS_ALLOWED_ORIGINS = _get_list_env(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
+)
+CSRF_TRUSTED_ORIGINS = _get_list_env(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    ",".join(CORS_ALLOWED_ORIGINS),
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -42,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core",
+    "organizations",
     "accounts",
     "services",
     "orders",
@@ -68,7 +87,6 @@ if HAS_DJANGO_FILTERS:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -76,6 +94,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if HAS_WHITENOISE:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 if HAS_CORSHEADERS:
     MIDDLEWARE.insert(2, "corsheaders.middleware.CorsMiddleware")
@@ -142,12 +163,30 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            if HAS_WHITENOISE
+            else "django.contrib.staticfiles.storage.StaticFilesStorage"
+        )
+    },
 }
 
 # Trust Coolify's Traefik proxy for HTTPS detection
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SESSION_COOKIE_SECURE = _get_bool_env("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_SECURE = _get_bool_env("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
+SESSION_COOKIE_SAMESITE = os.getenv("DJANGO_SESSION_COOKIE_SAMESITE", "Lax")
+CSRF_COOKIE_SAMESITE = os.getenv("DJANGO_CSRF_COOKIE_SAMESITE", "Lax")
+SECURE_SSL_REDIRECT = _get_bool_env("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
+SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000" if not DEBUG else "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _get_bool_env("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
+SECURE_HSTS_PRELOAD = _get_bool_env("DJANGO_SECURE_HSTS_PRELOAD", not DEBUG)
+SECURE_CONTENT_TYPE_NOSNIFF = _get_bool_env("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", True)
+SECURE_REFERRER_POLICY = os.getenv("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
+X_FRAME_OPTIONS = os.getenv("DJANGO_X_FRAME_OPTIONS", "DENY")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
