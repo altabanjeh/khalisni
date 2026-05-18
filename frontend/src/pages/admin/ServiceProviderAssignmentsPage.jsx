@@ -1,10 +1,13 @@
-import { BriefcaseBusiness, Link2 } from 'lucide-react'
+import { Link2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
+import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
 const defaultAssignmentValues = {
@@ -22,7 +25,17 @@ function CheckboxField({ label, checked, onChange }) {
   )
 }
 
+function Field({ label, children }) {
+  return (
+    <label className="space-y-2">
+      <span className="text-sm font-semibold text-ink">{label}</span>
+      {children}
+    </label>
+  )
+}
+
 function ServiceProviderAssignmentsPage() {
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const providerQuery = searchParams.get('provider') || ''
 
@@ -35,8 +48,10 @@ function ServiceProviderAssignmentsPage() {
   const { data: providers = [], loading: providersLoading } = useAsyncData(() => api.getProviders(), [], [])
 
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [assignmentForm, setAssignmentForm] = useState(defaultAssignmentValues)
-  const [feedback, setFeedback] = useState(null)
+  const [pendingDelete, setPendingDelete] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
 
   const selectedAssignment = useMemo(
     () => assignments.find((item) => String(item.id) === String(selectedAssignmentId)) || null,
@@ -52,61 +67,62 @@ function ServiceProviderAssignmentsPage() {
       })
       return
     }
-
-    setAssignmentForm({
-      ...defaultAssignmentValues,
-      provider_id: providerQuery || '',
-    })
+    setAssignmentForm({ ...defaultAssignmentValues, provider_id: providerQuery || '' })
   }, [providerQuery, selectedAssignment])
 
+  function closeForm() {
+    setIsFormOpen(false)
+    setSelectedAssignmentId(null)
+    setAssignmentForm({ ...defaultAssignmentValues, provider_id: providerQuery || '' })
+  }
+
+  function openCreateForm() {
+    setSelectedAssignmentId(null)
+    setAssignmentForm({ ...defaultAssignmentValues, provider_id: providerQuery || '' })
+    setIsFormOpen(true)
+  }
+
+  function openEditForm(id) {
+    setSelectedAssignmentId(id)
+    setIsFormOpen(true)
+  }
+
   async function handleAssignmentSave() {
+    setSubmitting(true)
     try {
       const payload = {
         service_id: Number(assignmentForm.service_id),
         provider_id: Number(assignmentForm.provider_id),
         is_active: assignmentForm.is_active,
       }
-
       if (selectedAssignment) {
         await api.updateAdminServiceAssignment(selectedAssignment.id, payload)
-        setFeedback({ type: 'success', text: 'تم تحديث خدمة المزود.' })
+        toast('تم تحديث ربط الخدمة بالمزود.', 'success')
       } else {
         await api.createAdminServiceAssignment(payload)
-        setFeedback({ type: 'success', text: 'تم ربط الخدمة بالمزود.' })
+        toast('تم ربط الخدمة بالمزود.', 'success')
       }
-
       reload()
-      setSelectedAssignmentId(null)
-      setAssignmentForm({
-        ...defaultAssignmentValues,
-        provider_id: providerQuery || '',
-      })
+      closeForm()
     } catch (error) {
-      setFeedback({ type: 'error', text: getDisplayError(error) })
+      toast(getDisplayError(error), 'error')
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  async function handleDeleteAssignment(id) {
-    if (!window.confirm('سيتم إلغاء ربط الخدمة بهذا المزود. هل تريد المتابعة؟')) return
-
+  async function handleDeleteConfirm() {
+    if (!pendingDelete) return
+    const id = pendingDelete
+    setPendingDelete(null)
     try {
       await api.deleteAdminServiceAssignment(id)
-      if (String(selectedAssignmentId) === String(id)) {
-        setSelectedAssignmentId(null)
-        setAssignmentForm({
-          ...defaultAssignmentValues,
-          provider_id: providerQuery || '',
-        })
-      }
+      if (String(selectedAssignmentId) === String(id)) closeForm()
       reload()
-      setFeedback({ type: 'success', text: 'تم إلغاء ربط الخدمة.' })
+      toast('تم إلغاء ربط الخدمة.', 'success')
     } catch (error) {
-      setFeedback({ type: 'error', text: getDisplayError(error) })
+      toast(getDisplayError(error), 'error')
     }
-  }
-
-  if (loading || servicesLoading || providersLoading) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جارٍ تحميل ربط الخدمات بالمزودين...</div>
   }
 
   const selectedProviderName = providers.find((provider) => String(provider.id) === String(providerQuery))?.full_name || ''
@@ -122,12 +138,12 @@ function ServiceProviderAssignmentsPage() {
       label: 'الإجراءات',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedAssignmentId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
             تعديل
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
-            onClick={() => handleDeleteAssignment(row.id)}
+            onClick={() => setPendingDelete(row.id)}
             type="button"
           >
             حذف
@@ -138,105 +154,105 @@ function ServiceProviderAssignmentsPage() {
   ]
 
   return (
-    <div className="page-section">
+    <div className="page-section space-y-6">
       <PageHeader
-        description="هذه الشاشة مخصصة لاختيار الخدمات التي ينفذها كل مزود. أنشئ المزود أولاً من شاشة المزودين، ثم اربطه بالخدمات المطلوبة هنا."
+        description="اختر الخدمات التي يستطيع كل مزود تنفيذها من نافذة واضحة ومنفصلة عن الجدول."
         eyebrow="خدمات المزودين"
         icon={Link2}
         title={selectedProviderName ? `خدمات ${selectedProviderName}` : 'ربط الخدمات بالمزودين'}
+        actions={
+          <button className="btn-primary" onClick={openCreateForm} type="button">
+            + ربط جديد
+          </button>
+        }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <DataTable
-          columns={columns}
-          emptyDescription="أضف أول ربط بين مزود وخدمة ليظهر المزود في مسار التعيين الخاص بهذه الخدمة."
-          emptyTitle="لا توجد روابط خدمات"
-          mobileCard={(row) => (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-bold text-ink">{row.provider_name}</p>
-                <span className="text-sm text-slate-500">{row.is_active ? 'نشط' : 'موقوف'}</span>
-              </div>
-              <p className="text-sm text-slate-600">{row.service_name}</p>
-              <p className="text-sm text-slate-500">{row.provider_city || 'بدون مدينة'}</p>
-            </div>
-          )}
-          rows={assignments}
-        />
+      <section className="glass-panel p-5">
+        <p className="text-sm leading-7 text-slate-600">
+          أنشئ المزود أولاً من شاشة المزودين، ثم اربطه بالخدمات المناسبة هنا. أصبح الربط يفتح في نافذة مستقلة حتى يبقى الجدول واضحاً ويمكن مراجعة الروابط الحالية بسرعة.
+        </p>
+      </section>
 
-        <section className="glass-panel p-6">
-          <div className="flex items-start gap-3">
-            <span className="icon-chip">
-              <BriefcaseBusiness className="h-5 w-5" />
-            </span>
-            <div>
-              <h2 className="text-xl font-bold text-ink">{selectedAssignment ? 'تعديل الربط' : 'ربط جديد'}</h2>
-              <p className="mt-2 text-sm text-slate-600">اختر المزود ثم الخدمة التي يستطيع تنفيذها. هذا الربط هو الذي يحدد ظهور المزود عند التعيين.</p>
+      <DataTable
+        columns={columns}
+        emptyDescription="أضف أول ربط بين مزود وخدمة ليظهر المزود في مسار التعيين الخاص بهذه الخدمة."
+        emptyTitle="لا توجد روابط خدمات"
+        loading={loading || servicesLoading || providersLoading}
+        mobileCard={(row) => (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-bold text-ink">{row.provider_name}</p>
+              <span className="text-sm text-slate-500">{row.is_active ? 'نشط' : 'موقوف'}</span>
             </div>
+            <p className="text-sm text-slate-600">{row.service_name}</p>
+            <p className="text-sm text-slate-500">{row.provider_city || 'بدون مدينة'}</p>
           </div>
+        )}
+        rows={assignments}
+      />
 
-          <div className="mt-6 space-y-4">
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-ink">المزود</span>
-              <select
-                className="field"
-                value={assignmentForm.provider_id}
-                onChange={(event) => setAssignmentForm({ ...assignmentForm, provider_id: event.target.value })}
-              >
-                <option value="">اختر المزود</option>
-                {providers.map((provider) => (
-                  <option key={provider.id} value={provider.id}>
-                    {provider.full_name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-ink">الخدمة</span>
-              <select
-                className="field"
-                value={assignmentForm.service_id}
-                onChange={(event) => setAssignmentForm({ ...assignmentForm, service_id: event.target.value })}
-              >
-                <option value="">اختر الخدمة</option>
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name_ar}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <CheckboxField
-              checked={assignmentForm.is_active}
-              label="الربط نشط"
-              onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })}
-            />
-
-            <div className="flex gap-3">
-              <button className="btn-primary flex-1" onClick={handleAssignmentSave} type="button">
-                {selectedAssignment ? 'حفظ التعديل' : 'ربط الخدمة'}
-              </button>
-              <button
-                className="btn-secondary"
-                onClick={() => {
-                  setSelectedAssignmentId(null)
-                  setAssignmentForm({
-                    ...defaultAssignmentValues,
-                    provider_id: providerQuery || '',
-                  })
-                }}
-                type="button"
-              >
-                جديد
-              </button>
-            </div>
-
-            {feedback ? <p className={`text-sm ${feedback.type === 'error' ? 'text-danger' : 'text-success'}`}>{feedback.text}</p> : null}
+      <FormModal
+        description="حدد المزود والخدمة، ثم فعّل الربط إذا كان المزود متاحاً حالياً في مسار التعيين."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeForm} type="button">
+              إلغاء
+            </button>
+            <button className="btn-primary min-w-40" disabled={submitting} onClick={handleAssignmentSave} type="button">
+              {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
+              {selectedAssignment ? 'حفظ التعديلات' : 'ربط الخدمة'}
+            </button>
           </div>
-        </section>
-      </div>
+        }
+        onClose={closeForm}
+        open={isFormOpen}
+        size="md"
+        title={selectedAssignment ? 'تعديل الربط' : 'ربط جديد'}
+      >
+        <div className="space-y-5">
+          <Field label="المزود">
+            <select
+              className="field"
+              value={assignmentForm.provider_id}
+              onChange={(event) => setAssignmentForm({ ...assignmentForm, provider_id: event.target.value })}
+            >
+              <option value="">اختر المزود</option>
+              {providers.map((provider) => (
+                <option key={provider.id} value={provider.id}>{provider.full_name}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="الخدمة">
+            <select
+              className="field"
+              value={assignmentForm.service_id}
+              onChange={(event) => setAssignmentForm({ ...assignmentForm, service_id: event.target.value })}
+            >
+              <option value="">اختر الخدمة</option>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>{service.name_ar}</option>
+              ))}
+            </select>
+          </Field>
+
+          <CheckboxField
+            checked={assignmentForm.is_active}
+            label="الربط نشط"
+            onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })}
+          />
+        </div>
+      </FormModal>
+
+      <ConfirmModal
+        confirmLabel="نعم، ألغِ الربط"
+        description="سيتم إلغاء ربط هذه الخدمة بالمزود. هل تريد المتابعة؟"
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        open={!!pendingDelete}
+        title="تأكيد إلغاء الربط"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -3,6 +3,7 @@ import os
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from core.serializer_mixins import PkAsIdMixin
 from documents.models import Document
 
 
@@ -140,7 +141,7 @@ class StaffDocumentSerializer(serializers.ModelSerializer):
         }
 
 
-class DocumentAdminSerializer(serializers.ModelSerializer):
+class DocumentAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = "__all__"

@@ -47,6 +47,20 @@ function ReportsPage() {
         emptyTitle="لا توجد بيانات أداء"
         emptyDescription="ستظهر إحصاءات أداء المزوّدين هنا."
       />
+
+      <DataTable
+        columns={[
+          { key: 'category_name', label: 'التصنيف' },
+          { key: 'orders_count', label: 'عدد الطلبات' },
+          { key: 'revenue', label: 'الإيراد', render: (row) => formatCurrency(row.revenue || 0) },
+          { key: 'completed_orders', label: 'المكتمل' },
+          { key: 'delayed_orders', label: 'المتأخر' },
+          { key: 'average_completion_time_hours', label: 'متوسط الإنجاز (ساعة)' },
+        ]}
+        rows={weekly.orders_by_category || []}
+        emptyTitle="لا توجد بيانات بالتصنيف"
+        emptyDescription="ستظهر إحصاءات الطلبات والإيراد مجمعة بحسب التصنيف هنا."
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { Bell, ClipboardList, FilePlus2, Home, UploadCloud } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import DataTable from '../../components/DataTable'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
@@ -13,7 +14,7 @@ function CustomerDashboardHome() {
   const { data: notifications = [] } = useAsyncData(() => api.getNotificationCenter(), [], [])
 
   if (loading) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل بيانات العميل...</div>
+    return <LoadingSpinner />
   }
 
   const cards = {

@@ -11,7 +11,7 @@ from orders.services import (
     review_order,
 )
 from providers.models import ProviderProfile
-from services.models import Service, ServiceCategory, ServiceRequiredDocument
+from services.models import Service, ServiceCategory, ServiceRelation, ServiceRequiredDocument
 
 
 class Command(BaseCommand):
@@ -120,6 +120,39 @@ class Command(BaseCommand):
             city="Zarqa",
             customer_notes="Fresh new demo order.",
         )
+
+    def _seed_service_relations(self, *, admin_user):
+        relation_definitions = [
+            ("Passport Appointment Booking", "Passport Renewal", ServiceRelation.RelationType.PREREQUISITE, True, "Book the appointment first, then continue with the renewal request."),
+            ("Tax Clearance", "Business License Renewal", ServiceRelation.RelationType.PREREQUISITE, True, "Your tax clearance should be completed before renewing the business license."),
+            ("Business License Renewal", "No Criminal Record Certificate", ServiceRelation.RelationType.RECOMMENDED_AFTER, False, "After renewing the business license, you may also need an updated no-criminal-record certificate."),
+            ("Business License Renewal", "Traffic Fines Payment", ServiceRelation.RelationType.OPTIONAL_BUNDLE, False, "Many clients also clear related traffic obligations during the same renewal cycle."),
+            ("Passport Renewal", "Passport Appointment Booking", ServiceRelation.RelationType.ALTERNATIVE, False, "If you only need a time slot first, start with appointment booking instead of the full renewal."),
+        ]
+
+        for source_name, target_name, relation_type, is_required, message_to_customer in relation_definitions:
+            source_service = Service.objects.filter(name_ar=source_name).first()
+            target_service = Service.objects.filter(name_ar=target_name).first()
+            if not source_service or not target_service:
+                continue
+
+            relation, created = ServiceRelation.objects.get_or_create(
+                source_service=source_service,
+                target_service=target_service,
+                relation_type=relation_type,
+                defaults={
+                    "is_required": is_required,
+                    "message_to_customer": message_to_customer,
+                    "is_active": True,
+                    "created_by": admin_user,
+                },
+            )
+            if not created:
+                relation.is_required = is_required
+                relation.message_to_customer = message_to_customer
+                relation.is_active = True
+                relation.created_by = admin_user
+                relation.save()
 
     def handle(self, *args, **options):
         categories = [
@@ -255,6 +288,8 @@ class Command(BaseCommand):
         provider_profile.approved_by = admin_user
         provider_profile.save()
         provider_profile.service_categories.set(ServiceCategory.objects.all()[:3])
+
+        self._seed_service_relations(admin_user=admin_user)
 
         self._seed_demo_orders(
             customer_user=customer_user,

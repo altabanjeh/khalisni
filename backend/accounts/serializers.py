@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
+from core.serializer_mixins import PkAsIdMixin
+from organizations.models import Branch, Organization, OrganizationMembership
+from organizations.serializers import MembershipSummarySerializer
+from organizations.selectors import active_memberships_for_user, is_platform_super_admin
 
 try:
     from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -67,6 +71,7 @@ SAFE_SYSTEM_SETTINGS = {
 
 class UserSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
+    memberships = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -81,10 +86,15 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "permissions",
+            "memberships",
         )
 
     def get_permissions(self, obj):
         return sorted(obj.get_all_permissions())
+
+    def get_memberships(self, obj):
+        memberships = obj.organization_memberships.filter(is_active=True).select_related("organization", "branch")
+        return MembershipSummarySerializer(memberships, many=True).data
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -122,7 +132,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
         fields = ("full_name", "phone", "email", "national_id")
 
 
-class CustomerProfileAdminSerializer(serializers.ModelSerializer):
+class CustomerProfileAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = CustomerProfile
         fields = "__all__"
@@ -130,6 +140,10 @@ class CustomerProfileAdminSerializer(serializers.ModelSerializer):
 
 class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, allow_blank=False)
+    organization_id = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.filter(is_active=True), required=False, allow_null=True, write_only=True)
+    branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), required=False, allow_null=True, write_only=True)
+    membership_role = serializers.ChoiceField(choices=OrganizationMembership.MembershipRole.choices, required=False, allow_null=True, write_only=True)
+    memberships = MembershipSummarySerializer(source="organization_memberships", many=True, read_only=True)
     is_staff = serializers.BooleanField(read_only=True)
     is_super_admin = serializers.SerializerMethodField()
     role_options = serializers.SerializerMethodField()
@@ -143,6 +157,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
             "phone",
             "email",
             "password",
+            "organization_id",
+            "branch_id",
+            "membership_role",
             "role",
             "national_id",
             "is_active",
@@ -151,6 +168,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
             "is_super_admin",
             "role_options",
             "current_permissions",
+            "memberships",
             "created_at",
             "updated_at",
         )
@@ -166,20 +184,32 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return bool(obj.is_superuser)
 
     def get_role_options(self, obj):
-        if self._is_super_admin_request():
-            return [choice for choice, _ in CustomUser.Role.choices]
-        return [
-            CustomUser.Role.CUSTOMER,
+        base_options = [
             CustomUser.Role.EMPLOYEE,
             CustomUser.Role.SUPPORT,
             CustomUser.Role.PROVIDER,
         ]
+        if self._is_super_admin_request():
+            base_options = [CustomUser.Role.ADMIN, *base_options]
+        if getattr(obj, "role", "") == CustomUser.Role.CUSTOMER:
+            return [CustomUser.Role.CUSTOMER, *base_options]
+        return base_options
 
     def _is_super_admin_request(self):
         request = self.context.get("request")
-        return bool(getattr(getattr(request, "user", None), "is_superuser", False))
+        user = getattr(request, "user", None)
+        if not user or not getattr(user, "is_authenticated", False):
+            return False
+        if getattr(user, "is_superuser", False):
+            return True
+        return active_memberships_for_user(user).filter(
+            role=OrganizationMembership.MembershipRole.PLATFORM_SUPER_ADMIN
+        ).exists()
 
     def validate_role(self, value):
+        if not self.instance and value == CustomUser.Role.CUSTOMER:
+            raise serializers.ValidationError("Customer users are created automatically from the public customer flow.")
+
         if self._is_super_admin_request():
             return value
         if value == CustomUser.Role.ADMIN:
@@ -187,24 +217,58 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        branch = attrs.get("branch_id")
+        organization = attrs.get("organization_id")
+        membership_role = attrs.get("membership_role")
+        target_role = attrs.get("role", getattr(self.instance, "role", ""))
+        if self.instance and self.instance.role != CustomUser.Role.CUSTOMER and target_role == CustomUser.Role.CUSTOMER:
+            raise serializers.ValidationError({"role": "Customer users are created automatically and cannot be assigned manually."})
         if not self._is_super_admin_request() and self.instance:
             if self.instance.is_superuser or self.instance.role == CustomUser.Role.ADMIN:
                 raise serializers.ValidationError({"detail": "Only super admin can change admin-level users."})
         if not self.instance and not attrs.get("password"):
             raise serializers.ValidationError({"password": "Password is required when creating a user."})
+        if branch and organization and branch.organization_id != organization.id:
+            raise serializers.ValidationError({"branch_id": "Branch must belong to the selected organization."})
+        if membership_role and not organization:
+            raise serializers.ValidationError({"organization_id": "Organization is required when assigning a membership role."})
         return attrs
 
     def create(self, validated_data):
+        organization = validated_data.pop("organization_id", None)
+        branch = validated_data.pop("branch_id", None)
+        membership_role = validated_data.pop("membership_role", None)
         password = validated_data.pop("password")
-        return CustomUser.objects.create_user(password=password, **validated_data)
+        user = CustomUser.objects.create_user(password=password, **validated_data)
+        if organization and membership_role:
+            OrganizationMembership.objects.create(
+                user=user,
+                organization=organization,
+                branch=branch,
+                role=membership_role,
+            )
+        return user
 
     def update(self, instance, validated_data):
+        organization = validated_data.pop("organization_id", None)
+        branch = validated_data.pop("branch_id", None)
+        membership_role = validated_data.pop("membership_role", None)
         password = validated_data.pop("password", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if password:
             instance.set_password(password)
         instance.save()
+        if organization and membership_role:
+            membership, _ = OrganizationMembership.objects.get_or_create(
+                user=instance,
+                organization=organization,
+                role=membership_role,
+                defaults={"branch": branch, "is_active": True},
+            )
+            if branch and membership.branch_id != branch.id:
+                membership.branch = branch
+                membership.save(update_fields=["branch"])
         return instance
 
 

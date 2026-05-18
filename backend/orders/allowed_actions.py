@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 
 from core.choices import OrderStatus, UserRole
+from organizations.selectors import is_partner_admin, is_partner_operational_user, is_provider_user
 from orders.selectors import can_view_order
 from workflow.rules import get_generic_status_update_targets
 from workflow.transition_permissions import assert_can_cancel_order, assert_order_transition_allowed
@@ -35,9 +36,9 @@ def _allowed_status_transitions(*, user, order):
         return []
 
     role = _role(user)
-    if role == UserRole.PROVIDER:
+    if role == UserRole.PROVIDER or is_provider_user(user):
         candidates = [OrderStatus.IN_PROGRESS, OrderStatus.WAITING_GOVERNMENT]
-    elif _has_perm(user, "orders.manage_order_workflow"):
+    elif _has_perm(user, "orders.manage_order_workflow") or is_partner_operational_user(user):
         candidates = get_generic_status_update_targets(order.status)
     else:
         candidates = ()
@@ -50,7 +51,7 @@ def _allowed_status_transitions(*, user, order):
 
 
 def _can_assign_provider(*, user, order):
-    if not _has_perm(user, "orders.assign_order"):
+    if not (_has_perm(user, "orders.assign_order") or is_partner_admin(user)):
         return False
     if not _can_transition(user=user, order=order, target_status=OrderStatus.ASSIGNED):
         return False
@@ -94,8 +95,9 @@ def get_order_allowed_actions(*, user, order, can_view=None):
     status_transitions = _allowed_status_transitions(user=user, order=order) if can_view else []
 
     can_add_internal_note = can_view and (
-        (role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} and _has_perm(user, "orders.review_order"))
+        ((role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user)) and (_has_perm(user, "orders.review_order") or is_partner_operational_user(user)))
         or role == UserRole.PROVIDER
+        or is_provider_user(user)
     )
 
     return {
@@ -106,20 +108,20 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         "can_view_missing_documents_form": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.WAITING_CUSTOMER,
         "can_submit_rating": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.COMPLETED and not hasattr(order, "rating"),
         "can_request_documents": can_view
-        and _has_perm(user, "orders.request_missing_documents")
+        and (_has_perm(user, "orders.request_missing_documents") or is_partner_operational_user(user))
         and _can_transition(user=user, order=order, target_status=OrderStatus.WAITING_CUSTOMER),
         "can_assign_provider": can_view and _can_assign_provider(user=user, order=order),
         "can_add_internal_note": can_add_internal_note,
         "can_add_customer_note": can_view
-        and role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT}
-        and _has_perm(user, "orders.review_order"),
-        "can_verify_documents": can_view and _has_perm(user, "documents.verify_document"),
+        and (role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user))
+        and (_has_perm(user, "orders.review_order") or is_partner_operational_user(user)),
+        "can_verify_documents": can_view and (_has_perm(user, "documents.verify_document") or is_partner_operational_user(user)),
         "can_send_manual_notification": can_view and _has_perm(user, "notifications.send_manual_notification"),
-        "can_reject": can_view and _has_perm(user, "orders.reject_order") and _can_transition(user=user, order=order, target_status=OrderStatus.REJECTED),
+        "can_reject": can_view and (_has_perm(user, "orders.reject_order") or is_partner_operational_user(user)) and _can_transition(user=user, order=order, target_status=OrderStatus.REJECTED),
         "can_complete": can_view
-        and _has_perm(user, "orders.manage_order_workflow")
+        and (_has_perm(user, "orders.manage_order_workflow") or is_partner_operational_user(user))
         and _can_transition(user=user, order=order, target_status=OrderStatus.COMPLETED),
         "can_upload_final_document": can_view
-        and (role == UserRole.PROVIDER or _has_perm(user, "documents.upload_final_document"))
+        and (role == UserRole.PROVIDER or is_provider_user(user) or _has_perm(user, "documents.upload_final_document"))
         and _can_transition(user=user, order=order, target_status=OrderStatus.READY_FOR_DELIVERY),
     }

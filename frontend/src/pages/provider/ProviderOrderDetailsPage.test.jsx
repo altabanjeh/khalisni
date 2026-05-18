@@ -37,7 +37,7 @@ test('provider upload flow defaults final document type and hides invalid ready 
     expect(screen.getByText('KH-2026-000007')).toBeInTheDocument()
   })
 
-  expect(screen.queryByRole('option', { name: 'تم رفع النتيجة' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('option', { name: 'جاهز للتسليم' })).not.toBeInTheDocument()
 
   const fileInput = container.querySelector('input[type="file"]')
   const file = new File(['result'], 'final.pdf', { type: 'application/pdf' })

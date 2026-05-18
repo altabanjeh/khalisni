@@ -92,8 +92,9 @@ class ProviderPermissionsTests(APITestCase):
         self.client.force_authenticate(self.provider_user)
         response = self.client.get("/api/provider/orders/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["id"], self.visible_order.id)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["id"], self.visible_order.id)
 
     def test_provider_cannot_access_unassigned_order_detail(self):
         self.client.force_authenticate(self.provider_user)
@@ -159,7 +160,8 @@ class ProviderPermissionsTests(APITestCase):
         self.client.force_authenticate(self.employee_user)
         response = self.client.get("/api/admin/providers/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 2)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 2)
 
     def test_employee_order_filtered_provider_list_returns_only_eligible_providers(self):
         service = self.visible_order.service
@@ -170,8 +172,9 @@ class ProviderPermissionsTests(APITestCase):
         self.client.force_authenticate(self.employee_user)
         response = self.client.get(f"/api/admin/providers/?order={self.visible_order.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["id"], self.provider.id)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["id"], self.provider.id)
 
     def test_admin_can_approve_and_deactivate_provider_with_audit(self):
         pending_provider_user = CustomUser.objects.create_user(

@@ -1,4 +1,4 @@
-﻿import { Bell, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -21,7 +21,12 @@ function Topbar({ title, onMenuClick }) {
   return (
     <header className="glass-panel relative flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center gap-3">
-        <button className="btn-ghost p-2 lg:hidden" onClick={onMenuClick} type="button">
+        <button
+          aria-label="فتح القائمة الجانبية"
+          className="btn-ghost p-2 xl:hidden"
+          onClick={onMenuClick}
+          type="button"
+        >
           <Menu className="h-5 w-5" />
         </button>
         <div>
@@ -30,9 +35,11 @@ function Topbar({ title, onMenuClick }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="relative">
           <button
+            aria-expanded={notificationsOpen}
+            aria-haspopup="dialog"
             className="btn-secondary px-4 py-2 text-xs"
             onClick={() => setNotificationsOpen((current) => !current)}
             type="button"
@@ -47,13 +54,13 @@ function Topbar({ title, onMenuClick }) {
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2 rounded-2xl bg-brand-50 px-4 py-2 text-sm">
-          <span className="icon-chip h-9 w-9 rounded-xl">
+        <div className="flex min-w-[200px] items-center gap-3 rounded-3xl border border-brand-100 bg-brand-50/80 px-4 py-2.5 text-sm">
+          <span className="icon-chip h-10 w-10 rounded-2xl bg-white">
             <UserRound className="h-4 w-4" />
           </span>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="font-bold text-ink">{user?.full_name || 'زائر'}</p>
-            <p className="text-xs text-slate-500">{user?.role || 'guest'}</p>
+            <p className="truncate text-xs text-slate-500">{user?.role || 'guest'}</p>
           </div>
           <ChevronDown className="h-4 w-4 text-slate-400" />
         </div>
@@ -75,4 +82,3 @@ function Topbar({ title, onMenuClick }) {
 }
 
 export default Topbar
-

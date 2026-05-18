@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, MinValueValidator
 from django.db import models, transaction
@@ -81,8 +82,10 @@ class PublicPageContent(TimeStampedModel):
     hero_subtitle_ar = models.TextField(validators=[validate_no_script_content])
     hero_subtitle_en = models.TextField(blank=True, validators=[validate_no_script_content])
     primary_button_text = models.CharField(max_length=120, validators=[validate_no_script_content])
+    primary_button_text_en = models.CharField(max_length=120, blank=True, validators=[validate_no_script_content])
     primary_button_url = models.CharField(max_length=500, validators=[validate_safe_url])
     secondary_button_text = models.CharField(max_length=120, blank=True, validators=[validate_no_script_content])
+    secondary_button_text_en = models.CharField(max_length=120, blank=True, validators=[validate_no_script_content])
     secondary_button_url = models.CharField(max_length=500, blank=True, validators=[validate_safe_url])
     hero_image = models.FileField(
         upload_to="public_site/homepage/hero/",
@@ -91,11 +94,14 @@ class PublicPageContent(TimeStampedModel):
         validators=[PublicSiteImageValidator()],
     )
     how_it_works_text = models.TextField(validators=[validate_no_script_content])
+    how_it_works_text_en = models.TextField(blank=True, validators=[validate_no_script_content])
     contact_phone = models.CharField(max_length=30, validators=[validate_no_script_content])
     whatsapp_number = models.CharField(max_length=30, validators=[validate_no_script_content])
     email = models.EmailField(validators=[EmailValidator()])
     office_address = models.CharField(max_length=255, validators=[validate_no_script_content])
+    office_address_en = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
     footer_text = models.TextField(validators=[validate_no_script_content])
+    footer_text_en = models.TextField(blank=True, validators=[validate_no_script_content])
     active_content = models.BooleanField(default=False)
 
     class Meta:
@@ -225,3 +231,119 @@ class Advertisement(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+
+class MissingServiceRequest(TimeStampedModel):
+    class Source(models.TextChoices):
+        HOMEPAGE_CHAT = "homepage_chat", "Homepage chat"
+        CONTACT_PAGE = "contact_page", "Contact page"
+        OTHER = "other", "Other"
+
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        IN_REVIEW = "in_review", "In review"
+        SERVICE_EXISTS = "service_exists", "Service exists"
+        FORWARDED = "forwarded", "Forwarded"
+        RESOLVED = "resolved", "Resolved"
+        CLOSED = "closed", "Closed"
+
+    class PreferredContactChannel(models.TextChoices):
+        PHONE = "phone", "Phone"
+        WHATSAPP = "whatsapp", "WhatsApp"
+        EMAIL = "email", "Email"
+
+    request_id = models.BigAutoField(primary_key=True)
+    request_number = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        editable=False,
+        db_index=True,
+        help_text="Auto-generated missing service request number, example: MSR-000001.",
+    )
+    source = models.CharField(max_length=30, choices=Source.choices, default=Source.HOMEPAGE_CHAT, db_index=True)
+    status = models.CharField(max_length=30, choices=Status.choices, default=Status.NEW, db_index=True)
+    service_name = models.CharField(max_length=255, validators=[validate_no_script_content])
+    request_message = models.TextField(validators=[validate_no_script_content])
+    requester_name = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
+    requester_phone = models.CharField(max_length=30, blank=True, validators=[validate_no_script_content], db_index=True)
+    requester_email = models.EmailField(blank=True)
+    preferred_contact_channel = models.CharField(
+        max_length=20,
+        choices=PreferredContactChannel.choices,
+        default=PreferredContactChannel.WHATSAPP,
+    )
+    created_by_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="submitted_missing_service_requests",
+    )
+    matched_service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="missing_service_requests",
+    )
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_missing_service_requests",
+    )
+    internal_notes = models.TextField(blank=True, validators=[validate_no_script_content])
+    response_message = models.TextField(blank=True, validators=[validate_no_script_content])
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-request_id"]
+        verbose_name = "Missing service request"
+        verbose_name_plural = "Missing service requests"
+        indexes = [
+            models.Index(fields=["request_number"]),
+            models.Index(fields=["status", "created_at"]),
+            models.Index(fields=["assigned_to", "status"]),
+            models.Index(fields=["source", "created_at"]),
+        ]
+
+    def __str__(self):
+        if self.request_number:
+            return f"{self.request_number} - {self.service_name}"
+        return self.service_name
+
+    @property
+    def id(self):
+        return self.pk
+
+    def clean(self):
+        errors = {}
+        if not self.requester_phone and not self.requester_email and not self.created_by_user_id:
+            errors["requester_phone"] = "Provide a phone number or email so the team can follow up."
+
+        if self.assigned_to_id and self.assigned_to.role not in {
+            self.assigned_to.Role.ADMIN,
+            self.assigned_to.Role.EMPLOYEE,
+            self.assigned_to.Role.SUPPORT,
+        }:
+            errors["assigned_to"] = "Missing service requests can only be assigned to admin, employee, or support users."
+
+        if self.status in {self.Status.RESOLVED, self.Status.CLOSED} and not self.resolved_at:
+            self.resolved_at = timezone.now()
+
+        if self.status not in {self.Status.RESOLVED, self.Status.CLOSED}:
+            self.resolved_at = None
+
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        exclude = ["request_number"] if not self.request_number else None
+        self.full_clean(exclude=exclude)
+        super().save(*args, **kwargs)
+        if is_new and not self.request_number:
+            self.request_number = f"MSR-{self.request_id:06d}"
+            super().save(update_fields=["request_number", "updated_at"])

@@ -11,6 +11,7 @@ function HomePage() {
 
   return (
     <PublicHomepageTemplate
+      allServices={services}
       advertisements={advertisements}
       content={content}
       featuredServices={featuredServices}

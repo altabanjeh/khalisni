@@ -346,3 +346,36 @@ class ReportsPermissionTests(APITestCase):
         self.assertIn(self.provider_user.full_name, provider_names)
         self.assertIsNotNone(completed_order.pk)
         self.assertIsNotNone(delayed_order.pk)
+
+    def test_reports_group_orders_by_category_snapshot(self):
+        shipping_category = ServiceCategory.objects.create(
+            name_ar="Shipping Services",
+            name_en="Shipping Services",
+            slug="shipping-services",
+        )
+        shipping_service = Service.objects.create(
+            category=shipping_category,
+            name_ar="Courier Delivery",
+            name_en="Courier Delivery",
+            slug="courier-delivery",
+            description_ar="Details",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=3,
+            service_fee=2,
+        )
+        Order.objects.create(
+            customer=self.customer,
+            service=shipping_service,
+            service_name_snapshot=shipping_service.name_ar,
+            service_category_name_snapshot=shipping_category.name_ar,
+            city="Amman",
+            status=Order.Status.COMPLETED,
+        )
+
+        self.client.force_authenticate(self.admin)
+        response = self.client.get("/api/reports/summary/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        category_names = {row["category_name"] for row in response.data["orders_by_category"]}
+        self.assertIn("Shipping Services", category_names)

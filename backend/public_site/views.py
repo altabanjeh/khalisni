@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
-from config.permissions import IsAdminRole
+from config.permissions import IsAdminRole, IsInternalStaffRole
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT, DEFAULT_SITE_THEME
-from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
+from public_site.services import notify_missing_service_request_assigned, notify_missing_service_request_created
 from public_site.selectors import (
     get_active_public_page_content,
     get_active_theme,
@@ -17,6 +18,8 @@ from public_site.serializers import (
     AdvertisementAdminSerializer,
     AdvertisementPublicSerializer,
     HomepagePayloadSerializer,
+    MissingServiceRequestAdminSerializer,
+    MissingServiceRequestPublicSerializer,
     PublicPageContentAdminSerializer,
     PublicPageContentPublicSerializer,
     SiteThemeAdminSerializer,
@@ -85,6 +88,29 @@ class PublicAdvertisementListAPIView(generics.ListAPIView):
         return get_current_public_advertisements()
 
 
+class PublicMissingServiceRequestCreateAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = MissingServiceRequestPublicSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user if getattr(self.request.user, "is_authenticated", False) else None
+        missing_request = serializer.save(created_by_user=user)
+        notify_missing_service_request_created(missing_request=missing_request, actor=user)
+        create_audit_log(
+            request=self.request,
+            user=user,
+            action="create_missing_service_request",
+            entity_type="MissingServiceRequest",
+            entity_id=missing_request.pk,
+            new_value={
+                "request_number": missing_request.request_number,
+                "service_name": missing_request.service_name,
+                "status": missing_request.status,
+                "source": missing_request.source,
+            },
+        )
+
+
 class AdminSingletonMixin:
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -149,15 +175,20 @@ class AdminPublicPageContentAPIView(AdminSingletonMixin, APIView):
         "hero_subtitle_ar",
         "hero_subtitle_en",
         "primary_button_text",
+        "primary_button_text_en",
         "primary_button_url",
         "secondary_button_text",
+        "secondary_button_text_en",
         "secondary_button_url",
         "how_it_works_text",
+        "how_it_works_text_en",
         "contact_phone",
         "whatsapp_number",
         "email",
         "office_address",
+        "office_address_en",
         "footer_text",
+        "footer_text_en",
         "active_content",
     )
 
@@ -187,6 +218,7 @@ class AdvertisementAdminViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     search_fields = ["title_ar", "title_en", "description_ar", "description_en"]
     ordering_fields = ["display_order", "start_date", "end_date", "created_at", "updated_at"]
+    pagination_class = None
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -282,3 +314,57 @@ class AdvertisementAdminViewSet(viewsets.ModelViewSet):
             new_value=None,
         )
         return response
+
+
+class MissingServiceRequestViewSet(viewsets.ModelViewSet):
+    serializer_class = MissingServiceRequestAdminSerializer
+    queryset = MissingServiceRequest.objects.select_related("assigned_to", "matched_service", "created_by_user")
+    permission_classes = [permissions.IsAuthenticated, IsInternalStaffRole]
+    http_method_names = ["get", "patch", "head", "options"]
+    pagination_class = None
+    search_fields = ["request_number", "service_name", "request_message", "requester_name", "requester_phone", "requester_email"]
+    ordering_fields = ["created_at", "updated_at", "resolved_at", "status"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status_value = self.request.query_params.get("status")
+        assigned_only = self.request.query_params.get("assigned_only")
+        source = self.request.query_params.get("source")
+
+        if status_value:
+            queryset = queryset.filter(status=status_value)
+        if source:
+            queryset = queryset.filter(source=source)
+        if str(assigned_only).strip().lower() in {"1", "true", "yes", "on"}:
+            queryset = queryset.filter(assigned_to=self.request.user)
+
+        return queryset.order_by("-created_at", "-request_id")
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_value = {
+            "status": instance.status,
+            "assigned_to": instance.assigned_to_id,
+            "matched_service": instance.matched_service_id,
+            "response_message": instance.response_message,
+        }
+        previous_assignee_id = instance.assigned_to_id
+        missing_request = serializer.save()
+
+        if missing_request.assigned_to_id and missing_request.assigned_to_id != previous_assignee_id:
+            notify_missing_service_request_assigned(missing_request=missing_request, actor=self.request.user)
+
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action="update_missing_service_request",
+            entity_type="MissingServiceRequest",
+            entity_id=missing_request.pk,
+            old_value=old_value,
+            new_value={
+                "status": missing_request.status,
+                "assigned_to": missing_request.assigned_to_id,
+                "matched_service": missing_request.matched_service_id,
+                "response_message": missing_request.response_message,
+            },
+        )

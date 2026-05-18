@@ -60,6 +60,7 @@ def create_notification(
     title,
     message,
     order=None,
+    target_service=None,
     actor=None,
     channel=Notification.Channel.SYSTEM,
     status=None,
@@ -67,6 +68,7 @@ def create_notification(
     template_key="",
     context_data=None,
     provider_response=None,
+    notification_type=None,
 ):
     if status is None:
         status = Notification.Status.SENT if channel == Notification.Channel.SYSTEM else Notification.Status.PENDING
@@ -79,7 +81,8 @@ def create_notification(
         recipient=user,
         actor=actor,
         order=order,
-        notification_type=Notification.NotificationType.ORDER if order else Notification.NotificationType.SYSTEM,
+        target_service=target_service,
+        notification_type=notification_type or (Notification.NotificationType.ORDER if order else Notification.NotificationType.SYSTEM),
         channel=channel,
         title=title,
         message=message,

@@ -1,11 +1,15 @@
 ﻿from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, CustomerProfile
 from audit.utils import create_audit_log
 from documents.services import create_order_document
 from notifications.services import notify_client, send_notification_event
+from organizations.models import OrganizationMembership
+from organizations.services import resolve_order_organization
 from orders.models import MissingDocumentRequest, Order, OrderAssignmentHistory, OrderNote, OrderStatusLog, Rating
+from services.order_completion import create_related_service_notifications
+from services.order_validation import validate_order_prerequisites
 from workflow.rules import get_transition_rule
 from workflow.transition_permissions import assert_can_cancel_order, assert_order_transition_allowed
 
@@ -42,6 +46,21 @@ def _get_or_create_public_customer(*, full_name, phone, national_id=""):
     customer.national_id = national_id or customer.national_id
     customer.save(update_fields=["full_name", "national_id", "updated_at"])
     return customer
+
+
+def _sync_customer_organization(customer, organization):
+    if organization is None:
+        return
+    profile, _ = CustomerProfile.objects.get_or_create(user=customer)
+    if profile.organization_id != organization.id:
+        profile.organization = organization
+        profile.save(update_fields=["organization", "updated_at"])
+    OrganizationMembership.objects.get_or_create(
+        user=customer,
+        organization=organization,
+        role=OrganizationMembership.MembershipRole.CUSTOMER,
+        defaults={"is_active": True},
+    )
 
 
 def _required_document_types(order):
@@ -135,6 +154,11 @@ def create_public_order(*, data, request=None):
     """
     initial_documents = list(data.get("initial_documents", []))
     national_id = data.get("national_id", "")
+    organization = resolve_order_organization(
+        customer=None,
+        service=data["service"],
+        organization=data.get("organization"),
+    )
 
     with transaction.atomic():
         customer = _get_or_create_public_customer(
@@ -142,9 +166,15 @@ def create_public_order(*, data, request=None):
             phone=data["phone"],
             national_id=national_id,
         )
+        _sync_customer_organization(customer, organization)
         order = Order.objects.create(
             customer=customer,
+            organization=organization,
+            branch=data.get("branch"),
             service=data["service"],
+            service_name_snapshot=data["service"].name_ar,
+            service_category_name_snapshot=data["service"].category.name_ar,
+            organization_name_snapshot=organization.name,
             city=data["city"],
             customer_notes=data.get("notes", ""),
         )
@@ -173,6 +203,78 @@ def create_public_order(*, data, request=None):
             entity_id=order.pk,
             new_value={"order_number": order.order_number, "service": data["service"].name_ar},
         )
+        return order
+
+
+def create_customer_order(*, customer, data, request=None):
+    """
+    Create an order for an authenticated customer account.
+
+    The submitted form can refresh the customer's contact fields so future
+    tracking and follow-up stay in sync with the latest public-facing data.
+    """
+    if getattr(customer, "role", "") != CustomUser.Role.CUSTOMER:
+        raise ValidationError({"detail": "Orders can only be created by customer accounts."})
+
+    initial_documents = list(data.get("initial_documents", []))
+    updated_fields = []
+    prerequisite_check = validate_order_prerequisites(customer=customer, service=data["service"])
+    organization = resolve_order_organization(
+        customer=customer,
+        service=data["service"],
+        organization=data.get("organization"),
+    )
+
+    for field_name in ("full_name", "phone", "national_id"):
+        new_value = data.get(field_name, "")
+        if new_value is None:
+            new_value = ""
+        if getattr(customer, field_name) != new_value:
+            setattr(customer, field_name, new_value)
+            updated_fields.append(field_name)
+
+    with transaction.atomic():
+        if updated_fields:
+            customer.save(update_fields=[*updated_fields, "updated_at"])
+        _sync_customer_organization(customer, organization)
+
+        order = Order.objects.create(
+            customer=customer,
+            organization=organization,
+            branch=data.get("branch"),
+            service=data["service"],
+            service_name_snapshot=data["service"].name_ar,
+            service_category_name_snapshot=data["service"].category.name_ar,
+            organization_name_snapshot=organization.name,
+            city=data["city"],
+            customer_notes=data.get("notes", ""),
+        )
+        OrderStatusLog.objects.create(order=order, old_status="", new_status=order.status, changed_by=customer)
+
+        for document in initial_documents:
+            create_order_document(
+                order=order,
+                uploaded_by=customer,
+                file_obj=document["file"],
+                document_type=document["document_type"],
+            )
+
+        send_notification_event(
+            event_key="order_submitted",
+            order=order,
+            actor=customer,
+            request=request,
+            dedupe_key=f"order_submitted:{order.pk}",
+        )
+        create_audit_log(
+            request=request,
+            user=customer,
+            action="create_order",
+            entity_type="Order",
+            entity_id=order.pk,
+            new_value={"order_number": order.order_number, "service": data["service"].name_ar},
+        )
+        order.prerequisite_warnings = prerequisite_check.warnings
         return order
 
 
@@ -382,6 +484,9 @@ def assign_provider_to_order(*, order, provider, actor, note="", request=None):
     old_status = order.status
     previous_provider_id = order.assigned_provider_id
     order.assign_provider(provider, assigned_by=actor, note=note)
+    if provider.organization_id and order.assigned_provider_organization_id != provider.organization_id:
+        order.assigned_provider_organization = provider.organization
+        order.save(update_fields=["assigned_provider_organization", "updated_at"])
     send_notification_event(
         event_key="provider_assigned",
         order=order,
@@ -595,14 +700,14 @@ def complete_order(*, order, actor, admin_confirmation=False, request=None):
         if order.assigned_provider:
             order.assigned_provider.total_completed_orders += 1
             order.assigned_provider.save(update_fields=["total_completed_orders"])
-
-    send_notification_event(
-        event_key="order_completed",
-        order=order,
-        actor=actor,
-        request=request,
-        dedupe_key=f"order_completed:{order.pk}:{order.completed_at.isoformat() if order.completed_at else ''}",
-    )
+        send_notification_event(
+            event_key="order_completed",
+            order=order,
+            actor=actor,
+            request=request,
+            dedupe_key=f"order_completed:{order.pk}:{order.completed_at.isoformat() if order.completed_at else ''}",
+        )
+        create_related_service_notifications(order=order, actor=actor, request=request)
     _audit_transition(
         request=request,
         actor=actor,
@@ -889,4 +994,3 @@ def archive_order(*, order, actor, note="", request=None):
         request=request,
         audit_action="archive_order",
     )
-

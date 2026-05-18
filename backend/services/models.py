@@ -18,6 +18,7 @@ class ServiceCategory(models.Model):
     description_en = models.TextField(blank=True)
 
     icon = models.CharField(max_length=100, blank=True)
+    color = models.CharField(max_length=20, blank=True, default="")
 
     image = models.ImageField(
         upload_to="service_categories/images/",
@@ -26,20 +27,33 @@ class ServiceCategory(models.Model):
     )
 
     display_order = models.PositiveIntegerField(default=0)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        related_name="children",
+        null=True,
+        blank=True,
+    )
 
     is_active = models.BooleanField(default=True)
+    show_on_public_site = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["display_order", "name_ar"]
+        ordering = ["sort_order", "display_order", "name_ar"]
         verbose_name = "Service category"
         verbose_name_plural = "Service categories"
         indexes = [
             models.Index(fields=["slug"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["display_order"]),
+            models.Index(fields=["sort_order"]),
+            models.Index(fields=["parent", "is_active"]),
+            models.Index(fields=["show_on_public_site"]),
         ]
 
     def __str__(self):
@@ -49,12 +63,75 @@ class ServiceCategory(models.Model):
     def id(self):
         return self.pk
 
+    @property
+    def name(self):
+        return self.name_ar
+
+    @property
+    def description(self):
+        return self.description_ar
+
+    @property
+    def full_path_name(self):
+        parts = [self.name_ar]
+        current = self.parent
+        while current is not None:
+            parts.append(current.name_ar)
+            current = current.parent
+        return " / ".join(reversed(parts))
+
+    @property
+    def full_path_name_en(self):
+        parts = [self.name_en or self.name_ar]
+        current = self.parent
+        while current is not None:
+            parts.append(current.name_en or current.name_ar)
+            current = current.parent
+        return " / ".join(reversed(parts))
+
+    def clean(self):
+        errors = {}
+
+        if self.parent_id and self.parent_id == self.pk:
+            errors["parent"] = "Category cannot be its own parent."
+
+        if self.parent_id:
+            from services.service_categories import ensure_category_parent_not_circular
+
+            try:
+                ensure_category_parent_not_circular(category=self)
+            except ValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    errors.update(exc.message_dict)
+                else:
+                    errors["parent"] = exc.messages[0]
+
+        duplicate_qs = type(self).objects.exclude(pk=self.pk).filter(
+            parent_id=self.parent_id,
+            name_ar__iexact=(self.name_ar or "").strip(),
+        )
+        if self.name_ar and duplicate_qs.exists():
+            errors["name_ar"] = "Category name must be unique under the same parent category."
+
+        if self.pk and not self.is_active and self.services.filter(is_active=True).exists():
+            errors["is_active"] = "Deactivate or reassign active services before deactivating this category."
+
+        if errors:
+            raise ValidationError(errors)
+
     def save(self, *args, **kwargs):
+        if not self.sort_order and self.display_order:
+            self.sort_order = self.display_order
         self.full_clean()
         super().save(*args, **kwargs)
 
 
 class Service(models.Model):
+    class Scope(models.TextChoices):
+        GLOBAL = "global", "Global"
+        PARTNER_PRIVATE = "partner_private", "Partner private"
+        PARTNER_CUSTOMIZED = "partner_customized", "Partner customized"
+
     class PriceType(models.TextChoices):
         FIXED = "fixed", "Fixed price"
         STARTS_FROM = "starts_from", "Starts from"
@@ -81,6 +158,19 @@ class Service(models.Model):
         ServiceCategory,
         on_delete=models.PROTECT,
         related_name="services"
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.SET_NULL,
+        related_name="services",
+        null=True,
+        blank=True,
+    )
+    scope = models.CharField(
+        max_length=30,
+        choices=Scope.choices,
+        default=Scope.GLOBAL,
+        db_index=True,
     )
 
     name_ar = models.CharField(max_length=255)
@@ -187,6 +277,7 @@ class Service(models.Model):
             models.Index(fields=["is_online"]),
             models.Index(fields=["display_order"]),
             models.Index(fields=["category", "is_active"]),
+            models.Index(fields=["organization", "scope", "is_active"]),
         ]
         constraints = [
             models.CheckConstraint(
@@ -211,6 +302,19 @@ class Service(models.Model):
     def total_fee(self):
         return self.base_price + self.government_fee + self.service_fee
 
+    def clean(self):
+        errors = {}
+
+        if self.category_id and self.is_active and not self.category.is_active:
+            errors["category"] = "Active services must belong to an active category."
+        if self.scope != self.Scope.GLOBAL and not self.organization_id:
+            errors["organization"] = "Partner-scoped services must belong to an organization."
+        if self.organization_id and not self.organization.is_active:
+            errors["organization"] = "Services can only belong to active organizations."
+
+        if errors:
+            raise ValidationError(errors)
+
     def __str__(self):
         if self.service_number:
             return f"{self.service_number} - {self.name_ar}"
@@ -230,6 +334,115 @@ class Service(models.Model):
         if is_new and not self.service_number:
             self.service_number = f"SRV-{self.service_id:06d}"
             super().save(update_fields=["service_number"])
+
+
+class ServiceRelation(models.Model):
+    class RelationType(models.TextChoices):
+        PREREQUISITE = "prerequisite", "Required first"
+        RECOMMENDED_AFTER = "recommended_after", "Recommended after completion"
+        OPTIONAL_BUNDLE = "optional_bundle", "Optional bundle"
+        ALTERNATIVE = "alternative", "Alternative option"
+
+    relation_id = models.BigAutoField(primary_key=True)
+
+    source_service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.CASCADE,
+        related_name="outgoing_relations"
+    )
+
+    target_service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.CASCADE,
+        related_name="incoming_relations"
+    )
+
+    relation_type = models.CharField(
+        max_length=30,
+        choices=RelationType.choices
+    )
+
+    is_required = models.BooleanField(default=False)
+    message_to_customer = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="created_service_relations"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["source_service__name_ar", "target_service__name_ar", "relation_type"]
+        verbose_name = "Service relation"
+        verbose_name_plural = "Service relations"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_service", "target_service", "relation_type"],
+                name="unique_service_relation_per_type"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["source_service", "relation_type", "is_active"]),
+            models.Index(fields=["target_service", "relation_type", "is_active"]),
+            models.Index(fields=["is_active", "relation_type"]),
+        ]
+
+    def __str__(self):
+        return f"{self.source_service} -> {self.target_service} ({self.relation_type})"
+
+    @property
+    def id(self):
+        return self.pk
+
+    def clean(self):
+        errors = {}
+
+        if self.source_service_id and self.target_service_id and self.source_service_id == self.target_service_id:
+            errors["target_service"] = "Source service and target service must be different."
+
+        if self.source_service_id and not self.source_service.is_active:
+            errors["source_service"] = "Only active services can be selected."
+
+        if self.target_service_id and not self.target_service.is_active:
+            errors["target_service"] = "Only active services can be selected."
+
+        if self.created_by_id and self.created_by.role not in {
+            self.created_by.Role.ADMIN,
+            self.created_by.Role.SUPPORT,
+        }:
+            errors["created_by"] = "Only admin or support users can create service relations."
+
+        if (
+            self.is_active
+            and self.is_required
+            and self.relation_type == self.RelationType.PREREQUISITE
+            and self.source_service_id
+            and self.target_service_id
+        ):
+            from services.service_relations import ensure_required_prerequisite_not_circular
+
+            try:
+                ensure_required_prerequisite_not_circular(
+                    source_service_id=self.source_service_id,
+                    target_service_id=self.target_service_id,
+                    exclude_relation_id=self.pk,
+                )
+            except ValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    errors.update(exc.message_dict)
+                else:
+                    errors["target_service"] = exc.messages[0]
+
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class ServiceProviderAssignment(models.Model):
     assignment_id = models.BigAutoField(primary_key=True)

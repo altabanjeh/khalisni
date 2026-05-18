@@ -1,13 +1,14 @@
 import { CircleAlert, UploadCloud } from 'lucide-react'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
 import FileUploader from '../../components/FileUploader'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getOrderAllowedActions } from '../../utils/authz'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import {
   applyServerFieldErrors,
@@ -21,7 +22,7 @@ import {
 function MissingDocumentsResponsePage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [message, setMessage] = useState('')
+  const { toast } = useToast()
   const { data: order, loading } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
   const {
     register,
@@ -36,9 +37,7 @@ function MissingDocumentsResponsePage() {
     null,
   )
 
-  if (loading) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جارٍ تحميل الطلب...</div>
-  }
+  if (loading) return <LoadingSpinner />
 
   if (!order) {
     return <EmptyState description="تعذر العثور على الطلب المطلوب." title="الطلب غير متاح" />
@@ -71,7 +70,7 @@ function MissingDocumentsResponsePage() {
         await api.uploadCustomerDocument(id, formData)
       }
 
-      setMessage('تم رفع المستندات الناقصة وإعادة إرسال الطلب للمراجعة.')
+      toast('تم رفع المستندات الناقصة وإعادة إرسال الطلب للمراجعة.', 'success')
       navigate(`/customer/orders/${id}`)
     } catch (submitError) {
       applyServerFieldErrors({
@@ -144,7 +143,6 @@ function MissingDocumentsResponsePage() {
           </button>
         </div>
 
-        {message ? <p className="text-sm text-success">{message}</p> : null}
       </form>
     </div>
   )

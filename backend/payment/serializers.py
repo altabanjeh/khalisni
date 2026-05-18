@@ -1,12 +1,15 @@
 from rest_framework import serializers
 
+from core.serializer_mixins import PkAsIdMixin
 from orders.models import Order
+from orders.selectors import get_orders_for_user
 from payment.models import Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     order_number = serializers.CharField(source="order.order_number", read_only=True)
     customer_name = serializers.CharField(source="order.customer.full_name", read_only=True)
+    organization_name = serializers.CharField(source="organization.name", read_only=True)
 
     class Meta:
         model = Payment
@@ -16,6 +19,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             "order",
             "order_number",
             "customer_name",
+            "organization_name",
             "payment_type",
             "method",
             "status",
@@ -38,6 +42,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 class AdminPaymentRuleListSerializer(serializers.ModelSerializer):
     order_number = serializers.CharField(source="order.order_number", read_only=True)
     customer_name = serializers.CharField(source="order.customer.full_name", read_only=True)
+    organization_name = serializers.CharField(source="organization.name", read_only=True)
     status_label = serializers.CharField(source="get_status_display", read_only=True)
     method_label = serializers.CharField(source="get_method_display", read_only=True)
     payment_type_label = serializers.CharField(source="get_payment_type_display", read_only=True)
@@ -49,6 +54,7 @@ class AdminPaymentRuleListSerializer(serializers.ModelSerializer):
             "payment_number",
             "order_number",
             "customer_name",
+            "organization_name",
             "payment_type",
             "payment_type_label",
             "method",
@@ -69,6 +75,12 @@ class AdminPaymentRuleListSerializer(serializers.ModelSerializer):
 class CustomerPaymentCreateSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request is not None:
+            self.fields["order"].queryset = get_orders_for_user(request.user)
+
     class Meta:
         model = Payment
         fields = (
@@ -87,6 +99,12 @@ class CustomerPaymentCreateSerializer(serializers.ModelSerializer):
 class AdminPaymentCreateSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request is not None:
+            self.fields["order"].queryset = get_orders_for_user(request.user)
+
     class Meta:
         model = Payment
         fields = ("order", "payment_type", "method", "amount", "currency", "reference_number", "notes")
@@ -99,7 +117,7 @@ class AdminPaymentStatusSerializer(serializers.Serializer):
     reference_number = serializers.CharField(required=False, allow_blank=True)
 
 
-class AdminPaymentSerializer(serializers.ModelSerializer):
+class AdminPaymentSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"

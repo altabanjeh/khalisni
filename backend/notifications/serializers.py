@@ -2,6 +2,7 @@ import re
 
 from rest_framework import serializers
 
+from core.serializer_mixins import PkAsIdMixin
 from notifications.event_map import ALLOWED_TEMPLATE_PLACEHOLDERS
 from notifications.models import Notification, NotificationTemplate
 
@@ -20,10 +21,11 @@ def _validate_safe_template_text(value):
     return text
 
 
-class NotificationSerializer(serializers.ModelSerializer):
+class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
     recipient_name = serializers.CharField(source="recipient.full_name", read_only=True)
     actor_name = serializers.CharField(source="actor.full_name", read_only=True)
     order_number = serializers.CharField(source="order.order_number", read_only=True)
+    target_service_name = serializers.CharField(source="target_service.name_ar", read_only=True)
 
     class Meta:
         model = Notification
@@ -43,7 +45,7 @@ class ManualNotificationSerializer(serializers.Serializer):
         return value
 
 
-class NotificationAdminSerializer(serializers.ModelSerializer):
+class NotificationAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = "__all__"

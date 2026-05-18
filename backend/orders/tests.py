@@ -7,7 +7,8 @@ from audit.models import AuditLog
 from notifications.models import Notification
 from orders.models import Order
 from providers.models import ProviderProfile
-from services.models import Service, ServiceCategory, ServiceRequiredDocument
+from services.order_completion import create_related_service_notifications
+from services.models import Service, ServiceCategory, ServiceRelation, ServiceRequiredDocument
 
 
 class OrderAPITests(APITestCase):
@@ -76,10 +77,12 @@ class OrderAPITests(APITestCase):
     def _pdf_upload(self, name):
         return SimpleUploadedFile(name, b"%PDF-1.4 test document", content_type="application/pdf")
 
-    def _create_public_order(self, *, phone="0795555555"):
+    def _create_customer_order(self, *, customer=None, phone="0795555555"):
+        customer = customer or self.customer
+        self.client.force_authenticate(customer)
         payload = {
             "service": self.service.id,
-            "full_name": "Guest Customer",
+            "full_name": customer.full_name,
             "phone": phone,
             "city": "Amman",
             "notes": "Please process quickly",
@@ -90,12 +93,32 @@ class OrderAPITests(APITestCase):
         return Order.objects.get(order_number=response.data["order_number"])
 
     def test_customer_can_create_order(self):
-        order = self._create_public_order()
+        order = self._create_customer_order()
         self.assertTrue(Order.objects.filter(pk=order.pk).exists())
         self.assertEqual(order.final_price, self.service.total_fee)
+        self.assertEqual(order.service_name_snapshot, self.service.name_ar)
+        self.assertEqual(order.service_category_name_snapshot, self.category.name_ar)
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.phone, "0795555555")
 
-    def test_public_order_submission_creates_notification_record(self):
-        order = self._create_public_order(phone="0799999991")
+    def test_anonymous_user_cannot_create_order(self):
+        response = self.client.post(
+            "/api/orders/",
+            {
+                "service": self.service.id,
+                "full_name": "Guest Customer",
+                "phone": "0799999990",
+                "city": "Amman",
+                "notes": "Please process quickly",
+                "consent": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_customer_order_submission_creates_notification_record(self):
+        order = self._create_customer_order(phone="0799999991")
 
         notifications = Notification.objects.filter(order=order, template_key="order_submitted").order_by("recipient_id")
         self.assertEqual(notifications.count(), 2)
@@ -106,7 +129,73 @@ class OrderAPITests(APITestCase):
         self.assertTrue(all(item.title == "Order received" for item in notifications))
         self.assertTrue(all(item.context_data["dedupe_key"] == f"order_submitted:{order.pk}" for item in notifications))
 
-    def test_public_order_requires_each_service_document_as_separate_upload(self):
+    def test_order_is_blocked_when_required_prerequisite_is_missing(self):
+        prerequisite_service = Service.objects.create(
+            category=self.category,
+            name_ar="Municipality Approval",
+            name_en="Municipality Approval",
+            slug="order-prerequisite-service",
+            description_ar="Approval details",
+            estimated_duration=2,
+            base_price=5,
+            government_fee=2,
+            service_fee=1,
+        )
+        ServiceRelation.objects.create(
+            source_service=prerequisite_service,
+            target_service=self.service,
+            relation_type=ServiceRelation.RelationType.PREREQUISITE,
+            is_required=True,
+            created_by=self.admin_user,
+        )
+        self.client.force_authenticate(self.customer)
+
+        response = self.client.post(
+            "/api/orders/",
+            {
+                "service": self.service.id,
+                "full_name": self.customer.full_name,
+                "phone": self.customer.phone,
+                "city": "Amman",
+                "consent": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("prerequisites", response.data)
+
+    def test_order_is_allowed_when_required_prerequisite_is_completed(self):
+        prerequisite_service = Service.objects.create(
+            category=self.category,
+            name_ar="Municipality Approval",
+            name_en="Municipality Approval",
+            slug="completed-prerequisite-service",
+            description_ar="Approval details",
+            estimated_duration=2,
+            base_price=5,
+            government_fee=2,
+            service_fee=1,
+        )
+        ServiceRelation.objects.create(
+            source_service=prerequisite_service,
+            target_service=self.service,
+            relation_type=ServiceRelation.RelationType.PREREQUISITE,
+            is_required=True,
+            created_by=self.admin_user,
+        )
+        Order.objects.create(
+            customer=self.customer,
+            service=prerequisite_service,
+            city="Amman",
+            status=Order.Status.COMPLETED,
+        )
+
+        order = self._create_customer_order(phone="0791111199")
+
+        self.assertEqual(order.service_id, self.service.id)
+
+    def test_customer_order_requires_each_service_document_as_separate_upload(self):
         ServiceRequiredDocument.objects.create(
             service=self.service,
             document_type="national_id",
@@ -121,12 +210,13 @@ class OrderAPITests(APITestCase):
             allowed_extensions=[".pdf"],
             display_order=2,
         )
+        self.client.force_authenticate(self.customer)
 
         response = self.client.post(
             "/api/orders/",
             {
                 "service": str(self.service.id),
-                "full_name": "Guest Customer",
+                "full_name": self.customer.full_name,
                 "phone": "0795656565",
                 "city": "Amman",
                 "consent": "true",
@@ -144,7 +234,7 @@ class OrderAPITests(APITestCase):
             ["authorization_letter", "national_id"],
         )
 
-    def test_public_order_rejects_generic_multi_upload_when_service_has_document_requirements(self):
+    def test_customer_order_rejects_generic_multi_upload_when_service_has_document_requirements(self):
         ServiceRequiredDocument.objects.create(
             service=self.service,
             document_type="national_id",
@@ -152,12 +242,13 @@ class OrderAPITests(APITestCase):
             allowed_extensions=[".pdf"],
             display_order=1,
         )
+        self.client.force_authenticate(self.customer)
 
         response = self.client.post(
             "/api/orders/",
             {
                 "service": str(self.service.id),
-                "full_name": "Guest Customer",
+                "full_name": self.customer.full_name,
                 "phone": "0795757575",
                 "city": "Amman",
                 "consent": "true",
@@ -215,7 +306,7 @@ class OrderAPITests(APITestCase):
         self.client.force_authenticate(self.employee_user)
         response = self.client.get("/api/admin/orders/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(len(response.data), 1)
 
     def test_employee_review_queue_supports_safe_filters(self):
         matching_order = Order.objects.create(
@@ -241,8 +332,8 @@ class OrderAPITests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["id"], matching_order.id)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], matching_order.id)
 
     def test_employee_can_start_review_via_status_endpoint(self):
         order = Order.objects.create(customer=self.customer, service=self.service, city="Amman")
@@ -610,6 +701,90 @@ class OrderAPITests(APITestCase):
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.COMPLETED)
 
+    def test_completion_creates_related_service_recommendation_notification(self):
+        follow_up_service = Service.objects.create(
+            category=self.category,
+            name_ar="Food Safety Certificate",
+            name_en="Food Safety Certificate",
+            slug="food-safety-follow-up",
+            description_ar="Follow-up service",
+            estimated_duration=2,
+            base_price=7,
+            government_fee=3,
+            service_fee=2,
+        )
+        ServiceRelation.objects.create(
+            source_service=self.service,
+            target_service=follow_up_service,
+            relation_type=ServiceRelation.RelationType.RECOMMENDED_AFTER,
+            is_required=False,
+            created_by=self.admin_user,
+        )
+        order = Order.objects.create(
+            customer=self.customer,
+            service=self.service,
+            city="Amman",
+            status=Order.Status.READY_FOR_DELIVERY,
+            assigned_provider=self.provider,
+        )
+        self.client.force_authenticate(self.admin_user)
+
+        response = self.client.post(
+            f"/api/admin/orders/{order.id}/complete/",
+            {"admin_confirmation": True},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        notification = Notification.objects.get(
+            order=order,
+            template_key="service_relation_recommendation",
+            target_service=follow_up_service,
+        )
+        self.assertEqual(notification.recipient_id, self.customer.id)
+        self.assertEqual(notification.title, "Related service recommended")
+        self.assertIn("Food Safety Certificate", notification.message)
+
+    def test_completion_recommendation_notifications_do_not_duplicate_unread_records(self):
+        follow_up_service = Service.objects.create(
+            category=self.category,
+            name_ar="Signboard Permit",
+            name_en="Signboard Permit",
+            slug="signboard-permit-follow-up",
+            description_ar="Follow-up service",
+            estimated_duration=2,
+            base_price=7,
+            government_fee=3,
+            service_fee=2,
+        )
+        ServiceRelation.objects.create(
+            source_service=self.service,
+            target_service=follow_up_service,
+            relation_type=ServiceRelation.RelationType.OPTIONAL_BUNDLE,
+            is_required=False,
+            created_by=self.admin_user,
+        )
+        order = Order.objects.create(
+            customer=self.customer,
+            service=self.service,
+            city="Amman",
+            status=Order.Status.COMPLETED,
+            assigned_provider=self.provider,
+        )
+
+        create_related_service_notifications(order=order, actor=self.admin_user)
+        create_related_service_notifications(order=order, actor=self.admin_user)
+
+        self.assertEqual(
+            Notification.objects.filter(
+                order=order,
+                template_key="service_relation_recommendation",
+                target_service=follow_up_service,
+                is_read=False,
+            ).count(),
+            1,
+        )
+
     def test_employee_cannot_complete_invalid_transition(self):
         order = Order.objects.create(
             customer=self.customer,
@@ -731,7 +906,7 @@ class OrderAPITests(APITestCase):
         self.assertIsNone(order.completed_at)
 
     def test_full_order_flow_updates_statuses_for_each_actor(self):
-        order = self._create_public_order(phone="0796666666")
+        order = self._create_customer_order(phone="0796666666")
         self.assertEqual(order.status, Order.Status.NEW)
         self.assertEqual(order.final_price, self.service.total_fee)
 
@@ -863,7 +1038,7 @@ class OrderAPITests(APITestCase):
         )
 
     def test_service_price_changes_apply_to_new_orders_only(self):
-        existing_order = self._create_public_order(phone="0797777777")
+        existing_order = self._create_customer_order(phone="0797777777")
         existing_total = existing_order.final_price
 
         self.client.force_authenticate(self.admin_user)
@@ -878,7 +1053,7 @@ class OrderAPITests(APITestCase):
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
         self.service.refresh_from_db()
 
-        new_order = self._create_public_order(phone="0798888888")
+        new_order = self._create_customer_order(phone="0798888888")
         existing_order.refresh_from_db()
 
         self.assertEqual(existing_order.final_price, existing_total)

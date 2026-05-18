@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 
 from core.choices import OrderStatus, UserRole
+from organizations.selectors import is_provider_user
 from workflow.rules import get_transition_rule
 
 
@@ -12,8 +13,11 @@ def _ensure_actor_matches_transition(actor, order):
     role = _role(actor)
     if role == UserRole.CUSTOMER and order.customer_id != actor.id:
         raise ValidationError({"detail": "Only the order customer can perform this action."})
-    if role == UserRole.PROVIDER:
-        if not order.assigned_provider or order.assigned_provider.user_id != actor.id:
+    if role == UserRole.PROVIDER or is_provider_user(actor):
+        can_access = bool(order.assigned_provider and order.assigned_provider.user_id == actor.id)
+        if not can_access and order.assigned_provider_organization_id:
+            can_access = order.assigned_provider_organization.memberships.filter(user=actor, is_active=True).exists()
+        if not can_access:
             raise ValidationError({"detail": "Only the assigned provider can perform this action."})
     if role in {UserRole.EMPLOYEE, UserRole.SUPPORT}:
         assigned_employee_id = getattr(order, "assigned_employee_id", None)

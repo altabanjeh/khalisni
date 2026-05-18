@@ -1,5 +1,6 @@
 from django.db.models import Prefetch, Q
 
+from organizations.selectors import enforce_organization_scope, is_customer_user, is_platform_super_admin, is_provider_user
 from orders.models import Order
 from services.models import ServiceRequiredDocument
 
@@ -36,38 +37,35 @@ def get_orders_for_user(user):
     if not user or not user.is_authenticated:
         return queryset.none()
 
-    role = (getattr(user, "role", "") or "").lower()
-    if role == "admin":
+    if is_platform_super_admin(user):
         return queryset
-    if role == "customer":
+    if is_customer_user(user):
         return queryset.filter(customer=user)
-    if role == "provider":
-        return queryset.filter(assigned_provider__user=user)
-    if role in {"employee", "support"}:
+    if is_provider_user(user):
         return queryset.filter(
-            Q(status__in=EMPLOYEE_REVIEWABLE_STATUSES)
-            | Q(assigned_employee=user)
-            | Q(
-                assignment_history__assignment_type="employee",
-                assignment_history__assigned_to=user,
-            )
+            Q(assigned_provider__user=user)
+            | Q(assigned_provider_organization__memberships__user=user, assigned_provider_organization__memberships__is_active=True)
         ).distinct()
-    return queryset.none()
+    return enforce_organization_scope(queryset, user=user, organization_field="organization", branch_field="branch").distinct()
 
 
 def get_reviewable_orders_for_user(user):
     queryset = get_orders_for_user(user)
-    role = (getattr(user, "role", "") or "").lower()
-    if role == "admin":
+    if is_platform_super_admin(user):
         return queryset
-    if role in {"employee", "support"}:
-        return queryset.filter(
+    if not is_customer_user(user) and not is_provider_user(user):
+        return enforce_organization_scope(
+            queryset.filter(
             Q(status__in=EMPLOYEE_REVIEWABLE_STATUSES)
             | Q(assigned_employee=user)
             | Q(
                 assignment_history__assignment_type="employee",
                 assignment_history__assigned_to=user,
             )
+        ),
+            user=user,
+            organization_field="organization",
+            branch_field="branch",
         ).distinct()
     return queryset.none()
 

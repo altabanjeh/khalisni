@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api/services'
 import { buildQuery } from '../api/client'
+import { useLanguage } from '../context/LanguageContext'
 import StatusBadge from './StatusBadge'
 
 function triggerBlobDownload(blob, filename) {
@@ -15,6 +16,7 @@ function triggerBlobDownload(blob, filename) {
 }
 
 function DocumentList({ documents = [], orderNumber, phone }) {
+  const { isArabic } = useLanguage()
   const [downloading, setDownloading] = useState({})
 
   async function handleAuthenticatedDownload(document) {
@@ -24,11 +26,18 @@ function DocumentList({ documents = [], orderNumber, phone }) {
       const blob = await api.downloadDocumentWithToken(document.id)
       triggerBlobDownload(blob, document.original_filename)
     } catch {
-      // Fallback: open the download URL in a new tab if token fetch fails.
       window.open(document.download_url, '_blank', 'noreferrer')
     } finally {
       setDownloading((prev) => ({ ...prev, [document.id]: false }))
     }
+  }
+
+  if (!documents.length) {
+    return (
+      <div className="rounded-3xl border border-dashed border-border bg-white/80 px-5 py-6 text-sm text-slate-500">
+        {isArabic ? 'لا توجد مستندات مرفوعة لهذا الطلب حتى الآن.' : 'No uploaded documents are available for this order yet.'}
+      </div>
+    )
   }
 
   return (
@@ -41,7 +50,7 @@ function DocumentList({ documents = [], orderNumber, phone }) {
 
         return (
           <div key={document.id} className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-white px-4 py-4">
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="font-semibold text-ink">{document.original_filename}</p>
               <p className="mt-1 text-xs text-slate-500">{document.document_type}</p>
             </div>
@@ -49,7 +58,7 @@ function DocumentList({ documents = [], orderNumber, phone }) {
               {document.status ? <StatusBadge status={document.status} /> : null}
               {isAnonymousMode ? (
                 <a className="btn-secondary px-4 py-2 text-xs" href={anonymousUrl}>
-                  تنزيل
+                  {isArabic ? 'تنزيل' : 'Download'}
                 </a>
               ) : (
                 <button
@@ -58,7 +67,13 @@ function DocumentList({ documents = [], orderNumber, phone }) {
                   onClick={() => handleAuthenticatedDownload(document)}
                   type="button"
                 >
-                  {downloading[document.id] ? '...' : 'تنزيل'}
+                  {downloading[document.id]
+                    ? isArabic
+                      ? 'جارٍ التنزيل...'
+                      : 'Downloading...'
+                    : isArabic
+                      ? 'تنزيل'
+                      : 'Download'}
                 </button>
               )}
             </div>

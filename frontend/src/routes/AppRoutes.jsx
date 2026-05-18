@@ -8,11 +8,14 @@ import {
   FilePlus2,
   FileSearch,
   FileText,
+  FolderTree,
   FolderKanban,
+  GitBranchPlus,
   Home,
   ImagePlus,
   LayoutDashboard,
   LineChart,
+  MessageSquareMore,
   Monitor,
   Palette,
   Settings,
@@ -22,17 +25,17 @@ import {
 } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import RouteErrorBoundary from '../components/RouteErrorBoundary'
 import DashboardLayout from '../layouts/DashboardLayout'
 import PublicLayout from '../layouts/PublicLayout'
 import ProtectedRoute from './ProtectedRoute'
 
-// Public pages — loaded immediately (landing traffic)
 import HomePage from '../pages/public/HomePage'
 import ServicesPage from '../pages/public/ServicesPage'
 import ServiceDetailsPage from '../pages/public/ServiceDetailsPage'
 import LoginPage from '../pages/public/LoginPage'
+import RegisterPage from '../pages/public/RegisterPage'
 
-// All other pages lazy-loaded — downloaded only when the user navigates to that role
 const CreateOrderPage = lazy(() => import('../pages/public/CreateOrderPage'))
 const TrackOrderPage = lazy(() => import('../pages/public/TrackOrderPage'))
 const AboutPage = lazy(() => import('../pages/public/AboutPage'))
@@ -52,6 +55,9 @@ const EmployeeReviewQueuePage = lazy(() => import('../pages/employee/EmployeeRev
 const EmployeeOrderReviewPage = lazy(() => import('../pages/employee/EmployeeOrderReviewPage'))
 const EmployeeVerifyDocumentsPage = lazy(() => import('../pages/employee/EmployeeVerifyDocumentsPage'))
 const EmployeeReportsPage = lazy(() => import('../pages/employee/EmployeeReportsPage'))
+const MissingServiceRequestsPage = lazy(() => import('../pages/shared/MissingServiceRequestsPage'))
+const ServiceCategoryManagementPage = lazy(() => import('../pages/shared/ServiceCategoryManagementPage'))
+const ServiceRelationsManagementPage = lazy(() => import('../pages/shared/ServiceRelationsManagementPage'))
 
 const AdminOverviewPage = lazy(() => import('../pages/admin/AdminOverviewPage'))
 const OrdersManagementPage = lazy(() => import('../pages/admin/OrdersManagementPage'))
@@ -86,6 +92,9 @@ const customerLinks = [
 const employeeLinks = [
   { to: '/employee', label: 'الرئيسية', icon: LayoutDashboard },
   { to: '/employee/orders', label: 'قائمة المراجعة', icon: FileSearch },
+  { to: '/employee/missing-service-requests', label: 'طلبات خدمات جديدة', icon: MessageSquareMore },
+  { to: '/employee/service-categories', label: 'تصنيفات الخدمات', icon: FolderTree, roles: ['support'] },
+  { to: '/employee/service-relations', label: 'علاقات الخدمات', icon: GitBranchPlus, roles: ['support'] },
   { to: '/employee/documents/verify', label: 'التحقق من الوثائق', icon: ShieldCheck },
   { to: '/employee/reports', label: 'تقارير الموظف', icon: LineChart },
 ]
@@ -94,13 +103,16 @@ const adminLinks = [
   { to: '/admin', label: 'لوحة الإدارة', icon: LayoutDashboard },
   { to: '/admin/orders', label: 'إدارة الطلبات', icon: FolderKanban },
   { to: '/admin/rules', label: 'قواعد التشغيل', icon: Settings },
-  { to: '/admin/cms', label: 'إدارة المحتوى', icon: Database },
+  { to: '/admin/cms', label: 'إعدادات النظام', icon: Database },
+  { to: '/admin/service-categories', label: 'تصنيفات الخدمات', icon: FolderTree },
   { to: '/admin/services', label: 'الخدمات', icon: Settings },
+  { to: '/admin/service-relations', label: 'علاقات الخدمات', icon: GitBranchPlus },
   { to: '/admin/public-site', label: 'الموقع العام', icon: Monitor },
   { to: '/admin/public-site/content', label: 'محتوى الرئيسية', icon: FileText },
   { to: '/admin/public-site/advertisements', label: 'الإعلانات', icon: ImagePlus },
   { to: '/admin/public-site/theme', label: 'المظهر العام', icon: Palette },
   { to: '/admin/public-site/preview', label: 'معاينة الواجهة', icon: Eye },
+  { to: '/admin/missing-service-requests', label: 'طلبات الخدمات الجديدة', icon: MessageSquareMore },
   { to: '/admin/users', label: 'المستخدمون والأدوار', icon: UsersRound },
   { to: '/admin/providers', label: 'المزودون', icon: BriefcaseBusiness },
   { to: '/admin/provider-services', label: 'خدمات المزودين', icon: ClipboardList },
@@ -125,76 +137,90 @@ function PageLoader() {
 
 function AppRoutes() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/services/:slug" element={<ServiceDetailsPage />} />
-          <Route path="/create-order" element={<CreateOrderPage />} />
-          <Route path="/track-order" element={<TrackOrderPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-
-        <Route element={<ProtectedRoute roles={['customer']} />}>
-          <Route element={<DashboardLayout links={customerLinks} title="بوابة العميل" />}>
-            <Route path="/customer" element={<CustomerDashboardHome />} />
-            <Route path="/customer/orders/new" element={<CustomerCreateOrderPage />} />
-            <Route path="/customer/orders" element={<MyOrdersPage />} />
-            <Route path="/customer/orders/:id" element={<CustomerOrderDetailsPage />} />
-            <Route path="/customer/orders/:id/missing-docs" element={<MissingDocumentsResponsePage />} />
-            <Route path="/customer/profile" element={<ProfilePage />} />
+    <RouteErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:slug" element={<ServiceDetailsPage />} />
+            <Route path="/create-order" element={<CreateOrderPage />} />
+            <Route path="/track-order" element={<TrackOrderPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           </Route>
-        </Route>
 
-        <Route element={<ProtectedRoute roles={['employee', 'support']} />}>
-          <Route element={<DashboardLayout links={employeeLinks} title="بوابة الموظف" />}>
-            <Route path="/employee" element={<EmployeeDashboardHome />} />
-            <Route path="/employee/orders" element={<EmployeeReviewQueuePage />} />
-            <Route path="/employee/orders/:id" element={<EmployeeOrderReviewPage />} />
-            <Route path="/employee/documents/verify" element={<EmployeeVerifyDocumentsPage />} />
-            <Route path="/employee/reports" element={<EmployeeReportsPage />} />
+          <Route element={<ProtectedRoute roles={['customer']} />}>
+            <Route element={<DashboardLayout links={customerLinks} title="بوابة العميل" />}>
+              <Route path="/customer" element={<CustomerDashboardHome />} />
+              <Route path="/customer/orders/new" element={<CustomerCreateOrderPage />} />
+              <Route path="/customer/orders" element={<MyOrdersPage />} />
+              <Route path="/customer/orders/:id" element={<CustomerOrderDetailsPage />} />
+              <Route path="/customer/orders/:id/missing-docs" element={<MissingDocumentsResponsePage />} />
+              <Route path="/customer/profile" element={<ProfilePage />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route element={<ProtectedRoute roles={['admin']} />}>
-          <Route element={<DashboardLayout links={adminLinks} title="لوحة الإدارة" />}>
-            <Route path="/admin" element={<AdminOverviewPage />} />
-            <Route path="/admin/orders" element={<OrdersManagementPage />} />
-            <Route path="/admin/orders/:id" element={<AdminOrderDetailsPage />} />
-            <Route path="/admin/rules" element={<AdminRuleManagementPage />} />
-            <Route path="/admin/cms" element={<AdminCmsPage />} />
-            <Route path="/admin/services" element={<ServicesManagementPage />} />
-            <Route path="/admin/public-site" element={<PublicSiteManagementPage />} />
-            <Route path="/admin/public-site/content" element={<HomepageContentEditorPage />} />
-            <Route path="/admin/public-site/advertisements" element={<AdvertisementManagerPage />} />
-            <Route path="/admin/public-site/theme" element={<ThemeSettingsPage />} />
-            <Route path="/admin/public-site/preview" element={<PreviewPublicPage />} />
-            <Route path="/admin/users" element={<AdminUsersRolesPage />} />
-            <Route path="/admin/providers" element={<ProvidersManagementPage />} />
-            <Route path="/admin/provider-services" element={<ServiceProviderAssignmentsPage />} />
-            <Route path="/admin/reports" element={<ReportsPage />} />
-            <Route path="/admin/notifications" element={<NotificationsPage />} />
-            <Route path="/admin/payments" element={<PaymentsManagementPage />} />
-            <Route path="/admin/audit" element={<AuditLogPage />} />
+          <Route element={<ProtectedRoute roles={['employee', 'support']} />}>
+            <Route element={<DashboardLayout links={employeeLinks} title="بوابة الموظف" />}>
+              <Route path="/employee" element={<EmployeeDashboardHome />} />
+              <Route path="/employee/orders" element={<EmployeeReviewQueuePage />} />
+              <Route path="/employee/missing-service-requests" element={<MissingServiceRequestsPage />} />
+              <Route path="/employee/orders/:id" element={<EmployeeOrderReviewPage />} />
+              <Route path="/employee/documents/verify" element={<EmployeeVerifyDocumentsPage />} />
+              <Route path="/employee/reports" element={<EmployeeReportsPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route element={<ProtectedRoute roles={['provider']} />}>
-          <Route element={<DashboardLayout links={providerLinks} title="بوابة المزود" />}>
-            <Route path="/provider" element={<ProviderDashboardHome />} />
-            <Route path="/provider/orders" element={<AssignedOrdersPage />} />
-            <Route path="/provider/orders/:id" element={<ProviderOrderDetailsPage />} />
+          <Route element={<ProtectedRoute roles={['support']} />}>
+            <Route element={<DashboardLayout links={employeeLinks} title="بوابة الموظف" />}>
+              <Route path="/employee/service-categories" element={<ServiceCategoryManagementPage />} />
+              <Route path="/employee/service-relations" element={<ServiceRelationsManagementPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+          <Route element={<ProtectedRoute roles={['admin']} />}>
+            <Route element={<DashboardLayout links={adminLinks} title="لوحة الإدارة" />}>
+              <Route path="/admin" element={<AdminOverviewPage />} />
+              <Route path="/admin/orders" element={<OrdersManagementPage />} />
+              <Route path="/admin/orders/:id" element={<AdminOrderDetailsPage />} />
+              <Route path="/admin/rules" element={<AdminRuleManagementPage />} />
+              <Route path="/admin/cms" element={<AdminCmsPage />} />
+              <Route path="/admin/service-categories" element={<ServiceCategoryManagementPage />} />
+              <Route path="/admin/services" element={<ServicesManagementPage />} />
+              <Route path="/admin/service-relations" element={<ServiceRelationsManagementPage />} />
+              <Route path="/admin/public-site" element={<PublicSiteManagementPage />} />
+              <Route path="/admin/public-site/content" element={<HomepageContentEditorPage />} />
+              <Route path="/admin/public-site/advertisements" element={<AdvertisementManagerPage />} />
+              <Route path="/admin/public-site/theme" element={<ThemeSettingsPage />} />
+              <Route path="/admin/public-site/preview" element={<PreviewPublicPage />} />
+              <Route path="/admin/missing-service-requests" element={<MissingServiceRequestsPage />} />
+              <Route path="/admin/users" element={<AdminUsersRolesPage />} />
+              <Route path="/admin/providers" element={<ProvidersManagementPage />} />
+              <Route path="/admin/provider-services" element={<ServiceProviderAssignmentsPage />} />
+              <Route path="/admin/reports" element={<ReportsPage />} />
+              <Route path="/admin/notifications" element={<NotificationsPage />} />
+              <Route path="/admin/payments" element={<PaymentsManagementPage />} />
+              <Route path="/admin/audit" element={<AuditLogPage />} />
+            </Route>
+          </Route>
+
+          <Route element={<ProtectedRoute roles={['provider']} />}>
+            <Route element={<DashboardLayout links={providerLinks} title="بوابة المزود" />}>
+              <Route path="/provider" element={<ProviderDashboardHome />} />
+              <Route path="/provider/orders" element={<AssignedOrdersPage />} />
+              <Route path="/provider/orders/:id" element={<ProviderOrderDetailsPage />} />
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </RouteErrorBoundary>
   )
 }
 

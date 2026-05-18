@@ -1,13 +1,17 @@
-import { CreditCard } from 'lucide-react'
+import { CreditCard, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import DataTable from '../../components/DataTable'
+import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
-import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { getDisplayError } from '../../api/client'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
+
+const PAGE_SIZE = 20
 
 const statusOptions = [
   { value: '', label: 'كل الحالات' },
@@ -30,11 +34,23 @@ const statusMap = {
   cancelled: 'CANCELLED',
 }
 
+function Field({ label, children }) {
+  return (
+    <label className="space-y-2">
+      <span className="text-sm font-semibold text-ink">{label}</span>
+      {children}
+    </label>
+  )
+}
+
 function PaymentsManagementPage() {
+  const { toast } = useToast()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterOrderNumber, setFilterOrderNumber] = useState('')
   const [selectedPaymentId, setSelectedPaymentId] = useState(null)
-  const [feedback, setFeedback] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [submitting, setSubmitting] = useState(false)
   const statusForm = useForm({ defaultValues: { status: '', failure_reason: '', notes: '', reference_number: '' } })
 
   const { data: payments = [], loading, reload } = useAsyncData(
@@ -43,20 +59,56 @@ function PaymentsManagementPage() {
     [],
   )
 
-  const selectedPayment = payments.find((p) => String(p.id) === String(selectedPaymentId)) || null
+  const selectedPayment = payments.find((payment) => String(payment.id) === String(selectedPaymentId)) || null
+
+  const total = payments.length
+  const paginated = payments.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  function openEditForm(paymentId) {
+    setSelectedPaymentId(paymentId)
+    statusForm.reset({ status: '', failure_reason: '', notes: '', reference_number: '' })
+    setIsFormOpen(true)
+  }
+
+  function closeForm() {
+    setSelectedPaymentId(null)
+    setIsFormOpen(false)
+    statusForm.reset({ status: '', failure_reason: '', notes: '', reference_number: '' })
+  }
 
   async function handleStatusUpdate(values) {
     if (!selectedPayment) return
+    setSubmitting(true)
     try {
       await api.updateAdminPaymentStatus(selectedPayment.id, values)
-      setFeedback({ type: 'success', text: 'تم تحديث حالة الدفع.' })
+      toast('تم تحديث حالة الدفع.', 'success')
       reload()
-      setSelectedPaymentId(null)
-      statusForm.reset()
+      closeForm()
     } catch (error) {
-      setFeedback({ type: 'error', text: getDisplayError(error) })
+      toast(getDisplayError(error), 'error')
+    } finally {
+      setSubmitting(false)
     }
   }
+
+  const toolbar = (
+    <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+      <div className="relative">
+        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          className="field pr-9 text-sm"
+          onChange={(event) => { setFilterOrderNumber(event.target.value); setPage(1) }}
+          placeholder="رقم الطلب..."
+          value={filterOrderNumber}
+        />
+      </div>
+      <select className="field min-w-44 text-sm" onChange={(event) => { setFilterStatus(event.target.value); setPage(1) }} value={filterStatus}>
+        {statusOptions.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    </div>
+  )
 
   const columns = [
     { key: 'payment_number', label: 'رقم الدفع' },
@@ -79,7 +131,7 @@ function PaymentsManagementPage() {
       key: 'actions',
       label: 'الإجراءات',
       render: (row) => (
-        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedPaymentId(row.id)} type="button">
+        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
           تعديل الحالة
         </button>
       ),
@@ -87,92 +139,90 @@ function PaymentsManagementPage() {
   ]
 
   return (
-    <div className="page-section">
+    <div className="page-section space-y-6">
       <PageHeader
-        description="استعرض سجلات الدفع للطلبات وحدّث الحالة أو أضف ملاحظات عند الحاجة."
+        description="استعرض سجل الدفعات وحدث حالة أي عملية من نافذة واضحة بدلاً من بطاقة جانبية ضيقة."
         eyebrow="إدارة المدفوعات"
         icon={CreditCard}
         title="المدفوعات"
       />
 
-      <div className="mb-4 grid gap-4 md:grid-cols-[1fr_auto]">
-        <input
-          className="field"
-          placeholder="رقم الطلب"
-          value={filterOrderNumber}
-          onChange={(e) => setFilterOrderNumber(e.target.value)}
-        />
-        <select className="field min-w-44" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-          {statusOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <section className="glass-panel p-5">
+        <p className="text-sm leading-7 text-slate-600">
+          افتح أي دفعة من الجدول لتحديث حالتها أو إضافة المرجع والملاحظات. تم نقل نموذج التعديل إلى نافذة مستقلة حتى تبقى القائمة أسهل في المراجعة والمتابعة.
+        </p>
+      </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        {loading ? (
-          <div className="glass-panel p-6 text-sm text-slate-500">جارٍ تحميل المدفوعات...</div>
-        ) : (
-          <DataTable
-            columns={columns}
-            emptyDescription="لا توجد مدفوعات مسجلة بعد أو لا تطابق أي نتيجة المرشحات الحالية."
-            emptyTitle="لا توجد مدفوعات"
-            mobileCard={(row) => (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-bold text-ink">{row.payment_number}</p>
-                  <StatusBadge status={statusMap[row.status] || row.status} />
-                </div>
-                <p className="text-sm text-slate-600">{row.order_number} — {row.customer_name}</p>
-                <p className="text-sm font-medium text-ink">{row.amount} {row.currency || 'JOD'}</p>
-              </div>
-            )}
-            rows={payments}
-          />
+      <DataTable
+        columns={columns}
+        emptyDescription="لا توجد مدفوعات مسجلة بعد أو لا تطابق أي نتيجة المرشحات الحالية."
+        emptyTitle="لا توجد مدفوعات"
+        loading={loading}
+        mobileCard={(row) => (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-bold text-ink">{row.payment_number}</p>
+              <StatusBadge status={statusMap[row.status] || row.status} />
+            </div>
+            <p className="text-sm text-slate-600">{row.order_number} — {row.customer_name}</p>
+            <p className="text-sm font-medium text-ink">{row.amount} {row.currency || 'JOD'}</p>
+          </div>
         )}
+        pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
+        rows={paginated}
+        toolbar={toolbar}
+      />
 
-        <section className="glass-panel p-6">
-          <h2 className="text-xl font-bold text-ink">{selectedPayment ? `تعديل ${selectedPayment.payment_number}` : 'اختر دفعة لتعديل حالتها'}</h2>
-          {selectedPayment ? (
-            <form className="mt-6 space-y-4" onSubmit={statusForm.handleSubmit(handleStatusUpdate)}>
-              <div className="rounded-3xl border border-border bg-white p-4 text-sm space-y-1">
-                <p>رقم الطلب: <span className="font-semibold">{selectedPayment.order_number}</span></p>
-                <p>العميل: <span className="font-semibold">{selectedPayment.customer_name}</span></p>
-                <p>المبلغ: <span className="font-semibold">{selectedPayment.amount} {selectedPayment.currency}</span></p>
-                <p>طريقة الدفع: <span className="font-semibold">{selectedPayment.method_label}</span></p>
-              </div>
+      <FormModal
+        description="حدث الحالة وأضف المرجع أو الملاحظات عند الحاجة. استخدم سبب الفشل فقط للحالات الفاشلة أو الملغاة."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeForm} type="button">
+              إلغاء
+            </button>
+            <button className="btn-primary min-w-40" disabled={submitting} form="payment-status-form" type="submit">
+              {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
+              تحديث الحالة
+            </button>
+          </div>
+        }
+        onClose={closeForm}
+        open={isFormOpen}
+        size="md"
+        title={selectedPayment ? `تعديل ${selectedPayment.payment_number}` : 'تعديل حالة الدفع'}
+      >
+        {selectedPayment ? (
+          <form className="space-y-5" id="payment-status-form" onSubmit={statusForm.handleSubmit(handleStatusUpdate)}>
+            <div className="rounded-3xl border border-border bg-slate-50 p-4 text-sm space-y-2">
+              <p>رقم الطلب: <span className="font-semibold">{selectedPayment.order_number}</span></p>
+              <p>العميل: <span className="font-semibold">{selectedPayment.customer_name}</span></p>
+              <p>المبلغ: <span className="font-semibold">{selectedPayment.amount} {selectedPayment.currency}</span></p>
+              <p>طريقة الدفع: <span className="font-semibold">{selectedPayment.method_label}</span></p>
+            </div>
+
+            <Field label="الحالة الجديدة">
               <select className="field" {...statusForm.register('status', { required: true })}>
                 <option value="">اختر الحالة الجديدة</option>
-                {statusOptions.filter((o) => o.value).map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                {statusOptions.filter((option) => option.value).map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
+            </Field>
+
+            <Field label="المرجع أو رقم الإيصال">
               <input className="field" placeholder="المرجع أو رقم الإيصال" {...statusForm.register('reference_number')} />
-              <textarea className="field min-h-20" placeholder="ملاحظات (اختياري)" {...statusForm.register('notes')} />
-              <input className="field" placeholder="سبب الفشل (إن وجد)" {...statusForm.register('failure_reason')} />
-              <div className="flex gap-3">
-                <button className="btn-primary flex-1" type="submit">
-                  تحديث الحالة
-                </button>
-                <button
-                  className="btn-secondary"
-                  onClick={() => { setSelectedPaymentId(null); statusForm.reset() }}
-                  type="button"
-                >
-                  إلغاء
-                </button>
-              </div>
-              {feedback ? <p className={`text-sm ${feedback.type === 'error' ? 'text-danger' : 'text-success'}`}>{feedback.text}</p> : null}
-            </form>
-          ) : (
-            <p className="mt-4 text-sm text-slate-500">انقر على "تعديل الحالة" في أي صف لفتح نموذج التحديث هنا.</p>
-          )}
-        </section>
-      </div>
+            </Field>
+
+            <Field label="ملاحظات">
+              <textarea className="field min-h-24" placeholder="ملاحظات إضافية" {...statusForm.register('notes')} />
+            </Field>
+
+            <Field label="سبب الفشل">
+              <input className="field" placeholder="يستخدم عند الحاجة فقط" {...statusForm.register('failure_reason')} />
+            </Field>
+          </form>
+        ) : null}
+      </FormModal>
     </div>
   )
 }

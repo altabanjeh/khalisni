@@ -59,8 +59,9 @@ class PaymentPermissionTests(APITestCase):
         self.client.force_authenticate(self.customer)
         response = self.client.get("/api/customer/payments/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["id"], self.payment.id)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["id"], self.payment.id)
 
     def test_employee_cannot_access_admin_payment_screen(self):
         self.client.force_authenticate(self.employee)

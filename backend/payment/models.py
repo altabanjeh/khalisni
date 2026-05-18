@@ -46,6 +46,13 @@ class Payment(models.Model):
         on_delete=models.PROTECT,
         related_name="payments"
     )
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="payments",
+        null=True,
+        blank=True,
+    )
 
     # User who made the payment.
     # This creates paid_by_id in the database.
@@ -209,6 +216,8 @@ class Payment(models.Model):
 
         if self.status == self.PaymentStatus.FAILED and not self.failure_reason:
             errors["failure_reason"] = "Failed payments require a failure reason."
+        if self.order_id and self.organization_id and self.order.organization_id != self.organization_id:
+            errors["organization"] = "Payment organization must match the order organization."
 
         if self.paid_at and self.status not in {
             self.PaymentStatus.PAID,
@@ -237,6 +246,8 @@ class Payment(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         exclude = ["payment_number"] if not self.payment_number else None
+        if self.order_id and not self.organization_id:
+            self.organization = self.order.organization
         self.full_clean(exclude=exclude)
 
         super().save(*args, **kwargs)
@@ -244,3 +255,95 @@ class Payment(models.Model):
         if is_new and not self.payment_number:
             self.payment_number = f"PAY-{self.payment_id:06d}"
             super().save(update_fields=["payment_number"])
+
+
+class Invoice(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        ISSUED = "issued", "Issued"
+        PAID = "paid", "Paid"
+        PARTIALLY_PAID = "partially_paid", "Partially paid"
+        CANCELLED = "cancelled", "Cancelled"
+
+    invoice_id = models.BigAutoField(primary_key=True)
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT, related_name="invoices")
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="invoices", null=True, blank=True)
+    invoice_number = models.CharField(max_length=40, unique=True, blank=True, db_index=True)
+    status = models.CharField(max_length=30, choices=Status.choices, default=Status.DRAFT, db_index=True)
+    subtotal_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    due_date = models.DateField(null=True, blank=True)
+    issued_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["organization", "status"]), models.Index(fields=["invoice_number"])]
+
+    @property
+    def id(self):
+        return self.pk
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        self.total_amount = (self.subtotal_amount or Decimal("0.00")) + (self.tax_amount or Decimal("0.00"))
+        super().save(*args, **kwargs)
+        if is_new and not self.invoice_number:
+            self.invoice_number = f"INV-{self.invoice_id:06d}"
+            super().save(update_fields=["invoice_number"])
+
+
+class CommissionRule(models.Model):
+    commission_rule_id = models.BigAutoField(primary_key=True)
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.CASCADE, related_name="commission_rules")
+    service = models.ForeignKey("services.Service", on_delete=models.CASCADE, related_name="commission_rules", null=True, blank=True)
+    provider_organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="provider_commission_rules",
+        null=True,
+        blank=True,
+    )
+    percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
+    fixed_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["organization__name", "-is_active", "service__name_ar"]
+        indexes = [models.Index(fields=["organization", "is_active"]), models.Index(fields=["provider_organization", "is_active"])]
+
+    @property
+    def id(self):
+        return self.pk
+
+
+class ProviderPayout(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        PAID = "paid", "Paid"
+        CANCELLED = "cancelled", "Cancelled"
+
+    provider_payout_id = models.BigAutoField(primary_key=True)
+    provider_organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT, related_name="payouts")
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="provider_payouts")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.00"))])
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True)
+    scheduled_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["provider_organization", "status"]), models.Index(fields=["order", "status"])]
+
+    @property
+    def id(self):
+        return self.pk

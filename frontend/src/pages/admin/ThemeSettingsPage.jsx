@@ -7,6 +7,7 @@ import { api } from '../../api/services'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { fallbackPublicTheme } from '../../utils/publicSiteDefaults'
 import { broadcastPublicSiteUpdate } from '../../utils/publicSiteSync'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import { ColorPickerField, FieldGroup, FormMessage, ImageUploadField, ToggleField } from '../../components/publicSite/PublicSiteFormFields'
 
 function applyServerErrors(error, setError, setFeedback) {
@@ -64,7 +65,7 @@ function ThemeSettingsPage() {
   }
 
   if (loading && !data) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل إعدادات المظهر...</div>
+    return <LoadingSpinner />
   }
 
   return (

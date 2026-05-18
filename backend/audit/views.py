@@ -12,6 +12,7 @@ class AuditLogListAPIView(generics.ListAPIView):
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = AuditLog.objects.select_related("user")
+    pagination_class = None
 
     def get_queryset(self):
         queryset = super().get_queryset()

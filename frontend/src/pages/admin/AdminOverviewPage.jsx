@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { BarChart3, Clock3, LayoutDashboard, UsersRound } from 'lucide-react'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import { api } from '../../api/services'
@@ -20,7 +21,7 @@ function AdminOverviewPage() {
   const { data, loading } = useAsyncData(() => api.getAdminDashboard(), [], null)
 
   if (loading || !data) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل لوحة الإدارة...</div>
+    return <LoadingSpinner />
   }
 
   return (

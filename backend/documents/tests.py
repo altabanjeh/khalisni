@@ -137,8 +137,9 @@ class DocumentStaffVerificationTests(APITestCase):
         response = self.client.get("/api/staff/documents/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        payload = response.data["results"][0]
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 1)
+        payload = records[0]
         self.assertEqual(payload["id"], self.document.id)
         self.assertEqual(payload["order"]["order_number"], self.order.order_number)
         self.assertEqual(payload["uploaded_by_name"], self.customer.full_name)

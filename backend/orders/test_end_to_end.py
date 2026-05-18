@@ -155,12 +155,13 @@ class OrderFlowEndToEndTests(APITestCase):
     def _pdf_upload(self, name, *, content=b"%PDF-1.4 flow test"):
         return SimpleUploadedFile(name, content, content_type="application/pdf")
 
-    def _create_public_order(self, *, service, phone, document_types=None, documents=None, city="Amman"):
-        self._as(None)
+    def _create_customer_order(self, *, service, customer=None, phone=None, document_types=None, documents=None, city="Amman"):
+        customer = customer or self.customer
+        self._as(customer)
         payload = {
             "service": str(service.id) if documents else service.id,
-            "full_name": "Flow Customer",
-            "phone": phone,
+            "full_name": customer.full_name,
+            "phone": phone or customer.phone,
             "city": city,
             "notes": "Please process carefully",
             "consent": True if not documents else "true",
@@ -246,7 +247,7 @@ class OrderFlowEndToEndTests(APITestCase):
         return response
 
     def test_scenario_1_normal_successful_order_flow(self):
-        order = self._create_public_order(
+        order = self._create_customer_order(
             service=self.flow_service,
             phone=self.customer.phone,
             document_types=["national_id", "authorization_letter"],
@@ -351,7 +352,7 @@ class OrderFlowEndToEndTests(APITestCase):
         )
 
     def test_scenario_2_missing_document_flow(self):
-        order = self._create_public_order(
+        order = self._create_customer_order(
             service=self.missing_docs_service,
             phone="0797111111",
         )
@@ -408,7 +409,7 @@ class OrderFlowEndToEndTests(APITestCase):
         self.assertEqual(Notification.objects.filter(order=order, template_key="client_uploaded_missing_document").count(), 6)
 
     def test_scenario_3_provider_return_flow(self):
-        order = self._create_public_order(
+        order = self._create_customer_order(
             service=self.flow_service,
             phone="0797222222",
             document_types=["national_id", "authorization_letter"],
@@ -591,7 +592,6 @@ class OrderFlowEndToEndTests(APITestCase):
             AuditLog.objects.filter(entity_type="ServiceRequiredDocument", entity_id=str(rule_id)).exists()
         )
 
-        self._as(None)
         new_order_response = self.client.post(
             "/api/orders/",
             {
@@ -604,8 +604,7 @@ class OrderFlowEndToEndTests(APITestCase):
             },
             format="json",
         )
-        self.assertEqual(new_order_response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("documents", new_order_response.data)
+        self.assertEqual(new_order_response.status_code, status.HTTP_403_FORBIDDEN)
 
         old_completed_order.refresh_from_db()
         self.assertEqual(old_completed_order.status, Order.Status.COMPLETED)

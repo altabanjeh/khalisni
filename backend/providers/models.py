@@ -6,6 +6,13 @@ from django.utils import timezone
 
 
 class ProviderProfile(models.Model):
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="provider_profiles",
+        null=True,
+        blank=True,
+    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -53,6 +60,8 @@ class ProviderProfile(models.Model):
 
         if self.user_id and self.user.role != self.user.Role.PROVIDER:
             errors["user"] = "Provider profiles can only be linked to provider users."
+        if self.organization_id and self.organization.organization_type != self.organization.OrganizationType.PROVIDER:
+            errors["organization"] = "Provider profiles must belong to provider organizations."
 
         if self.is_approved and not self.approved_at:
             self.approved_at = timezone.now()

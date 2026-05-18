@@ -10,6 +10,7 @@ import {
   mockAdminDashboard,
   mockAuditLogs,
   mockCategories,
+  mockMissingServiceRequests,
   mockNotifications,
   mockOrders,
   mockProviders,
@@ -35,6 +36,8 @@ const mockNotificationCenter = mockNotifications.map((notification, index) => ({
   message: notification.order_number ? `Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø·Ù„Ø¨ ${notification.order_number}` : 'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ø§Ù…',
   is_read: index !== 0,
 }))
+let mockPublicMissingServiceRequests = [...mockMissingServiceRequests]
+const mockRoleOptions = ['admin', 'customer', 'employee', 'support', 'provider']
 const mockUsers = [
   {
     id: 1,
@@ -43,6 +46,10 @@ const mockUsers = [
     phone: '0790000001',
     role: 'admin',
     is_active: true,
+    is_verified: true,
+    is_super_admin: true,
+    role_options: mockRoleOptions,
+    current_permissions: [],
   },
   {
     id: 2,
@@ -51,6 +58,10 @@ const mockUsers = [
     phone: '0790000002',
     role: 'customer',
     is_active: true,
+    is_verified: true,
+    is_super_admin: false,
+    role_options: mockRoleOptions,
+    current_permissions: [],
   },
   {
     id: 3,
@@ -59,6 +70,10 @@ const mockUsers = [
     phone: '0790000004',
     role: 'employee',
     is_active: true,
+    is_verified: true,
+    is_super_admin: false,
+    role_options: mockRoleOptions,
+    current_permissions: ['orders.review_order', 'documents.view_document'],
   },
   {
     id: 4,
@@ -67,6 +82,10 @@ const mockUsers = [
     phone: '0790000003',
     role: 'provider',
     is_active: true,
+    is_verified: false,
+    is_super_admin: false,
+    role_options: mockRoleOptions,
+    current_permissions: [],
   },
 ]
 const mockSystemSettings = [
@@ -168,6 +187,15 @@ const mockPublicHomepage = {
 }
 
 export const api = {
+  register: async (payload) =>
+    withTestValue(() => authApi.register(payload), {
+      id: Date.now(),
+      full_name: payload?.full_name || '',
+      phone: payload?.phone || '',
+      email: payload?.email || '',
+      national_id: payload?.national_id || '',
+      role: 'customer',
+    }),
   login: authApi.login,
   logout: authApi.logout,
   me: async () => withTestValue(() => authApi.me(), null),
@@ -183,6 +211,37 @@ export const api = {
   getPublicHomepage: async () => withTestValue(() => publicSiteApi.getPublicHomepage(), mockPublicHomepage),
   getPublicTheme: async () => withTestValue(() => publicSiteApi.getPublicTheme(), fallbackPublicTheme),
   getPublicAdvertisements: async () => withTestValue(() => publicSiteApi.getPublicAdvertisements(), mockPublicAdvertisements),
+  createPublicMissingServiceRequest: async (payload) =>
+    withTestValue(
+      () => publicSiteApi.createPublicMissingServiceRequest(payload),
+      (() => {
+        const nextId = (mockPublicMissingServiceRequests.at(-1)?.id || 0) + 1
+        const created = {
+          id: nextId,
+          request_id: nextId,
+          request_number: `MSR-${String(nextId).padStart(6, '0')}`,
+          service_name: payload?.service_name || '',
+          request_message: payload?.request_message || '',
+          requester_name: payload?.requester_name || '',
+          requester_phone: payload?.requester_phone || '',
+          requester_email: payload?.requester_email || '',
+          preferred_contact_channel: payload?.preferred_contact_channel || 'whatsapp',
+          source: payload?.source || 'homepage_chat',
+          status: 'new',
+          assigned_to: null,
+          assigned_to_name: '',
+          matched_service: payload?.matched_service_id || null,
+          matched_service_name: mockServices.find((service) => service.id === payload?.matched_service_id)?.name_ar || '',
+          response_message: '',
+          internal_notes: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          resolved_at: null,
+        }
+        mockPublicMissingServiceRequests = [created, ...mockPublicMissingServiceRequests]
+        return created
+      })(),
+    ),
 
   createOrder: ordersApi.createOrder,
   trackOrder: async (payload) =>
@@ -231,8 +290,13 @@ export const api = {
   rejectOrder: ordersApi.rejectOrder,
 
   getAdminServices: async () => withTestValue(() => servicesApi.getAdminServices(), mockServices),
-  getAdminCategories: async () => withTestValue(() => servicesApi.getAdminCategories(), mockCategories),
+  getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), mockCategories),
+  reorderAdminCategories: servicesApi.reorderAdminCategories,
   getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), []),
+  getAdminServiceRelations: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceRelations(params), []),
+  createAdminServiceRelation: servicesApi.createAdminServiceRelation,
+  updateAdminServiceRelation: servicesApi.updateAdminServiceRelation,
+  deleteAdminServiceRelation: servicesApi.deleteAdminServiceRelation,
   createAdminServiceDocument: servicesApi.createAdminServiceDocument,
   updateAdminServiceDocument: servicesApi.updateAdminServiceDocument,
   deleteAdminServiceDocument: servicesApi.deleteAdminServiceDocument,
@@ -261,6 +325,47 @@ export const api = {
   updateAdminPublicSiteTheme: publicSiteApi.updateAdminPublicSiteTheme,
   getAdminPublicSiteAdvertisements: async () =>
     withTestValue(() => publicSiteApi.getAdminPublicSiteAdvertisements(), mockPublicAdvertisements),
+  getMissingServiceRequests: async (params = {}) =>
+    withTestValue(
+      () => publicSiteApi.getMissingServiceRequests(params),
+      mockPublicMissingServiceRequests.filter((item) => {
+        if (params?.status && item.status !== params.status) return false
+        if (params?.assigned_only && !item.assigned_to) return false
+        return true
+      }),
+    ),
+  getMissingServiceRequest: async (id) =>
+    withTestValue(
+      () => publicSiteApi.getMissingServiceRequest(id),
+      mockPublicMissingServiceRequests.find((item) => item.id === Number(id)) || null,
+    ),
+  updateMissingServiceRequest: async (id, payload) =>
+    withTestValue(
+      () => publicSiteApi.updateMissingServiceRequest(id, payload),
+      (() => {
+        const index = mockPublicMissingServiceRequests.findIndex((item) => item.id === Number(id))
+        if (index === -1) return null
+        const current = mockPublicMissingServiceRequests[index]
+        const updated = {
+          ...current,
+          ...payload,
+          updated_at: new Date().toISOString(),
+          assigned_to_name:
+            payload?.assigned_to_name != null
+              ? payload.assigned_to_name
+              : current.assigned_to_name,
+          matched_service_name:
+            payload?.matched_service != null
+              ? mockServices.find((service) => service.id === Number(payload.matched_service))?.name_ar || ''
+              : current.matched_service_name,
+        }
+        mockPublicMissingServiceRequests = [
+          updated,
+          ...mockPublicMissingServiceRequests.filter((item) => item.id !== Number(id)),
+        ]
+        return updated
+      })(),
+    ),
   createAdminPublicSiteAdvertisement: publicSiteApi.createAdminPublicSiteAdvertisement,
   updateAdminPublicSiteAdvertisement: publicSiteApi.updateAdminPublicSiteAdvertisement,
   deleteAdminPublicSiteAdvertisement: publicSiteApi.deleteAdminPublicSiteAdvertisement,
@@ -289,6 +394,7 @@ export const api = {
   getProviders: async (params = {}) => withTestValue(() => providersApi.getProviders(params), mockProviders),
   createProvider: providersApi.createProvider,
   updateProvider: providersApi.updateProvider,
+  deleteProvider: providersApi.deleteProvider,
   updateProviderApproval: providersApi.updateProviderApproval,
   updateProviderActivation: providersApi.updateProviderActivation,
   getNotifications: async () => withTestValue(() => notificationsApi.getNotifications(), mockNotifications),

@@ -1,15 +1,28 @@
 from rest_framework import filters, generics, permissions, status, viewsets
+from rest_framework.decorators import action
+from django.db.models import Count, Q
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from audit.utils import create_audit_log
-from config.permissions import CanManageServicePrices
-from services.models import Address, Service, ServiceCategory, ServiceProviderAssignment, ServiceRequiredDocument
+from config.permissions import CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
+from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_platform_super_admin
+from services.models import Address, Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
+from services.service_categories import category_snapshot
+from services.service_relations import relation_snapshot
+from services.selectors import (
+    resolve_service_organization_from_request,
+    visible_service_categories_queryset,
+    visible_services_queryset,
+)
 from services.serializers import (
     AddressAdminSerializer,
     AdminCategoryRuleSerializer,
     AdminRequiredDocumentRuleSerializer,
     AdminServiceProviderAssignmentSerializer,
     AdminServiceRuleSerializer,
+    ServiceRelationAdminSerializer,
     ServiceCategorySerializer,
     ServiceDetailSerializer,
     ServiceListSerializer,
@@ -52,13 +65,23 @@ class AdminAuditMixin:
         )
 
     def perform_create(self, serializer):
-        instance = serializer.save()
+        try:
+            instance = serializer.save()
+        except DjangoValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                raise ValidationError(exc.message_dict)
+            raise ValidationError(exc.messages)
         self._log_change(self.request, f"create_{self.audit_entity_type.lower()}", instance, new_value=_snapshot(instance, self.audit_fields))
 
     def perform_update(self, serializer):
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
-        instance = serializer.save()
+        try:
+            instance = serializer.save()
+        except DjangoValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                raise ValidationError(exc.message_dict)
+            raise ValidationError(exc.messages)
         self._log_change(self.request, f"update_{self.audit_entity_type.lower()}", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
 
 
@@ -66,14 +89,19 @@ class ServiceListAPIView(generics.ListAPIView):
     serializer_class = ServiceListSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
-    search_fields = ["name_ar", "name_en", "description_ar"]
+    search_fields = ["name_ar", "name_en", "description_ar", "description_en"]
+    pagination_class = None
 
     def get_queryset(self):
-        queryset = Service.objects.filter(is_active=True).select_related("category")
+        organization = resolve_service_organization_from_request(self.request)
+        queryset = visible_services_queryset(organization=organization)
         category_slug = self.request.query_params.get("category")
+        category_id = self.request.query_params.get("category_id")
         featured = self.request.query_params.get("featured")
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
         if featured:
             queryset = queryset.filter(is_featured=featured.lower() == "true")
         return queryset
@@ -82,24 +110,43 @@ class ServiceListAPIView(generics.ListAPIView):
 class ServiceCategoryListAPIView(generics.ListAPIView):
     serializer_class = ServiceCategorySerializer
     permission_classes = [permissions.AllowAny]
-    queryset = ServiceCategory.objects.filter(is_active=True)
+    pagination_class = None
+
+    def get_queryset(self):
+        organization = resolve_service_organization_from_request(self.request)
+        queryset = visible_service_categories_queryset(organization=organization)
+        parent_id = self.request.query_params.get("parent")
+        if parent_id == "root":
+            queryset = queryset.filter(parent__isnull=True)
+        elif parent_id:
+            queryset = queryset.filter(parent_id=parent_id)
+        return queryset.order_by("sort_order", "display_order", "name_ar")
 
 
 class ServiceDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ServiceDetailSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Service.objects.filter(is_active=True).select_related("category")
     lookup_field = "slug"
+
+    def get_queryset(self):
+        organization = resolve_service_organization_from_request(self.request)
+        return visible_services_queryset(organization=organization).prefetch_related(
+            "document_requirements",
+            "incoming_relations__source_service",
+            "outgoing_relations__target_service",
+        )
 
 
 class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     queryset = Service.objects.all().select_related("category")
-    permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["name_ar", "name_en", "slug"]
     ordering_fields = ["created_at", "service_fee", "government_fee"]
     serializer_class = AdminServiceRuleSerializer
+    pagination_class = None
     audit_entity_type = "Service"
     audit_fields = (
+        "organization_id",
         "name_ar",
         "name_en",
         "category_id",
@@ -115,6 +162,10 @@ class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        organization_id = self.request.query_params.get("organization")
+        queryset = enforce_organization_scope(queryset, user=self.request.user, organization_field="organization")
+        if organization_id:
+            queryset = queryset.filter(organization_id=organization_id)
         category_id = self.request.query_params.get("category")
         active = _as_bool(self.request.query_params.get("is_active"))
         if category_id:
@@ -145,26 +196,80 @@ class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
 
 class CategoryAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminCategoryRuleSerializer
-    queryset = ServiceCategory.objects.all()
-    permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]
+    queryset = ServiceCategory.objects.all().select_related("parent").prefetch_related("services")
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["name_ar", "name_en", "slug"]
+    pagination_class = None
     audit_entity_type = "ServiceCategory"
-    audit_fields = ("name_ar", "name_en", "display_order", "is_active")
+    audit_fields = ("name_ar", "name_en", "parent_id", "sort_order", "show_on_public_site", "is_active")
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not is_platform_super_admin(self.request.user):
+            org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
+            queryset = queryset.filter(Q(services__organization__in=org_ids) | Q(services__organization__isnull=True)).distinct()
+        active = _as_bool(self.request.query_params.get("is_active"))
+        public = _as_bool(self.request.query_params.get("show_on_public_site"))
+        parent_id = self.request.query_params.get("parent")
+        if active is not None:
+            queryset = queryset.filter(is_active=active)
+        if public is not None:
+            queryset = queryset.filter(show_on_public_site=public)
+        if parent_id == "root":
+            queryset = queryset.filter(parent__isnull=True)
+        elif parent_id:
+            queryset = queryset.filter(parent_id=parent_id)
+        return queryset.annotate(active_services_count=Count("services", filter=Q(services__is_active=True), distinct=True)).order_by(
+            "sort_order", "display_order", "name_ar"
+        )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
         instance.is_active = False
-        instance.save(update_fields=["is_active", "updated_at"])
+        try:
+            instance.save(update_fields=["is_active", "updated_at"])
+        except DjangoValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                raise ValidationError(exc.message_dict)
+            raise ValidationError(exc.messages)
         self._log_change(request, "disable_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=["post"])
+    def reorder(self, request):
+        if not request.user.role == request.user.Role.ADMIN and not request.user.has_perm("services.manage_service_prices"):
+            raise PermissionDenied("You do not have permission to reorder service categories.")
+
+        items = request.data.get("items", [])
+        if not isinstance(items, list):
+            return Response({"items": "Items must be a list."}, status=status.HTTP_400_BAD_REQUEST)
+
+        for item in items:
+            category = ServiceCategory.objects.filter(pk=item.get("id")).first()
+            if not category:
+                continue
+            sort_order = int(item.get("sort_order", category.sort_order))
+            category.sort_order = sort_order
+            category.display_order = sort_order
+            category.save(update_fields=["sort_order", "display_order", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="reorder_service_category",
+                entity_type="ServiceCategory",
+                entity_id=category.pk,
+                new_value=category_snapshot(category),
+            )
+        return Response({"detail": "Categories reordered."})
 
 
 class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminRequiredDocumentRuleSerializer
     queryset = ServiceRequiredDocument.objects.select_related("service").all()
-    permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["service__name_ar", "document_type", "name_ar", "name_en"]
+    pagination_class = None
     audit_entity_type = "ServiceRequiredDocument"
     audit_fields = (
         "service_id",
@@ -197,11 +302,118 @@ class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
+    serializer_class = ServiceRelationAdminSerializer
+    queryset = ServiceRelation.objects.select_related(
+        "source_service",
+        "target_service",
+        "created_by",
+    ).all()
+    permission_classes = [permissions.IsAuthenticated, CanManageServiceRelations]
+    search_fields = [
+        "source_service__name_ar",
+        "source_service__name_en",
+        "target_service__name_ar",
+        "target_service__name_en",
+        "message_to_customer",
+    ]
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.select_related("source_service__organization", "target_service__organization")
+        if not is_platform_super_admin(self.request.user):
+            org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
+            queryset = queryset.filter(
+                Q(source_service__organization__in=org_ids)
+                | Q(target_service__organization__in=org_ids)
+                | Q(source_service__organization__isnull=True, target_service__organization__isnull=True)
+            ).distinct()
+        source_service_id = self.request.query_params.get("source_service")
+        target_service_id = self.request.query_params.get("target_service")
+        relation_type = self.request.query_params.get("relation_type")
+        active = _as_bool(self.request.query_params.get("is_active"))
+
+        if source_service_id:
+            queryset = queryset.filter(source_service_id=source_service_id)
+        if target_service_id:
+            queryset = queryset.filter(target_service_id=target_service_id)
+        if relation_type:
+            queryset = queryset.filter(relation_type=relation_type)
+        if active is not None:
+            queryset = queryset.filter(is_active=active)
+        return queryset
+
+    def perform_create(self, serializer):
+        relation = serializer.save(created_by=self.request.user)
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action="create_service_relation",
+            entity_type="ServiceRelation",
+            entity_id=relation.pk,
+            new_value=relation_snapshot(relation),
+        )
+
+    def perform_update(self, serializer):
+        relation = self.get_object()
+        old_value = relation_snapshot(relation)
+        relation = serializer.save()
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action="update_service_relation",
+            entity_type="ServiceRelation",
+            entity_id=relation.pk,
+            old_value=old_value,
+            new_value=relation_snapshot(relation),
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        relation = self.get_object()
+        if request.user.role == request.user.Role.SUPPORT and not request.user.has_perm("services.manage_service_prices"):
+            raise PermissionDenied("You do not have permission to deactivate service relations.")
+
+        old_value = relation_snapshot(relation)
+        relation.is_active = False
+        relation.save(update_fields=["is_active", "updated_at"])
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="deactivate_service_relation",
+            entity_type="ServiceRelation",
+            entity_id=relation.pk,
+            old_value=old_value,
+            new_value=relation_snapshot(relation),
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["delete"], url_path="hard-delete")
+    def hard_delete(self, request, pk=None):
+        if request.user.role != request.user.Role.ADMIN:
+            raise PermissionDenied("Only admin users can permanently delete service relations.")
+
+        relation = self.get_object()
+        old_value = relation_snapshot(relation)
+        relation_id = relation.pk
+        relation.delete()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="delete_service_relation",
+            entity_type="ServiceRelation",
+            entity_id=relation_id,
+            old_value=old_value,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminServiceProviderAssignmentSerializer
     queryset = ServiceProviderAssignment.objects.select_related("service", "provider", "provider__user").all()
-    permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["service__name_ar", "provider__user__full_name"]
+    pagination_class = None
     audit_entity_type = "ServiceProviderAssignment"
     audit_fields = ("service_id", "provider_id", "is_active")
 
@@ -230,5 +442,6 @@ class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewS
 class AddressAdminViewSet(viewsets.ModelViewSet):
     serializer_class = AddressAdminSerializer
     queryset = Address.objects.select_related("user").all()
-    permission_classes = [permissions.IsAuthenticated, CanManageServicePrices]
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["user__full_name", "city", "area", "street"]
+    pagination_class = None

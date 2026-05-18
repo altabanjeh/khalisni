@@ -10,12 +10,14 @@ from services.views import (
     ServiceDetailAPIView,
     ServiceListAPIView,
     ServiceProviderAssignmentAdminViewSet,
+    ServiceRelationAdminViewSet,
 )
 
 router = DefaultRouter()
 router.register("admin/services", ServiceAdminViewSet, basename="admin-services")
 router.register("admin/categories", CategoryAdminViewSet, basename="admin-categories")
 router.register("admin/service-documents", RequiredDocumentAdminViewSet, basename="admin-service-documents")
+router.register("admin/service-relations", ServiceRelationAdminViewSet, basename="admin-service-relations")
 router.register("admin/service-provider-assignments", ServiceProviderAssignmentAdminViewSet, basename="admin-service-provider-assignments")
 router.register("admin/addresses", AddressAdminViewSet, basename="admin-addresses")
 

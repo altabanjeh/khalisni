@@ -51,11 +51,45 @@ class Order(models.Model):
         on_delete=models.PROTECT,
         related_name="customer_orders",
     )
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
+    branch = models.ForeignKey(
+        "organizations.Branch",
+        on_delete=models.PROTECT,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
 
     service = models.ForeignKey(
         "services.Service",
         on_delete=models.PROTECT,
         related_name="orders",
+    )
+
+    service_name_snapshot = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        db_index=True,
+    )
+
+    service_category_name_snapshot = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        db_index=True,
+    )
+    organization_name_snapshot = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        db_index=True,
     )
 
     status = models.CharField(
@@ -78,6 +112,13 @@ class Order(models.Model):
         null=True,
         blank=True,
         related_name="assigned_orders",
+    )
+    assigned_provider_organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_provider_orders",
     )
 
     assigned_by = models.ForeignKey(
@@ -178,6 +219,9 @@ class Order(models.Model):
             models.Index(fields=["customer", "created_at"]),
             models.Index(fields=["assigned_employee", "status"]),
             models.Index(fields=["assigned_provider", "status"]),
+            models.Index(fields=["organization", "status"]),
+            models.Index(fields=["branch", "status"]),
+            models.Index(fields=["assigned_provider_organization", "status"]),
             models.Index(fields=["city", "status"]),
             models.Index(fields=["expected_delivery_date"]),
         ]
@@ -230,6 +274,15 @@ class Order(models.Model):
 
         if self.customer_id and self.customer.role != self.customer.Role.CUSTOMER:
             errors["customer"] = "Orders can only belong to customer users."
+        if not self.organization_id:
+            errors["organization"] = "Every order must belong to an organization."
+        if self.branch_id and self.organization_id and self.branch.organization_id != self.organization_id:
+            errors["branch"] = "Branch must belong to the same organization as the order."
+        if self.customer_id:
+            customer_profile = getattr(self.customer, "customer_profile", None)
+            if customer_profile and customer_profile.organization_id and self.organization_id:
+                if customer_profile.organization_id != self.organization_id:
+                    errors["organization"] = "Order organization must match the customer organization."
 
         if self.assigned_by_id and self.assigned_by.role not in {
             self.assigned_by.Role.ADMIN,
@@ -247,6 +300,13 @@ class Order(models.Model):
 
         if self.assigned_provider_id and not self.service.provider_required:
             errors["assigned_provider"] = "This service does not require an assigned provider."
+        if self.assigned_provider_id and self.assigned_provider.organization_id and self.assigned_provider_organization_id:
+            if self.assigned_provider.organization_id != self.assigned_provider_organization_id:
+                errors["assigned_provider_organization"] = "Assigned provider organization must match the assigned provider profile."
+        if self.assigned_provider_id and self.assigned_provider.organization_id and not self.assigned_provider_organization_id:
+            self.assigned_provider_organization = self.assigned_provider.organization
+        if self.assigned_provider_organization_id and self.assigned_provider_organization.organization_type != self.assigned_provider_organization.OrganizationType.PROVIDER:
+            errors["assigned_provider_organization"] = "Assigned provider organization must be a provider organization."
 
         if self.status == self.Status.ASSIGNED and not self.assigned_provider:
             errors["assigned_provider"] = "Assigned orders require a provider."
@@ -277,6 +337,45 @@ class Order(models.Model):
 
         if self.final_price is None and self.service_id:
             self.final_price = self.service.total_fee
+
+        if self.service_id and not self.service_name_snapshot:
+            self.service_name_snapshot = self.service.name_ar
+
+        if self.service_id and not self.service_category_name_snapshot:
+            self.service_category_name_snapshot = self.service.category.name_ar
+        if self.organization_id and not self.organization_name_snapshot:
+            self.organization_name_snapshot = self.organization.name
+        if self.service_id and not self.organization_id:
+            if self.service.organization_id:
+                self.organization = self.service.organization
+            else:
+                customer_profile = getattr(self.customer, "customer_profile", None)
+                if customer_profile and customer_profile.organization_id:
+                    self.organization = customer_profile.organization
+        if not self.organization_id:
+            from organizations.models import Organization
+
+            fallback_org = (
+                Organization.objects.filter(
+                    organization_type=Organization.OrganizationType.PARTNER,
+                    is_active=True,
+                )
+                .order_by("created_at")
+                .first()
+            )
+            if fallback_org is None:
+                fallback_org = (
+                    Organization.objects.filter(
+                        organization_type=Organization.OrganizationType.PLATFORM,
+                        is_active=True,
+                    )
+                    .order_by("created_at")
+                    .first()
+                )
+            if fallback_org is not None:
+                self.organization = fallback_org
+        if self.assigned_provider_id and not self.assigned_provider_organization_id and self.assigned_provider.organization_id:
+            self.assigned_provider_organization = self.assigned_provider.organization
 
         if self.expected_delivery_date is None and self.service_id:
             if self.service.estimated_duration_unit == self.service.DurationUnit.HOURS:

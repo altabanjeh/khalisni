@@ -7,6 +7,7 @@ import { api } from '../../api/services'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { fallbackPublicContent } from '../../utils/publicSiteDefaults'
 import { broadcastPublicSiteUpdate } from '../../utils/publicSiteSync'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import { FieldGroup, FormMessage, ImageUploadField, ToggleField } from '../../components/publicSite/PublicSiteFormFields'
 
 function applyServerErrors(error, setError, setFeedback) {
@@ -31,16 +32,21 @@ function HomepageContentEditorPage() {
       hero_subtitle_ar: data.hero_subtitle_ar || '',
       hero_subtitle_en: data.hero_subtitle_en || '',
       primary_button_text: data.primary_button_text || '',
+      primary_button_text_en: data.primary_button_text_en || '',
       primary_button_url: data.primary_button_url || '',
       secondary_button_text: data.secondary_button_text || '',
+      secondary_button_text_en: data.secondary_button_text_en || '',
       secondary_button_url: data.secondary_button_url || '',
       hero_image: undefined,
       how_it_works_text: data.how_it_works_text || '',
+      how_it_works_text_en: data.how_it_works_text_en || '',
       contact_phone: data.contact_phone || '',
       whatsapp_number: data.whatsapp_number || '',
       email: data.email || '',
       office_address: data.office_address || '',
+      office_address_en: data.office_address_en || '',
       footer_text: data.footer_text || '',
+      footer_text_en: data.footer_text_en || '',
       active_content: Boolean(data.active_content),
     })
   }, [data, form])
@@ -63,7 +69,7 @@ function HomepageContentEditorPage() {
   }
 
   if (loading && !data) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل محرر الصفحة الرئيسية...</div>
+    return <LoadingSpinner />
   }
 
   return (
@@ -94,14 +100,21 @@ function HomepageContentEditorPage() {
             <textarea className="field min-h-28" {...form.register('hero_subtitle_en')} />
           </FieldGroup>
           <div className="grid gap-4 md:grid-cols-2">
-            <FieldGroup error={form.formState.errors.primary_button_text} label="Primary button text / نص الزر الرئيسي">
+            <FieldGroup error={form.formState.errors.primary_button_text} label="Primary button text AR / نص الزر الرئيسي">
               <input className="field" {...form.register('primary_button_text', { required: 'نص الزر الرئيسي مطلوب' })} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.primary_button_text_en} label="Primary button text EN / English primary button">
+              <input className="field" {...form.register('primary_button_text_en')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.primary_button_url} label="Primary button URL / رابط الزر الرئيسي">
               <input className="field" {...form.register('primary_button_url', { required: 'رابط الزر الرئيسي مطلوب' })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.secondary_button_text} label="Secondary button text / نص الزر الثانوي">
+            <div />
+            <FieldGroup error={form.formState.errors.secondary_button_text} label="Secondary button text AR / نص الزر الثانوي">
               <input className="field" {...form.register('secondary_button_text')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.secondary_button_text_en} label="Secondary button text EN / English secondary button">
+              <input className="field" {...form.register('secondary_button_text_en')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.secondary_button_url} label="Secondary button URL / رابط الزر الثانوي">
               <input className="field" {...form.register('secondary_button_url')} />
@@ -121,8 +134,11 @@ function HomepageContentEditorPage() {
         <section className="space-y-6">
           <div className="glass-panel space-y-5 p-6">
             <h2 className="text-xl font-extrabold text-ink">How It Works</h2>
-            <FieldGroup error={form.formState.errors.how_it_works_text} label="How it works text / نص كيف تعمل المنصة">
+            <FieldGroup error={form.formState.errors.how_it_works_text} label="How it works AR / نص كيف تعمل المنصة">
               <textarea className="field min-h-32" {...form.register('how_it_works_text', { required: 'هذا النص مطلوب' })} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.how_it_works_text_en} label="How it works EN / English how it works text">
+              <textarea className="field min-h-32" {...form.register('how_it_works_text_en')} />
             </FieldGroup>
           </div>
 
@@ -137,11 +153,17 @@ function HomepageContentEditorPage() {
             <FieldGroup error={form.formState.errors.email} label="Email / البريد الإلكتروني">
               <input className="field" type="email" {...form.register('email', { required: 'البريد الإلكتروني مطلوب' })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.office_address} label="Office address / عنوان المكتب">
+            <FieldGroup error={form.formState.errors.office_address} label="Office address AR / عنوان المكتب">
               <input className="field" {...form.register('office_address', { required: 'عنوان المكتب مطلوب' })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.footer_text} label="Footer text / نص التذييل">
+            <FieldGroup error={form.formState.errors.office_address_en} label="Office address EN / English office address">
+              <input className="field" {...form.register('office_address_en')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.footer_text} label="Footer text AR / نص التذييل">
               <textarea className="field min-h-28" {...form.register('footer_text', { required: 'نص التذييل مطلوب' })} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.footer_text_en} label="Footer text EN / English footer text">
+              <textarea className="field min-h-28" {...form.register('footer_text_en')} />
             </FieldGroup>
             <ToggleField
               description="يتم عرض هذه النسخة مباشرة على الموقع العام."

@@ -7,6 +7,7 @@ from notifications.views import (
     EmployeeNotificationTemplateListAPIView,
     ManualOrderNotificationAPIView,
     NotificationCenterAPIView,
+    NotificationMarkReadAPIView,
     NotificationTemplateAdminViewSet,
 )
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path("admin/notifications/", AdminNotificationListAPIView.as_view()),
     path("admin/notifications/<int:pk>/", AdminNotificationDetailAPIView.as_view()),
     path("notifications/", NotificationCenterAPIView.as_view()),
+    path("notifications/<int:pk>/read/", NotificationMarkReadAPIView.as_view()),
     path("employee/notification-templates/", EmployeeNotificationTemplateListAPIView.as_view()),
     path("orders/<int:pk>/manual-notification/", ManualOrderNotificationAPIView.as_view()),
 ]

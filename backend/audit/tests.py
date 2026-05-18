@@ -35,8 +35,9 @@ class AuditLogPermissionTests(APITestCase):
         self.client.force_authenticate(self.admin)
         response = self.client.get("/api/admin/audit-logs/?module=Service")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        record = response.data["results"][0]
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual(len(records), 1)
+        record = records[0]
         self.assertEqual(record["entity_type"], "Service")
         self.assertEqual(record["entity_id"], "1")
         self.assertEqual(record["user_role"], CustomUser.Role.ADMIN)

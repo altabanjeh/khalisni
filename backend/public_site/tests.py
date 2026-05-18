@@ -6,7 +6,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import CustomUser
-from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from notifications.models import Notification
+from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
+from services.models import Service, ServiceCategory
 
 
 class PublicSiteAPITests(TestCase):
@@ -26,6 +28,32 @@ class PublicSiteAPITests(TestCase):
             full_name="Public Site Employee",
             phone="0791234501",
             role=CustomUser.Role.EMPLOYEE,
+        )
+        self.support_user = CustomUser.objects.create_user(
+            email="public-site-support@example.com",
+            password="Password@123",
+            full_name="Public Site Support",
+            phone="0791234502",
+            role=CustomUser.Role.SUPPORT,
+        )
+        self.category = ServiceCategory.objects.create(
+            name_ar="خدمات عامة",
+            name_en="General services",
+            slug="general-services",
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name_ar="تجديد جواز سفر",
+            name_en="Passport renewal",
+            slug="passport-renewal",
+            description_ar="تجديد جواز السفر",
+            description_en="Passport renewal",
+            base_price=0,
+            government_fee=0,
+            service_fee=0,
+            estimated_duration=3,
+            is_online=True,
+            provider_required=False,
         )
 
     def test_public_advertisements_endpoint_returns_only_current_active_ads(self):
@@ -160,3 +188,75 @@ class PublicSiteAPITests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
+
+    def test_public_missing_service_request_creates_notifications_for_admin_and_support(self):
+        payload = {
+            "service_name": "معاملة جديدة",
+            "request_message": "أريد خدمة غير موجودة داخل التطبيق.",
+            "requester_name": "عميل تجريبي",
+            "requester_phone": "0795555555",
+            "preferred_contact_channel": "whatsapp",
+            "source": "homepage_chat",
+        }
+
+        response = self.client.post("/api/public-site/missing-service-requests/", payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        request_record = MissingServiceRequest.objects.get()
+        self.assertTrue(request_record.request_number.startswith("MSR-"))
+        self.assertEqual(
+            set(Notification.objects.filter(template_key="missing_service_request_created").values_list("recipient_id", flat=True)),
+            {self.admin_user.pk, self.support_user.pk},
+        )
+
+    def test_public_missing_service_request_requires_contact_for_anonymous_visitor(self):
+        payload = {
+            "service_name": "معاملة جديدة",
+            "request_message": "أحتاج خدمة غير موجودة.",
+            "source": "homepage_chat",
+        }
+
+        response = self.client.post("/api/public-site/missing-service-requests/", payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("requester_phone", response.data)
+
+    def test_support_user_can_list_and_update_missing_service_requests(self):
+        request_record = MissingServiceRequest.objects.create(
+            service_name="خدمة تجريبية",
+            request_message="تفاصيل الطلب",
+            requester_phone="0797777777",
+        )
+
+        self.client.force_authenticate(self.support_user)
+        list_response = self.client.get("/api/admin/public-site/missing-service-requests/")
+        self.assertEqual(list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(list_response.data), 1)
+
+        patch_response = self.client.patch(
+            f"/api/admin/public-site/missing-service-requests/{request_record.pk}/",
+            {
+                "status": MissingServiceRequest.Status.SERVICE_EXISTS,
+                "matched_service": self.service.pk,
+                "response_message": "تمت مطابقة الطلب مع خدمة موجودة.",
+            },
+            format="json",
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+        request_record.refresh_from_db()
+        self.assertEqual(request_record.status, MissingServiceRequest.Status.SERVICE_EXISTS)
+        self.assertEqual(request_record.matched_service_id, self.service.pk)
+
+    def test_customer_cannot_access_internal_missing_service_request_queue(self):
+        customer_user = CustomUser.objects.create_user(
+            email="customer-queue@example.com",
+            password="Password@123",
+            full_name="Queue Customer",
+            phone="0796666666",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.client.force_authenticate(customer_user)
+
+        response = self.client.get("/api/admin/public-site/missing-service-requests/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

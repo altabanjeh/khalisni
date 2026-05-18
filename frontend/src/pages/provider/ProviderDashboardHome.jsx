@@ -1,6 +1,7 @@
 import { Building2, Clock3, FolderCheck, ShieldAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import DataTable from '../../components/DataTable'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
@@ -13,7 +14,7 @@ function ProviderDashboardHome() {
   const { data: orders = [] } = useAsyncData(() => api.getProviderOrders(), [], [])
 
   if (loading || !data) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل لوحة المزود...</div>
+    return <LoadingSpinner />
   }
 
   const columns = [

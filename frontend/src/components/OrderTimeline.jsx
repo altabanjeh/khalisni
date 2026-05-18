@@ -1,8 +1,19 @@
 import { CheckCircle2 } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 import StatusBadge from './StatusBadge'
 import { formatDateTime } from '../utils/format'
 
 function OrderTimeline({ items = [] }) {
+  const { language, isArabic } = useLanguage()
+
+  if (!items.length) {
+    return (
+      <div className="rounded-3xl border border-dashed border-border bg-white/80 px-5 py-6 text-sm text-slate-500">
+        {isArabic ? 'لا توجد تحديثات مسجلة على هذا الطلب حتى الآن.' : 'No updates have been logged for this order yet.'}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {items.map((item, index) => (
@@ -14,9 +25,11 @@ function OrderTimeline({ items = [] }) {
               </span>
               <StatusBadge status={item.new_status || item.status} />
             </div>
-            <span className="text-xs text-slate-500">{formatDateTime(item.created_at)}</span>
+            <span className="text-xs text-slate-500">{formatDateTime(item.created_at, language)}</span>
           </div>
-          <p className="mt-3 text-sm leading-7 text-slate-600">{item.note || 'لا توجد ملاحظات إضافية.'}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            {item.note || (isArabic ? 'لا توجد ملاحظات إضافية لهذا التحديث.' : 'No additional notes are available for this update.')}
+          </p>
         </div>
       ))}
     </div>

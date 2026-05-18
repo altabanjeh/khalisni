@@ -8,6 +8,10 @@ function normalizeService(record) {
   return withId(record, 'service_id')
 }
 
+function normalizeServiceRelation(record) {
+  return withId(record, 'relation_id')
+}
+
 function normalizeSetting(record) {
   return withId(record, 'setting_id')
 }
@@ -29,12 +33,32 @@ export const servicesApi = {
     return unwrapList(await http.get('/admin/services/')).map(normalizeService)
   },
 
-  async getAdminCategories() {
-    return unwrapList(await http.get('/admin/categories/')).map(normalizeCategory)
+  async getAdminCategories(params = {}) {
+    return unwrapList(await http.get(`/admin/categories/${buildQuery(params)}`)).map(normalizeCategory)
+  },
+
+  reorderAdminCategories(items) {
+    return http.post('/admin/categories/reorder/', { items })
   },
 
   async getAdminServiceDocuments(params = {}) {
     return unwrapList(await http.get(`/admin/service-documents/${buildQuery(params)}`))
+  },
+
+  async getAdminServiceRelations(params = {}) {
+    return unwrapList(await http.get(`/admin/service-relations/${buildQuery(params)}`)).map(normalizeServiceRelation)
+  },
+
+  async createAdminServiceRelation(payload) {
+    return normalizeServiceRelation(await http.post('/admin/service-relations/', payload))
+  },
+
+  async updateAdminServiceRelation(id, payload) {
+    return normalizeServiceRelation(await http.patch(`/admin/service-relations/${id}/`, payload))
+  },
+
+  deleteAdminServiceRelation(id) {
+    return http.delete(`/admin/service-relations/${id}/`)
   },
 
   createAdminServiceDocument(payload) {

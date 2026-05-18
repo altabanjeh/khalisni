@@ -33,6 +33,7 @@ class ProviderAdminListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     phone = serializers.CharField(source="user.phone", read_only=True)
     service_categories = serializers.SlugRelatedField(many=True, slug_field="name_ar", read_only=True)
+    service_category_ids = serializers.PrimaryKeyRelatedField(source="service_categories", many=True, read_only=True)
     account_active = serializers.BooleanField(source="user.is_active", read_only=True)
     approval_status_label = serializers.SerializerMethodField()
     capability_summary = serializers.SerializerMethodField()
@@ -45,7 +46,12 @@ class ProviderAdminListSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "provider_type",
+            "company_name",
+            "commercial_registration_number",
+            "tax_number",
+            "address",
             "service_categories",
+            "service_category_ids",
             "city",
             "rating",
             "total_completed_orders",
@@ -91,6 +97,10 @@ class ProviderAdminSerializer(serializers.ModelSerializer):
             "phone",
             "password",
             "provider_type",
+            "company_name",
+            "commercial_registration_number",
+            "tax_number",
+            "address",
             "service_categories",
             "service_category_ids",
             "city",

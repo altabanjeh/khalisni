@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, CircleAlert, Clock3, FileCheck2, LineChart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import DataTable from '../../components/DataTable'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
@@ -52,7 +53,7 @@ function EmployeeDashboardHome() {
   }
 
   if (loading || !data) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جارٍ تحميل لوحة الموظف...</div>
+    return <LoadingSpinner />
   }
 
   const summary = data.summary || {}

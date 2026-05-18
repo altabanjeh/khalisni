@@ -5,10 +5,10 @@ from services.models import Service, ServiceCategory, ServiceProviderAssignment,
 
 @admin.register(ServiceCategory)
 class ServiceCategoryAdmin(admin.ModelAdmin):
-    list_display = ("name_ar", "slug", "display_order", "is_active")
-    list_filter = ("is_active",)
+    list_display = ("name_ar", "parent", "slug", "sort_order", "show_on_public_site", "is_active")
+    list_filter = ("is_active", "show_on_public_site", "parent")
     search_fields = ("name_ar", "name_en", "slug")
-    ordering = ("display_order", "name_ar")
+    ordering = ("sort_order", "display_order", "name_ar")
 
 
 @admin.register(Service)

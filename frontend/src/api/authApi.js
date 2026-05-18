@@ -1,6 +1,10 @@
 import { http } from './client'
 
 export const authApi = {
+  register(payload) {
+    return http.post('/auth/register/', payload)
+  },
+
   login(payload) {
     return http.post('/auth/login/', payload)
   },

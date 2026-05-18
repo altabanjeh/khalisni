@@ -1,4 +1,4 @@
-import { Eye, FileText, ImagePlus, Palette } from 'lucide-react'
+import { Eye, FileText, ImagePlus, MessageSquareMore, Palette } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PageHeader from '../../components/PageHeader'
 
@@ -30,6 +30,13 @@ const managementCards = [
     subtitle: 'معاينة الصفحة العامة',
     description: 'راجع الشكل العام للصفحة الرئيسية كما يراه الزائر قبل نشر أي تغييرات.',
     icon: Eye,
+  },
+  {
+    to: '/admin/missing-service-requests',
+    title: 'Missing Service Requests',
+    subtitle: 'طلبات الخدمات الجديدة',
+    description: 'راجع الرسائل القادمة من مساعد الصفحة الرئيسية وعيّنها إلى فريق الدعم أو اربطها بخدمة موجودة.',
+    icon: MessageSquareMore,
   },
 ]
 
@@ -66,4 +73,3 @@ function PublicSiteManagementPage() {
 }
 
 export default PublicSiteManagementPage
-

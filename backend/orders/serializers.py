@@ -3,15 +3,20 @@ import os
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from core.serializer_mixins import PkAsIdMixin
+
 from accounts.models import CustomUser
 from core.choices import DocumentType
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
 from documents.services import can_user_download_document
+from organizations.models import Branch
+from organizations.selectors import resolve_organization_by_ref
 from orders.models import Order, OrderIssue, OrderNote, OrderStatusLog, Rating
 from orders.allowed_actions import get_order_allowed_actions
-from orders.services import create_public_order
+from orders.services import create_customer_order
 from providers.models import ProviderProfile
 from services.models import Service
+from services.selectors import visible_services_queryset
 from workflow.rules import get_transition_rule
 
 
@@ -77,6 +82,9 @@ class OrderListSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "order_number",
+            "service_name_snapshot",
+            "service_category_name_snapshot",
+            "organization_name_snapshot",
             "customer",
             "city",
             "service",
@@ -255,6 +263,8 @@ class ProviderOrderDetailSerializer(ProviderOrderListSerializer):
 
 class PublicOrderCreateSerializer(serializers.Serializer):
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.filter(is_active=True))
+    organization = serializers.CharField(required=False, allow_blank=True)
+    branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), required=False, allow_null=True)
     full_name = serializers.CharField(max_length=255)
     phone = serializers.CharField(max_length=30)
     national_id = serializers.CharField(max_length=32, required=False, allow_blank=True)
@@ -300,6 +310,17 @@ class PublicOrderCreateSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+        organization = resolve_organization_by_ref(attrs.get("organization"))
+        if organization is not None:
+            visible_service_ids = visible_services_queryset(organization=organization).values_list("pk", flat=True)
+            if attrs["service"].pk not in visible_service_ids:
+                raise serializers.ValidationError({"service": "This service is not available for the selected organization."})
+        attrs["organization_obj"] = organization
+
+        branch = attrs.get("branch_id")
+        if branch is not None and organization is not None and branch.organization_id != organization.id:
+            raise serializers.ValidationError({"branch_id": "Branch must belong to the selected organization."})
+
         service = attrs["service"]
         requirements = list(service.document_requirements.filter(is_active=True).order_by("display_order", "name_ar"))
         requirements_by_type = {requirement.document_type: requirement for requirement in requirements}
@@ -365,10 +386,17 @@ class PublicOrderCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not getattr(user, "is_authenticated", False) or getattr(user, "role", "") != CustomUser.Role.CUSTOMER:
+            raise serializers.ValidationError("Only authenticated customer accounts can create orders.")
+
         payload = dict(validated_data)
         payload.pop("consent", None)
+        payload["organization"] = payload.pop("organization_obj", None)
+        payload["branch"] = payload.pop("branch_id", None)
         try:
-            return create_public_order(data=payload, request=self.context.get("request"))
+            return create_customer_order(customer=user, data=payload, request=request)
         except DjangoValidationError as exc:
             if hasattr(exc, "message_dict"):
                 raise serializers.ValidationError(exc.message_dict)
@@ -448,7 +476,7 @@ class OrderNoteAdminSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class OrderIssueAdminSerializer(serializers.ModelSerializer):
+class OrderIssueAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = OrderIssue
         fields = "__all__"

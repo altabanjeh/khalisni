@@ -138,6 +138,22 @@
     background: rgba(255, 255, 255, 0.18);
   }
 
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-danger px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-brand-100;
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(1rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-slide-up {
+    animation: slide-up 0.2s ease-out;
+  }
+
   .public-hero-section {
     background:
       linear-gradient(135deg, color-mix(in srgb, var(--public-primary-color) 92%, #081c2f) 0%, var(--public-secondary-color) 100%);

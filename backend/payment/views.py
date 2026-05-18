@@ -3,6 +3,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 
 from config.permissions import CanCreatePaymentRecord, CanRefundPayment, CanViewPaymentStatus, IsCustomerRole
+from organizations.selectors import enforce_organization_scope
 from payment.models import Payment
 from payment.serializers import (
     AdminPaymentCreateSerializer,
@@ -20,6 +21,7 @@ def customer_payments_queryset(user):
 
 class CustomerPaymentListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
+    pagination_class = None
 
     def get_queryset(self):
         return customer_payments_queryset(self.request.user)
@@ -49,9 +51,14 @@ class CustomerPaymentDetailAPIView(generics.RetrieveAPIView):
 
 class AdminPaymentListAPIView(generics.ListCreateAPIView):
     queryset = Payment.objects.select_related("order", "order__customer", "paid_by", "recorded_by")
+    pagination_class = None
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = enforce_organization_scope(
+            super().get_queryset(),
+            user=self.request.user,
+            organization_field="organization",
+        )
         status_value = self.request.query_params.get("status")
         payment_type = self.request.query_params.get("payment_type")
         order_number = self.request.query_params.get("order_number")
@@ -85,12 +92,18 @@ class AdminPaymentDetailAPIView(generics.RetrieveAPIView):
     queryset = Payment.objects.select_related("order", "order__customer", "paid_by", "recorded_by")
     serializer_class = AdminPaymentRuleListSerializer
 
+    def get_queryset(self):
+        return enforce_organization_scope(super().get_queryset(), user=self.request.user, organization_field="organization")
+
 
 class AdminPaymentStatusAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, CanRefundPayment]
 
     def post(self, request, pk):
-        payment = generics.get_object_or_404(Payment, pk=pk)
+        payment = generics.get_object_or_404(
+            enforce_organization_scope(Payment.objects.all(), user=request.user, organization_field="organization"),
+            pk=pk,
+        )
         serializer = AdminPaymentStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payment = update_payment_status(

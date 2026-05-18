@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
 from documents.serializers import DocumentUploadSerializer
+from organizations.selectors import enforce_organization_scope
 from orders.models import Order
 from orders.serializers import ProviderOrderDetailSerializer, ProviderOrderListSerializer
 from orders.services import complete_provider_work, provider_add_internal_note, provider_update_status
@@ -27,6 +28,7 @@ from providers.serializers import (
 class ProviderAdminViewSet(viewsets.ModelViewSet):
     queryset = ProviderProfile.objects.select_related("user").prefetch_related("service_categories")
     search_fields = ["user__full_name", "user__email", "city", "provider_type"]
+    pagination_class = None
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -204,11 +206,15 @@ class ProviderAdminViewSet(viewsets.ModelViewSet):
 
 
 def provider_orders_queryset(user):
-    return (
+    queryset = (
         Order.objects.select_related("customer", "service", "service__category", "assigned_provider", "assigned_provider__user")
         .prefetch_related("documents", "status_logs", "notes__user")
-        .filter(assigned_provider__user=user)
     )
+    return enforce_organization_scope(
+        queryset.filter(Q(assigned_provider__user=user) | Q(assigned_provider_organization__memberships__user=user)),
+        user=user,
+        organization_field="organization",
+    ).distinct()
 
 
 def _raise_drf_validation_error(exc):
@@ -227,6 +233,7 @@ class ProviderDashboardAPIView(APIView):
             "provider": ProviderProfileSerializer(provider).data,
             "assigned_orders": queryset.count(),
             "in_progress": queryset.filter(status=Order.Status.IN_PROGRESS).count(),
+            "ready_for_delivery": queryset.filter(status=Order.Status.READY_FOR_DELIVERY).count(),
             "completed": queryset.filter(status=Order.Status.COMPLETED).count(),
             "delayed": queryset.filter(expected_delivery_date__lt=timezone.localdate()).exclude(
                 status__in=[Order.Status.COMPLETED, Order.Status.REJECTED, Order.Status.CANCELLED]
@@ -238,6 +245,7 @@ class ProviderDashboardAPIView(APIView):
 class ProviderOrderListAPIView(generics.ListAPIView):
     serializer_class = ProviderOrderListSerializer
     permission_classes = [permissions.IsAuthenticated, IsProviderRole]
+    pagination_class = None
 
     def get_queryset(self):
         return provider_orders_queryset(self.request.user)

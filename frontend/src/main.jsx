@@ -4,9 +4,6 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 
-document.documentElement.lang = 'ar'
-document.documentElement.dir = 'rtl'
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>

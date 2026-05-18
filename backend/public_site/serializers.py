@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
+from core.serializer_mixins import PkAsIdMixin
 from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from public_site.models import MissingServiceRequest
 
 
 def build_media_url(request, file_field):
@@ -54,16 +56,21 @@ class PublicPageContentPublicSerializer(serializers.ModelSerializer):
             "hero_subtitle_ar",
             "hero_subtitle_en",
             "primary_button_text",
+            "primary_button_text_en",
             "primary_button_url",
             "secondary_button_text",
+            "secondary_button_text_en",
             "secondary_button_url",
             "hero_image_url",
             "how_it_works_text",
+            "how_it_works_text_en",
             "contact_phone",
             "whatsapp_number",
             "email",
             "office_address",
+            "office_address_en",
             "footer_text",
+            "footer_text_en",
             "active_content",
         )
 
@@ -146,17 +153,22 @@ class PublicPageContentAdminSerializer(serializers.ModelSerializer):
             "hero_subtitle_ar",
             "hero_subtitle_en",
             "primary_button_text",
+            "primary_button_text_en",
             "primary_button_url",
             "secondary_button_text",
+            "secondary_button_text_en",
             "secondary_button_url",
             "hero_image",
             "hero_image_url",
             "how_it_works_text",
+            "how_it_works_text_en",
             "contact_phone",
             "whatsapp_number",
             "email",
             "office_address",
+            "office_address_en",
             "footer_text",
+            "footer_text_en",
             "active_content",
             "created_at",
             "updated_at",
@@ -206,3 +218,72 @@ class HomepagePayloadSerializer(serializers.Serializer):
     advertisements = AdvertisementPublicSerializer(many=True)
     important_alert = AdvertisementPublicSerializer(allow_null=True)
 
+
+class MissingServiceRequestPublicSerializer(serializers.ModelSerializer):
+    matched_service_id = serializers.PrimaryKeyRelatedField(
+        queryset=MissingServiceRequest._meta.get_field("matched_service").remote_field.model.objects.all(),
+        source="matched_service",
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = MissingServiceRequest
+        fields = (
+            "request_id",
+            "request_number",
+            "service_name",
+            "request_message",
+            "requester_name",
+            "requester_phone",
+            "requester_email",
+            "preferred_contact_channel",
+            "source",
+            "matched_service_id",
+            "status",
+            "created_at",
+        )
+        read_only_fields = ("request_id", "request_number", "status", "created_at")
+
+    def validate(self, attrs):
+        requester_phone = attrs.get("requester_phone", "")
+        requester_email = attrs.get("requester_email", "")
+        request_user = getattr(self.context.get("request"), "user", None)
+        if not requester_phone and not requester_email and not getattr(request_user, "is_authenticated", False):
+            raise serializers.ValidationError(
+                {"requester_phone": "أدخل رقم هاتف أو بريد إلكتروني حتى يتمكن الفريق من التواصل معك."}
+            )
+        return attrs
+
+
+class MissingServiceRequestAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+    assigned_to_name = serializers.CharField(source="assigned_to.full_name", read_only=True)
+    matched_service_name = serializers.CharField(source="matched_service.name_ar", read_only=True)
+    created_by_user_name = serializers.CharField(source="created_by_user.full_name", read_only=True)
+
+    class Meta:
+        model = MissingServiceRequest
+        fields = (
+            "request_id",
+            "request_number",
+            "service_name",
+            "request_message",
+            "requester_name",
+            "requester_phone",
+            "requester_email",
+            "preferred_contact_channel",
+            "source",
+            "status",
+            "created_by_user",
+            "created_by_user_name",
+            "matched_service",
+            "matched_service_name",
+            "assigned_to",
+            "assigned_to_name",
+            "internal_notes",
+            "response_message",
+            "resolved_at",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("request_id", "request_number", "created_at", "updated_at", "resolved_at")

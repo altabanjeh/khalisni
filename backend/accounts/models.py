@@ -157,6 +157,13 @@ class CustomerProfile(models.Model):
     )
 
     national_id = models.CharField(max_length=32, blank=True)
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="customer_profiles",
+        null=True,
+        blank=True,
+    )
     address = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
 
@@ -166,8 +173,13 @@ class CustomerProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
+        errors = {}
         if self.user_id and self.user.role != self.user.Role.CUSTOMER:
-            raise ValidationError({"user": "Customer profiles can only be linked to customer users."})
+            errors["user"] = "Customer profiles can only be linked to customer users."
+        if self.organization_id and not self.organization.is_active:
+            errors["organization"] = "Customer profiles can only be linked to active organizations."
+        if errors:
+            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
         self.full_clean()

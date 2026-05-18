@@ -1,78 +1,53 @@
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import CreateOrderPage from './CreateOrderPage'
+import { AuthProvider } from '../../context/AuthContext'
 import { api } from '../../api/services'
 
-test('order form validates required fields', async () => {
-  const user = userEvent.setup()
-  render(
-    <MemoryRouter>
-      <CreateOrderPage />
-    </MemoryRouter>,
-  )
+function LocationProbe() {
+  const location = useLocation()
+  return <div data-testid="location-probe">{`${location.pathname}${location.search}`}</div>
+}
 
-  await user.click(screen.getByRole('button'))
-  expect(await screen.findByText('الاسم الكامل مطلوب')).toBeInTheDocument()
-  expect(screen.getByText('رقم الهاتف مطلوب')).toBeInTheDocument()
+function renderCreateOrderPage(initialEntry = '/create-order') {
+  return render(
+    <AuthProvider>
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <Routes>
+          <Route path="*" element={<><LocationProbe /><CreateOrderPage /></>} />
+        </Routes>
+      </MemoryRouter>
+    </AuthProvider>,
+  )
+}
+
+afterEach(() => {
+  sessionStorage.clear()
+  vi.restoreAllMocks()
 })
 
-test('multi-document services submit each required document with its own type', async () => {
-  const user = userEvent.setup()
-  vi.spyOn(api, 'getServices').mockResolvedValueOnce([
-    { id: 1, slug: 'multi-doc-service', name_ar: 'Service', estimated_duration: 2 },
-  ])
-  vi.spyOn(api, 'getService').mockResolvedValue({
-    id: 1,
-    slug: 'multi-doc-service',
-    name_ar: 'Service',
-    required_documents: [
-      { id: 11, document_type: 'national_id', name_ar: 'National ID', is_required: true },
-      { id: 12, document_type: 'authorization_letter', name_ar: 'Authorization Letter', is_required: true },
-    ],
-  })
-  const createOrderSpy = vi.spyOn(api, 'createOrder').mockResolvedValueOnce({ order_number: 'KH-2026-000111' })
+test('unauthenticated visitor is redirected to register with the customer order path', async () => {
+  vi.spyOn(api, 'me').mockResolvedValueOnce(null)
 
-  const { container } = render(
-    <MemoryRouter>
-      <CreateOrderPage />
-    </MemoryRouter>,
-  )
+  renderCreateOrderPage('/create-order?service=12')
 
   await waitFor(() => {
-    expect(screen.getByRole('combobox')).toBeInTheDocument()
+    expect(screen.getByTestId('location-probe')).toHaveTextContent('/register?next=%2Fcustomer%2Forders%2Fnew%3Fservice%3D12')
+  })
+})
+
+test('authenticated customer is redirected to the customer order flow', async () => {
+  vi.spyOn(api, 'me').mockResolvedValueOnce({
+    id: 5,
+    full_name: 'Customer User',
+    role: 'customer',
+    email: 'customer@example.com',
+    phone: '0799999999',
   })
 
-  await user.selectOptions(screen.getByRole('combobox'), '1')
-  await waitFor(() => {
-    expect(screen.getByText('National ID')).toBeInTheDocument()
-    expect(screen.getByText('Authorization Letter')).toBeInTheDocument()
-  })
-
-  const fileInputs = container.querySelectorAll('input[type="file"]')
-  const textInputs = container.querySelectorAll('input.field:not([type="file"]):not([type="checkbox"])')
-  const nationalIdFile = new File(['id'], 'national-id.pdf', { type: 'application/pdf' })
-  const authorizationFile = new File(['auth'], 'authorization-letter.pdf', { type: 'application/pdf' })
-
-  await user.type(textInputs[0], 'Test Customer')
-  await user.type(textInputs[1], '0799999999')
-  await user.type(textInputs[3], 'Amman')
-  await user.upload(fileInputs[0], nationalIdFile)
-  await user.upload(fileInputs[1], authorizationFile)
-  await user.click(container.querySelector('input[type="checkbox"]'))
-  await user.click(screen.getByRole('button'))
+  renderCreateOrderPage('/create-order?service=7')
 
   await waitFor(() => {
-    expect(createOrderSpy).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('location-probe')).toHaveTextContent('/customer/orders/new?service=7')
   })
-
-  const formData = createOrderSpy.mock.calls[0][0]
-  const entries = Array.from(formData.entries())
-  expect(
-    entries.filter(([key]) => key === 'document_types').map(([, value]) => value),
-  ).toEqual(['national_id', 'authorization_letter'])
-  expect(entries.filter(([key]) => key === 'documents').map(([, value]) => value.name)).toEqual([
-    'national-id.pdf',
-    'authorization-letter.pdf',
-  ])
 })

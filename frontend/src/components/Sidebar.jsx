@@ -1,35 +1,61 @@
 import clsx from 'clsx'
 import { X } from 'lucide-react'
+import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { normalizeRole } from '../utils/format'
 
 function Sidebar({ title, links, isOpen, onClose }) {
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') onClose?.()
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose])
+
+  const currentRole = normalizeRole(user?.role)
+  const visibleLinks = links.filter((link) => {
+    if (!Array.isArray(link.roles) || !link.roles.length) return true
+    return link.roles.map(normalizeRole).includes(currentRole)
+  })
+
   return (
     <>
       <div
         className={clsx(
-          'fixed inset-0 z-40 bg-ink/30 transition lg:hidden',
+          'fixed inset-0 z-40 bg-ink/35 backdrop-blur-sm transition xl:hidden',
           isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={onClose}
       />
       <aside
         className={clsx(
-          'fixed inset-y-4 right-4 z-50 w-[300px] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-4xl border border-border bg-white p-5 shadow-panel transition lg:sticky lg:top-4 lg:z-auto lg:block lg:h-fit lg:w-auto lg:max-w-none lg:translate-x-0',
-          isOpen ? 'translate-x-0' : 'translate-x-[120%] lg:translate-x-0',
+          'fixed inset-y-4 right-4 z-50 w-[300px] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[2rem] border border-border bg-white/95 p-5 shadow-panel backdrop-blur transition xl:sticky xl:top-4 xl:z-auto xl:block xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
+          isOpen ? 'translate-x-0' : 'translate-x-[120%] xl:translate-x-0',
         )}
       >
-        <div className="flex items-start justify-between gap-4 lg:block">
+        <div className="flex items-start justify-between gap-4 xl:block">
           <div>
             <p className="text-sm font-semibold text-brand-600">بوابة العمل</p>
             <p className="mt-1 text-2xl font-extrabold text-ink">{title}</p>
           </div>
-          <button className="btn-ghost p-2 lg:hidden" onClick={onClose} type="button">
+          <button aria-label="إغلاق القائمة" className="btn-ghost p-2 xl:hidden" onClick={onClose} type="button">
             <X className="h-5 w-5" />
           </button>
         </div>
 
+        <div className="mt-5 rounded-3xl border border-brand-100 bg-brand-50/70 px-4 py-3 text-sm text-slate-600">
+          تنقل سريع بين أهم الشاشات المرتبطة بدورك الحالي.
+        </div>
+
         <nav className="mt-6 space-y-2">
-          {links.map((link) => {
+          {visibleLinks.map((link) => {
             const Icon = link.icon
 
             return (
@@ -44,7 +70,11 @@ function Sidebar({ title, links, isOpen, onClose }) {
                   )
                 }
               >
-                {Icon ? <Icon className="h-4 w-4" /> : null}
+                {Icon ? (
+                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/15">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                ) : null}
                 <span>{link.label}</span>
               </NavLink>
             )

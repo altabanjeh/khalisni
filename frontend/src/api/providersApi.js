@@ -13,6 +13,10 @@ export const providersApi = {
     return http.patch(`/admin/providers/${id}/`, payload)
   },
 
+  deleteProvider(id) {
+    return http.delete(`/admin/providers/${id}/`)
+  },
+
   updateProviderApproval(id, payload) {
     return http.post(`/admin/providers/${id}/approval/`, payload)
   },

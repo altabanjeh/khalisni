@@ -61,6 +61,14 @@ class Notification(models.Model):
         blank=True
     )
 
+    target_service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.SET_NULL,
+        related_name="notifications",
+        null=True,
+        blank=True
+    )
+
     notification_type = models.CharField(
         max_length=30,
         choices=NotificationType.choices,
@@ -194,6 +202,7 @@ class Notification(models.Model):
             models.Index(fields=["recipient"]),
             models.Index(fields=["actor"]),
             models.Index(fields=["order"]),
+            models.Index(fields=["target_service"]),
             models.Index(fields=["channel"]),
             models.Index(fields=["status"]),
             models.Index(fields=["priority"]),
@@ -204,6 +213,7 @@ class Notification(models.Model):
             models.Index(fields=["recipient", "is_read"]),
             models.Index(fields=["recipient", "status"]),
             models.Index(fields=["order", "created_at"]),
+            models.Index(fields=["recipient", "order", "target_service", "is_read"]),
             models.Index(fields=["channel", "status"]),
             models.Index(fields=["next_retry_at"]),
         ]

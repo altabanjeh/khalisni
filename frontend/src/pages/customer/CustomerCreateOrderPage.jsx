@@ -1,11 +1,13 @@
 import { CheckCircle2, FilePlus2, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
 import FileUploader from '../../components/FileUploader'
 import DynamicServiceFields from '../../components/DynamicServiceFields'
 import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatCurrency } from '../../utils/format'
 import {
@@ -25,9 +27,12 @@ const draftStorageKey = 'khalisni-client-order-draft'
 
 function CustomerCreateOrderPage() {
   const { user } = useAuth()
-  const [message, setMessage] = useState('')
+  const { toast } = useToast()
+  const [searchParams] = useSearchParams()
   const [submittedOrder, setSubmittedOrder] = useState(null)
+  const { data: categories = [] } = useAsyncData(() => api.getCategories(), [], [])
   const { data: services = [] } = useAsyncData(() => api.getServices(), [], [])
+  const requestedServiceId = searchParams.get('service') || ''
   const {
     register,
     handleSubmit,
@@ -38,7 +43,8 @@ function CustomerCreateOrderPage() {
     clearErrors,
   } = useForm({
     defaultValues: {
-      service: '',
+      category_slug: '',
+      service: requestedServiceId,
       full_name: user?.full_name || '',
       phone: user?.phone || '',
       national_id: user?.national_id || '',
@@ -47,6 +53,10 @@ function CustomerCreateOrderPage() {
       consent: true,
     },
   })
+  const selectedCategorySlug = watch('category_slug')
+  const filteredServices = selectedCategorySlug
+    ? services.filter((service) => service.category?.slug === selectedCategorySlug)
+    : services
   const selectedService = services.find((service) => String(service.id) === String(watch('service')))
   const { data: selectedServiceDetails } = useAsyncData(
     () => (selectedService?.slug ? api.getService(selectedService.slug) : Promise.resolve(null)),
@@ -58,25 +68,53 @@ function CustomerCreateOrderPage() {
 
   useEffect(() => {
     const storedDraft = localStorage.getItem(draftStorageKey)
-    if (storedDraft) {
-      reset({ ...JSON.parse(storedDraft), consent: true })
-      return
-    }
-
-    reset({
-      service: '',
+    const baseValues = {
+      category_slug: '',
+      service: requestedServiceId,
       full_name: user?.full_name || '',
       phone: user?.phone || '',
       national_id: user?.national_id || '',
       city: '',
       notes: '',
       consent: true,
+    }
+
+    if (storedDraft) {
+      const parsedDraft = JSON.parse(storedDraft)
+      reset({
+        ...baseValues,
+        ...parsedDraft,
+        service: requestedServiceId || parsedDraft.service || '',
+        consent: true,
+      })
+      return
+    }
+
+    reset(baseValues)
+  }, [requestedServiceId, reset, user])
+
+  useEffect(() => {
+    if (!requestedServiceId || !selectedService?.category?.slug) return
+    const currentValues = watch()
+    if (currentValues.category_slug === selectedService.category.slug) return
+    reset({
+      ...currentValues,
+      category_slug: selectedService.category.slug,
     })
-  }, [reset, user])
+  }, [requestedServiceId, reset, selectedService, watch])
+
+  useEffect(() => {
+    if (!selectedCategorySlug || !selectedService) return
+    if (selectedService.category?.slug === selectedCategorySlug) return
+    const currentValues = watch()
+    reset({
+      ...currentValues,
+      service: '',
+    })
+  }, [reset, selectedCategorySlug, selectedService, watch])
 
   async function onSubmit(values) {
     clearErrors('root.server')
-    setMessage('')
 
     const formData = new FormData()
     formData.append('service', values.service)
@@ -103,10 +141,14 @@ function CustomerCreateOrderPage() {
     try {
       const result = await api.createOrder(formData)
       setSubmittedOrder(result)
-      setMessage('تم إرسال الطلب بنجاح، ويمكنك متابعته من شاشة طلباتي.')
+      toast('تم إرسال الطلب بنجاح، ويمكنك متابعته من شاشة طلباتي.', 'success')
+      ;(result.warnings || []).forEach((warning) => {
+        toast(warning, 'info')
+      })
       localStorage.removeItem(draftStorageKey)
       reset({
-        service: '',
+        category_slug: selectedService?.category?.slug || '',
+        service: requestedServiceId,
         full_name: user?.full_name || '',
         phone: user?.phone || '',
         national_id: user?.national_id || '',
@@ -134,7 +176,7 @@ function CustomerCreateOrderPage() {
       }
     })
     localStorage.setItem(draftStorageKey, JSON.stringify(values))
-    setMessage('تم حفظ المسودة محلياً على هذا الجهاز.')
+    toast('تم حفظ المسودة محلياً على هذا الجهاز.', 'info')
   }
 
   const requiredDocumentLabels = requiredDocuments.map((document) => getRequiredDocumentLabel(document)).filter(Boolean)
@@ -164,13 +206,32 @@ function CustomerCreateOrderPage() {
         <form className="glass-panel space-y-6 p-6" id="client-create-order" onSubmit={handleSubmit(onSubmit)}>
           <section className="panel-muted p-5">
             <p className="text-sm font-bold text-brand-600">الخطوة 1</p>
+            <h2 className="mt-1 text-xl font-bold text-ink">اختيار تصنيف الخدمة</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm font-semibold text-ink">تصنيف الخدمة</label>
+                <select className="field" {...register('category_slug', { required: 'اختر تصنيف الخدمة' })}>
+                  <option value="">اختر التصنيف</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.slug}>
+                      {category.full_path_name || category.name_ar}
+                    </option>
+                  ))}
+                </select>
+                {errors.category_slug ? <p className="mt-2 text-sm text-danger">{errors.category_slug.message}</p> : null}
+              </div>
+            </div>
+          </section>
+
+          <section className="panel-muted p-5">
+            <p className="text-sm font-bold text-brand-600">الخطوة 2</p>
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار الخدمة والبيانات الأساسية</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-semibold text-ink">الخدمة</label>
                 <select className="field" {...register('service', { required: 'اختر الخدمة المطلوبة' })}>
                   <option value="">اختر الخدمة</option>
-                  {services.map((service) => (
+                  {filteredServices.map((service) => (
                     <option key={service.id} value={service.id}>
                       {service.name_ar}
                     </option>
@@ -206,7 +267,7 @@ function CustomerCreateOrderPage() {
 
           {schemaFields.length ? (
             <section className="panel-muted p-5">
-              <p className="text-sm font-bold text-brand-600">الخطوة 2</p>
+              <p className="text-sm font-bold text-brand-600">الخطوة 3</p>
               <h2 className="mt-1 text-xl font-bold text-ink">البيانات الإضافية المطلوبة</h2>
               <div className="mt-5">
                 <DynamicServiceFields errors={errors} register={register} service={selectedServiceDetails} />
@@ -215,7 +276,7 @@ function CustomerCreateOrderPage() {
           ) : null}
 
           <section className="panel-muted p-5">
-            <p className="text-sm font-bold text-brand-600">{schemaFields.length ? 'الخطوة 3' : 'الخطوة 2'}</p>
+            <p className="text-sm font-bold text-brand-600">{schemaFields.length ? 'الخطوة 4' : 'الخطوة 3'}</p>
             <h2 className="mt-1 text-xl font-bold text-ink">الوثائق والملاحظات</h2>
             <div className="mt-5 space-y-4">
               {requiredDocuments.length ? (
@@ -270,7 +331,6 @@ function CustomerCreateOrderPage() {
             </div>
           </section>
 
-          {message ? <p className="text-sm text-success">{message}</p> : null}
         </form>
 
         <aside className="space-y-6">
@@ -294,6 +354,37 @@ function CustomerCreateOrderPage() {
             </div>
           </div>
 
+          {selectedServiceDetails?.prerequisite_services?.length ? (
+            <div className="glass-panel p-6">
+              <p className="text-sm font-bold text-brand-600">المتطلبات السابقة</p>
+              <div className="mt-4 space-y-3">
+                {selectedServiceDetails.prerequisite_services.map((item) => (
+                  <div key={item.id} className="rounded-2xl border border-border px-4 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-medium text-ink">{item.source_service?.name_ar}</span>
+                      <span className={`text-xs font-semibold ${item.is_completed ? 'text-green-700' : 'text-amber-700'}`}>
+                        {item.is_completed ? 'مكتملة' : 'غير مكتملة'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {selectedServiceDetails?.recommended_services?.length ? (
+            <div className="glass-panel p-6">
+              <p className="text-sm font-bold text-brand-600">خدمات مرتبطة مقترحة</p>
+              <div className="mt-4 space-y-3">
+                {selectedServiceDetails.recommended_services.map((item) => (
+                  <div key={item.id} className="rounded-2xl border border-border px-4 py-3 text-sm text-ink">
+                    {item.target_service?.name_ar}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="glass-panel p-6">
             <p className="text-sm font-bold text-brand-600">الوثائق المطلوبة</p>
             <div className="mt-4 space-y-3">
@@ -312,6 +403,13 @@ function CustomerCreateOrderPage() {
             <div className="glass-panel border-green-200 bg-green-50 p-6">
               <p className="font-bold text-green-800">تم استلام الطلب</p>
               <p className="mt-2 text-sm text-green-700">رقم الطلب: {submittedOrder.order_number}</p>
+              {submittedOrder.warnings?.length ? (
+                <div className="mt-4 space-y-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                  {submittedOrder.warnings.map((warning) => (
+                    <p key={warning}>{warning}</p>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ) : null}
         </aside>

@@ -12,6 +12,10 @@ function normalizeAdvertisement(record) {
   return withId(record, 'advertisement_id')
 }
 
+function normalizeMissingServiceRequest(record) {
+  return withId(record, 'request_id')
+}
+
 function appendFormDataValue(formData, key, value) {
   if (value == null) return
   if (typeof FileList !== 'undefined' && value instanceof FileList) {
@@ -46,6 +50,10 @@ export const publicSiteApi = {
 
   async getPublicAdvertisements() {
     return unwrapList(await http.get('/public-site/advertisements/')).map(normalizeAdvertisement)
+  },
+
+  async createPublicMissingServiceRequest(payload) {
+    return normalizeMissingServiceRequest(await http.post('/public-site/missing-service-requests/', payload))
   },
 
   async getAdminPublicSiteContent() {
@@ -84,7 +92,23 @@ export const publicSiteApi = {
   deleteAdminPublicSiteAdvertisement(id) {
     return http.delete(`/admin/public-site/advertisements/${id}/`)
   },
+
+  async getMissingServiceRequests(params = {}) {
+    const query = new URLSearchParams()
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value != null && value !== '') query.append(key, String(value))
+    })
+    const suffix = query.toString() ? `?${query.toString()}` : ''
+    return unwrapList(await http.get(`/admin/public-site/missing-service-requests/${suffix}`)).map(normalizeMissingServiceRequest)
+  },
+
+  async getMissingServiceRequest(id) {
+    return normalizeMissingServiceRequest(await http.get(`/admin/public-site/missing-service-requests/${id}/`))
+  },
+
+  async updateMissingServiceRequest(id, payload) {
+    return normalizeMissingServiceRequest(await http.patch(`/admin/public-site/missing-service-requests/${id}/`, payload))
+  },
 }
 
 export default publicSiteApi
-

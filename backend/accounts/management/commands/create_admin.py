@@ -18,8 +18,11 @@ class Command(BaseCommand):
             self.stdout.write("DJANGO_ADMIN_EMAIL or DJANGO_ADMIN_PASSWORD not set — skipping admin creation.")
             return
 
-        if CustomUser.objects.filter(email=email).exists():
-            self.stdout.write(f"Admin user {email} already exists — skipping.")
+        user = CustomUser.objects.filter(email=email).first()
+        if user:
+            user.set_password(password)
+            user.save()
+            self.stdout.write(self.style.SUCCESS(f"Admin user password updated: {email}"))
             return
 
         user = CustomUser.objects.create_superuser(

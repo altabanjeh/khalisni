@@ -20,8 +20,10 @@ test('service provider assignments page can link a provider to a service', async
   )
 
   await waitFor(() => {
-    expect(screen.getByText('خدمات المزودين')).toBeInTheDocument()
+    expect(screen.getByText('خدمات Provider Two')).toBeInTheDocument()
   })
+
+  await user.click(screen.getByRole('button', { name: /\+ ربط جديد/ }))
 
   const selects = screen.getAllByRole('combobox')
   await user.selectOptions(selects[0], '8')

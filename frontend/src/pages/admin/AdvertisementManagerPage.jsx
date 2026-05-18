@@ -1,7 +1,8 @@
-import { CalendarRange, Megaphone, Plus, Save, Trash2 } from 'lucide-react'
+import { Megaphone, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import DataTable from '../../components/DataTable'
+import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
@@ -63,6 +64,7 @@ function AdvertisementManagerPage() {
   const { data: advertisements = [], loading, reload } = useAsyncData(() => api.getAdminPublicSiteAdvertisements(), [], [])
   const [selectedId, setSelectedId] = useState(null)
   const [feedback, setFeedback] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const form = useForm({ defaultValues })
   const imageFile = form.watch('image')
   const backgroundColor = form.watch('background_color')
@@ -98,6 +100,26 @@ function AdvertisementManagerPage() {
     })
   }, [selectedAdvertisement, form])
 
+  function closeForm() {
+    setIsFormOpen(false)
+    setSelectedId(null)
+    setFeedback(null)
+    form.reset(defaultValues)
+  }
+
+  function openCreateForm() {
+    setSelectedId(null)
+    setFeedback(null)
+    form.reset(defaultValues)
+    setIsFormOpen(true)
+  }
+
+  function openEditForm(id) {
+    setSelectedId(id)
+    setFeedback(null)
+    setIsFormOpen(true)
+  }
+
   async function onSubmit(values) {
     setFeedback(null)
     const payload = {
@@ -119,9 +141,8 @@ function AdvertisementManagerPage() {
         broadcastPublicSiteUpdate('advertisement-create')
         setFeedback({ type: 'success', text: 'تم إنشاء الإعلان.' })
       }
-      setSelectedId(null)
-      form.reset(defaultValues)
       reload()
+      closeForm()
     } catch (error) {
       applyServerErrors(error, form.setError, setFeedback)
     }
@@ -134,8 +155,7 @@ function AdvertisementManagerPage() {
       broadcastPublicSiteUpdate('advertisement-delete')
       setFeedback({ type: 'success', text: 'تم حذف الإعلان.' })
       if (String(selectedId) === String(id)) {
-        setSelectedId(null)
-        form.reset(defaultValues)
+        closeForm()
       }
       reload()
     } catch (error) {
@@ -166,7 +186,7 @@ function AdvertisementManagerPage() {
       label: 'الإجراءات',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
             تعديل
           </button>
           <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger" onClick={() => handleDelete(row.id)} type="button">
@@ -178,138 +198,118 @@ function AdvertisementManagerPage() {
   ]
 
   return (
-    <div className="page-section">
+    <div className="page-section space-y-6">
       <PageHeader
-        icon={Megaphone}
-        title="Advertisement Manager"
-        eyebrow="PUBLIC SITE"
-        description="أنشئ حملات عامة وتنبيهات مهمة مع ترتيب عرض وجدولة زمنية وتفعيل/تعطيل سريع بدون حذف المحتوى."
         actions={
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setSelectedId(null)
-              form.reset(defaultValues)
-            }}
-            type="button"
-          >
+          <button className="btn-primary" onClick={openCreateForm} type="button">
             <Plus className="h-4 w-4" />
             إعلان جديد
           </button>
         }
+        description="أنشئ الحملات العامة والتنبيهات المهمة من نافذة منظمة وواضحة بدون ضغط الجدول أو تشتيت الصفحة."
+        eyebrow="PUBLIC SITE"
+        icon={Megaphone}
+        title="Advertisement Manager"
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <section className="glass-panel p-6">
-          {loading ? (
-            <div className="text-sm text-slate-500">جاري تحميل الإعلانات...</div>
-          ) : (
-            <DataTable
-              columns={columns}
-              emptyDescription="أضف أول إعلان لعرضه أسفل البطل أو في قسم الإعلانات العامة."
-              emptyTitle="لا توجد إعلانات"
-              rows={advertisements}
-            />
-          )}
-        </section>
+      <section className="glass-panel p-6">
+        {loading ? (
+          <div className="text-sm text-slate-500">جاري تحميل الإعلانات...</div>
+        ) : (
+          <DataTable
+            columns={columns}
+            emptyDescription="أضف أول إعلان لعرضه أسفل البطل أو في قسم الإعلانات العامة."
+            emptyTitle="لا توجد إعلانات"
+            rows={advertisements}
+          />
+        )}
+        <div className="mt-4">
+          <FormMessage message={feedback} />
+        </div>
+      </section>
 
-        <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-          <section className="glass-panel space-y-5 p-6">
-            <div className="flex items-center gap-3">
-              <span className="icon-chip">
-                <CalendarRange className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-extrabold text-ink">{selectedAdvertisement ? 'تعديل الإعلان' : 'إعلان جديد'}</h2>
-                <p className="text-sm text-slate-500">الألوان والجدولة والروابط كلها اختيارية ما عدا النص الأساسي.</p>
-              </div>
-            </div>
-
-            <FieldGroup error={form.formState.errors.title_ar} label="Title AR / العنوان العربي">
-              <input className="field" {...form.register('title_ar', { required: 'العنوان العربي مطلوب' })} />
-            </FieldGroup>
-            <FieldGroup error={form.formState.errors.title_en} label="Title EN / العنوان الإنجليزي">
-              <input className="field" {...form.register('title_en')} />
-            </FieldGroup>
-            <FieldGroup error={form.formState.errors.description_ar} label="Description AR / الوصف العربي">
-              <textarea className="field min-h-28" {...form.register('description_ar', { required: 'الوصف العربي مطلوب' })} />
-            </FieldGroup>
-            <FieldGroup error={form.formState.errors.description_en} label="Description EN / الوصف الإنجليزي">
-              <textarea className="field min-h-28" {...form.register('description_en')} />
-            </FieldGroup>
-            <FieldGroup error={form.formState.errors.advertisement_type} label="Type / النوع">
-              <select className="field" {...form.register('advertisement_type')}>
-                {advertisementTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </FieldGroup>
-            <ImageUploadField
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              error={form.formState.errors.image}
-              fileList={imageFile}
-              fileUrl={selectedAdvertisement?.image_url}
-              hint="Optional visual for the banner or announcement card"
-              label="Image / صورة الإعلان"
-              registration={form.register('image')}
-            />
-            <div className="grid gap-4 md:grid-cols-2">
-              <FieldGroup error={form.formState.errors.button_text_ar} label="Button AR / نص الزر العربي">
-                <input className="field" {...form.register('button_text_ar')} />
-              </FieldGroup>
-              <FieldGroup error={form.formState.errors.button_text_en} label="Button EN / نص الزر الإنجليزي">
-                <input className="field" {...form.register('button_text_en')} />
-              </FieldGroup>
-            </div>
-            <FieldGroup error={form.formState.errors.button_url} label="Button URL / رابط الزر">
-              <input className="field" {...form.register('button_url')} />
-            </FieldGroup>
-            <div className="grid gap-4 md:grid-cols-2">
-              <ColorPickerField allowClear error={form.formState.errors.background_color} hint="Optional" label="Background color / لون الخلفية" name="background_color" register={form.register} setValue={form.setValue} value={backgroundColor} />
-              <ColorPickerField allowClear error={form.formState.errors.text_color} hint="Optional" label="Text color / لون النص" name="text_color" register={form.register} setValue={form.setValue} value={textColor} />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <FieldGroup error={form.formState.errors.display_order} label="Display order / ترتيب العرض">
-                <input className="field" type="number" {...form.register('display_order')} />
-              </FieldGroup>
-              <FieldGroup error={form.formState.errors.start_date} label="Start date / بداية العرض">
-                <input className="field" type="datetime-local" {...form.register('start_date', { required: 'تاريخ البداية مطلوب' })} />
-              </FieldGroup>
-              <FieldGroup error={form.formState.errors.end_date} label="End date / نهاية العرض">
-                <input className="field" type="datetime-local" {...form.register('end_date')} />
-              </FieldGroup>
-            </div>
-            <ToggleField
-              description="يمكن تعطيل الإعلان بدون حذفه."
-              label="Active / نشط"
-              registration={form.register('is_active')}
-            />
-          </section>
-
-          <section className="glass-panel space-y-4 p-6">
-            <button className="btn-primary w-full" type="submit">
-              <Save className="h-4 w-4" />
-              {selectedAdvertisement ? 'حفظ التعديل' : 'إضافة الإعلان'}
+      <FormModal
+        description="حرر نص الإعلان وزمن ظهوره وألوانه في نافذة مستقلة تبقي قائمة الإعلانات واضحة أثناء العمل."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeForm} type="button">
+              إلغاء
             </button>
-            {selectedAdvertisement ? (
-              <button
-                className="btn-secondary w-full"
-                onClick={() => {
-                  setSelectedId(null)
-                  form.reset(defaultValues)
-                }}
-                type="button"
-              >
-                <Trash2 className="h-4 w-4" />
-                إلغاء التحديد
-              </button>
-            ) : null}
-            <FormMessage message={feedback} />
-          </section>
+            <button className="btn-primary min-w-40" form="advertisement-form" type="submit">
+              {selectedAdvertisement ? 'حفظ التعديلات' : 'إضافة الإعلان'}
+            </button>
+          </div>
+        }
+        onClose={closeForm}
+        open={isFormOpen}
+        size="lg"
+        title={selectedAdvertisement ? 'تعديل الإعلان' : 'إعلان جديد'}
+      >
+        <form className="space-y-5" id="advertisement-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup error={form.formState.errors.title_ar} label="Title AR / العنوان العربي">
+            <input className="field" {...form.register('title_ar', { required: 'العنوان العربي مطلوب' })} />
+          </FieldGroup>
+          <FieldGroup error={form.formState.errors.title_en} label="Title EN / العنوان الإنجليزي">
+            <input className="field" {...form.register('title_en')} />
+          </FieldGroup>
+          <FieldGroup error={form.formState.errors.description_ar} label="Description AR / الوصف العربي">
+            <textarea className="field min-h-28" {...form.register('description_ar', { required: 'الوصف العربي مطلوب' })} />
+          </FieldGroup>
+          <FieldGroup error={form.formState.errors.description_en} label="Description EN / الوصف الإنجليزي">
+            <textarea className="field min-h-28" {...form.register('description_en')} />
+          </FieldGroup>
+          <FieldGroup error={form.formState.errors.advertisement_type} label="Type / النوع">
+            <select className="field" {...form.register('advertisement_type')}>
+              {advertisementTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </FieldGroup>
+          <ImageUploadField
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            error={form.formState.errors.image}
+            fileList={imageFile}
+            fileUrl={selectedAdvertisement?.image_url}
+            hint="Optional visual for the banner or announcement card"
+            label="Image / صورة الإعلان"
+            registration={form.register('image')}
+          />
+          <div className="grid gap-4 md:grid-cols-2">
+            <FieldGroup error={form.formState.errors.button_text_ar} label="Button AR / نص الزر العربي">
+              <input className="field" {...form.register('button_text_ar')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.button_text_en} label="Button EN / نص الزر الإنجليزي">
+              <input className="field" {...form.register('button_text_en')} />
+            </FieldGroup>
+          </div>
+          <FieldGroup error={form.formState.errors.button_url} label="Button URL / رابط الزر">
+            <input className="field" {...form.register('button_url')} />
+          </FieldGroup>
+          <div className="grid gap-4 md:grid-cols-2">
+            <ColorPickerField allowClear error={form.formState.errors.background_color} hint="Optional" label="Background color / لون الخلفية" name="background_color" register={form.register} setValue={form.setValue} value={backgroundColor} />
+            <ColorPickerField allowClear error={form.formState.errors.text_color} hint="Optional" label="Text color / لون النص" name="text_color" register={form.register} setValue={form.setValue} value={textColor} />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FieldGroup error={form.formState.errors.display_order} label="Display order / ترتيب العرض">
+              <input className="field" type="number" {...form.register('display_order')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.start_date} label="Start date / بداية العرض">
+              <input className="field" type="datetime-local" {...form.register('start_date', { required: 'تاريخ البداية مطلوب' })} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.end_date} label="End date / نهاية العرض">
+              <input className="field" type="datetime-local" {...form.register('end_date')} />
+            </FieldGroup>
+          </div>
+          <ToggleField
+            description="يمكن تعطيل الإعلان بدون حذفه."
+            label="Active / نشط"
+            registration={form.register('is_active')}
+          />
+          <FormMessage message={feedback} />
         </form>
-      </div>
+      </FormModal>
     </div>
   )
 }

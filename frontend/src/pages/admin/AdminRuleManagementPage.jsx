@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from 'react'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
+import FormModal from '../../components/FormModal'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
@@ -235,6 +236,7 @@ function AdminRuleManagementPage() {
   const [selectedPaymentId, setSelectedPaymentId] = useState(null)
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [selectedSettingId, setSelectedSettingId] = useState(null)
+  const [activeEditor, setActiveEditor] = useState(null)
 
   const [serviceForm, setServiceForm] = useState(DEFAULT_SERVICE_FORM)
   const [documentForm, setDocumentForm] = useState(DEFAULT_DOCUMENT_FORM)
@@ -425,6 +427,104 @@ function AdminRuleManagementPage() {
     setFeedback((current) => ({ ...current, [section]: { type, text } }))
   }
 
+  function openServiceEditor(id = null) {
+    setSelectedServiceId(id)
+    if (!id) setServiceForm(DEFAULT_SERVICE_FORM)
+    setActiveEditor('service')
+  }
+
+  function closeServiceEditor() {
+    setActiveEditor((current) => (current === 'service' ? null : current))
+    setSelectedServiceId(null)
+    setServiceForm(DEFAULT_SERVICE_FORM)
+  }
+
+  function openDocumentEditor(id = null) {
+    setSelectedDocumentId(id)
+    if (!id) setDocumentForm(DEFAULT_DOCUMENT_FORM)
+    setActiveEditor('document')
+  }
+
+  function closeDocumentEditor() {
+    setActiveEditor((current) => (current === 'document' ? null : current))
+    setSelectedDocumentId(null)
+    setDocumentForm(DEFAULT_DOCUMENT_FORM)
+  }
+
+  function openAssignmentEditor(id = null) {
+    setSelectedAssignmentId(id)
+    if (!id) setAssignmentForm(DEFAULT_ASSIGNMENT_FORM)
+    setActiveEditor('assignment')
+  }
+
+  function closeAssignmentEditor() {
+    setActiveEditor((current) => (current === 'assignment' ? null : current))
+    setSelectedAssignmentId(null)
+    setAssignmentForm(DEFAULT_ASSIGNMENT_FORM)
+  }
+
+  function openProviderEditor(id) {
+    setSelectedProviderId(id)
+    setActiveEditor('provider')
+  }
+
+  function closeProviderEditor() {
+    setActiveEditor((current) => (current === 'provider' ? null : current))
+    setSelectedProviderId(null)
+    setProviderActionForm(DEFAULT_PROVIDER_ACTION)
+  }
+
+  function openTemplateEditor(id = null) {
+    setSelectedTemplateId(id)
+    if (!id) {
+      setTemplateForm(DEFAULT_TEMPLATE_FORM)
+      setTemplatePreview(null)
+    }
+    setActiveEditor('template')
+  }
+
+  function closeTemplateEditor() {
+    setActiveEditor((current) => (current === 'template' ? null : current))
+    setSelectedTemplateId(null)
+    setTemplateForm(DEFAULT_TEMPLATE_FORM)
+    setTemplatePreview(null)
+  }
+
+  function openPaymentEditor(id) {
+    setSelectedPaymentId(id)
+    setActiveEditor('payment')
+  }
+
+  function closePaymentEditor() {
+    setActiveEditor((current) => (current === 'payment' ? null : current))
+    setSelectedPaymentId(null)
+    setPaymentForm(DEFAULT_PAYMENT_FORM)
+  }
+
+  function openUserEditor(id = null) {
+    setSelectedUserId(id)
+    if (!id) setUserForm(DEFAULT_USER_FORM)
+    setActiveEditor('user')
+  }
+
+  function closeUserEditor() {
+    setActiveEditor((current) => (current === 'user' ? null : current))
+    setSelectedUserId(null)
+    setUserForm(DEFAULT_USER_FORM)
+  }
+
+  function openSettingEditor(id = null) {
+    setSelectedSettingId(id)
+    if (!id) setSettingForm({ key: SYSTEM_SETTING_KEYS[0], description: '', values: {} })
+    setActiveEditor('setting')
+  }
+
+  function closeSettingEditor() {
+    setActiveEditor((current) => (current === 'setting' ? null : current))
+    setSelectedSettingId(null)
+    setSettingForm({ key: SYSTEM_SETTING_KEYS[0], description: '', values: {} })
+  }
+
   function openConfirm(title, description, onConfirm) {
     setConfirmState({ open: true, title, description, onConfirm })
   }
@@ -443,8 +543,7 @@ function AdminRuleManagementPage() {
         await api.createAdminService(payload)
       }
       reloadServices()
-      setSelectedServiceId(null)
-      setServiceForm(DEFAULT_SERVICE_FORM)
+      closeServiceEditor()
       setSectionFeedback('services', 'success', 'Service rules saved.')
     } catch (error) {
       setSectionFeedback('services', 'error', getDisplayError(error))
@@ -466,8 +565,7 @@ function AdminRuleManagementPage() {
         await api.createAdminServiceDocument(payload)
       }
       reloadDocuments()
-      setSelectedDocumentId(null)
-      setDocumentForm(DEFAULT_DOCUMENT_FORM)
+      closeDocumentEditor()
       setSectionFeedback('documents', 'success', 'Document rule saved.')
     } catch (error) {
       setSectionFeedback('documents', 'error', getDisplayError(error))
@@ -487,8 +585,7 @@ function AdminRuleManagementPage() {
         await api.createAdminServiceAssignment(payload)
       }
       reloadAssignments()
-      setSelectedAssignmentId(null)
-      setAssignmentForm(DEFAULT_ASSIGNMENT_FORM)
+      closeAssignmentEditor()
       setSectionFeedback('assignments', 'success', 'Provider rule saved.')
     } catch (error) {
       setSectionFeedback('assignments', 'error', getDisplayError(error))
@@ -541,9 +638,7 @@ function AdminRuleManagementPage() {
         await api.createAdminNotificationTemplate(templateForm)
       }
       reloadTemplates()
-      setSelectedTemplateId(null)
-      setTemplateForm(DEFAULT_TEMPLATE_FORM)
-      setTemplatePreview(null)
+      closeTemplateEditor()
       setSectionFeedback('notifications', 'success', 'Notification template saved.')
     } catch (error) {
       setSectionFeedback('notifications', 'error', getDisplayError(error))
@@ -555,6 +650,7 @@ function AdminRuleManagementPage() {
     try {
       await api.updateAdminPaymentStatus(selectedPayment.id, paymentForm)
       reloadPayments()
+      closePaymentEditor()
       setSectionFeedback('payments', 'success', 'Payment status updated safely.')
     } catch (error) {
       setSectionFeedback('payments', 'error', getDisplayError(error))
@@ -571,8 +667,7 @@ function AdminRuleManagementPage() {
         await api.createAdminUser(payload)
       }
       reloadUsers()
-      setSelectedUserId(null)
-      setUserForm(DEFAULT_USER_FORM)
+      closeUserEditor()
       setSectionFeedback('users', 'success', 'User saved.')
     } catch (error) {
       setSectionFeedback('users', 'error', getDisplayError(error))
@@ -592,7 +687,7 @@ function AdminRuleManagementPage() {
         await api.createSystemSetting(payload)
       }
       reloadSettings()
-      setSelectedSettingId(null)
+      closeSettingEditor()
       setSectionFeedback('settings', 'success', 'System setting saved.')
     } catch (error) {
       setSectionFeedback('settings', 'error', getDisplayError(error))
@@ -614,7 +709,7 @@ function AdminRuleManagementPage() {
       label: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedServiceId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openServiceEditor(row.id)} type="button">
             Edit
           </button>
           <button
@@ -646,7 +741,7 @@ function AdminRuleManagementPage() {
       label: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedDocumentId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openDocumentEditor(row.id)} type="button">
             Edit
           </button>
           <button
@@ -678,7 +773,7 @@ function AdminRuleManagementPage() {
       label: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedAssignmentId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openAssignmentEditor(row.id)} type="button">
             Edit
           </button>
           <button
@@ -709,7 +804,7 @@ function AdminRuleManagementPage() {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedProviderId(row.id)} type="button">
+        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openProviderEditor(row.id)} type="button">
           Manage
         </button>
       ),
@@ -734,7 +829,7 @@ function AdminRuleManagementPage() {
       label: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedTemplateId(row.id || row.template_id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openTemplateEditor(row.id || row.template_id)} type="button">
             Edit
           </button>
           <button
@@ -766,7 +861,7 @@ function AdminRuleManagementPage() {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedPaymentId(row.id)} type="button">
+        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openPaymentEditor(row.id)} type="button">
           Update
         </button>
       ),
@@ -783,7 +878,7 @@ function AdminRuleManagementPage() {
       label: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedUserId(row.id)} type="button">
+          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openUserEditor(row.id)} type="button">
             Edit
           </button>
           <button
@@ -821,23 +916,27 @@ function AdminRuleManagementPage() {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setSelectedSettingId(row.id || row.setting_id)} type="button">
+        <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openSettingEditor(row.id || row.setting_id)} type="button">
           Edit
         </button>
       ),
     },
   ]
 
-  const currentSettingDefinition =
-    systemSettings.find((item) => item.key === settingForm.key) || {
-      key: settingForm.key,
-      ...(SETTING_DEFINITIONS[settingForm.key] || {
-        label: settingForm.key,
-        help_text: 'Choose a safe setting and fill in the allowed fields only.',
-        warning: '',
-        fields: [],
-      }),
-    }
+  const settingDefinition = SETTING_DEFINITIONS[settingForm.key] || {
+    label: settingForm.key,
+    help_text: 'Choose a safe setting and fill in the allowed fields only.',
+    warning: '',
+    fields: [],
+  }
+
+  const currentSettingDefinition = {
+    key: settingForm.key,
+    label: settingDefinition.label,
+    help_text: settingDefinition.help_text,
+    warning: settingDefinition.warning,
+    fields: settingDefinition.fields || [],
+  }
 
   return (
     <div className="page-section space-y-6">
@@ -855,238 +954,61 @@ function AdminRuleManagementPage() {
       </div>
 
       {activeTab === 'services' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
               title="Service management"
               text="Manage only business-facing service details. Internal identifiers stay hidden and used services are disabled instead of deleted."
             />
-            <DataTable columns={serviceColumns} emptyDescription="Create the first service to start taking orders." emptyTitle="No services found" rows={services} />
+            <button className="btn-primary" onClick={() => openServiceEditor()} type="button">
+              New service
+            </button>
           </div>
-
-          <div className="glass-panel space-y-4 p-6">
-            <EmptyHelp
-              title="Price rules"
-              text="Base price, extra fees, review requirement, and provider requirement are audited. This form does not allow direct workflow bypass."
-              warning="Price changes are visible to staff immediately and are recorded in the audit log."
-            />
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Category" help="Choose the business category shown to admins and clients.">
-                <select className="field" value={serviceForm.category_id} onChange={(event) => setServiceForm({ ...serviceForm, category_id: event.target.value })}>
-                  <option value="">Choose category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name_ar}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Arabic name" help="Main service name visible in Arabic screens.">
-                <input className="field" value={serviceForm.name_ar} onChange={(event) => setServiceForm({ ...serviceForm, name_ar: event.target.value })} />
-              </Field>
-              <Field label="English name" help="Used in bilingual screens and reports.">
-                <input className="field" value={serviceForm.name_en} onChange={(event) => setServiceForm({ ...serviceForm, name_en: event.target.value })} />
-              </Field>
-              <Field label="Base price" help="Main service amount before other fees.">
-                <input className="field" type="number" value={serviceForm.base_price} onChange={(event) => setServiceForm({ ...serviceForm, base_price: event.target.value })} />
-              </Field>
-              <Field label="Government fee" help="Optional government amount if this service needs it.">
-                <input className="field" type="number" value={serviceForm.government_fee} onChange={(event) => setServiceForm({ ...serviceForm, government_fee: event.target.value })} />
-              </Field>
-              <Field label="Extra service fee" help="Any extra internal fee allowed by the business model.">
-                <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
-              </Field>
-              <Field label="Estimated duration" help="Use a simple number for non-technical admins.">
-                <input className="field" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
-              </Field>
-              <Field label="Duration unit" help="Choose the clearest unit for operations.">
-                <select className="field" value={serviceForm.estimated_duration_unit} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_unit: event.target.value })}>
-                  <option value="hours">Hours</option>
-                  <option value="days">Days</option>
-                  <option value="weeks">Weeks</option>
-                </select>
-              </Field>
-              <Field label="Arabic description" help="Explain the service in simple language.">
-                <textarea className="field min-h-28" value={serviceForm.description_ar} onChange={(event) => setServiceForm({ ...serviceForm, description_ar: event.target.value })} />
-              </Field>
-              <Field label="English description" help="Optional bilingual description.">
-                <textarea className="field min-h-28" value={serviceForm.description_en} onChange={(event) => setServiceForm({ ...serviceForm, description_en: event.target.value })} />
-              </Field>
-            </div>
-            <div className="grid gap-3">
-              <ToggleField checked={serviceForm.provider_required} help="Turn this off only for services completed fully inside the office." label="Provider is required" onChange={(value) => setServiceForm({ ...serviceForm, provider_required: value })} />
-              <ToggleField checked={serviceForm.requires_manual_review} help="Keep this on when an employee must review each order before execution." label="Employee review is required" onChange={(value) => setServiceForm({ ...serviceForm, requires_manual_review: value })} />
-              <ToggleField checked={serviceForm.is_active} help="Inactive services stay in history but stop accepting new orders." label="Service is active" onChange={(value) => setServiceForm({ ...serviceForm, is_active: value })} />
-            </div>
-            <div className="flex gap-3">
-              <button className="btn-primary flex-1" onClick={handleServiceSave} type="button">
-                Save service
-              </button>
-              <button className="btn-secondary" onClick={() => { setSelectedServiceId(null); setServiceForm(DEFAULT_SERVICE_FORM) }} type="button">
-                New
-              </button>
-            </div>
-            <SectionMessage message={feedback.services} />
-          </div>
+          <DataTable columns={serviceColumns} emptyDescription="Create the first service to start taking orders." emptyTitle="No services found" rows={services} />
+          <SectionMessage message={feedback.services} />
         </section>
       ) : null}
 
       {activeTab === 'documents' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
               title="Required documents"
               text="Define which files are required for each service using clear names, safe file types, and replacement rules."
               warning="Admins cannot edit the actual uploaded files from this screen."
             />
-            <DataTable columns={documentColumns} emptyDescription="Add the first document rule for a service." emptyTitle="No document rules found" rows={documents} />
+            <button className="btn-primary" onClick={() => openDocumentEditor()} type="button">
+              New document rule
+            </button>
           </div>
-
-          <div className="glass-panel space-y-4 p-6">
-            <Field label="Service" help="Choose which service needs this document.">
-              <select className="field" value={documentForm.service_id} onChange={(event) => setDocumentForm({ ...documentForm, service_id: event.target.value })}>
-                <option value="">Choose service</option>
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name_ar}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Arabic document name" help="Visible label shown to staff and clients.">
-              <input className="field" value={documentForm.name_ar} onChange={(event) => setDocumentForm({ ...documentForm, name_ar: event.target.value })} />
-            </Field>
-            <Field label="English document name" help="Optional bilingual label.">
-              <input className="field" value={documentForm.name_en} onChange={(event) => setDocumentForm({ ...documentForm, name_en: event.target.value })} />
-            </Field>
-            <div className="grid gap-3 md:grid-cols-2">
-              {SAFE_FILE_TYPES.map((extension) => (
-                <label key={extension} className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm">
-                  <input
-                    checked={documentForm.allowed_extensions.includes(extension)}
-                    onChange={(event) =>
-                      setDocumentForm({
-                        ...documentForm,
-                        allowed_extensions: event.target.checked
-                          ? [...documentForm.allowed_extensions, extension]
-                          : documentForm.allowed_extensions.filter((item) => item !== extension),
-                      })
-                    }
-                    type="checkbox"
-                  />
-                  <span>{extension}</span>
-                </label>
-              ))}
-            </div>
-            <Field label="Maximum size in bytes" help="Keep this simple. The system also applies a global safety limit.">
-              <input className="field" type="number" value={documentForm.max_file_size} onChange={(event) => setDocumentForm({ ...documentForm, max_file_size: event.target.value })} />
-            </Field>
-            <div className="grid gap-3">
-              <ToggleField checked={documentForm.is_required} help="Required documents block order progress until uploaded and approved." label="Required document" onChange={(value) => setDocumentForm({ ...documentForm, is_required: value })} />
-              <ToggleField checked={documentForm.requires_verification} help="Use this when staff must verify the file before the order can move forward." label="Requires verification" onChange={(value) => setDocumentForm({ ...documentForm, requires_verification: value })} />
-              <ToggleField checked={documentForm.client_can_replace_file} help="Turn off when the client should not replace a previously uploaded file without staff action." label="Client can replace the file" onChange={(value) => setDocumentForm({ ...documentForm, client_can_replace_file: value })} />
-              <ToggleField checked={documentForm.provider_can_view_file} help="Only enable if the provider truly needs access to this file." label="Provider can view the file" onChange={(value) => setDocumentForm({ ...documentForm, provider_can_view_file: value })} />
-            </div>
-            <div className="flex gap-3">
-              <button className="btn-primary flex-1" onClick={handleDocumentSave} type="button">
-                Save document rule
-              </button>
-              <button className="btn-secondary" onClick={() => { setSelectedDocumentId(null); setDocumentForm(DEFAULT_DOCUMENT_FORM) }} type="button">
-                New
-              </button>
-            </div>
-            <SectionMessage message={feedback.documents} />
-          </div>
+          <DataTable columns={documentColumns} emptyDescription="Add the first document rule for a service." emptyTitle="No document rules found" rows={documents} />
+          <SectionMessage message={feedback.documents} />
         </section>
       ) : null}
 
       {activeTab === 'providers' ? (
         <section className="space-y-6">
-          <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="glass-panel p-6">
+          <div className="glass-panel p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <EmptyHelp
                 title="Provider assignment rules"
                 text="Link approved providers to services. Actual order reassignment stays on the order screen and requires a reason."
               />
-              <DataTable columns={assignmentColumns} emptyDescription="Link providers to services before assigning live orders." emptyTitle="No provider assignment rules found" rows={assignments} />
+              <button className="btn-primary" onClick={() => openAssignmentEditor()} type="button">
+                New assignment rule
+              </button>
             </div>
-
-            <div className="glass-panel space-y-4 p-6">
-              <Field label="Service" help="Choose the service that this provider can execute.">
-                <select className="field" value={assignmentForm.service_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, service_id: event.target.value })}>
-                  <option value="">Choose service</option>
-                  {services.filter((service) => service.provider_required).map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.name_ar}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Provider" help="Only approved, business-active providers should be linked.">
-                <select className="field" value={assignmentForm.provider_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, provider_id: event.target.value })}>
-                  <option value="">Choose provider</option>
-                  {providers.map((provider) => (
-                    <option key={provider.id} value={provider.id}>
-                      {provider.full_name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <ToggleField checked={assignmentForm.is_active} help="Inactive links stay in audit history but stop future matching." label="Assignment rule is active" onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })} />
-              <div className="flex gap-3">
-                <button className="btn-primary flex-1" onClick={handleAssignmentSave} type="button">
-                  Save assignment rule
-                </button>
-                <button className="btn-secondary" onClick={() => { setSelectedAssignmentId(null); setAssignmentForm(DEFAULT_ASSIGNMENT_FORM) }} type="button">
-                  New
-                </button>
-              </div>
-              <SectionMessage message={feedback.assignments} />
-            </div>
+            <DataTable columns={assignmentColumns} emptyDescription="Link providers to services before assigning live orders." emptyTitle="No provider assignment rules found" rows={assignments} />
+            <SectionMessage message={feedback.assignments} />
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="glass-panel p-6">
+          <div className="glass-panel p-6">
               <EmptyHelp
                 title="Provider approval"
                 text="Review provider capabilities, approve or reject them, and activate or deactivate business access without editing security internals."
               />
               <DataTable columns={providerColumns} emptyDescription="Provider accounts appear here once created." emptyTitle="No providers found" rows={providers} />
-            </div>
-
-            <div className="glass-panel space-y-4 p-6">
-              {selectedProvider ? (
-                <>
-                  <EmptyHelp
-                    title={selectedProvider.full_name}
-                    text={`Capabilities: ${selectedProvider.capability_summary}.`}
-                    warning="Approval and activation changes are audited."
-                  />
-                  <Field label="Approval decision" help="Rejecting a provider requires a reason for the audit trail.">
-                    <select className="field" value={providerActionForm.decision} onChange={(event) => setProviderActionForm({ ...providerActionForm, decision: event.target.value })}>
-                      <option value="approve">Approve provider</option>
-                      <option value="reject">Reject provider</option>
-                    </select>
-                  </Field>
-                  <Field label="Approval reason" help="Required only when rejecting a provider.">
-                    <textarea className="field min-h-24" value={providerActionForm.approval_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, approval_reason: event.target.value })} />
-                  </Field>
-                  <button className="btn-primary" onClick={handleProviderApproval} type="button">
-                    Save approval decision
-                  </button>
-                  <ToggleField checked={providerActionForm.is_active} help="Turn off access safely without deleting the provider profile." label="Provider account is active" onChange={(value) => setProviderActionForm({ ...providerActionForm, is_active: value })} />
-                  <Field label="Activation reason" help="Required only when deactivating a provider.">
-                    <textarea className="field min-h-24" value={providerActionForm.activation_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, activation_reason: event.target.value })} />
-                  </Field>
-                  <button className="btn-secondary" onClick={handleProviderActivation} type="button">
-                    Save activation
-                  </button>
-                </>
-              ) : (
-                <EmptyHelp title="Select a provider" text="Choose a provider from the table to manage approval and activation safely." />
-              )}
               <SectionMessage message={feedback.providers} />
-            </div>
           </div>
         </section>
       ) : null}
@@ -1103,155 +1025,47 @@ function AdminRuleManagementPage() {
       ) : null}
 
       {activeTab === 'notifications' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
               title="Notification templates"
               text="Only safe text templates can be edited here. HTML and unsafe placeholders are blocked."
               warning="Preview the message before saving any change."
             />
-            <DataTable columns={templateColumns} emptyDescription="Create the first notification template for staff-approved messages." emptyTitle="No notification templates found" rows={notificationTemplates} />
+            <button className="btn-primary" onClick={() => openTemplateEditor()} type="button">
+              New template
+            </button>
           </div>
-
-          <div className="glass-panel space-y-4 p-6">
-            <Field label="Template key" help="Internal key used by staff. Keep it short and stable.">
-              <input className="field" value={templateForm.key} onChange={(event) => setTemplateForm({ ...templateForm, key: event.target.value })} />
-            </Field>
-            <Field label="Channel" help="Only safe channels already supported by the system should be used.">
-              <select className="field" value={templateForm.channel} onChange={(event) => setTemplateForm({ ...templateForm, channel: event.target.value })}>
-                <option value="system">System</option>
-                <option value="email">Email</option>
-                <option value="sms">SMS</option>
-                <option value="whatsapp">WhatsApp</option>
-              </select>
-            </Field>
-            <Field label="Arabic title" help="Visible notification title.">
-              <input className="field" value={templateForm.title_ar} onChange={(event) => setTemplateForm({ ...templateForm, title_ar: event.target.value })} />
-            </Field>
-            <Field label="Arabic message" help="Allowed placeholders: {{order_number}}, {{service_name}}, {{customer_name}}, {{status_label}}.">
-              <textarea className="field min-h-24" value={templateForm.message_ar} onChange={(event) => setTemplateForm({ ...templateForm, message_ar: event.target.value })} />
-            </Field>
-            <Field label="English title" help="Optional bilingual title.">
-              <input className="field" value={templateForm.title_en} onChange={(event) => setTemplateForm({ ...templateForm, title_en: event.target.value })} />
-            </Field>
-            <Field label="English message" help="Optional bilingual message.">
-              <textarea className="field min-h-24" value={templateForm.message_en} onChange={(event) => setTemplateForm({ ...templateForm, message_en: event.target.value })} />
-            </Field>
-            <ToggleField checked={templateForm.is_active} help="Inactive templates stay in history and stop being used." label="Template is active" onChange={(value) => setTemplateForm({ ...templateForm, is_active: value })} />
-            <div className="flex gap-3">
-              <button className="btn-secondary flex-1" onClick={handleTemplatePreview} type="button">
-                Preview
-              </button>
-              <button className="btn-primary flex-1" onClick={handleTemplateSave} type="button">
-                Save template
-              </button>
-            </div>
-            {templatePreview ? (
-              <div className="rounded-3xl border border-brand-100 bg-brand-50/50 p-4">
-                <p className="text-sm font-bold text-ink">Preview</p>
-                <p className="mt-3 text-sm font-semibold text-ink">{templatePreview.title_ar || templatePreview.title_en || 'No title'}</p>
-                <p className="mt-2 text-sm leading-7 text-slate-600">{templatePreview.message_ar || templatePreview.message_en || 'No message'}</p>
-              </div>
-            ) : null}
-            <SectionMessage message={feedback.notifications} />
-          </div>
+          <DataTable columns={templateColumns} emptyDescription="Create the first notification template for staff-approved messages." emptyTitle="No notification templates found" rows={notificationTemplates} />
+          <SectionMessage message={feedback.notifications} />
         </section>
       ) : null}
 
       {activeTab === 'payments' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
             <EmptyHelp
               title="Payment status management"
               text="View payment status and update it only through the safe status action. Raw transaction records are not editable here."
             />
             <DataTable columns={paymentColumns} emptyDescription="Payments linked to orders will appear here." emptyTitle="No payments found" rows={payments} />
-          </div>
-
-          <div className="glass-panel space-y-4 p-6">
-            {selectedPayment ? (
-              <>
-                <EmptyHelp title={selectedPayment.payment_number} text={`Order ${selectedPayment.order_number} for ${selectedPayment.customer_name}.`} warning="Status changes are audited." />
-                <Field label="Payment status" help="Choose the correct business status for this payment.">
-                  <select className="field" value={paymentForm.status} onChange={(event) => setPaymentForm({ ...paymentForm, status: event.target.value })}>
-                    {PAYMENT_STATUS_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label="Reference number" help="Add a bank, gateway, or manual receipt reference when available.">
-                  <input className="field" value={paymentForm.reference_number} onChange={(event) => setPaymentForm({ ...paymentForm, reference_number: event.target.value })} />
-                </Field>
-                <Field label="Reason or notes" help="Explain why this payment status changed.">
-                  <textarea className="field min-h-24" value={paymentForm.notes} onChange={(event) => setPaymentForm({ ...paymentForm, notes: event.target.value })} />
-                </Field>
-                <Field label="Failure reason" help="Use this only when the payment failed.">
-                  <textarea className="field min-h-24" value={paymentForm.failure_reason} onChange={(event) => setPaymentForm({ ...paymentForm, failure_reason: event.target.value })} />
-                </Field>
-                <button className="btn-primary" onClick={handlePaymentSave} type="button">
-                  Update payment status
-                </button>
-              </>
-            ) : (
-              <EmptyHelp title="Select a payment" text="Choose a payment from the table to update its status safely." />
-            )}
-            <SectionMessage message={feedback.payments} />
-          </div>
+          <SectionMessage message={feedback.payments} />
         </section>
       ) : null}
 
       {activeTab === 'users' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
               title="User and role management"
               text="Manage normal business users and roles only. Super admin accounts and permission internals stay protected."
               warning="Normal admins cannot create or modify admin-level users."
             />
-            <DataTable columns={userColumns} emptyDescription="Business users will appear here once created." emptyTitle="No users found" rows={users} />
+            <button className="btn-primary" onClick={() => openUserEditor()} type="button">
+              New user
+            </button>
           </div>
-
-          <div className="glass-panel space-y-4 p-6">
-            <Field label="Full name" help="Use the business-facing display name.">
-              <input className="field" value={userForm.full_name} onChange={(event) => setUserForm({ ...userForm, full_name: event.target.value })} />
-            </Field>
-            <Field label="Email" help="Used for login and notifications.">
-              <input className="field" type="email" value={userForm.email} onChange={(event) => setUserForm({ ...userForm, email: event.target.value })} />
-            </Field>
-            <Field label="Phone" help="Primary contact number.">
-              <input className="field" value={userForm.phone} onChange={(event) => setUserForm({ ...userForm, phone: event.target.value })} />
-            </Field>
-            <Field label="Password" help="Leave blank when editing if no password reset is needed.">
-              <input className="field" type="password" value={userForm.password} onChange={(event) => setUserForm({ ...userForm, password: event.target.value })} />
-            </Field>
-            <Field label="Role" help="Only normal business roles are available here.">
-              <select className="field" value={userForm.role} onChange={(event) => setUserForm({ ...userForm, role: event.target.value })}>
-                {(selectedUser?.role_options || ['customer', 'employee', 'support', 'provider']).map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="National ID" help="Optional identity reference when the business uses it.">
-              <input className="field" value={userForm.national_id} onChange={(event) => setUserForm({ ...userForm, national_id: event.target.value })} />
-            </Field>
-            <div className="grid gap-3">
-              <ToggleField checked={userForm.is_active} help="Turn off access without deleting the account." label="User is active" onChange={(value) => setUserForm({ ...userForm, is_active: value })} />
-              <ToggleField checked={userForm.is_verified} help="Use only when the business verification process is complete." label="User is verified" onChange={(value) => setUserForm({ ...userForm, is_verified: value })} />
-            </div>
-            <div className="flex gap-3">
-              <button className="btn-primary flex-1" onClick={handleUserSave} type="button">
-                Save user
-              </button>
-              <button className="btn-secondary" onClick={() => { setSelectedUserId(null); setUserForm(DEFAULT_USER_FORM) }} type="button">
-                New
-              </button>
-            </div>
-            <SectionMessage message={feedback.users} />
-          </div>
+          <DataTable columns={userColumns} emptyDescription="Business users will appear here once created." emptyTitle="No users found" rows={users} />
+          <SectionMessage message={feedback.users} />
         </section>
       ) : null}
 
@@ -1298,65 +1112,462 @@ function AdminRuleManagementPage() {
       ) : null}
 
       {activeTab === 'settings' ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="glass-panel p-6">
+        <section className="glass-panel p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
               title="System settings"
               text="Only whitelisted business-safe settings appear here. Raw JSON and security internals are blocked."
               warning="Sensitive settings should stay under super admin or code control."
             />
-            <DataTable columns={settingColumns} emptyDescription="Create a safe setting when the business needs a controlled option." emptyTitle="No safe settings found" rows={systemSettings} />
+            <button className="btn-primary" onClick={() => openSettingEditor()} type="button">
+              New setting
+            </button>
           </div>
+          <DataTable columns={settingColumns} emptyDescription="Create a safe setting when the business needs a controlled option." emptyTitle="No safe settings found" rows={systemSettings} />
+          <SectionMessage message={feedback.settings} />
+        </section>
+      ) : null}
 
-          <div className="glass-panel space-y-4 p-6">
-            <Field label="Setting" help="Choose one of the allowed business-safe settings.">
-              <select className="field" value={settingForm.key} onChange={(event) => setSettingForm({ key: event.target.value, description: '', values: {} })}>
-                {SYSTEM_SETTING_KEYS.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
+      <FormModal
+        open={activeEditor === 'service'}
+        onClose={closeServiceEditor}
+        size="xl"
+        title={selectedService ? 'Edit service' : 'New service'}
+        description="Manage business-facing service details in one focused popup without compressing the table view."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeServiceEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleServiceSave} type="button">
+              Save service
+            </button>
+          </div>
+        }
+      >
+        <EmptyHelp
+          title="Price rules"
+          text="Base price, extra fees, review requirement, and provider requirement are audited. This form does not allow direct workflow bypass."
+          warning="Price changes are visible to staff immediately and are recorded in the audit log."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Category" help="Choose the business category shown to admins and clients.">
+            <select className="field" value={serviceForm.category_id} onChange={(event) => setServiceForm({ ...serviceForm, category_id: event.target.value })}>
+              <option value="">Choose category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name_ar}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Arabic name" help="Main service name visible in Arabic screens.">
+            <input className="field" value={serviceForm.name_ar} onChange={(event) => setServiceForm({ ...serviceForm, name_ar: event.target.value })} />
+          </Field>
+          <Field label="English name" help="Used in bilingual screens and reports.">
+            <input className="field" value={serviceForm.name_en} onChange={(event) => setServiceForm({ ...serviceForm, name_en: event.target.value })} />
+          </Field>
+          <Field label="Base price" help="Main service amount before other fees.">
+            <input className="field" type="number" value={serviceForm.base_price} onChange={(event) => setServiceForm({ ...serviceForm, base_price: event.target.value })} />
+          </Field>
+          <Field label="Government fee" help="Optional government amount if this service needs it.">
+            <input className="field" type="number" value={serviceForm.government_fee} onChange={(event) => setServiceForm({ ...serviceForm, government_fee: event.target.value })} />
+          </Field>
+          <Field label="Extra service fee" help="Any extra internal fee allowed by the business model.">
+            <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
+          </Field>
+          <Field label="Estimated duration" help="Use a simple number for non-technical admins.">
+            <input className="field" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
+          </Field>
+          <Field label="Duration unit" help="Choose the clearest unit for operations.">
+            <select className="field" value={serviceForm.estimated_duration_unit} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_unit: event.target.value })}>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+            </select>
+          </Field>
+          <Field label="Arabic description" help="Explain the service in simple language.">
+            <textarea className="field min-h-28" value={serviceForm.description_ar} onChange={(event) => setServiceForm({ ...serviceForm, description_ar: event.target.value })} />
+          </Field>
+          <Field label="English description" help="Optional bilingual description.">
+            <textarea className="field min-h-28" value={serviceForm.description_en} onChange={(event) => setServiceForm({ ...serviceForm, description_en: event.target.value })} />
+          </Field>
+        </div>
+        <div className="mt-4 grid gap-3">
+          <ToggleField checked={serviceForm.provider_required} help="Turn this off only for services completed fully inside the office." label="Provider is required" onChange={(value) => setServiceForm({ ...serviceForm, provider_required: value })} />
+          <ToggleField checked={serviceForm.requires_manual_review} help="Keep this on when an employee must review each order before execution." label="Employee review is required" onChange={(value) => setServiceForm({ ...serviceForm, requires_manual_review: value })} />
+          <ToggleField checked={serviceForm.is_active} help="Inactive services stay in history but stop accepting new orders." label="Service is active" onChange={(value) => setServiceForm({ ...serviceForm, is_active: value })} />
+        </div>
+        <div className="mt-4">
+          <SectionMessage message={feedback.services} />
+        </div>
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'document'}
+        onClose={closeDocumentEditor}
+        size="lg"
+        title={selectedDocument ? 'Edit document rule' : 'New document rule'}
+        description="Define required files in a focused popup so the rules list stays readable."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeDocumentEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleDocumentSave} type="button">
+              Save document rule
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <Field label="Service" help="Choose which service needs this document.">
+            <select className="field" value={documentForm.service_id} onChange={(event) => setDocumentForm({ ...documentForm, service_id: event.target.value })}>
+              <option value="">Choose service</option>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.name_ar}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Arabic document name" help="Visible label shown to staff and clients.">
+            <input className="field" value={documentForm.name_ar} onChange={(event) => setDocumentForm({ ...documentForm, name_ar: event.target.value })} />
+          </Field>
+          <Field label="English document name" help="Optional bilingual label.">
+            <input className="field" value={documentForm.name_en} onChange={(event) => setDocumentForm({ ...documentForm, name_en: event.target.value })} />
+          </Field>
+          <div className="grid gap-3 md:grid-cols-2">
+            {SAFE_FILE_TYPES.map((extension) => (
+              <label key={extension} className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm">
+                <input
+                  checked={documentForm.allowed_extensions.includes(extension)}
+                  onChange={(event) =>
+                    setDocumentForm({
+                      ...documentForm,
+                      allowed_extensions: event.target.checked
+                        ? [...documentForm.allowed_extensions, extension]
+                        : documentForm.allowed_extensions.filter((item) => item !== extension),
+                    })
+                  }
+                  type="checkbox"
+                />
+                <span>{extension}</span>
+              </label>
+            ))}
+          </div>
+          <Field label="Maximum size in bytes" help="Keep this simple. The system also applies a global safety limit.">
+            <input className="field" type="number" value={documentForm.max_file_size} onChange={(event) => setDocumentForm({ ...documentForm, max_file_size: event.target.value })} />
+          </Field>
+          <div className="grid gap-3">
+            <ToggleField checked={documentForm.is_required} help="Required documents block order progress until uploaded and approved." label="Required document" onChange={(value) => setDocumentForm({ ...documentForm, is_required: value })} />
+            <ToggleField checked={documentForm.requires_verification} help="Use this when staff must verify the file before the order can move forward." label="Requires verification" onChange={(value) => setDocumentForm({ ...documentForm, requires_verification: value })} />
+            <ToggleField checked={documentForm.client_can_replace_file} help="Turn off when the client should not replace a previously uploaded file without staff action." label="Client can replace the file" onChange={(value) => setDocumentForm({ ...documentForm, client_can_replace_file: value })} />
+            <ToggleField checked={documentForm.provider_can_view_file} help="Only enable if the provider truly needs access to this file." label="Provider can view the file" onChange={(value) => setDocumentForm({ ...documentForm, provider_can_view_file: value })} />
+          </div>
+          <SectionMessage message={feedback.documents} />
+        </div>
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'assignment'}
+        onClose={closeAssignmentEditor}
+        size="md"
+        title={selectedAssignment ? 'Edit assignment rule' : 'New assignment rule'}
+        description="Link approved providers to services without compressing the rule tables."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeAssignmentEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleAssignmentSave} type="button">
+              Save assignment rule
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <Field label="Service" help="Choose the service that this provider can execute.">
+            <select className="field" value={assignmentForm.service_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, service_id: event.target.value })}>
+              <option value="">Choose service</option>
+              {services.filter((service) => service.provider_required).map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.name_ar}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Provider" help="Only approved, business-active providers should be linked.">
+            <select className="field" value={assignmentForm.provider_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, provider_id: event.target.value })}>
+              <option value="">Choose provider</option>
+              {providers.map((provider) => (
+                <option key={provider.id} value={provider.id}>
+                  {provider.full_name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <ToggleField checked={assignmentForm.is_active} help="Inactive links stay in audit history but stop future matching." label="Assignment rule is active" onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })} />
+          <SectionMessage message={feedback.assignments} />
+        </div>
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'provider'}
+        onClose={closeProviderEditor}
+        size="lg"
+        title={selectedProvider ? `Manage ${selectedProvider.full_name}` : 'Manage provider'}
+        description="Review provider approval and business access in a focused popup."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeProviderEditor} type="button">
+              Close
+            </button>
+          </div>
+        }
+      >
+        {selectedProvider ? (
+          <div className="space-y-4">
+            <EmptyHelp
+              title={selectedProvider.full_name}
+              text={`Capabilities: ${selectedProvider.capability_summary}.`}
+              warning="Approval and activation changes are audited."
+            />
+            <Field label="Approval decision" help="Rejecting a provider requires a reason for the audit trail.">
+              <select className="field" value={providerActionForm.decision} onChange={(event) => setProviderActionForm({ ...providerActionForm, decision: event.target.value })}>
+                <option value="approve">Approve provider</option>
+                <option value="reject">Reject provider</option>
+              </select>
+            </Field>
+            <Field label="Approval reason" help="Required only when rejecting a provider.">
+              <textarea className="field min-h-24" value={providerActionForm.approval_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, approval_reason: event.target.value })} />
+            </Field>
+            <button className="btn-primary" onClick={handleProviderApproval} type="button">
+              Save approval decision
+            </button>
+            <ToggleField checked={providerActionForm.is_active} help="Turn off access safely without deleting the provider profile." label="Provider account is active" onChange={(value) => setProviderActionForm({ ...providerActionForm, is_active: value })} />
+            <Field label="Activation reason" help="Required only when deactivating a provider.">
+              <textarea className="field min-h-24" value={providerActionForm.activation_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, activation_reason: event.target.value })} />
+            </Field>
+            <button className="btn-secondary" onClick={handleProviderActivation} type="button">
+              Save activation
+            </button>
+            <SectionMessage message={feedback.providers} />
+          </div>
+        ) : null}
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'template'}
+        onClose={closeTemplateEditor}
+        size="lg"
+        title={selectedTemplate ? 'Edit notification template' : 'New notification template'}
+        description="Edit safe message templates in a popup and preview them before saving."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeTemplateEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-secondary" onClick={handleTemplatePreview} type="button">
+              Preview
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleTemplateSave} type="button">
+              Save template
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <Field label="Template key" help="Internal key used by staff. Keep it short and stable.">
+            <input className="field" value={templateForm.key} onChange={(event) => setTemplateForm({ ...templateForm, key: event.target.value })} />
+          </Field>
+          <Field label="Channel" help="Only safe channels already supported by the system should be used.">
+            <select className="field" value={templateForm.channel} onChange={(event) => setTemplateForm({ ...templateForm, channel: event.target.value })}>
+              <option value="system">System</option>
+              <option value="email">Email</option>
+              <option value="sms">SMS</option>
+              <option value="whatsapp">WhatsApp</option>
+            </select>
+          </Field>
+          <Field label="Arabic title" help="Visible notification title.">
+            <input className="field" value={templateForm.title_ar} onChange={(event) => setTemplateForm({ ...templateForm, title_ar: event.target.value })} />
+          </Field>
+          <Field label="Arabic message" help="Allowed placeholders: {{order_number}}, {{service_name}}, {{customer_name}}, {{status_label}}.">
+            <textarea className="field min-h-24" value={templateForm.message_ar} onChange={(event) => setTemplateForm({ ...templateForm, message_ar: event.target.value })} />
+          </Field>
+          <Field label="English title" help="Optional bilingual title.">
+            <input className="field" value={templateForm.title_en} onChange={(event) => setTemplateForm({ ...templateForm, title_en: event.target.value })} />
+          </Field>
+          <Field label="English message" help="Optional bilingual message.">
+            <textarea className="field min-h-24" value={templateForm.message_en} onChange={(event) => setTemplateForm({ ...templateForm, message_en: event.target.value })} />
+          </Field>
+          <ToggleField checked={templateForm.is_active} help="Inactive templates stay in history and stop being used." label="Template is active" onChange={(value) => setTemplateForm({ ...templateForm, is_active: value })} />
+          {templatePreview ? (
+            <div className="rounded-3xl border border-brand-100 bg-brand-50/50 p-4">
+              <p className="text-sm font-bold text-ink">Preview</p>
+              <p className="mt-3 text-sm font-semibold text-ink">{templatePreview.title_ar || templatePreview.title_en || 'No title'}</p>
+              <p className="mt-2 text-sm leading-7 text-slate-600">{templatePreview.message_ar || templatePreview.message_en || 'No message'}</p>
+            </div>
+          ) : null}
+          <SectionMessage message={feedback.notifications} />
+        </div>
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'payment'}
+        onClose={closePaymentEditor}
+        size="md"
+        title={selectedPayment ? `Update ${selectedPayment.payment_number}` : 'Update payment'}
+        description="Change payment status in a popup while keeping the payment history list visible in the background."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closePaymentEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handlePaymentSave} type="button">
+              Update payment status
+            </button>
+          </div>
+        }
+      >
+        {selectedPayment ? (
+          <div className="space-y-4">
+            <EmptyHelp title={selectedPayment.payment_number} text={`Order ${selectedPayment.order_number} for ${selectedPayment.customer_name}.`} warning="Status changes are audited." />
+            <Field label="Payment status" help="Choose the correct business status for this payment.">
+              <select className="field" value={paymentForm.status} onChange={(event) => setPaymentForm({ ...paymentForm, status: event.target.value })}>
+                {PAYMENT_STATUS_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
                 ))}
               </select>
             </Field>
-            <EmptyHelp title={currentSettingDefinition.label} text={currentSettingDefinition.help_text} warning={currentSettingDefinition.warning} />
-            {currentSettingDefinition.fields.map((field) => (
-              <Field key={field.key} label={field.label} help={field.help_text}>
-                {field.control === 'textarea' ? (
-                  <textarea
-                    className="field min-h-24"
-                    value={settingForm.values[field.key] || ''}
-                    onChange={(event) =>
-                      setSettingForm({
-                        ...settingForm,
-                        values: { ...settingForm.values, [field.key]: event.target.value },
-                      })
-                    }
-                  />
-                ) : (
-                  <input
-                    className="field"
-                    type={field.control === 'email' ? 'email' : 'text'}
-                    value={settingForm.values[field.key] || ''}
-                    onChange={(event) =>
-                      setSettingForm({
-                        ...settingForm,
-                        values: { ...settingForm.values, [field.key]: event.target.value },
-                      })
-                    }
-                  />
-                )}
-              </Field>
-            ))}
-            <Field label="Admin note" help="Optional note explaining why this setting changed.">
-              <textarea className="field min-h-24" value={settingForm.description} onChange={(event) => setSettingForm({ ...settingForm, description: event.target.value })} />
+            <Field label="Reference number" help="Add a bank, gateway, or manual receipt reference when available.">
+              <input className="field" value={paymentForm.reference_number} onChange={(event) => setPaymentForm({ ...paymentForm, reference_number: event.target.value })} />
             </Field>
-            <button className="btn-primary" onClick={handleSettingSave} type="button">
+            <Field label="Reason or notes" help="Explain why this payment status changed.">
+              <textarea className="field min-h-24" value={paymentForm.notes} onChange={(event) => setPaymentForm({ ...paymentForm, notes: event.target.value })} />
+            </Field>
+            <Field label="Failure reason" help="Use this only when the payment failed.">
+              <textarea className="field min-h-24" value={paymentForm.failure_reason} onChange={(event) => setPaymentForm({ ...paymentForm, failure_reason: event.target.value })} />
+            </Field>
+            <SectionMessage message={feedback.payments} />
+          </div>
+        ) : null}
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'user'}
+        onClose={closeUserEditor}
+        size="lg"
+        title={selectedUser ? 'Edit user' : 'New user'}
+        description="Manage standard business users in a popup without shrinking the list."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeUserEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleUserSave} type="button">
+              Save user
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <Field label="Full name" help="Use the business-facing display name.">
+            <input className="field" value={userForm.full_name} onChange={(event) => setUserForm({ ...userForm, full_name: event.target.value })} />
+          </Field>
+          <Field label="Email" help="Used for login and notifications.">
+            <input className="field" type="email" value={userForm.email} onChange={(event) => setUserForm({ ...userForm, email: event.target.value })} />
+          </Field>
+          <Field label="Phone" help="Primary contact number.">
+            <input className="field" value={userForm.phone} onChange={(event) => setUserForm({ ...userForm, phone: event.target.value })} />
+          </Field>
+          <Field label="Password" help="Leave blank when editing if no password reset is needed.">
+            <input className="field" type="password" value={userForm.password} onChange={(event) => setUserForm({ ...userForm, password: event.target.value })} />
+          </Field>
+          <Field label="Role" help="Only normal business roles are available here.">
+            <select className="field" value={userForm.role} onChange={(event) => setUserForm({ ...userForm, role: event.target.value })}>
+              {(selectedUser?.role_options || ['customer', 'employee', 'support', 'provider']).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="National ID" help="Optional identity reference when the business uses it.">
+            <input className="field" value={userForm.national_id} onChange={(event) => setUserForm({ ...userForm, national_id: event.target.value })} />
+          </Field>
+          <div className="grid gap-3">
+            <ToggleField checked={userForm.is_active} help="Turn off access without deleting the account." label="User is active" onChange={(value) => setUserForm({ ...userForm, is_active: value })} />
+            <ToggleField checked={userForm.is_verified} help="Use only when the business verification process is complete." label="User is verified" onChange={(value) => setUserForm({ ...userForm, is_verified: value })} />
+          </div>
+          <SectionMessage message={feedback.users} />
+        </div>
+      </FormModal>
+
+      <FormModal
+        open={activeEditor === 'setting'}
+        onClose={closeSettingEditor}
+        size="lg"
+        title={selectedSetting ? 'Edit setting' : 'New setting'}
+        description="Only whitelisted business-safe settings can be edited here."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button className="btn-secondary" onClick={closeSettingEditor} type="button">
+              Cancel
+            </button>
+            <button className="btn-primary min-w-40" onClick={handleSettingSave} type="button">
               Save setting
             </button>
-            <SectionMessage message={feedback.settings} />
           </div>
-        </section>
-      ) : null}
+        }
+      >
+        <div className="space-y-4">
+          <Field label="Setting" help="Choose one of the allowed business-safe settings.">
+            <select className="field" value={settingForm.key} onChange={(event) => setSettingForm({ key: event.target.value, description: '', values: {} })}>
+              {SYSTEM_SETTING_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <EmptyHelp title={currentSettingDefinition.label} text={currentSettingDefinition.help_text} warning={currentSettingDefinition.warning} />
+          {currentSettingDefinition.fields.map((field) => (
+            <Field key={field.key} label={field.label} help={field.help_text}>
+              {field.control === 'textarea' ? (
+                <textarea
+                  className="field min-h-24"
+                  value={settingForm.values[field.key] || ''}
+                  onChange={(event) =>
+                    setSettingForm({
+                      ...settingForm,
+                      values: { ...settingForm.values, [field.key]: event.target.value },
+                    })
+                  }
+                />
+              ) : (
+                <input
+                  className="field"
+                  type={field.control === 'email' ? 'email' : 'text'}
+                  value={settingForm.values[field.key] || ''}
+                  onChange={(event) =>
+                    setSettingForm({
+                      ...settingForm,
+                      values: { ...settingForm.values, [field.key]: event.target.value },
+                    })
+                  }
+                />
+              )}
+            </Field>
+          ))}
+          <Field label="Admin note" help="Optional note explaining why this setting changed.">
+            <textarea className="field min-h-24" value={settingForm.description} onChange={(event) => setSettingForm({ ...settingForm, description: event.target.value })} />
+          </Field>
+          <SectionMessage message={feedback.settings} />
+        </div>
+      </FormModal>
 
       <ConfirmModal
         description={confirmState.description}

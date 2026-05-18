@@ -16,9 +16,10 @@ from accounts.serializers import (
 )
 from audit.utils import create_audit_log
 from config.permissions import CanManageUserRoles, IsCustomerRole
+from organizations.selectors import active_memberships_for_user, is_platform_super_admin
 
 # Apps whose permissions are surfaced in the admin permission-assignment UI.
-_PERMISSION_APPS = {"orders", "documents", "services", "payment", "accounts", "notifications", "providers", "audit"}
+_PERMISSION_APPS = {"orders", "documents", "services", "payment", "accounts", "notifications", "providers", "audit", "organizations"}
 
 try:
     from rest_framework_simplejwt.tokens import RefreshToken
@@ -110,11 +111,19 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().order_by("full_name")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
     search_fields = ["full_name", "email", "phone", "role"]
+    pagination_class = None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["request"] = self.request
         return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if is_platform_super_admin(self.request.user):
+            return queryset
+        org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
+        return queryset.filter(organization_memberships__organization_id__in=org_ids).distinct()
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -221,6 +230,7 @@ class SystemSettingViewSet(viewsets.ModelViewSet):
     serializer_class = SafeSystemSettingSerializer
     queryset = SystemSetting.objects.all().order_by("key")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
+    pagination_class = None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -260,6 +270,7 @@ class CustomerProfileAdminViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerProfileAdminSerializer
     queryset = CustomerProfile.objects.select_related("user").all()
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
+    pagination_class = None
 
 
 class AvailablePermissionsAPIView(APIView):

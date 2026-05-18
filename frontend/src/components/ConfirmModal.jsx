@@ -1,17 +1,50 @@
-function ConfirmModal({ open, title, description, onConfirm, onClose }) {
+import { TriangleAlert } from 'lucide-react'
+import { useEffect } from 'react'
+
+function ConfirmModal({
+  open,
+  title,
+  description,
+  onConfirm,
+  onClose,
+  confirmLabel = 'تأكيد',
+  cancelLabel = 'إلغاء',
+  variant = 'default',
+  loading = false,
+}) {
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, onClose])
+
   if (!open) return null
 
+  const isDanger = variant === 'danger'
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-soft">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md animate-slide-up rounded-3xl bg-white p-6 shadow-soft">
+        {isDanger && (
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100">
+            <TriangleAlert className="h-6 w-6 text-danger" />
+          </div>
+        )}
         <h3 className="text-xl font-bold text-ink">{title}</h3>
-        <p className="mt-3 text-sm text-slate-600">{description}</p>
+        {description && <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>}
         <div className="mt-6 flex gap-3">
-          <button className="btn-primary flex-1" onClick={onConfirm}>
-            تأكيد
+          <button
+            className={isDanger ? 'btn-danger flex-1' : 'btn-primary flex-1'}
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : null}
+            {confirmLabel}
           </button>
-          <button className="btn-secondary flex-1" onClick={onClose}>
-            إلغاء
+          <button className="btn-secondary flex-1" onClick={onClose} disabled={loading}>
+            {cancelLabel}
           </button>
         </div>
       </div>

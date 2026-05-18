@@ -69,8 +69,8 @@ class NotificationCenterTests(APITestCase):
         self.client.force_authenticate(self.customer)
         response = self.client.get("/api/notifications/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["title"], "Own")
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "Own")
 
     def test_admin_can_crud_notifications_and_templates(self):
         admin = CustomUser.objects.create_user(
@@ -148,7 +148,7 @@ class NotificationCenterTests(APITestCase):
         self.client.force_authenticate(employee)
         template_response = self.client.get("/api/employee/notification-templates/")
         self.assertEqual(template_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(template_response.data["results"]), 1)
+        self.assertEqual(len(template_response.data), 1)
 
         response = self.client.post(
             f"/api/orders/{self.order.id}/manual-notification/",

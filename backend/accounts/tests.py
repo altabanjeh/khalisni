@@ -115,6 +115,85 @@ class RoleGroupSyncTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_admin_cannot_create_customer_user_manually(self):
+        client = APIClient()
+        admin = CustomUser.objects.create_user(
+            email="ops-admin@example.com",
+            password="Password@123",
+            full_name="Ops Admin",
+            phone="0791000010",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        client.force_authenticate(admin)
+
+        response = client.post(
+            "/api/admin/users/",
+            {
+                "full_name": "Manual Customer",
+                "email": "manual-customer@example.com",
+                "phone": "0791000011",
+                "password": "Password@123",
+                "role": "customer",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("role", response.data)
+
+    def test_super_admin_cannot_create_customer_user_manually(self):
+        client = APIClient()
+        super_admin = CustomUser.objects.create_superuser(
+            email="super-admin-customer@example.com",
+            password="Password@123",
+            full_name="Super Admin Customer",
+        )
+        client.force_authenticate(super_admin)
+
+        response = client.post(
+            "/api/admin/users/",
+            {
+                "full_name": "Manual Customer",
+                "email": "manual-customer-2@example.com",
+                "phone": "0791000012",
+                "password": "Password@123",
+                "role": "customer",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("role", response.data)
+
+    def test_admin_cannot_convert_existing_employee_into_customer(self):
+        client = APIClient()
+        admin = CustomUser.objects.create_user(
+            email="ops-admin-2@example.com",
+            password="Password@123",
+            full_name="Ops Admin 2",
+            phone="0791000013",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        employee = CustomUser.objects.create_user(
+            email="ops-employee@example.com",
+            password="Password@123",
+            full_name="Ops Employee",
+            phone="0791000014",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        client.force_authenticate(admin)
+
+        response = client.patch(
+            f"/api/admin/users/{employee.pk}/",
+            {"role": "customer"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("role", response.data)
+
     def test_system_settings_reject_unknown_key(self):
         client = APIClient()
         admin = CustomUser.objects.create_user(

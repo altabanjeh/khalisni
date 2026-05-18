@@ -110,7 +110,7 @@ test('employee can still see provider candidates before assignment is allowed', 
   })
 
   expect(screen.getByText(workflowStepsTitle)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: verifyFirstLabel })).toBeInTheDocument()
+  expect(screen.getAllByRole('link', { name: verifyFirstLabel }).length).toBeGreaterThan(0)
 
   const providerSection = screen.getByText('Provider One').closest('section')
   expect(providerSection).not.toBeNull()

@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from collections import Counter
+from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncDate
@@ -9,6 +10,7 @@ from rest_framework.views import APIView
 
 from config.permissions import CanViewReportsDashboard, CanViewScopedReports
 from documents.models import Document
+from organizations.selectors import is_platform_super_admin, is_platform_support
 from orders.models import Order, OrderStatusLog
 from orders.selectors import get_orders_for_user, get_reviewable_orders_for_user
 from orders.serializers import OrderListSerializer
@@ -36,9 +38,9 @@ def _final_order_states():
 
 def _scoped_orders_for_reports(user):
     role = (getattr(user, "role", "") or "").lower()
-    if role == "admin":
+    if is_platform_super_admin(user):
         return Order.objects.select_related("service", "customer", "assigned_provider__user", "assigned_employee")
-    if role in {"employee", "support"}:
+    if role in {"employee", "support"} or is_platform_support(user):
         return get_reviewable_orders_for_user(user)
     return get_orders_for_user(user)
 
@@ -138,6 +140,96 @@ def _service_volume(queryset):
     )
 
 
+def _resolved_category_name(order):
+    if order.service_category_name_snapshot:
+        return order.service_category_name_snapshot
+    service = getattr(order, "service", None)
+    category = getattr(service, "category", None)
+    if category is not None:
+        return category.name_ar
+    return "Uncategorized"
+
+
+def _category_summary(queryset):
+    rows = {}
+    for order in queryset.select_related("service", "service__category"):
+        category_name = _resolved_category_name(order)
+        entry = rows.setdefault(
+            category_name,
+            {
+                "category_name": category_name,
+                "orders_count": 0,
+                "revenue": Decimal("0.00"),
+                "completed_orders": 0,
+                "delayed_orders": 0,
+                "average_completion_time_hours": 0,
+                "_completion_samples": [],
+            },
+        )
+        entry["orders_count"] += 1
+        entry["revenue"] += order.final_price or Decimal("0.00")
+        if order.status == Order.Status.COMPLETED:
+            entry["completed_orders"] += 1
+            if order.completed_at and order.created_at:
+                hours = (order.completed_at - order.created_at).total_seconds() / 3600
+                entry["_completion_samples"].append(round(hours, 2))
+        if order.expected_delivery_date and order.expected_delivery_date < timezone.localdate() and order.status not in _final_order_states():
+            entry["delayed_orders"] += 1
+
+    results = []
+    for entry in rows.values():
+        samples = entry.pop("_completion_samples")
+        entry["average_completion_time_hours"] = round(sum(samples) / len(samples), 2) if samples else 0
+        results.append(entry)
+    return sorted(results, key=lambda item: (-item["orders_count"], item["category_name"]))
+
+
+def _organization_summary(queryset):
+    rows = (
+        queryset.values("organization_name_snapshot", "organization__name")
+        .annotate(
+            orders_count=Count("pk", distinct=True),
+            revenue=Sum("final_price"),
+            completed_orders=Count("pk", filter=Q(status=Order.Status.COMPLETED), distinct=True),
+        )
+        .order_by("-orders_count", "organization_name_snapshot", "organization__name")
+    )
+    return [
+        {
+            "organization_name": row["organization_name_snapshot"] or row["organization__name"] or "Unknown organization",
+            "orders_count": row["orders_count"],
+            "revenue": row["revenue"] or 0,
+            "completed_orders": row["completed_orders"],
+        }
+        for row in rows
+    ]
+
+
+def _branch_summary(queryset):
+    rows = (
+        queryset.values("branch__name")
+        .annotate(
+            orders_count=Count("pk", distinct=True),
+            revenue=Sum("final_price"),
+            completed_orders=Count("pk", filter=Q(status=Order.Status.COMPLETED), distinct=True),
+        )
+        .order_by("-orders_count", "branch__name")
+    )
+    return [
+        {
+            "branch_name": row["branch__name"] or "Unassigned branch",
+            "orders_count": row["orders_count"],
+            "revenue": row["revenue"] or 0,
+            "completed_orders": row["completed_orders"],
+        }
+        for row in rows
+    ]
+
+
+def _status_summary(queryset):
+    return list(queryset.values("status").annotate(total=Count("pk", distinct=True)).order_by("status"))
+
+
 def _delayed_orders_payload(queryset, request):
     today = timezone.localdate()
     delayed_orders = _active_orders(queryset).filter(expected_delivery_date__lt=today).distinct()
@@ -161,7 +253,7 @@ class AdminDashboardAPIView(APIView):
     def get(self, request):
         today = timezone.localdate()
         week_ago = today - timedelta(days=7)
-        orders = Order.objects.select_related("service", "assigned_provider__user")
+        orders = _scoped_orders_for_reports(request.user)
         full_data = {
             "cards": {
                 "new_orders_today": orders.filter(created_at__date=today, status=Order.Status.NEW).count(),
@@ -184,7 +276,7 @@ class AdminDashboardAPIView(APIView):
                 .order_by("-total")[:5]
             ),
         }
-        if getattr(request.user, "role", "") == "admin":
+        if is_platform_super_admin(request.user):
             return response.Response(full_data)
 
         limited_cards = {
@@ -205,15 +297,19 @@ class DailyReportAPIView(APIView):
 
     def get(self, request):
         today = timezone.localdate()
-        queryset = Order.objects.filter(created_at__date=today)
+        queryset = _scoped_orders_for_reports(request.user).filter(created_at__date=today)
         full_data = {
             "date": str(today),
             "created_orders": queryset.count(),
             "completed_orders": queryset.filter(status=Order.Status.COMPLETED).count(),
             "revenue": queryset.filter(status=Order.Status.COMPLETED).aggregate(total=Sum("final_price"))["total"] or 0,
             "top_services": list(queryset.values("service__name_ar").annotate(total=Count("id")).order_by("-total")[:5]),
+            "orders_by_category": _category_summary(queryset),
+            "orders_by_organization": _organization_summary(queryset),
+            "orders_by_branch": _branch_summary(queryset),
+            "orders_by_status": _status_summary(queryset),
         }
-        if getattr(request.user, "role", "") == "admin":
+        if is_platform_super_admin(request.user):
             return response.Response(full_data)
         return response.Response(
             {
@@ -221,6 +317,7 @@ class DailyReportAPIView(APIView):
                 "created_orders": full_data["created_orders"],
                 "completed_orders": full_data["completed_orders"],
                 "top_services": full_data["top_services"],
+                "orders_by_status": full_data["orders_by_status"],
             }
         )
 
@@ -231,7 +328,7 @@ class WeeklyReportAPIView(APIView):
     def get(self, request):
         today = timezone.localdate()
         start = today - timedelta(days=6)
-        queryset = Order.objects.filter(created_at__date__gte=start, created_at__date__lte=today)
+        queryset = _scoped_orders_for_reports(request.user).filter(created_at__date__gte=start, created_at__date__lte=today)
         full_data = {
             "start_date": str(start),
             "end_date": str(today),
@@ -251,8 +348,12 @@ class WeeklyReportAPIView(APIView):
                 .annotate(total=Count("id"))
                 .order_by("-total")[:5]
             ),
+            "orders_by_category": _category_summary(queryset),
+            "orders_by_organization": _organization_summary(queryset),
+            "orders_by_branch": _branch_summary(queryset),
+            "orders_by_status": _status_summary(queryset),
         }
-        if getattr(request.user, "role", "") == "admin":
+        if is_platform_super_admin(request.user):
             return response.Response(full_data)
         return response.Response(
             {
@@ -260,6 +361,7 @@ class WeeklyReportAPIView(APIView):
                 "end_date": full_data["end_date"],
                 "daily_breakdown": full_data["daily_breakdown"],
                 "delayed_orders": full_data["delayed_orders"],
+                "orders_by_status": full_data["orders_by_status"],
             }
         )
 
@@ -367,9 +469,10 @@ class OperationalSummaryReportAPIView(APIView):
         data = {
             "scope": role,
             "visible_orders": orders.count(),
-            "order_status_summary": list(
-                orders.values("status").annotate(total=Count("pk", distinct=True)).order_by("status")
-            ),
+            "order_status_summary": _status_summary(orders),
+            "orders_by_category": _category_summary(orders),
+            "orders_by_organization": _organization_summary(orders),
+            "orders_by_branch": _branch_summary(orders),
             "employee_workload": _employee_workload(orders, request.user),
             "provider_performance": _provider_performance(orders, request.user),
             "missing_document_frequency": _missing_document_frequency(orders),

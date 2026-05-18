@@ -1,3 +1,4 @@
+import { FileText, MessageSquare, ShieldCheck, UserRoundPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
@@ -5,177 +6,184 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
+import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getOrderAllowedActions } from '../../utils/authz'
-import { getStatusLabel } from '../../utils/format'
+import { formatDate, getStatusLabel } from '../../utils/format'
+
+function MetricCard({ label, value, hint }) {
+  return (
+    <div className="panel-muted p-4">
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="mt-2 font-bold text-ink">{value}</p>
+      {hint ? <p className="mt-2 text-xs text-slate-500">{hint}</p> : null}
+    </div>
+  )
+}
+
+function SectionCard({ icon: Icon, title, description, children }) {
+  return (
+    <section className="glass-panel p-6">
+      <div className="flex items-start gap-3">
+        {Icon ? (
+          <span className="icon-chip">
+            <Icon className="h-5 w-5" />
+          </span>
+        ) : null}
+        <div>
+          <h2 className="text-xl font-bold text-ink">{title}</h2>
+          {description ? <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p> : null}
+        </div>
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  )
+}
 
 function AdminOrderDetailsPage() {
   const { id } = useParams()
-  const [message, setMessage] = useState('')
-  const [messageTone, setMessageTone] = useState('success')
-  const [confirmOpen, setConfirmOpen] = useState(false)
+  const { toast } = useToast()
+  const [confirmComplete, setConfirmComplete] = useState(false)
+  const [confirmReject, setConfirmReject] = useState(false)
+  const [confirmAssign, setConfirmAssign] = useState(false)
+  const [pendingAssign, setPendingAssign] = useState(null)
+  const [submitting, setSubmitting] = useState('')
+
   const { data: order, loading, error, reload } = useAsyncData(() => api.getAdminOrder(id), [id], null)
   const { data: providers = [], error: providersError } = useAsyncData(() => api.getProviders({ order: id }), [id], [])
   const statusForm = useForm()
-  const noteForm = useForm({
-    defaultValues: {
-      visibility: 'INTERNAL',
-    },
-  })
+  const noteForm = useForm({ defaultValues: { visibility: 'INTERNAL' } })
   const assignForm = useForm()
 
-  if (error) {
-    return <div className="glass-panel p-6 text-sm text-danger">{getDisplayError(error)}</div>
-  }
-
+  if (error) return <div className="glass-panel p-6 text-sm text-danger">{getDisplayError(error)}</div>
   if (loading || !order) return <LoadingSpinner />
 
   const allowedActions = getOrderAllowedActions(order)
   const availableStatusTransitions = allowedActions.available_status_transitions || []
-  const noteVisibilityOptions = []
+  const noteVisibilityOptions = [
+    ...(allowedActions.can_add_internal_note ? [{ value: 'INTERNAL', label: 'داخلية' }] : []),
+    ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: 'مرئية للعميل' }] : []),
+  ]
 
-  if (allowedActions.can_add_internal_note) {
-    noteVisibilityOptions.push({ value: 'INTERNAL', label: 'داخلية' })
-  }
-  if (allowedActions.can_add_customer_note) {
-    noteVisibilityOptions.push({ value: 'CUSTOMER', label: 'مرئية للعميل' })
+  async function run(key, fn, successMessage) {
+    setSubmitting(key)
+    try {
+      await fn()
+      reload()
+      toast(successMessage, 'success')
+    } catch (submitError) {
+      toast(getDisplayError(submitError), 'error')
+    } finally {
+      setSubmitting('')
+    }
   }
 
   async function handleStatus(values) {
-    try {
-      await api.changeOrderStatus(id, values)
-      reload()
-      setMessageTone('success')
-      setMessage('تم تحديث الحالة.')
-    } catch (submitError) {
-      setMessageTone('danger')
-      setMessage(getDisplayError(submitError))
-    }
+    await run('status', () => api.changeOrderStatus(id, values), 'تم تحديث حالة الطلب.')
+    statusForm.reset()
   }
 
-  async function handleAssign(values) {
-    try {
-      await api.assignOrder(id, values)
-      reload()
-      setMessageTone('success')
-      setMessage('تم تعيين مزود الخدمة.')
-    } catch (submitError) {
-      setMessageTone('danger')
-      setMessage(getDisplayError(submitError))
-    }
+  async function handleAssignSubmit(values) {
+    setPendingAssign(values)
+    setConfirmAssign(true)
+  }
+
+  async function handleAssignConfirm() {
+    setConfirmAssign(false)
+    await run('assign', () => api.assignOrder(id, pendingAssign), 'تم تعيين مزوّد الخدمة.')
+    assignForm.reset()
   }
 
   async function handleNote(values) {
-    const visibility =
-      noteVisibilityOptions.find((option) => option.value === values.visibility)?.value || noteVisibilityOptions[0]?.value || 'INTERNAL'
-
-    try {
-      await api.addAdminNote(id, { ...values, visibility })
-      reload()
-      setMessageTone('success')
-      setMessage('تم حفظ الملاحظة.')
-    } catch (submitError) {
-      setMessageTone('danger')
-      setMessage(getDisplayError(submitError))
-    }
+    const visibility = noteVisibilityOptions.find((option) => option.value === values.visibility)?.value || 'INTERNAL'
+    await run('note', () => api.addAdminNote(id, { ...values, visibility }), 'تم حفظ الملاحظة.')
+    noteForm.reset({ visibility })
   }
 
   async function handleComplete() {
-    try {
-      await api.completeOrder(id, { admin_confirmation: true })
-      reload()
-      setMessageTone('success')
-      setMessage('تم إكمال الطلب.')
-      setConfirmOpen(false)
-    } catch (submitError) {
-      setMessageTone('danger')
-      setMessage(getDisplayError(submitError))
-    }
+    setConfirmComplete(false)
+    await run('complete', () => api.completeOrder(id, { admin_confirmation: true }), 'تم إكمال الطلب بنجاح.')
   }
 
   async function handleReject() {
-    try {
-      await api.rejectOrder(id, { reason: 'لم يتم استيفاء المتطلبات.' })
-      reload()
-      setMessageTone('success')
-      setMessage('تم رفض الطلب.')
-    } catch (submitError) {
-      setMessageTone('danger')
-      setMessage(getDisplayError(submitError))
-    }
+    setConfirmReject(false)
+    await run('reject', () => api.rejectOrder(id, { reason: 'لم يتم استيفاء متطلبات المراجعة.' }), 'تم رفض الطلب.')
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-section">
+      <PageHeader
+        badge={<StatusBadge status={order.status} />}
+        description="عرض إداري موحد لتتبع الطلب، مراجعة الوثائق والخط الزمني، ثم تنفيذ الإجراء المناسب بحسب المرحلة الحالية."
+        eyebrow="إدارة الطلبات"
+        icon={ShieldCheck}
+        title={order.order_number}
+      />
+
       <section className="glass-panel p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-slate-500">رقم الطلب</p>
-            <h2 className="text-2xl font-extrabold text-ink">{order.order_number}</h2>
-          </div>
-          <StatusBadge status={order.status} />
-        </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl bg-brand-50 p-4">
-            <p className="text-xs text-slate-500">العميل</p>
-            <p className="mt-2 font-bold">{order.customer?.full_name}</p>
-          </div>
-          <div className="rounded-2xl bg-brand-50 p-4">
-            <p className="text-xs text-slate-500">الخدمة</p>
-            <p className="mt-2 font-bold">{order.service?.name_ar}</p>
-          </div>
-          <div className="rounded-2xl bg-brand-50 p-4">
-            <p className="text-xs text-slate-500">المدينة</p>
-            <p className="mt-2 font-bold">{order.city}</p>
-          </div>
-          <div className="rounded-2xl bg-brand-50 p-4">
-            <p className="text-xs text-slate-500">المزوّد</p>
-            <p className="mt-2 font-bold">{order.assigned_provider?.full_name || 'غير معين'}</p>
-          </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <MetricCard label="العميل" value={order.customer?.full_name || 'غير متاح'} hint={order.customer?.phone || 'لا يوجد هاتف'} />
+          <MetricCard label="الخدمة" value={order.service?.name_ar || 'غير محددة'} />
+          <MetricCard label="المدينة" value={order.city || 'غير محددة'} />
+          <MetricCard label="المزوّد الحالي" value={order.assigned_provider?.full_name || 'غير معين'} />
+          <MetricCard label="التسليم المتوقع" value={formatDate(order.expected_delivery_date)} />
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <div className="glass-panel p-6">
-            <h3 className="text-xl font-bold text-ink">الوثائق</h3>
-            <div className="mt-5">
-              <DocumentList documents={order.documents || []} />
-            </div>
-          </div>
-          <div className="glass-panel p-6">
-            <h3 className="text-xl font-bold text-ink">الخط الزمني</h3>
-            <div className="mt-5">
-              <OrderTimeline items={order.status_logs || []} />
-            </div>
-          </div>
+          <SectionCard
+            icon={FileText}
+            title="الوثائق المرفوعة"
+            description="راجع جميع الوثائق المرتبطة بالطلب قبل تحديث الحالة أو اتخاذ قرار نهائي."
+          >
+            <DocumentList documents={order.documents || []} />
+          </SectionCard>
+
+          <SectionCard
+            icon={MessageSquare}
+            title="الخط الزمني"
+            description="تسلسل كامل لجميع التحديثات والحركات المسجلة على الطلب."
+          >
+            <OrderTimeline items={order.status_logs || []} />
+          </SectionCard>
         </div>
 
         <div className="space-y-6">
-          <div className="glass-panel p-6">
-            <h3 className="text-xl font-bold text-ink">لوحة الإجراءات</h3>
-            <form className="mt-5 space-y-4" onSubmit={statusForm.handleSubmit(handleStatus)}>
+          <SectionCard
+            icon={ShieldCheck}
+            title="تحديث حالة الطلب"
+            description="لا تظهر هنا إلا التحولات المسموح بها لهذه المرحلة من دورة الطلب."
+          >
+            <form className="space-y-4" onSubmit={statusForm.handleSubmit(handleStatus)}>
               <select className="field" {...statusForm.register('status')}>
-                {availableStatusTransitions.length ? null : <option value="">لا توجد حالة انتقال متاحة حالياً</option>}
-                {availableStatusTransitions.map((statusValue) => (
-                  <option key={statusValue} value={statusValue}>
-                    {getStatusLabel(statusValue)}
+                {!availableStatusTransitions.length ? <option value="">لا توجد تحولات حالة متاحة</option> : null}
+                {availableStatusTransitions.map((status) => (
+                  <option key={status} value={status}>
+                    {getStatusLabel(status)}
                   </option>
                 ))}
               </select>
-              <textarea className="field min-h-24" placeholder="ملاحظة على التحديث" {...statusForm.register('note')} />
-              <button className="btn-secondary w-full" disabled={!availableStatusTransitions.length} type="submit">
-                تحديث الحالة
+              <textarea className="field min-h-24" placeholder="ملاحظة على التحديث إن لزم" {...statusForm.register('note')} />
+              <button className="btn-secondary w-full" disabled={!availableStatusTransitions.length || submitting === 'status'} type="submit">
+                {submitting === 'status' ? 'جارٍ التحديث...' : 'تحديث الحالة'}
               </button>
             </form>
+          </SectionCard>
 
-            {allowedActions.can_assign_provider ? (
-              <form className="mt-6 space-y-4" onSubmit={assignForm.handleSubmit(handleAssign)}>
+          {allowedActions.can_assign_provider ? (
+            <SectionCard
+              icon={UserRoundPlus}
+              title="تعيين مزوّد خدمة"
+              description="اختر مزوّداً مناسباً للطلب الحالي ثم أكد الإرسال."
+            >
+              <form className="space-y-4" onSubmit={assignForm.handleSubmit(handleAssignSubmit)}>
                 {providersError ? <p className="text-sm text-danger">{getDisplayError(providersError)}</p> : null}
-                <select className="field" {...assignForm.register('provider_id')}>
+                <select className="field" {...assignForm.register('provider_id', { required: true })}>
                   <option value="">اختر مزوّد الخدمة</option>
                   {providers.map((provider) => (
                     <option key={provider.id} value={provider.id}>
@@ -183,13 +191,25 @@ function AdminOrderDetailsPage() {
                     </option>
                   ))}
                 </select>
-                <button className="btn-secondary w-full">تعيين مزوّد</button>
+                <button className="btn-secondary w-full" disabled={submitting === 'assign'} type="submit">
+                  {submitting === 'assign' ? 'جارٍ التعيين...' : 'تعيين المزوّد'}
+                </button>
               </form>
-            ) : null}
+            </SectionCard>
+          ) : null}
 
-            {noteVisibilityOptions.length ? (
-              <form className="mt-6 space-y-4" onSubmit={noteForm.handleSubmit(handleNote)}>
-                <textarea className="field min-h-24" placeholder="أضف ملاحظة داخلية أو مرئية للعميل" {...noteForm.register('note')} />
+          {noteVisibilityOptions.length ? (
+            <SectionCard
+              icon={MessageSquare}
+              title="إضافة ملاحظة"
+              description="استخدم الملاحظات الداخلية للتنسيق التشغيلي، أو الملاحظات المرئية لإيضاح ما يحتاجه العميل."
+            >
+              <form className="space-y-4" onSubmit={noteForm.handleSubmit(handleNote)}>
+                <textarea
+                  className="field min-h-24"
+                  placeholder="اكتب الملاحظة هنا"
+                  {...noteForm.register('note', { required: true })}
+                />
                 <select className="field" {...noteForm.register('visibility')}>
                   {noteVisibilityOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -197,36 +217,61 @@ function AdminOrderDetailsPage() {
                     </option>
                   ))}
                 </select>
-                <button className="btn-secondary w-full">حفظ الملاحظة</button>
+                <button className="btn-secondary w-full" disabled={submitting === 'note'} type="submit">
+                  {submitting === 'note' ? 'جارٍ الحفظ...' : 'حفظ الملاحظة'}
+                </button>
               </form>
-            ) : null}
+            </SectionCard>
+          ) : null}
 
-            {allowedActions.can_complete || allowedActions.can_reject ? (
-              <div className="mt-6 grid gap-3 md:grid-cols-2">
+          {allowedActions.can_complete || allowedActions.can_reject ? (
+            <section className="glass-panel p-6">
+              <h2 className="text-xl font-bold text-ink">القرار النهائي</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-600">أكمل الطلب فقط بعد اكتمال التنفيذ، أو ارفضه إذا تعذر استيفاء المتطلبات التشغيلية.</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {allowedActions.can_complete ? (
-                  <button className="btn-primary" onClick={() => setConfirmOpen(true)} type="button">
+                  <button className="btn-primary" onClick={() => setConfirmComplete(true)} type="button">
                     إكمال الطلب
                   </button>
                 ) : null}
                 {allowedActions.can_reject ? (
-                  <button className="btn-secondary" onClick={handleReject} type="button">
+                  <button className="btn-danger" onClick={() => setConfirmReject(true)} type="button">
                     رفض الطلب
                   </button>
                 ) : null}
               </div>
-            ) : null}
-
-            {message ? <p className={`mt-4 text-sm ${messageTone === 'danger' ? 'text-danger' : 'text-success'}`}>{message}</p> : null}
-          </div>
+            </section>
+          ) : null}
         </div>
-      </section>
+      </div>
 
       <ConfirmModal
-        open={confirmOpen}
-        title="تأكيد إكمال الطلب"
-        description="سيتم تحويل الحالة إلى مكتمل وإشعار العميل."
+        confirmLabel="نعم، أكمل الطلب"
+        description="سيتم تحويل حالة الطلب إلى مكتمل وإشعار العميل بذلك. لا يمكن التراجع عن هذا الإجراء."
+        loading={submitting === 'complete'}
+        onClose={() => setConfirmComplete(false)}
         onConfirm={handleComplete}
-        onClose={() => setConfirmOpen(false)}
+        open={confirmComplete}
+        title="تأكيد إكمال الطلب"
+      />
+      <ConfirmModal
+        confirmLabel="نعم، ارفض الطلب"
+        description="سيتم رفض الطلب وإشعار العميل بسبب الرفض. هذا الإجراء نهائي."
+        loading={submitting === 'reject'}
+        onClose={() => setConfirmReject(false)}
+        onConfirm={handleReject}
+        open={confirmReject}
+        title="تأكيد رفض الطلب"
+        variant="danger"
+      />
+      <ConfirmModal
+        confirmLabel="نعم، عيّن المزوّد"
+        description="هل تريد تعيين هذا المزوّد على الطلب الحالي؟"
+        loading={submitting === 'assign'}
+        onClose={() => setConfirmAssign(false)}
+        onConfirm={handleAssignConfirm}
+        open={confirmAssign}
+        title="تأكيد تعيين المزوّد"
       />
     </div>
   )

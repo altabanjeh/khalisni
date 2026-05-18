@@ -6,6 +6,7 @@ import { api } from '../../api/services'
 const fullNamePlaceholder = 'الاسم الكامل'
 const emailPlaceholder = 'البريد الإلكتروني'
 const passwordPlaceholder = 'كلمة المرور'
+const openCreateLabel = '+ مستخدم تشغيلي جديد'
 const addUserLabel = 'إضافة المستخدم'
 
 const mockUsers = [
@@ -45,6 +46,7 @@ test('admin users page can create a new user from the admin flow', async () => {
     expect(screen.getByText('Existing User')).toBeInTheDocument()
   })
 
+  await user.click(screen.getByRole('button', { name: openCreateLabel }))
   await user.type(screen.getByPlaceholderText(fullNamePlaceholder), 'New Employee')
   await user.type(screen.getByPlaceholderText(emailPlaceholder), 'employee2@khalisni.local')
   await user.type(screen.getByPlaceholderText(passwordPlaceholder), 'Password123')
@@ -81,39 +83,30 @@ test('admin can open permissions tab for an existing user and save permission ch
     expect(screen.getByText('Existing User')).toBeInTheDocument()
   })
 
-  // Select the user by clicking the edit button in the table
   const editButton = screen.getAllByRole('button', { name: /تعديل/ })[0]
   await user.click(editButton)
 
-  // The permissions tab should now appear since a user is selected
   await waitFor(() => {
     expect(screen.getByRole('button', { name: /الصلاحيات/ })).toBeInTheDocument()
   })
 
-  // Switch to the permissions tab
   await user.click(screen.getByRole('button', { name: /الصلاحيات/ }))
 
-  // Wait for available permissions to load and render as checkboxes
   await waitFor(() => {
     expect(screen.getByLabelText('Can review order')).toBeInTheDocument()
   })
 
-  // review_order should be pre-checked (it's in current_permissions)
   expect(screen.getByLabelText('Can review order')).toBeChecked()
-  // assign_order should be unchecked
   expect(screen.getByLabelText('Can assign order')).not.toBeChecked()
 
-  // Uncheck review_order and check assign_order
   await user.click(screen.getByLabelText('Can review order'))
   await user.click(screen.getByLabelText('Can assign order'))
-
-  // Save
   await user.click(screen.getByRole('button', { name: /حفظ الصلاحيات/ }))
 
   await waitFor(() => {
     expect(setPermsSpy).toHaveBeenCalledWith(2, expect.arrayContaining(['orders.assign_order']))
   })
-  // review_order must NOT be in the saved list
+
   const savedPerms = setPermsSpy.mock.calls[0][1]
   expect(savedPerms).not.toContain('orders.review_order')
 })
@@ -143,7 +136,6 @@ test('permissions tab shows empty state when user has no current permissions', a
     expect(screen.getByLabelText('Can review order')).toBeInTheDocument()
   })
 
-  // All checkboxes should be unchecked when current_permissions is empty
   expect(screen.getByLabelText('Can review order')).not.toBeChecked()
   expect(screen.getByLabelText('Can assign order')).not.toBeChecked()
   expect(screen.getByLabelText('Can verify document')).not.toBeChecked()

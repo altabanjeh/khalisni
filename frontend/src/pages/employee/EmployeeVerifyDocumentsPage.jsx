@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
+import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
 
@@ -23,8 +25,8 @@ function getErrorMessage(error) {
 
 function EmployeeVerifyDocumentsPage() {
   const [searchParams] = useSearchParams()
+  const { toast } = useToast()
   const [selectedDocumentId, setSelectedDocumentId] = useState(null)
-  const [message, setMessage] = useState('')
   const verifyForm = useForm()
   const orderId = searchParams.get('order')
   const { data: documents = [], loading, error, setData: setDocuments, reload } = useAsyncData(
@@ -50,9 +52,7 @@ function EmployeeVerifyDocumentsPage() {
     return () => { cancelled = true }
   }, [selectedDocument?.id, selectedDocument?.download_url])
 
-  if (loading) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جارٍ تحميل الوثائق...</div>
-  }
+  if (loading) return <LoadingSpinner />
 
   if (error) {
     return <EmptyState description={getErrorMessage(error)} title="تعذر تحميل الوثائق" />
@@ -72,9 +72,9 @@ function EmployeeVerifyDocumentsPage() {
         ),
       )
       reload()
-      setMessage(isVerified ? 'تم اعتماد الوثيقة.' : 'تم رفض الوثيقة وطلب استبدالها.')
+      toast(isVerified ? 'تم اعتماد الوثيقة.' : 'تم رفض الوثيقة وطلب استبدالها.', 'success')
     } catch (submitError) {
-      setMessage(getErrorMessage(submitError))
+      toast(getErrorMessage(submitError), 'error')
     }
   }
 
@@ -175,7 +175,6 @@ function EmployeeVerifyDocumentsPage() {
                   رفض الوثيقة وطلب استبدالها
                 </button>
               </div>
-              {message ? <p className="mt-4 text-sm text-slate-700">{message}</p> : null}
             </div>
           </div>
         </section>
