@@ -34,8 +34,13 @@ echo "Syncing roles..."
 python manage.py setup_roles || true
 echo "Creating admin user if configured..."
 python manage.py create_admin || true
-echo "Seeding initial data..."
-python manage.py seed_initial_data || true
+
+if [ "${DJANGO_SEED_INITIAL_DATA:-False}" = "True" ]; then
+    echo "Seeding initial data..."
+    python manage.py seed_initial_data || true
+else
+    echo "Skipping initial data seed."
+fi
 
 GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}"
 GUNICORN_TIMEOUT="${GUNICORN_TIMEOUT:-120}"
