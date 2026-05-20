@@ -2,6 +2,7 @@ import os
 from importlib.util import find_spec
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,6 +33,11 @@ def _get_list_env(name: str, default: str = "") -> list[str]:
         raw_value = default
     return [item.strip() for item in raw_value.split(",") if item.strip()]
 
+
+def _host_from_origin(origin: str) -> str | None:
+    parsed = urlparse(origin)
+    return parsed.hostname
+
 _secret_key = os.getenv("DJANGO_SECRET_KEY")
 _debug = _get_bool_env("DJANGO_DEBUG", True)
 if not _secret_key:
@@ -42,22 +48,33 @@ if not _secret_key:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production.")
 SECRET_KEY = _secret_key
 DEBUG = _debug
+_cors_allowed_origins = _get_list_env(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
+)
+_csrf_trusted_origins = _get_list_env(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    ",".join(_cors_allowed_origins),
+)
+_derived_allowed_hosts = {
+    host
+    for host in (
+        _host_from_origin(origin)
+        for origin in [*_cors_allowed_origins, *_csrf_trusted_origins]
+    )
+    if host
+}
 ALLOWED_HOSTS = sorted(
     {
         *(_get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")),
+        *_derived_allowed_hosts,
         "localhost",
         "127.0.0.1",
         "[::1]",
     }
 )
-CORS_ALLOWED_ORIGINS = _get_list_env(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
-)
-CSRF_TRUSTED_ORIGINS = _get_list_env(
-    "DJANGO_CSRF_TRUSTED_ORIGINS",
-    ",".join(CORS_ALLOWED_ORIGINS),
-)
+CORS_ALLOWED_ORIGINS = _cors_allowed_origins
+CSRF_TRUSTED_ORIGINS = _csrf_trusted_origins
 
 INSTALLED_APPS = [
     "django.contrib.admin",

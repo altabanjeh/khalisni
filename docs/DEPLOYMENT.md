@@ -9,6 +9,7 @@ This project is prepared for single-server deployment with Docker Compose.
 - `db`: PostgreSQL 16 with a persistent named volume.
 - nginx proxies `/api/` and `/admin/` to Django.
 - nginx serves `/static/` and `/media/` directly from shared Docker volumes.
+- The Compose file intentionally does not define a custom Docker network. Coolify injects its own network and proxy wiring, and custom networks can cause intermittent timeouts.
 
 ## Required server prerequisites
 
@@ -23,15 +24,29 @@ This project is prepared for single-server deployment with Docker Compose.
    - `DJANGO_SECRET_KEY`
    - `DJANGO_ALLOWED_HOSTS`
    - `DJANGO_CSRF_TRUSTED_ORIGINS`
+   - `CORS_ALLOWED_ORIGINS`
    - `POSTGRES_PASSWORD`
    - `DJANGO_ADMIN_EMAIL`
    - `DJANGO_ADMIN_PASSWORD`
-3. If you are publishing on a non-default port, change `APP_PORT`.
-4. Build and start the stack:
+3. For a public domain, set the host and origin variables with the exact deployed domain. Example for `app.example.com`:
+
+```env
+DJANGO_ALLOWED_HOSTS=app.example.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://app.example.com
+CORS_ALLOWED_ORIGINS=https://app.example.com
+```
+4. If you are publishing on a non-default port, change `APP_PORT`.
+5. Build and start the stack:
 
 ```bash
 docker compose up -d --build
 ```
+
+If `POSTGRES_PASSWORD` or another required variable is missing, `docker compose` now stops immediately with a configuration error instead of letting the PostgreSQL container enter a restart loop.
+The backend does not rely on Compose-level database health to start. It waits for a real PostgreSQL connection in its entrypoint, which is more reliable on platforms like Coolify where container health can be reported before init work fully settles.
+The backend healthcheck is proxy-aware and uses loopback-safe headers so production settings like `ALLOWED_HOSTS` and `SECURE_SSL_REDIRECT` do not cause false negatives during container startup.
+On a first deploy, the backend healthcheck allows extra time for database readiness, migrations, static collection, and seed commands before Gunicorn starts serving requests.
+Demo data seeding is disabled by default in production. Enable `DJANGO_SEED_INITIAL_DATA=True` only when you explicitly want sample users, services, and orders created at startup.
 
 ## Operational notes
 

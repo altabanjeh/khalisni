@@ -9,6 +9,8 @@ services:
   backend:
     ports:
       - "8000:8000"
+    environment:
+      DJANGO_SEED_INITIAL_DATA: "True"
     volumes:
       - ./backend:/app
       - backend_media:/app/media
