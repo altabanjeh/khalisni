@@ -1,4 +1,4 @@
-﻿services:
+services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -76,7 +76,7 @@
       backend:
         condition: service_started
     expose:
-     - "80"
+      - "80"
     volumes:
       - backend_media:/var/www/media:ro
       - backend_static:/var/www/static:ro
