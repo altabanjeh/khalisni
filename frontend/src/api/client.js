@@ -46,6 +46,16 @@ function normalizeErrorPayload(data, status) {
   const nonFieldErrors = []
 
   if (typeof data === 'string') {
+    if (/<\/?(html|body|title|h1)\b/i.test(data)) {
+      return {
+        code: '',
+        detail: '',
+        fieldErrors,
+        nonFieldErrors,
+        displayMessage: getDefaultErrorMessage(status),
+      }
+    }
+
     return {
       code: '',
       detail: data,

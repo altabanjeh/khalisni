@@ -1,9 +1,13 @@
+from django.core.management import call_command
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import CustomUser
+from orders.models import Order
+from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from services.models import Service, ServiceCategory
 
 
 class RoleGroupSyncTests(TestCase):
@@ -354,3 +358,83 @@ class UserPermissionManagementTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("current_permissions", response.data)
         self.assertIn("orders.review_order", response.data["current_permissions"])
+
+
+class PublicAuthTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_register_then_login_succeeds(self):
+        register_response = self.client.post(
+            "/api/auth/register/",
+            {
+                "full_name": "Portal User",
+                "phone": "0793000001",
+                "email": "portal-user@example.com",
+                "password": "Password@123",
+                "national_id": "1234567890",
+            },
+            format="json",
+        )
+
+        self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(register_response.data["email"], "portal-user@example.com")
+
+        login_response = self.client.post(
+            "/api/auth/login/",
+            {
+                "email": "portal-user@example.com",
+                "password": "Password@123",
+            },
+            format="json",
+        )
+
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", login_response.data)
+        self.assertIn("refresh", login_response.data)
+        self.assertEqual(login_response.data["user"]["email"], "portal-user@example.com")
+
+
+class SeedCommandTests(TestCase):
+    def test_baseline_seed_does_not_create_public_demo_users(self):
+        call_command("seed_initial_data")
+
+        self.assertGreater(ServiceCategory.objects.count(), 0)
+        self.assertGreater(Service.objects.count(), 0)
+        self.assertFalse(CustomUser.objects.filter(email="admin@khalisni.local").exists())
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_seed_demo_creates_demo_users_orders_and_public_site_content(self):
+        call_command("seed_demo")
+
+        self.assertTrue(CustomUser.objects.filter(email="admin@khalisni.local").exists())
+        self.assertTrue(CustomUser.objects.filter(email="customer@khalisni.local").exists())
+        self.assertTrue(CustomUser.objects.filter(email="employee@khalisni.local").exists())
+        self.assertTrue(CustomUser.objects.filter(email="provider@khalisni.local").exists())
+        self.assertGreater(Order.objects.count(), 0)
+        self.assertGreater(SiteTheme.objects.count(), 0)
+        self.assertGreater(PublicPageContent.objects.count(), 0)
+        self.assertGreater(Advertisement.objects.count(), 0)
+
+    def test_seed_demo_does_not_reset_existing_passwords_without_flag(self):
+        call_command("seed_demo")
+        admin_user = CustomUser.objects.get(email="admin@khalisni.local")
+        admin_user.set_password("ChangedPassword@123")
+        admin_user.save()
+
+        call_command("seed_demo")
+
+        admin_user.refresh_from_db()
+        self.assertTrue(admin_user.check_password("ChangedPassword@123"))
+        self.assertFalse(admin_user.check_password("Admin@123"))
+
+    def test_seed_demo_can_reset_existing_passwords_when_requested(self):
+        call_command("seed_demo")
+        admin_user = CustomUser.objects.get(email="admin@khalisni.local")
+        admin_user.set_password("ChangedPassword@123")
+        admin_user.save()
+
+        call_command("seed_demo", reset_passwords=True)
+
+        admin_user.refresh_from_db()
+        self.assertTrue(admin_user.check_password("Admin@123"))

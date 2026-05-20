@@ -35,8 +35,7 @@ DJANGO_ALLOWED_HOSTS=app.example.com
 DJANGO_CSRF_TRUSTED_ORIGINS=https://app.example.com
 CORS_ALLOWED_ORIGINS=https://app.example.com
 ```
-4. If you are publishing on a non-default port, change `APP_PORT`.
-5. Build and start the stack:
+4. Build and start the stack:
 
 ```bash
 docker compose up -d --build
@@ -46,7 +45,8 @@ If `POSTGRES_PASSWORD` or another required variable is missing, `docker compose`
 The backend does not rely on Compose-level database health to start. It waits for a real PostgreSQL connection in its entrypoint, which is more reliable on platforms like Coolify where container health can be reported before init work fully settles.
 The backend healthcheck is proxy-aware and uses loopback-safe headers so production settings like `ALLOWED_HOSTS` and `SECURE_SSL_REDIRECT` do not cause false negatives during container startup.
 On a first deploy, the backend healthcheck allows extra time for database readiness, migrations, static collection, and seed commands before Gunicorn starts serving requests.
-Demo data seeding is disabled by default in production. Enable `DJANGO_SEED_INITIAL_DATA=True` only when you explicitly want sample users, services, and orders created at startup.
+`DJANGO_SEED_INITIAL_DATA=True` now seeds only the baseline catalog data required by the app. Public demo users and example orders are intentionally excluded from automatic startup seeding.
+Use `python manage.py seed_demo` only on non-public demo environments when you explicitly want sample accounts, public-site content, and example orders. Re-run `python manage.py seed_demo --reset-passwords` only when you intentionally want the demo passwords reset.
 
 ## Operational notes
 

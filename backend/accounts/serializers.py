@@ -17,16 +17,6 @@ else:
 
 SAFE_SYSTEM_SETTINGS = {
     "site.homepage": {
-        "label": "محتوى الصفحة الرئيسية",
-        "fields": ("hero_title", "hero_subtitle"),
-    },
-    "site.contact": {
-        "label": "بيانات التواصل",
-        "fields": ("phone", "email"),
-    },
-}
-SAFE_SYSTEM_SETTINGS = {
-    "site.homepage": {
         "label": "Homepage content",
         "help_text": "Edit only the safe public text shown on the home page.",
         "warning": "",

@@ -37,7 +37,7 @@ python manage.py create_admin || true
 
 if [ "${DJANGO_SEED_INITIAL_DATA:-False}" = "True" ]; then
     echo "Seeding initial data..."
-    python manage.py seed_initial_data || true
+    python manage.py seed_initial_data
 else
     echo "Skipping initial data seed."
 fi
