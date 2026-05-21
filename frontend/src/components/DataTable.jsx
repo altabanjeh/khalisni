@@ -26,22 +26,41 @@ function DataTable({
   loading = false,
   pagination,
 }) {
-  const [isDesktop, setIsDesktop] = useState(() =>
+  const [isTableLayout, setIsTableLayout] = useState(() =>
     typeof window === 'undefined' || !window.matchMedia
       ? true
-      : window.matchMedia('(min-width: 768px)').matches,
+      : window.matchMedia('(min-width: 1024px)').matches,
   )
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined
-    const mediaQuery = window.matchMedia('(min-width: 768px)')
-    const update = (event) => setIsDesktop(event.matches)
+    const mediaQuery = window.matchMedia('(min-width: 1024px)')
+    const update = (event) => setIsTableLayout(event.matches)
     mediaQuery.addEventListener('change', update)
     return () => mediaQuery.removeEventListener('change', update)
   }, [])
 
   const isEmpty = !loading && !rows?.length
   const visibleRows = rows?.length || 0
+  const mobileColumns = columns.filter((column) => column.hideOnMobile !== true)
+
+  function renderDefaultMobileCard(row) {
+    return (
+      <div className="space-y-3">
+        {mobileColumns.map((column) => (
+          <div
+            key={column.key}
+            className="flex flex-col gap-1 rounded-2xl border border-brand-50 bg-brand-50/45 px-3 py-2.5"
+          >
+            <span className="text-xs font-bold text-brand-700">{column.label}</span>
+            <div className="min-w-0 break-words text-sm text-slate-700">
+              {column.render ? column.render(row) : row[column.key]}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -63,7 +82,7 @@ function DataTable({
         />
       ) : (
         <>
-          {mobileCard && !isDesktop ? (
+          {!isTableLayout ? (
             <div className="grid gap-4">
               {loading
                 ? Array.from({ length: 4 }).map((_, index) => (
@@ -74,13 +93,13 @@ function DataTable({
                   ))
                 : rows.map((row) => (
                     <div key={row.id} className="table-card">
-                      {mobileCard(row)}
+                      {mobileCard ? mobileCard(row) : renderDefaultMobileCard(row)}
                     </div>
                   ))}
             </div>
           ) : null}
 
-          {!mobileCard || isDesktop ? (
+          {isTableLayout ? (
             <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-white shadow-soft" role="region">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border text-sm">

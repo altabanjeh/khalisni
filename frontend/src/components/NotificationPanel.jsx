@@ -13,7 +13,7 @@ function NotificationPanel({ user, onNavigate }) {
 
   if (!notifications.length) {
     return (
-      <div className="w-full max-w-sm">
+      <div className="w-full sm:max-w-sm">
         <EmptyState
           title="لا توجد إشعارات حالياً"
           description="ستظهر هنا التنبيهات المرتبطة بالطلبات والوثائق."
@@ -24,7 +24,7 @@ function NotificationPanel({ user, onNavigate }) {
   }
 
   return (
-    <div className="w-full max-w-sm rounded-3xl border border-border bg-white p-4 shadow-panel">
+    <div className="w-full rounded-3xl border border-border bg-white p-4 shadow-panel sm:max-w-sm">
       <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
         <div>
           <p className="text-sm font-bold text-ink">مركز الإشعارات</p>

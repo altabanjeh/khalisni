@@ -15,8 +15,12 @@ function Sidebar({ title, links, isOpen, onClose }) {
       if (event.key === 'Escape') onClose?.()
     }
 
+    document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleEscape)
+    }
   }, [isOpen, onClose])
 
   const currentRole = normalizeRole(user?.role)
@@ -36,7 +40,7 @@ function Sidebar({ title, links, isOpen, onClose }) {
       />
       <aside
         className={clsx(
-          'fixed inset-y-4 right-4 z-50 w-[300px] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[2rem] border border-border bg-white/95 p-5 shadow-panel backdrop-blur transition xl:sticky xl:top-4 xl:z-auto xl:block xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
+          'fixed inset-y-3 left-3 right-3 z-50 overflow-y-auto rounded-[2rem] border border-border bg-white/95 p-5 shadow-panel backdrop-blur transition sm:left-auto sm:w-[340px] sm:max-w-[calc(100vw-1.5rem)] xl:sticky xl:top-4 xl:z-auto xl:block xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
           isOpen ? 'translate-x-0' : 'translate-x-[120%] xl:translate-x-0',
         )}
       >

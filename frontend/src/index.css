@@ -36,15 +36,26 @@
   }
 
   body {
-    @apply min-h-screen bg-background font-body text-ink antialiased;
+    @apply min-h-screen overflow-x-hidden bg-background font-body text-ink antialiased;
     background-image:
       radial-gradient(circle at top right, rgba(20, 127, 209, 0.16), transparent 24%),
       radial-gradient(circle at bottom left, rgba(11, 103, 178, 0.1), transparent 22%),
       linear-gradient(180deg, #f7fbff 0%, #f4faff 100%);
   }
 
+  #root {
+    @apply min-h-screen;
+  }
+
   a {
     @apply transition-colors duration-200;
+  }
+
+  img,
+  video,
+  canvas {
+    @apply block max-w-full;
+    height: auto;
   }
 
   button,
@@ -101,7 +112,7 @@
   }
 
   .table-card {
-    @apply rounded-[var(--radius)] border border-border bg-card p-5 shadow-soft;
+    @apply rounded-[var(--radius)] border border-border bg-card p-4 shadow-soft sm:p-5;
   }
 
   .status-pill {

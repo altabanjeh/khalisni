@@ -449,26 +449,26 @@ function PublicHomepageTemplate({
 
   return (
     <div className="space-y-8">
-      <section className="public-hero-section relative overflow-hidden rounded-[2rem] px-6 py-16 text-white shadow-soft">
+      <section className="public-hero-section relative overflow-hidden rounded-[2rem] px-4 py-10 text-white shadow-soft sm:px-6 sm:py-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.12),_transparent_28%)]" />
         <div className="relative grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <p className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white/90">
               {copy.heroBadge}
             </p>
-            <h1 className="mt-6 text-4xl font-extrabold leading-tight md:text-5xl">{heroTitle}</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/85">{heroSubtitle}</p>
+            <h1 className="mt-6 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">{heroTitle}</h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">{heroSubtitle}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ActionLink className="public-primary-button" label={primaryButtonText} to={content.primary_button_url} />
               <ActionLink className="public-secondary-button" label={secondaryButtonText} to={content.secondary_button_url} />
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-white p-6 text-ink shadow-[0_24px_60px_rgba(15,53,84,0.18)]">
+          <div className="rounded-[2rem] bg-white p-4 text-ink shadow-[0_24px_60px_rgba(15,53,84,0.18)] sm:p-6">
             {content.hero_image_url ? (
               <img
                 alt={heroTitle}
-                className="mb-5 h-40 w-full rounded-[1.5rem] object-cover"
+                className="mb-5 h-32 w-full rounded-[1.5rem] object-cover sm:h-40"
                 src={content.hero_image_url}
               />
             ) : null}
@@ -487,7 +487,7 @@ function PublicHomepageTemplate({
               {chatMessages.map((message) => (
                 <div
                   key={message.id}
-                  className={`max-w-[90%] rounded-[1.4rem] px-4 py-3 text-sm leading-7 ${
+                  className={`max-w-full rounded-[1.4rem] px-4 py-3 text-sm leading-7 sm:max-w-[90%] ${
                     message.role === 'user'
                       ? `${isArabic ? 'mr-auto' : 'ml-auto'} bg-brand-700 text-white`
                       : 'border border-slate-200 bg-white text-slate-700'
@@ -688,7 +688,7 @@ function PublicHomepageTemplate({
       </section>
 
       <section className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-bold text-brand-700">{copy.announcementsEyebrow}</p>
             <h2 className="section-title">{copy.announcementsTitle}</h2>
@@ -714,7 +714,7 @@ function PublicHomepageTemplate({
       </section>
 
       <section className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-bold text-brand-700">{copy.featuredEyebrow}</p>
             <h2 className="section-title">{copy.featuredTitle}</h2>

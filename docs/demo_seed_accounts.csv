@@ -1,0 +1,5 @@
+role,email,password,notes
+admin,admin@khalisni.local,Admin@123,Created by `python manage.py seed_demo`
+customer,customer@khalisni.local,Customer@123,Created by `python manage.py seed_demo`
+employee,employee@khalisni.local,Employee@123,Created by `python manage.py seed_demo`
+provider,provider@khalisni.local,Provider@123,Created by `python manage.py seed_demo`

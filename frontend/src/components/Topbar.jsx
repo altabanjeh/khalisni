@@ -19,8 +19,8 @@ function Topbar({ title, onMenuClick }) {
   }
 
   return (
-    <header className="glass-panel relative flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
-      <div className="flex items-center gap-3">
+    <header className="glass-panel relative flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex min-w-0 items-center gap-3">
         <button
           aria-label="فتح القائمة الجانبية"
           className="btn-ghost p-2 xl:hidden"
@@ -29,18 +29,18 @@ function Topbar({ title, onMenuClick }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-brand-600">Khalisni / خلصني</p>
-          <h2 className="text-2xl font-extrabold text-ink">{title}</h2>
+          <h2 className="break-words text-xl font-extrabold text-ink sm:text-2xl">{title}</h2>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <div className="relative">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+        <div className="relative w-full sm:w-auto">
           <button
             aria-expanded={notificationsOpen}
             aria-haspopup="dialog"
-            className="btn-secondary px-4 py-2 text-xs"
+            className="btn-secondary w-full px-4 py-2 text-xs sm:w-auto"
             onClick={() => setNotificationsOpen((current) => !current)}
             type="button"
           >
@@ -48,13 +48,13 @@ function Topbar({ title, onMenuClick }) {
             الإشعارات
           </button>
           {notificationsOpen ? (
-            <div className="absolute left-0 top-[calc(100%+0.75rem)] z-30">
+            <div className="fixed inset-x-4 top-24 z-30 sm:absolute sm:left-0 sm:right-auto sm:top-[calc(100%+0.75rem)]">
               <NotificationPanel onNavigate={handleNotificationNavigate} user={user} />
             </div>
           ) : null}
         </div>
 
-        <div className="flex min-w-[200px] items-center gap-3 rounded-3xl border border-brand-100 bg-brand-50/80 px-4 py-2.5 text-sm">
+        <div className="flex w-full items-center gap-3 rounded-3xl border border-brand-100 bg-brand-50/80 px-4 py-2.5 text-sm sm:min-w-[220px] sm:w-auto">
           <span className="icon-chip h-10 w-10 rounded-2xl bg-white">
             <UserRound className="h-4 w-4" />
           </span>
@@ -65,13 +65,13 @@ function Topbar({ title, onMenuClick }) {
           <ChevronDown className="h-4 w-4 text-slate-400" />
         </div>
 
-        <Link className="btn-secondary px-4 py-2 text-xs" to="/">
+        <Link className="btn-secondary w-full px-4 py-2 text-xs sm:w-auto" to="/">
           <Monitor className="h-4 w-4" />
           الموقع العام
         </Link>
 
         {user ? (
-          <button className="btn-primary px-4 py-2 text-xs" onClick={handleLogout} type="button">
+          <button className="btn-primary w-full px-4 py-2 text-xs sm:w-auto" onClick={handleLogout} type="button">
             <LogOut className="h-4 w-4" />
             تسجيل الخروج
           </button>
