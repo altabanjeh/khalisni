@@ -111,8 +111,272 @@ function toExtensionArray(value) {
     .filter(Boolean)
 }
 
-function formatJson(value) {
-  return JSON.stringify(value ?? [], null, 2)
+const schemaFieldTypeOptions = [
+  { value: 'text', label: 'نص قصير' },
+  { value: 'textarea', label: 'نص طويل' },
+  { value: 'number', label: 'رقم' },
+  { value: 'email', label: 'بريد إلكتروني' },
+  { value: 'tel', label: 'رقم هاتف' },
+  { value: 'date', label: 'تاريخ' },
+  { value: 'select', label: 'قائمة خيارات' },
+  { value: 'checkbox', label: 'صح / خطأ' },
+]
+
+let schemaFieldRowCounter = 0
+
+function nextSchemaFieldRowId() {
+  schemaFieldRowCounter += 1
+  return `schema-field-${schemaFieldRowCounter}`
+}
+
+function normalizeSchemaFieldType(value) {
+  const nextValue = String(value || 'text').trim().toLowerCase()
+  if (schemaFieldTypeOptions.some((option) => option.value === nextValue)) {
+    return nextValue
+  }
+  return 'text'
+}
+
+function serializeSchemaOptions(value) {
+  if (!Array.isArray(value)) return ''
+
+  return value
+    .map((option) => {
+      if (option && typeof option === 'object') {
+        return String(option.label ?? option.value ?? option.name ?? '').trim()
+      }
+      return String(option || '').trim()
+    })
+    .filter(Boolean)
+    .join('\n')
+}
+
+function parseSchemaOptionsText(value) {
+  return String(value || '')
+    .split(/[\n,]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function sanitizeSchemaFieldToken(value, fallback) {
+  const nextValue = String(value || fallback)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+
+  return nextValue || fallback
+}
+
+function createSchemaFieldRow(field = {}) {
+  return {
+    row_id: nextSchemaFieldRowId(),
+    technical_name: String(field.name ?? field.key ?? field.field ?? '').trim(),
+    label_ar: String(field.label_ar ?? field.name_ar ?? '').trim(),
+    label: String(field.label ?? field.title ?? '').trim(),
+    type: normalizeSchemaFieldType(field.type ?? field.field_type ?? field.input_type),
+    required: Boolean(field.required),
+    placeholder: String(field.placeholder ?? '').trim(),
+    help_text: String(field.help_text ?? field.description ?? '').trim(),
+    options_text: serializeSchemaOptions(field.options ?? field.choices ?? field.values),
+  }
+}
+
+function isSchemaFieldRowBlank(field) {
+  return (
+    !field.technical_name.trim() &&
+    !field.label_ar.trim() &&
+    !field.label.trim() &&
+    !field.placeholder.trim() &&
+    !field.help_text.trim() &&
+    !field.options_text.trim() &&
+    !field.required &&
+    normalizeSchemaFieldType(field.type) === 'text'
+  )
+}
+
+function getGeneratedSchemaFieldName(field, index) {
+  if (field.technical_name.trim()) {
+    return sanitizeSchemaFieldToken(field.technical_name, `field_${index + 1}`)
+  }
+
+  return sanitizeSchemaFieldToken(field.label || field.placeholder || `field_${index + 1}`, `field_${index + 1}`)
+}
+
+function validateSchemaFieldRows(fields) {
+  const errors = []
+
+  fields.forEach((field, index) => {
+    if (isSchemaFieldRowBlank(field)) return
+
+    if (!field.label_ar.trim() && !field.label.trim()) {
+      errors.push(`الحقل ${index + 1}: أضف الاسم الذي سيظهر للمستخدم.`)
+    }
+
+    if (normalizeSchemaFieldType(field.type) === 'select' && !parseSchemaOptionsText(field.options_text).length) {
+      errors.push(`الحقل ${index + 1}: أضف خيارات القائمة، كل خيار في سطر منفصل.`)
+    }
+  })
+
+  return errors
+}
+
+function buildRequiredInformationSchema(fields) {
+  return fields
+    .filter((field) => !isSchemaFieldRowBlank(field))
+    .map((field, index) => {
+      const type = normalizeSchemaFieldType(field.type)
+      const payload = {
+        name: getGeneratedSchemaFieldName(field, index),
+        type,
+        required: Boolean(field.required),
+      }
+
+      if (field.label_ar.trim()) payload.label_ar = field.label_ar.trim()
+      if (field.label.trim()) payload.label = field.label.trim()
+      if (field.placeholder.trim()) payload.placeholder = field.placeholder.trim()
+      if (field.help_text.trim()) payload.help_text = field.help_text.trim()
+      if (type === 'select') payload.options = parseSchemaOptionsText(field.options_text)
+
+      return payload
+    })
+}
+
+function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField, onRemoveField, previewJson }) {
+  return (
+    <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h3 className="text-base font-bold text-ink">البيانات المطلوبة من العميل</h3>
+          <p className="text-sm leading-6 text-slate-600">
+            أضف الحقول التي سيملؤها العميل عند طلب الخدمة، وسيتم توليد JSON تلقائياً في الخلفية.
+          </p>
+        </div>
+        <button className="btn-secondary whitespace-nowrap" onClick={onAddField} type="button">
+          + حقل مطلوب
+        </button>
+      </div>
+
+      {fields.length ? (
+        <div className="space-y-4">
+          {fields.map((field, index) => (
+            <div key={field.row_id} className="space-y-4 rounded-[1.5rem] border border-border bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-bold text-ink">الحقل {index + 1}</p>
+                  <p className="text-xs text-slate-500">
+                    المعرّف المولّد: <span className="font-mono text-ink">{getGeneratedSchemaFieldName(field, index)}</span>
+                  </p>
+                </div>
+                <button
+                  className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
+                  onClick={() => onRemoveField(field.row_id)}
+                  type="button"
+                >
+                  حذف الحقل
+                </button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="الاسم الظاهر بالعربية">
+                  <input
+                    className="field"
+                    onChange={(event) => onChangeField(field.row_id, 'label_ar', event.target.value)}
+                    placeholder="مثال: رقم الجواز"
+                    value={field.label_ar}
+                  />
+                </Field>
+                <Field hint="يُستخدم أيضاً لتوليد معرّف مناسب إذا تُرك الحقل التقني فارغاً." label="الاسم الظاهر بالإنجليزية">
+                  <input
+                    className="field"
+                    onChange={(event) => onChangeField(field.row_id, 'label', event.target.value)}
+                    placeholder="Passport number"
+                    value={field.label}
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field hint="اختياري. إن تُرك فارغاً سنولّده تلقائياً." label="المعرّف التقني">
+                  <input
+                    className="field font-mono"
+                    dir="ltr"
+                    onChange={(event) => onChangeField(field.row_id, 'technical_name', event.target.value)}
+                    placeholder="passport_number"
+                    value={field.technical_name}
+                  />
+                </Field>
+                <Field label="نوع الحقل">
+                  <select className="field" onChange={(event) => onChangeField(field.row_id, 'type', event.target.value)} value={field.type}>
+                    {schemaFieldTypeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="نص مساعد داخل الحقل">
+                  <input
+                    className="field"
+                    onChange={(event) => onChangeField(field.row_id, 'placeholder', event.target.value)}
+                    placeholder="أدخل رقم الجواز"
+                    value={field.placeholder}
+                  />
+                </Field>
+                <Field label="ملاحظة توضيحية">
+                  <input
+                    className="field"
+                    onChange={(event) => onChangeField(field.row_id, 'help_text', event.target.value)}
+                    placeholder="كما هو مكتوب في الوثيقة الرسمية"
+                    value={field.help_text}
+                  />
+                </Field>
+              </div>
+
+              {field.type === 'select' ? (
+                <Field hint="كل خيار في سطر منفصل. سيُستخدم النص نفسه كقيمة واسم ظاهر." label="خيارات القائمة">
+                  <textarea
+                    className="field min-h-24"
+                    onChange={(event) => onChangeField(field.row_id, 'options_text', event.target.value)}
+                    placeholder={'ذكر\nأنثى'}
+                    value={field.options_text}
+                  />
+                </Field>
+              ) : null}
+
+              <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-border bg-brand-50/40 px-4 py-3 text-sm font-medium text-ink">
+                <span>الحقل مطلوب عند الطلب</span>
+                <input
+                  checked={field.required}
+                  onChange={(event) => onChangeField(field.row_id, 'required', event.target.checked)}
+                  type="checkbox"
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-[1.5rem] border border-dashed border-border bg-white px-4 py-6 text-sm text-slate-500">
+          إذا كانت الخدمة تحتاج بيانات إضافية من العميل فأضفها من هنا. إذا لم تحتج أي حقول إضافية سيبقى JSON فارغاً.
+        </div>
+      )}
+
+      {errorMessages.length ? (
+        <div className="space-y-1 rounded-2xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+          {errorMessages.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+        </div>
+      ) : null}
+
+      <Field hint="للمعاينة فقط. لا يحتاج المستخدم إلى كتابة أو تعديل هذا النص." label="JSON المولّد تلقائياً">
+        <textarea className="field min-h-28 bg-slate-100 font-mono text-left" dir="ltr" readOnly value={previewJson} />
+      </Field>
+    </div>
+  )
 }
 
 function ServicesManagementPage() {
@@ -132,6 +396,8 @@ function ServicesManagementPage() {
   const [activeModal, setActiveModal] = useState(null)
   const [pendingDelete, setPendingDelete] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [serviceSchemaFields, setServiceSchemaFields] = useState([])
+  const [serviceSchemaErrors, setServiceSchemaErrors] = useState([])
 
   const categoryForm = useForm({ defaultValues: defaultCategoryValues })
   const serviceForm = useForm({ defaultValues: defaultServiceValues })
@@ -149,6 +415,7 @@ function ServicesManagementPage() {
     () => documentRules.find((item) => String(item.id) === String(selectedDocumentId)) || null,
     [documentRules, selectedDocumentId],
   )
+  const schemaPreviewJson = useMemo(() => JSON.stringify(buildRequiredInformationSchema(serviceSchemaFields), null, 2), [serviceSchemaFields])
 
   useEffect(() => {
     categoryForm.reset(
@@ -179,7 +446,7 @@ function ServicesManagementPage() {
             short_description_en: selectedService.short_description_en || '',
             description_ar: selectedService.description_ar || '',
             description_en: selectedService.description_en || '',
-            required_information_schema_text: formatJson(selectedService.required_information_schema),
+            required_information_schema_text: JSON.stringify(selectedService.required_information_schema ?? [], null, 2),
             terms_ar: selectedService.terms_ar || '',
             terms_en: selectedService.terms_en || '',
             base_price: selectedService.base_price ?? '0.00',
@@ -198,6 +465,12 @@ function ServicesManagementPage() {
           }
         : defaultServiceValues,
     )
+    setServiceSchemaFields(
+      Array.isArray(selectedService?.required_information_schema)
+        ? selectedService.required_information_schema.map((field) => createSchemaFieldRow(field))
+        : [],
+    )
+    setServiceSchemaErrors([])
   }, [selectedService, serviceForm])
 
   useEffect(() => {
@@ -221,11 +494,20 @@ function ServicesManagementPage() {
     )
   }, [documentForm, selectedDocument])
 
+  useEffect(() => {
+    serviceForm.setValue('required_information_schema_text', schemaPreviewJson, {
+      shouldDirty: false,
+      shouldValidate: false,
+    })
+  }, [schemaPreviewJson, serviceForm])
+
   function closeModal() {
     setActiveModal(null)
     setSelectedCategoryId(null)
     setSelectedServiceId(null)
     setSelectedDocumentId(null)
+    setServiceSchemaFields([])
+    setServiceSchemaErrors([])
     categoryForm.reset(defaultCategoryValues)
     serviceForm.reset(defaultServiceValues)
     documentForm.reset(defaultDocumentValues)
@@ -275,6 +557,13 @@ function ServicesManagementPage() {
   async function handleServiceSubmit(values) {
     setSubmitting(true)
     try {
+      const schemaErrors = validateSchemaFieldRows(serviceSchemaFields)
+      if (schemaErrors.length) {
+        setServiceSchemaErrors(schemaErrors)
+        setSubmitting(false)
+        return
+      }
+
       let requiredInformationSchema = []
       try {
         requiredInformationSchema = JSON.parse(values.required_information_schema_text || '[]')
@@ -339,6 +628,31 @@ function ServicesManagementPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function addServiceSchemaField() {
+    setServiceSchemaErrors([])
+    setServiceSchemaFields((current) => [...current, createSchemaFieldRow()])
+  }
+
+  function updateServiceSchemaField(rowId, key, value) {
+    setServiceSchemaErrors([])
+    setServiceSchemaFields((current) =>
+      current.map((field) =>
+        field.row_id === rowId
+          ? {
+              ...field,
+              [key]: key === 'type' ? normalizeSchemaFieldType(value) : value,
+              ...(key === 'type' && value !== 'select' ? { options_text: '' } : {}),
+            }
+          : field,
+      ),
+    )
+  }
+
+  function removeServiceSchemaField(rowId) {
+    setServiceSchemaErrors([])
+    setServiceSchemaFields((current) => current.filter((field) => field.row_id !== rowId))
   }
 
   async function handleDocumentSubmit(values) {
@@ -706,13 +1020,17 @@ function ServicesManagementPage() {
             <textarea className="field min-h-28" {...serviceForm.register('description_en')} />
           </Field>
 
-          <Field hint='مثال: [{"name":"passport_number","type":"text","required":true}]' label="بنية البيانات المطلوبة JSON">
-            <textarea
-              className="field min-h-28 font-mono text-left"
-              dir="ltr"
-              {...serviceForm.register('required_information_schema_text')}
+          <div className="space-y-2">
+            <ServiceSchemaBuilder
+              errorMessages={serviceSchemaErrors}
+              fields={serviceSchemaFields}
+              onAddField={addServiceSchemaField}
+              onChangeField={updateServiceSchemaField}
+              onRemoveField={removeServiceSchemaField}
+              previewJson={schemaPreviewJson}
             />
-          </Field>
+            <input type="hidden" {...serviceForm.register('required_information_schema_text')} />
+          </div>
           {serviceForm.formState.errors.required_information_schema_text ? (
             <p className="text-sm text-danger">{serviceForm.formState.errors.required_information_schema_text.message}</p>
           ) : null}
