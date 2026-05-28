@@ -15,6 +15,8 @@ function isFormData(value) {
 }
 
 function clearStoredAuth() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
   sessionStorage.removeItem(ACCESS_TOKEN_KEY)
   sessionStorage.removeItem(REFRESH_TOKEN_KEY)
   if (typeof window !== 'undefined') {
@@ -23,7 +25,29 @@ function clearStoredAuth() {
 }
 
 function getStoredAccessToken() {
-  return sessionStorage.getItem(ACCESS_TOKEN_KEY)
+  const localAccess = localStorage.getItem(ACCESS_TOKEN_KEY)
+  if (localAccess) return localAccess
+
+  const sessionAccess = sessionStorage.getItem(ACCESS_TOKEN_KEY)
+  if (sessionAccess) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, sessionAccess)
+    return sessionAccess
+  }
+
+  return null
+}
+
+function getStoredRefreshToken() {
+  const localRefresh = localStorage.getItem(REFRESH_TOKEN_KEY)
+  if (localRefresh) return localRefresh
+
+  const sessionRefresh = sessionStorage.getItem(REFRESH_TOKEN_KEY)
+  if (sessionRefresh) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, sessionRefresh)
+    return sessionRefresh
+  }
+
+  return null
 }
 
 function flattenErrorMessages(value) {
@@ -239,7 +263,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(createApiError(error))
     }
 
-    const refresh = sessionStorage.getItem(REFRESH_TOKEN_KEY)
+    const refresh = getStoredRefreshToken()
     const isRefreshCall = error?.config?.url?.includes('/auth/token/refresh/')
 
     if (!refresh || isRefreshCall) {
@@ -261,6 +285,7 @@ apiClient.interceptors.response.use(
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, { refresh })
       const newAccess = response.data.access
+      localStorage.setItem(ACCESS_TOKEN_KEY, newAccess)
       sessionStorage.setItem(ACCESS_TOKEN_KEY, newAccess)
       _processRefreshQueue(null, newAccess)
       const retryConfig = { ...error.config }

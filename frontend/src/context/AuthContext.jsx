@@ -42,16 +42,20 @@ export function AuthProvider({ children }) {
       loading,
       async login(payload) {
         const result = await api.login(payload)
+        localStorage.setItem('khalisni_access', result.access)
+        localStorage.setItem('khalisni_refresh', result.refresh)
         sessionStorage.setItem('khalisni_access', result.access)
         sessionStorage.setItem('khalisni_refresh', result.refresh)
         setUser(result.user)
         return result.user
       },
       async logout() {
-        const refresh = sessionStorage.getItem('khalisni_refresh')
+        const refresh = localStorage.getItem('khalisni_refresh') || sessionStorage.getItem('khalisni_refresh')
         if (refresh) {
           await api.logout(refresh).catch(() => null)
         }
+        localStorage.removeItem('khalisni_access')
+        localStorage.removeItem('khalisni_refresh')
         sessionStorage.removeItem('khalisni_access')
         sessionStorage.removeItem('khalisni_refresh')
         setUser(null)

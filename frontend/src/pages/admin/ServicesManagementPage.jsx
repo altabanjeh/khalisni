@@ -242,7 +242,7 @@ function buildRequiredInformationSchema(fields) {
     })
 }
 
-function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField, onRemoveField, previewJson }) {
+function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField, onRemoveField }) {
   return (
     <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -371,10 +371,6 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
           ))}
         </div>
       ) : null}
-
-      <Field hint="للمعاينة فقط. لا يحتاج المستخدم إلى كتابة أو تعديل هذا النص." label="JSON المولّد تلقائياً">
-        <textarea className="field min-h-28 bg-slate-100 font-mono text-left" dir="ltr" readOnly value={previewJson} />
-      </Field>
     </div>
   )
 }
@@ -1027,7 +1023,6 @@ function ServicesManagementPage() {
               onAddField={addServiceSchemaField}
               onChangeField={updateServiceSchemaField}
               onRemoveField={removeServiceSchemaField}
-              previewJson={schemaPreviewJson}
             />
             <input type="hidden" {...serviceForm.register('required_information_schema_text')} />
           </div>
