@@ -1,13 +1,15 @@
-import { Bell, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
+import { Bell, BookOpenText, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import HelpGuidePanel from './HelpGuidePanel'
 import NotificationPanel from './NotificationPanel'
 
 function Topbar({ title, onMenuClick }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   async function handleLogout() {
     await logout()
@@ -54,6 +56,11 @@ function Topbar({ title, onMenuClick }) {
           ) : null}
         </div>
 
+        <button className="btn-secondary w-full px-4 py-2 text-xs sm:w-auto" onClick={() => setHelpOpen(true)} type="button">
+          <BookOpenText className="h-4 w-4" />
+          الدليل
+        </button>
+
         <div className="flex w-full items-center gap-3 rounded-3xl border border-brand-100 bg-brand-50/80 px-4 py-2.5 text-sm sm:min-w-[220px] sm:w-auto">
           <span className="icon-chip h-10 w-10 rounded-2xl bg-white">
             <UserRound className="h-4 w-4" />
@@ -77,6 +84,8 @@ function Topbar({ title, onMenuClick }) {
           </button>
         ) : null}
       </div>
+
+      <HelpGuidePanel onClose={() => setHelpOpen(false)} open={helpOpen} />
     </header>
   )
 }

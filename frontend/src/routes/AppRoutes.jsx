@@ -1,5 +1,6 @@
 import {
   Bell,
+  BookOpenText,
   BriefcaseBusiness,
   ClipboardList,
   CreditCard,
@@ -77,6 +78,7 @@ const ReportsPage = lazy(() => import('../pages/admin/ReportsPage'))
 const NotificationsPage = lazy(() => import('../pages/admin/NotificationsPage'))
 const PaymentsManagementPage = lazy(() => import('../pages/admin/PaymentsManagementPage'))
 const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'))
+const HelpGuideManagementPage = lazy(() => import('../pages/admin/HelpGuideManagementPage'))
 
 const ProviderDashboardHome = lazy(() => import('../pages/provider/ProviderDashboardHome'))
 const AssignedOrdersPage = lazy(() => import('../pages/provider/AssignedOrdersPage'))
@@ -120,6 +122,7 @@ const adminLinks = [
   { to: '/admin/reports', label: 'التقارير', icon: LineChart },
   { to: '/admin/notifications', label: 'الإشعارات', icon: Bell },
   { to: '/admin/audit', label: 'سجل التدقيق', icon: ShieldCheck },
+  { to: '/admin/help-guides', label: 'Help Guides', icon: BookOpenText },
 ]
 
 const providerLinks = [
@@ -206,6 +209,7 @@ function AppRoutes() {
               <Route path="/admin/notifications" element={<NotificationsPage />} />
               <Route path="/admin/payments" element={<PaymentsManagementPage />} />
               <Route path="/admin/audit" element={<AuditLogPage />} />
+              <Route path="/admin/help-guides" element={<HelpGuideManagementPage />} />
             </Route>
           </Route>
 

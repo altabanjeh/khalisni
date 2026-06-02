@@ -1,5 +1,6 @@
 ﻿import { authApi } from './authApi'
 import { documentsApi } from './documentsApi'
+import { helpGuidesApi } from './helpGuidesApi'
 import { notificationsApi } from './notificationsApi'
 import { ordersApi } from './ordersApi'
 import { paymentApi } from './paymentApi'
@@ -16,6 +17,7 @@ import {
   mockProviders,
   mockServices,
 } from '../utils/mockData'
+import { HELP_SCREEN_REGISTRY } from '../help/screenRegistry'
 import { fallbackHomepagePayload, fallbackPublicTheme } from '../utils/publicSiteDefaults'
 
 const isTestMode = import.meta.env.MODE === 'test'
@@ -158,6 +160,56 @@ const mockNotificationTemplates = [
   { template_id: 1, key: 'missing_documents_followup', channel: 'system', title_ar: 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø·Ù„Ø¨', message_ar: 'ÙŠØ±Ø¬Ù‰ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ« Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ.' },
   { template_id: 2, key: 'review_started', channel: 'system', title_ar: 'Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', message_ar: 'ØªÙ… Ø¨Ø¯Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø·Ù„Ø¨Ùƒ.' },
 ]
+let mockHelpGuides = [
+  {
+    id: 1,
+    screen_key: 'customer_orders',
+    screen_label: 'طلباتي',
+    route_path: '/customer/orders',
+    role: 'customer',
+    role_label: 'Customer',
+    workflow_status: '',
+    workflow_status_label: '',
+    title: 'متابعة الطلبات',
+    short_description: 'دليل سريع لمراجعة الطلبات والبحث عنها.',
+    purpose: 'يساعدك على الوصول السريع إلى الطلب الصحيح ومعرفة حالته الحالية.',
+    before_you_start: 'استخدم البحث إذا كان لديك أكثر من طلب مفتوح.',
+    step_by_step_guide: '1. افتح شاشة طلباتي\n2. ابحث عن الطلب\n3. افتح التفاصيل',
+    steps: ['افتح شاشة طلباتي', 'ابحث عن الطلب', 'افتح التفاصيل'],
+    expected_result: 'تصل إلى الطلب المطلوب وتعرف حالته الحالية.',
+    common_errors: 'فتح طلب مشابه بالخطأ',
+    common_error_items: ['فتح طلب مشابه بالخطأ'],
+    related_screen: 'customer_order_details',
+    related_permission: '',
+    display_order: 10,
+    permission_key: '',
+    is_active: true,
+  },
+]
+const mockHelpGuideMetadata = {
+  screens: HELP_SCREEN_REGISTRY.map((item) => ({
+    screen_key: item.screen_key,
+    route_path: '',
+    label: item.label,
+  })),
+  roles: [
+    { value: 'all_users', label: 'All users' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'customer', label: 'Customer' },
+    { value: 'employee', label: 'Employee' },
+    { value: 'support', label: 'Support' },
+    { value: 'provider', label: 'Provider' },
+  ],
+  workflow_statuses: [
+    { value: 'NEW', label: 'New' },
+    { value: 'UNDER_REVIEW', label: 'Under review' },
+    { value: 'WAITING_CUSTOMER', label: 'Waiting customer' },
+    { value: 'ASSIGNED', label: 'Assigned' },
+    { value: 'IN_PROGRESS', label: 'In progress' },
+    { value: 'READY_FOR_DELIVERY', label: 'Ready for delivery' },
+    { value: 'COMPLETED', label: 'Completed' },
+  ],
+}
 const mockPublicAdvertisements = [
   {
     id: 1,
@@ -426,6 +478,92 @@ export const api = {
   getWorkflowRules: async () => withTestValue(() => servicesApi.getWorkflowRules(), []),
   getAdminPayments: async (params = {}) => withTestValue(() => paymentApi.getAdminPayments(params), []),
   updateAdminPaymentStatus: paymentApi.updateAdminPaymentStatus,
+  getCurrentHelpGuides: async (params = {}) =>
+    withTestValue(
+      () => helpGuidesApi.getCurrentHelpGuides(params),
+      {
+        screen_key: params?.screen_key || '',
+        screen_label: HELP_SCREEN_REGISTRY.find((item) => item.screen_key === params?.screen_key)?.label || '',
+        workflow_status: params?.workflow_status || '',
+        results: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
+      },
+    ),
+  getHelpGuides: async (params = {}) =>
+    withTestValue(
+      () => helpGuidesApi.getHelpGuides(params),
+      mockHelpGuides.filter((guide) => {
+        const screenKey = String(params?.screen_key || '').trim()
+        const search = String(params?.search || '').trim().toLowerCase()
+        if (screenKey && guide.screen_key !== screenKey) return false
+        if (!search) return true
+        return [guide.title, guide.screen_label, guide.short_description, guide.purpose]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(search))
+      }),
+    ),
+  getHelpGuideMetadata: async () => withTestValue(() => helpGuidesApi.getHelpGuideMetadata(), mockHelpGuideMetadata),
+  createHelpGuide: async (payload) =>
+    withTestValue(
+      () => helpGuidesApi.createHelpGuide(payload),
+      (() => {
+        const nextId = (mockHelpGuides.at(-1)?.id || 0) + 1
+        const created = {
+          ...payload,
+          id: nextId,
+          screen_label: HELP_SCREEN_REGISTRY.find((item) => item.screen_key === payload?.screen_key)?.label || payload?.screen_key || 'دليل عام',
+          role_label: mockHelpGuideMetadata.roles.find((item) => item.value === payload?.role)?.label || payload?.role || '',
+          workflow_status_label:
+            mockHelpGuideMetadata.workflow_statuses.find((item) => item.value === payload?.workflow_status)?.label || payload?.workflow_status || '',
+          steps: String(payload?.step_by_step_guide || '')
+            .split(/\r?\n/)
+            .map((item) => item.trim())
+            .filter(Boolean),
+          common_error_items: String(payload?.common_errors || '')
+            .split(/\r?\n/)
+            .map((item) => item.trim())
+            .filter(Boolean),
+        }
+        mockHelpGuides = [created, ...mockHelpGuides]
+        return created
+      })(),
+    ),
+  updateHelpGuide: async (id, payload) =>
+    withTestValue(
+      () => helpGuidesApi.updateHelpGuide(id, payload),
+      (() => {
+        mockHelpGuides = mockHelpGuides.map((guide) =>
+          guide.id === Number(id)
+            ? {
+                ...guide,
+                ...payload,
+                screen_label: HELP_SCREEN_REGISTRY.find((item) => item.screen_key === payload?.screen_key)?.label || guide.screen_label,
+                role_label: mockHelpGuideMetadata.roles.find((item) => item.value === payload?.role)?.label || guide.role_label,
+                workflow_status_label:
+                  mockHelpGuideMetadata.workflow_statuses.find((item) => item.value === payload?.workflow_status)?.label || payload?.workflow_status || '',
+                steps: String((payload?.step_by_step_guide ?? guide.step_by_step_guide) || '')
+                  .split(/\r?\n/)
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+                common_error_items: String((payload?.common_errors ?? guide.common_errors) || '')
+                  .split(/\r?\n/)
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+              }
+            : guide,
+        )
+        return mockHelpGuides.find((guide) => guide.id === Number(id)) || null
+      })(),
+    ),
+  deleteHelpGuide: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.deleteHelpGuide(id),
+      (() => {
+        mockHelpGuides = mockHelpGuides.map((guide) =>
+          guide.id === Number(id) ? { ...guide, is_active: false } : guide,
+        )
+        return null
+      })(),
+    ),
 
   getAvailablePermissions: async () => withTestValue(() => servicesApi.getAvailablePermissions(), {}),
   getUserPermissions: (userId) => servicesApi.getUserPermissions(userId),
@@ -449,6 +587,7 @@ export const api = {
 export {
   authApi,
   documentsApi,
+  helpGuidesApi,
   notificationsApi,
   ordersApi,
   paymentApi,

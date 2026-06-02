@@ -11,6 +11,7 @@ import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
+import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getOrderAllowedActions, hasPermission } from '../../utils/authz'
@@ -79,6 +80,7 @@ function EmployeeOrderReviewPage() {
     [order?.service?.slug],
     null,
   )
+  useRegisterPageHelp({ workflowStatus: order?.status || '' })
   const assignForm = useForm()
   const docsRequestForm = useForm()
   const noteForm = useForm()

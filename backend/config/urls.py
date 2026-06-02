@@ -23,6 +23,7 @@ urlpatterns = [
     path("api/", include("notifications.urls")),
     path("api/", include("payment.urls")),
     path("api/", include("public_site.urls")),
+    path("api/", include("help_guides.urls")),
     # Serve uploaded media files for all environments.
     # For high-traffic deployments replace this with nginx or object storage.
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),

@@ -8,6 +8,7 @@ import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getOrderAllowedActions } from '../../utils/authz'
+import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import {
@@ -36,6 +37,7 @@ function MissingDocumentsResponsePage() {
     [order?.service?.slug],
     null,
   )
+  useRegisterPageHelp({ workflowStatus: order?.status || '' })
 
   if (loading) return <LoadingSpinner />
 

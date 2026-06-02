@@ -367,3 +367,12 @@ class CanManagePartnerCatalog(BasePermission):
         if is_partner_admin(request.user):
             return True
         return _has_perm(request.user, "organizations.manage_partner_service_config")
+
+
+class CanManageHelpGuides(HasDjangoPermission):
+    permission_name = "help_guides.manage_help_guides"
+
+    def has_permission(self, request, view):
+        if is_platform_super_admin(request.user):
+            return True
+        return super().has_permission(request, view)

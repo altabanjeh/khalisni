@@ -9,6 +9,7 @@ import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
+import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getOrderAllowedActions } from '../../utils/authz'
@@ -48,6 +49,7 @@ function ProviderOrderDetailsPage() {
   const { id } = useParams()
   const { toast } = useToast()
   const { data: order, loading, error, reload } = useAsyncData(() => api.getProviderOrder(id), [id], null)
+  useRegisterPageHelp({ workflowStatus: order?.status || '' })
   const statusForm = useForm()
   const noteForm = useForm()
   const uploadForm = useForm({

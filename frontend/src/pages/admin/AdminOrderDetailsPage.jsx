@@ -10,6 +10,7 @@ import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
+import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getOrderAllowedActions } from '../../utils/authz'
@@ -54,6 +55,7 @@ function AdminOrderDetailsPage() {
   const [submitting, setSubmitting] = useState('')
 
   const { data: order, loading, error, reload } = useAsyncData(() => api.getAdminOrder(id), [id], null)
+  useRegisterPageHelp({ workflowStatus: order?.status || '' })
   const { data: providers = [], error: providersError } = useAsyncData(() => api.getProviders({ order: id }), [id], [])
   const statusForm = useForm()
   const noteForm = useForm({ defaultValues: { visibility: 'INTERNAL' } })

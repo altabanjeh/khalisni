@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     "reports",
     "audit",
     "public_site",
+    "help_guides",
 ]
 
 if HAS_CORSHEADERS:
