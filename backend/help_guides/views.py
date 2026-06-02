@@ -3,9 +3,32 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageHelpGuides
-from help_guides.models import HelpGuide
-from help_guides.selectors import get_help_guides_for_screen, get_readable_help_guides_queryset
-from help_guides.serializers import HelpGuideAdminSerializer, HelpGuideMetadataSerializer, HelpGuideReadSerializer, build_help_guide_metadata
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideService, HelpGuideWorkflow
+from help_guides.selectors import (
+    build_contextual_help_payload,
+    get_action_guides_for_context,
+    get_field_guides_for_context,
+    get_readable_entity_queryset,
+    get_readable_help_guides_queryset,
+    get_service_guide_for_context,
+    get_workflow_guides_for_context,
+    search_help_content,
+)
+from help_guides.serializers import (
+    HelpGuideActionAdminSerializer,
+    HelpGuideAdminSerializer,
+    HelpGuideFieldAdminSerializer,
+    HelpGuideMetadataSerializer,
+    HelpGuideReadOnlySerializer,
+    HelpGuideServiceAdminSerializer,
+    HelpGuideWorkflowAdminSerializer,
+    build_help_guide_metadata,
+    serialize_action_guide,
+    serialize_field_guide,
+    serialize_screen_guide,
+    serialize_service_guide,
+    serialize_workflow_guide,
+)
 from help_guides.screen_registry import get_help_screen_label
 
 
@@ -18,25 +41,143 @@ class CanManageHelpGuidesOrReadOnly(permissions.BasePermission):
         return CanManageHelpGuides().has_permission(request, view)
 
 
+def _preview_role(request):
+    return str(request.query_params.get("preview_role", "")).strip()
+
+
+def _include_preview_permissions(request, view):
+    return bool(_preview_role(request) and CanManageHelpGuides().has_permission(request, view))
+
+
+def _service_id(request):
+    raw_value = request.query_params.get("service_id")
+    if raw_value in (None, ""):
+        return None
+    try:
+        return int(raw_value)
+    except (TypeError, ValueError):
+        return None
+
+
 class HelpGuideCurrentAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         screen_key = str(request.query_params.get("screen_key", "")).strip()
         workflow_status = str(request.query_params.get("workflow_status", "")).strip()
-        guides, fallback_priority = get_help_guides_for_screen(
+        preview_role = _preview_role(request)
+        payload = build_contextual_help_payload(
             request.user,
             screen_key=screen_key,
             workflow_status=workflow_status,
+            service_id=_service_id(request),
+            preview_role=preview_role if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
         )
-        serializer = HelpGuideReadSerializer(guides, many=True)
+        screen_guides = [serialize_screen_guide(item) for item in payload["screen_guides"]]
+        action_guides = [serialize_action_guide(item) for item in payload["actions"]]
+        field_guides = [serialize_field_guide(item) for item in payload["fields"]]
+        workflow_guides = [serialize_workflow_guide(item) for item in payload["workflows"]]
+        service_guide = serialize_service_guide(payload["service"]) if payload["service"] else None
         return response.Response(
             {
                 "screen_key": screen_key,
                 "screen_label": get_help_screen_label(screen_key),
                 "workflow_status": workflow_status,
-                "fallback_priority": fallback_priority,
-                "results": serializer.data,
+                "service_id": _service_id(request),
+                "preview_role": preview_role if CanManageHelpGuides().has_permission(request, self) else "",
+                "fallback_priority": payload["fallback_priority"],
+                "results": screen_guides,
+                "screen_guides": screen_guides,
+                "actions": action_guides,
+                "fields": field_guides,
+                "service": service_guide,
+                "workflows": workflow_guides,
+            }
+        )
+
+
+class HelpGuideFieldsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        screen_key = str(request.query_params.get("screen_key", "")).strip()
+        rows = get_field_guides_for_context(
+            request.user,
+            screen_key=screen_key,
+            preview_role=_preview_role(request) if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
+        )
+        return response.Response([serialize_field_guide(item) for item in rows])
+
+
+class HelpGuideActionsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        screen_key = str(request.query_params.get("screen_key", "")).strip()
+        workflow_status = str(request.query_params.get("workflow_status", "")).strip()
+        rows = get_action_guides_for_context(
+            request.user,
+            screen_key=screen_key,
+            workflow_status=workflow_status,
+            preview_role=_preview_role(request) if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
+        )
+        return response.Response([serialize_action_guide(item) for item in rows])
+
+
+class HelpGuideServiceAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, service_id):
+        guide = get_service_guide_for_context(
+            request.user,
+            service_id=service_id,
+            screen_key=str(request.query_params.get("screen_key", "")).strip(),
+            preview_role=_preview_role(request) if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
+        )
+        if not guide:
+            return response.Response({"detail": "Service help was not found."}, status=status.HTTP_404_NOT_FOUND)
+        return response.Response(serialize_service_guide(guide))
+
+
+class HelpGuideWorkflowsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        screen_key = str(request.query_params.get("screen_key", "")).strip()
+        current_status = str(request.query_params.get("status", "") or request.query_params.get("workflow_status", "")).strip()
+        rows = get_workflow_guides_for_context(
+            request.user,
+            screen_key=screen_key,
+            current_status=current_status,
+            preview_role=_preview_role(request) if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
+        )
+        return response.Response([serialize_workflow_guide(item) for item in rows])
+
+
+class HelpGuideSearchAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        query = str(request.query_params.get("q", "") or request.query_params.get("search", "")).strip()
+        results = search_help_content(
+            request.user,
+            query=query,
+            preview_role=_preview_role(request) if CanManageHelpGuides().has_permission(request, self) else "",
+            include_permission_restricted=_include_preview_permissions(request, self),
+        )
+        return response.Response(
+            {
+                "query": query,
+                "screens": [serialize_screen_guide(item) for item in results["screens"]],
+                "actions": [serialize_action_guide(item) for item in results["actions"]],
+                "fields": [serialize_field_guide(item) for item in results["fields"]],
+                "services": [serialize_service_guide(item) for item in results["services"]],
+                "workflows": [serialize_workflow_guide(item) for item in results["workflows"]],
             }
         )
 
@@ -49,8 +190,56 @@ class HelpGuideMetadataAPIView(APIView):
         return response.Response(serializer.data)
 
 
-class HelpGuideViewSet(viewsets.ModelViewSet):
+class BaseAdminGuideViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated, CanManageHelpGuides]
+    pagination_class = None
+
+    def get_queryset(self):
+        return self.queryset.order_by(*self.ordering)
+
+    def perform_create(self, serializer):
+        instance = serializer.save(created_by=self.request.user, updated_by=self.request.user)
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action=f"create_{instance.__class__.__name__.lower()}",
+            entity_type=instance.__class__.__name__,
+            entity_id=instance.pk,
+            new_value={"id": instance.pk},
+        )
+
+    def perform_update(self, serializer):
+        instance = serializer.save(updated_by=self.request.user)
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action=f"update_{instance.__class__.__name__.lower()}",
+            entity_type=instance.__class__.__name__,
+            entity_id=instance.pk,
+            new_value={"id": instance.pk},
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_active = False
+        instance.updated_by = request.user
+        instance.save(update_fields=["is_active", "updated_by", "updated_at"])
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action=f"deactivate_{instance.__class__.__name__.lower()}",
+            entity_type=instance.__class__.__name__,
+            entity_id=instance.pk,
+            new_value={"is_active": False},
+        )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class HelpGuideViewSet(BaseAdminGuideViewSet):
     permission_classes = [CanManageHelpGuidesOrReadOnly]
+    queryset = HelpGuide.objects.all()
+    serializer_class = HelpGuideAdminSerializer
+    ordering = ("screen_key", "display_order", "title", "help_guide_id")
     search_fields = [
         "title",
         "screen_key",
@@ -58,76 +247,55 @@ class HelpGuideViewSet(viewsets.ModelViewSet):
         "purpose",
         "before_you_start",
         "step_by_step_guide",
-        "expected_result",
         "common_errors",
-        "related_screen",
-        "related_permission",
         "search_keywords",
     ]
-    ordering_fields = ["display_order", "title", "created_at", "updated_at", "screen_key", "role"]
     filterset_fields = ["screen_key", "role", "workflow_status", "is_active"]
-    pagination_class = None
-
-    def get_queryset(self):
-        if CanManageHelpGuides().has_permission(self.request, self):
-            return HelpGuide.objects.all().order_by("screen_key", "display_order", "title", "help_guide_id")
-        return get_readable_help_guides_queryset(self.request.user).order_by("screen_key", "display_order", "title", "help_guide_id")
 
     def get_serializer_class(self):
         if CanManageHelpGuides().has_permission(self.request, self):
             return HelpGuideAdminSerializer
-        return HelpGuideReadSerializer
+        return HelpGuideReadOnlySerializer
 
-    def perform_create(self, serializer):
-        guide = serializer.save(created_by=self.request.user, updated_by=self.request.user)
-        create_audit_log(
-            request=self.request,
-            user=self.request.user,
-            action="create_help_guide",
-            entity_type="HelpGuide",
-            entity_id=guide.pk,
-            new_value={"screen_key": guide.screen_key, "role": guide.role, "title": guide.title},
-        )
+    def get_queryset(self):
+        if CanManageHelpGuides().has_permission(self.request, self):
+            queryset = super().get_queryset()
+        else:
+            queryset = get_readable_help_guides_queryset(self.request.user)
+        screen_key = str(self.request.query_params.get("screen_key", "")).strip()
+        role = str(self.request.query_params.get("role", "")).strip()
+        workflow_status = str(self.request.query_params.get("workflow_status", "")).strip()
+        is_active = self.request.query_params.get("is_active")
+        if screen_key:
+            queryset = queryset.filter(screen_key=screen_key)
+        if role:
+            queryset = queryset.filter(role=role)
+        if workflow_status:
+            queryset = queryset.filter(workflow_status=workflow_status)
+        if is_active not in (None, ""):
+            queryset = queryset.filter(is_active=str(is_active).lower() == "true")
+        return queryset
 
-    def perform_update(self, serializer):
-        instance = self.get_object()
-        old_value = {
-            "screen_key": instance.screen_key,
-            "role": instance.role,
-            "title": instance.title,
-            "is_active": instance.is_active,
-            "display_order": instance.display_order,
-        }
-        guide = serializer.save(updated_by=self.request.user)
-        create_audit_log(
-            request=self.request,
-            user=self.request.user,
-            action="update_help_guide",
-            entity_type="HelpGuide",
-            entity_id=guide.pk,
-            old_value=old_value,
-            new_value={
-                "screen_key": guide.screen_key,
-                "role": guide.role,
-                "title": guide.title,
-                "is_active": guide.is_active,
-                "display_order": guide.display_order,
-            },
-        )
 
-    def destroy(self, request, *args, **kwargs):
-        guide = self.get_object()
-        old_value = {"title": guide.title, "is_active": guide.is_active}
-        guide.is_active = False
-        guide.updated_by = request.user
-        guide.save(update_fields=["is_active", "updated_by", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="deactivate_help_guide",
-            entity_type="HelpGuide",
-            entity_id=guide.pk,
-            old_value=old_value,
-            new_value={"is_active": guide.is_active},
-        )
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+class HelpGuideActionAdminViewSet(BaseAdminGuideViewSet):
+    queryset = HelpGuideAction.objects.all()
+    serializer_class = HelpGuideActionAdminSerializer
+    ordering = ("screen_key", "display_order", "button_label", "id")
+
+
+class HelpGuideFieldAdminViewSet(BaseAdminGuideViewSet):
+    queryset = HelpGuideField.objects.all()
+    serializer_class = HelpGuideFieldAdminSerializer
+    ordering = ("screen_key", "display_order", "field_label", "id")
+
+
+class HelpGuideServiceAdminViewSet(BaseAdminGuideViewSet):
+    queryset = HelpGuideService.objects.select_related("service", "service__category").all()
+    serializer_class = HelpGuideServiceAdminSerializer
+    ordering = ("service_id", "display_order", "role", "id")
+
+
+class HelpGuideWorkflowAdminViewSet(BaseAdminGuideViewSet):
+    queryset = HelpGuideWorkflow.objects.all()
+    serializer_class = HelpGuideWorkflowAdminSerializer
+    ordering = ("screen_key", "display_order", "workflow_key", "id")

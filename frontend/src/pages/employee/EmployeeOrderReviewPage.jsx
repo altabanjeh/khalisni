@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
+import InlineHelp from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
@@ -80,7 +81,7 @@ function EmployeeOrderReviewPage() {
     [order?.service?.slug],
     null,
   )
-  useRegisterPageHelp({ workflowStatus: order?.status || '' })
+  useRegisterPageHelp({ workflowStatus: order?.status || '', serviceId: order?.service?.id || '' })
   const assignForm = useForm()
   const docsRequestForm = useForm()
   const noteForm = useForm()
@@ -301,10 +302,13 @@ function EmployeeOrderReviewPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-slate-500">جميع المرفقات الخاصة بالطلب في مرحلته الحالية.</div>
               {allowedActions.can_verify_documents ? (
-                <Link className="btn-secondary px-4 py-2 text-xs" to={`/employee/documents/verify?order=${order.id}`}>
+                <div className="flex items-center gap-2">
+                  <Link className="btn-secondary px-4 py-2 text-xs" to={`/employee/documents/verify?order=${order.id}`}>
                   <ShieldCheck className="h-4 w-4" />
                   فتح شاشة التحقق
-                </Link>
+                  </Link>
+                  <InlineHelp actionKey="verify_documents" />
+                </div>
               ) : null}
             </div>
             <div className="mt-5">
@@ -338,9 +342,12 @@ function EmployeeOrderReviewPage() {
             <div className="glass-panel border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span>الطلب ما زال بحالة جديد. يمكنك بدء المراجعة الآن أو سيبدأ النظام المراجعة مع أول إجراء صالح.</span>
-                <button className="btn-primary shrink-0" onClick={handleStartReview} type="button">
+                <div className="flex items-center gap-2">
+                  <button className="btn-primary shrink-0" onClick={handleStartReview} type="button">
                   بدء المراجعة
-                </button>
+                  </button>
+                  <InlineHelp actionKey="start_review" />
+                </div>
               </div>
             </div>
           ) : null}
@@ -438,6 +445,8 @@ function EmployeeOrderReviewPage() {
                 <button className="btn-secondary w-full" type="submit">
                   إرسال الطلب
                 </button>
+                <InlineHelp actionKey="add_internal_note" className="mt-2" />
+                <InlineHelp actionKey="request_missing_documents" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
@@ -535,6 +544,7 @@ function EmployeeOrderReviewPage() {
                 >
                   تعيين المزوّد
                 </button>
+                <InlineHelp actionKey="assign_provider" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
@@ -547,9 +557,12 @@ function EmployeeOrderReviewPage() {
             >
               <DocumentList documents={finalDocuments} />
               {allowedActions.can_complete ? (
-                <button className="btn-primary mt-4 w-full" onClick={handleComplete} type="button">
+                <div className="mt-4 space-y-2">
+                  <button className="btn-primary w-full" onClick={handleComplete} type="button">
                   اعتماد النتيجة وإكمال الطلب
-                </button>
+                  </button>
+                  <InlineHelp actionKey="complete_order" />
+                </div>
               ) : null}
               {canReturnToProvider ? (
                 <form className="mt-4 space-y-3" onSubmit={returnProviderForm.handleSubmit(handleReturnToProvider)}>
@@ -562,6 +575,7 @@ function EmployeeOrderReviewPage() {
                   <button className="btn-secondary w-full" type="submit">
                     إعادة إلى المزوّد
                   </button>
+                  <InlineHelp actionKey="return_to_provider" className="mt-2" />
                 </form>
               ) : null}
               {canReturnToInternalReview ? (
@@ -575,6 +589,7 @@ function EmployeeOrderReviewPage() {
                   <button className="btn-secondary w-full" type="submit">
                     إعادة إلى المراجعة الداخلية
                   </button>
+                  <InlineHelp actionKey="return_to_internal_review" className="mt-2" />
                 </form>
               ) : null}
             </SectionCard>
@@ -596,6 +611,7 @@ function EmployeeOrderReviewPage() {
                 <button className="btn-secondary w-full" type="submit">
                   حفظ الملاحظة
                 </button>
+                <InlineHelp actionKey="add_internal_note" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
@@ -621,15 +637,19 @@ function EmployeeOrderReviewPage() {
                 <button className="btn-secondary w-full" type="submit">
                   إرسال الإشعار
                 </button>
+                <InlineHelp actionKey="send_manual_notification" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
 
           {allowedActions.can_reject ? (
-            <button className="btn-danger w-full" onClick={() => setConfirmReject(true)} type="button">
+            <div className="space-y-2">
+              <button className="btn-danger w-full" onClick={() => setConfirmReject(true)} type="button">
               <XCircle className="h-4 w-4" />
               رفض الطلب
-            </button>
+              </button>
+              <InlineHelp actionKey="reject_order" />
+            </div>
           ) : null}
         </div>
       </div>

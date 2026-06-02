@@ -1,7 +1,11 @@
 import { buildQuery, http, unwrapList, withId } from './client'
 
-function normalizeHelpGuide(record) {
+function normalizeScreen(record) {
   return withId(record, 'help_guide_id')
+}
+
+function normalizeRecord(record) {
+  return withId(record, 'id')
 }
 
 export const helpGuidesApi = {
@@ -9,24 +13,108 @@ export const helpGuidesApi = {
     return http.get(`/help/current/${buildQuery(params)}`)
   },
 
+  async searchHelp(params = {}) {
+    return http.get(`/help/search/${buildQuery(params)}`)
+  },
+
+  async getFieldHelp(params = {}) {
+    return unwrapList(await http.get(`/help/fields/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async getActionHelp(params = {}) {
+    return unwrapList(await http.get(`/help/actions/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async getWorkflowHelp(params = {}) {
+    return unwrapList(await http.get(`/help/workflows/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async getServiceHelp(serviceId, params = {}) {
+    return normalizeRecord(await http.get(`/help/services/${serviceId}/${buildQuery(params)}`))
+  },
+
   async getHelpGuides(params = {}) {
-    return unwrapList(await http.get(`/help/${buildQuery(params)}`)).map(normalizeHelpGuide)
+    return unwrapList(await http.get(`/help/${buildQuery(params)}`)).map(normalizeScreen)
   },
 
-  async getHelpGuide(id) {
-    return normalizeHelpGuide(await http.get(`/help/${id}/`))
+  async getAdminHelpScreens(params = {}) {
+    return unwrapList(await http.get(`/help/admin/screens/${buildQuery(params)}`)).map(normalizeScreen)
   },
 
-  async createHelpGuide(payload) {
-    return normalizeHelpGuide(await http.post('/help/', payload))
+  async createAdminHelpScreen(payload) {
+    return normalizeScreen(await http.post('/help/admin/screens/', payload))
   },
 
-  async updateHelpGuide(id, payload) {
-    return normalizeHelpGuide(await http.patch(`/help/${id}/`, payload))
+  async updateAdminHelpScreen(id, payload) {
+    return normalizeScreen(await http.patch(`/help/admin/screens/${id}/`, payload))
   },
 
-  deleteHelpGuide(id) {
-    return http.delete(`/help/${id}/`)
+  deleteAdminHelpScreen(id) {
+    return http.delete(`/help/admin/screens/${id}/`)
+  },
+
+  async getAdminHelpFields(params = {}) {
+    return unwrapList(await http.get(`/help/admin/fields/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async createAdminHelpField(payload) {
+    return normalizeRecord(await http.post('/help/admin/fields/', payload))
+  },
+
+  async updateAdminHelpField(id, payload) {
+    return normalizeRecord(await http.patch(`/help/admin/fields/${id}/`, payload))
+  },
+
+  deleteAdminHelpField(id) {
+    return http.delete(`/help/admin/fields/${id}/`)
+  },
+
+  async getAdminHelpActions(params = {}) {
+    return unwrapList(await http.get(`/help/admin/actions/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async createAdminHelpAction(payload) {
+    return normalizeRecord(await http.post('/help/admin/actions/', payload))
+  },
+
+  async updateAdminHelpAction(id, payload) {
+    return normalizeRecord(await http.patch(`/help/admin/actions/${id}/`, payload))
+  },
+
+  deleteAdminHelpAction(id) {
+    return http.delete(`/help/admin/actions/${id}/`)
+  },
+
+  async getAdminHelpServices(params = {}) {
+    return unwrapList(await http.get(`/help/admin/services/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async createAdminHelpService(payload) {
+    return normalizeRecord(await http.post('/help/admin/services/', payload))
+  },
+
+  async updateAdminHelpService(id, payload) {
+    return normalizeRecord(await http.patch(`/help/admin/services/${id}/`, payload))
+  },
+
+  deleteAdminHelpService(id) {
+    return http.delete(`/help/admin/services/${id}/`)
+  },
+
+  async getAdminHelpWorkflows(params = {}) {
+    return unwrapList(await http.get(`/help/admin/workflows/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async createAdminHelpWorkflow(payload) {
+    return normalizeRecord(await http.post('/help/admin/workflows/', payload))
+  },
+
+  async updateAdminHelpWorkflow(id, payload) {
+    return normalizeRecord(await http.patch(`/help/admin/workflows/${id}/`, payload))
+  },
+
+  deleteAdminHelpWorkflow(id) {
+    return http.delete(`/help/admin/workflows/${id}/`)
   },
 
   getHelpGuideMetadata() {
@@ -35,4 +123,3 @@ export const helpGuidesApi = {
 }
 
 export default helpGuidesApi
-

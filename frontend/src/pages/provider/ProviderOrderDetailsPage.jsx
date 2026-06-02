@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import DocumentList from '../../components/DocumentList'
 import FileUploader from '../../components/FileUploader'
+import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
@@ -49,7 +50,7 @@ function ProviderOrderDetailsPage() {
   const { id } = useParams()
   const { toast } = useToast()
   const { data: order, loading, error, reload } = useAsyncData(() => api.getProviderOrder(id), [id], null)
-  useRegisterPageHelp({ workflowStatus: order?.status || '' })
+  useRegisterPageHelp({ workflowStatus: order?.status || '', serviceId: order?.service?.id || '' })
   const statusForm = useForm()
   const noteForm = useForm()
   const uploadForm = useForm({
@@ -153,6 +154,9 @@ function ProviderOrderDetailsPage() {
             description="حدّث الحالة فقط عندما تكون المرحلة التالية جاهزة فعلاً."
           >
             <form className="space-y-4" onSubmit={statusForm.handleSubmit(handleStatus)}>
+              <label className="mb-2 block text-sm font-semibold text-ink">
+                <HelpLabel fieldKey="status">حالة التنفيذ</HelpLabel>
+              </label>
               <select className="field" {...statusForm.register('status')}>
                 {!availableStatusTransitions.length ? <option value="">لا توجد حالة انتقال متاحة حالياً</option> : null}
                 {availableStatusTransitions.map((statusValue) => (
@@ -165,14 +169,19 @@ function ProviderOrderDetailsPage() {
               <button className="btn-secondary w-full" disabled={!availableStatusTransitions.length} type="submit">
                 تحديث الحالة
               </button>
+              <InlineHelp actionKey="update_status" className="mt-2" />
             </form>
 
             {allowedActions.can_add_internal_note ? (
               <form className="mt-5 space-y-4 border-t border-border pt-5" onSubmit={noteForm.handleSubmit(handleNote)}>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="internal_note">ملاحظة داخلية</HelpLabel>
+                </label>
                 <textarea className="field min-h-24" placeholder="ملاحظة داخلية" {...noteForm.register('note')} />
                 <button className="btn-secondary w-full" type="submit">
                   إضافة ملاحظة
                 </button>
+                <InlineHelp actionKey="add_provider_note" className="mt-2" />
               </form>
             ) : null}
           </SectionCard>
@@ -191,7 +200,7 @@ function ProviderOrderDetailsPage() {
                 accept={buildAcceptValue()}
                 error={uploadForm.formState.errors.file}
                 hint={buildUploadHint()}
-                label="الملف النهائي"
+                label={<HelpLabel fieldKey="final_file">الملف النهائي</HelpLabel>}
                 registration={uploadForm.register('file', {
                   validate: (fileList) => validateSingleFileList(fileList, null, 'الملف النهائي مطلوب'),
                 })}
@@ -207,6 +216,7 @@ function ProviderOrderDetailsPage() {
               <button className="btn-primary w-full" disabled={!canUploadFinal} type="submit">
                 رفع النتيجة
               </button>
+              <InlineHelp actionKey="upload_final_result" className="mt-2" />
               {!canUploadFinal ? (
                 <p className="text-sm text-slate-500">لا يمكن رفع النتيجة النهائية قبل السماح بذلك من مسار الطلب الحالي.</p>
               ) : null}

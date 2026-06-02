@@ -1,0 +1,2934 @@
+{
+  "generated_from": "python manage.py generate_help_registry",
+  "screens": [
+    {
+      "screen_key": "customer_dashboard",
+      "route_path": "/customer",
+      "label": "Customer Dashboard"
+    },
+    {
+      "screen_key": "customer_create_order",
+      "route_path": "/customer/orders/new",
+      "label": "Customer Create Order"
+    },
+    {
+      "screen_key": "customer_orders",
+      "route_path": "/customer/orders",
+      "label": "Customer Orders"
+    },
+    {
+      "screen_key": "customer_order_details",
+      "route_path": "/customer/orders/:id",
+      "label": "Customer Order Details"
+    },
+    {
+      "screen_key": "customer_missing_documents",
+      "route_path": "/customer/orders/:id/missing-docs",
+      "label": "Customer Missing Documents Response"
+    },
+    {
+      "screen_key": "customer_profile",
+      "route_path": "/customer/profile",
+      "label": "Customer Profile"
+    },
+    {
+      "screen_key": "employee_dashboard",
+      "route_path": "/employee",
+      "label": "Employee Dashboard"
+    },
+    {
+      "screen_key": "employee_review_queue",
+      "route_path": "/employee/orders",
+      "label": "Employee Review Queue"
+    },
+    {
+      "screen_key": "employee_order_review",
+      "route_path": "/employee/orders/:id",
+      "label": "Employee Order Review"
+    },
+    {
+      "screen_key": "employee_verify_documents",
+      "route_path": "/employee/documents/verify",
+      "label": "Employee Verify Documents"
+    },
+    {
+      "screen_key": "employee_reports",
+      "route_path": "/employee/reports",
+      "label": "Employee Reports"
+    },
+    {
+      "screen_key": "employee_missing_service_requests",
+      "route_path": "/employee/missing-service-requests",
+      "label": "Employee Missing Service Requests"
+    },
+    {
+      "screen_key": "employee_service_categories",
+      "route_path": "/employee/service-categories",
+      "label": "Employee Service Categories"
+    },
+    {
+      "screen_key": "employee_service_relations",
+      "route_path": "/employee/service-relations",
+      "label": "Employee Service Relations"
+    },
+    {
+      "screen_key": "admin_dashboard",
+      "route_path": "/admin",
+      "label": "Admin Dashboard"
+    },
+    {
+      "screen_key": "admin_orders",
+      "route_path": "/admin/orders",
+      "label": "Admin Orders Management"
+    },
+    {
+      "screen_key": "admin_order_details",
+      "route_path": "/admin/orders/:id",
+      "label": "Admin Order Details"
+    },
+    {
+      "screen_key": "admin_rules",
+      "route_path": "/admin/rules",
+      "label": "Admin Rule Management"
+    },
+    {
+      "screen_key": "admin_system_settings",
+      "route_path": "/admin/cms",
+      "label": "Admin System Settings"
+    },
+    {
+      "screen_key": "admin_service_categories",
+      "route_path": "/admin/service-categories",
+      "label": "Admin Service Categories"
+    },
+    {
+      "screen_key": "admin_services",
+      "route_path": "/admin/services",
+      "label": "Admin Services"
+    },
+    {
+      "screen_key": "admin_service_relations",
+      "route_path": "/admin/service-relations",
+      "label": "Admin Service Relations"
+    },
+    {
+      "screen_key": "admin_public_site",
+      "route_path": "/admin/public-site",
+      "label": "Admin Public Site"
+    },
+    {
+      "screen_key": "admin_homepage_content",
+      "route_path": "/admin/public-site/content",
+      "label": "Admin Homepage Content"
+    },
+    {
+      "screen_key": "admin_advertisements",
+      "route_path": "/admin/public-site/advertisements",
+      "label": "Admin Advertisements"
+    },
+    {
+      "screen_key": "admin_theme_settings",
+      "route_path": "/admin/public-site/theme",
+      "label": "Admin Theme Settings"
+    },
+    {
+      "screen_key": "admin_missing_service_requests",
+      "route_path": "/admin/missing-service-requests",
+      "label": "Admin Missing Service Requests"
+    },
+    {
+      "screen_key": "admin_users_roles",
+      "route_path": "/admin/users",
+      "label": "Admin Users And Roles"
+    },
+    {
+      "screen_key": "admin_providers",
+      "route_path": "/admin/providers",
+      "label": "Admin Providers"
+    },
+    {
+      "screen_key": "admin_provider_services",
+      "route_path": "/admin/provider-services",
+      "label": "Admin Provider Service Assignments"
+    },
+    {
+      "screen_key": "admin_reports",
+      "route_path": "/admin/reports",
+      "label": "Admin Reports"
+    },
+    {
+      "screen_key": "admin_notifications",
+      "route_path": "/admin/notifications",
+      "label": "Admin Notifications"
+    },
+    {
+      "screen_key": "admin_payments",
+      "route_path": "/admin/payments",
+      "label": "Admin Payments"
+    },
+    {
+      "screen_key": "admin_audit_log",
+      "route_path": "/admin/audit",
+      "label": "Admin Audit Log"
+    },
+    {
+      "screen_key": "admin_help_guides",
+      "route_path": "/admin/help-guides",
+      "label": "Admin Help Guides"
+    },
+    {
+      "screen_key": "provider_dashboard",
+      "route_path": "/provider",
+      "label": "Provider Dashboard"
+    },
+    {
+      "screen_key": "provider_orders",
+      "route_path": "/provider/orders",
+      "label": "Provider Assigned Orders"
+    },
+    {
+      "screen_key": "provider_order_details",
+      "route_path": "/provider/orders/:id",
+      "label": "Provider Order Details"
+    }
+  ],
+  "roles": [
+    "customer",
+    "admin",
+    "employee",
+    "provider",
+    "support"
+  ],
+  "permissions": [
+    {
+      "app_label": "accounts",
+      "codename": "add_customerprofile",
+      "full_codename": "accounts.add_customerprofile",
+      "name": "Can add customer profile"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "add_customuser",
+      "full_codename": "accounts.add_customuser",
+      "name": "Can add User"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "add_systemsetting",
+      "full_codename": "accounts.add_systemsetting",
+      "name": "Can add system setting"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "change_customerprofile",
+      "full_codename": "accounts.change_customerprofile",
+      "name": "Can change customer profile"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "change_customuser",
+      "full_codename": "accounts.change_customuser",
+      "name": "Can change User"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "change_systemsetting",
+      "full_codename": "accounts.change_systemsetting",
+      "name": "Can change system setting"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "delete_customerprofile",
+      "full_codename": "accounts.delete_customerprofile",
+      "name": "Can delete customer profile"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "delete_customuser",
+      "full_codename": "accounts.delete_customuser",
+      "name": "Can delete User"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "delete_systemsetting",
+      "full_codename": "accounts.delete_systemsetting",
+      "name": "Can delete system setting"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "manage_user_roles",
+      "full_codename": "accounts.manage_user_roles",
+      "name": "Can manage users and roles"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "view_customerprofile",
+      "full_codename": "accounts.view_customerprofile",
+      "name": "Can view customer profile"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "view_customuser",
+      "full_codename": "accounts.view_customuser",
+      "name": "Can view User"
+    },
+    {
+      "app_label": "accounts",
+      "codename": "view_systemsetting",
+      "full_codename": "accounts.view_systemsetting",
+      "name": "Can view system setting"
+    },
+    {
+      "app_label": "admin",
+      "codename": "add_logentry",
+      "full_codename": "admin.add_logentry",
+      "name": "Can add log entry"
+    },
+    {
+      "app_label": "admin",
+      "codename": "change_logentry",
+      "full_codename": "admin.change_logentry",
+      "name": "Can change log entry"
+    },
+    {
+      "app_label": "admin",
+      "codename": "delete_logentry",
+      "full_codename": "admin.delete_logentry",
+      "name": "Can delete log entry"
+    },
+    {
+      "app_label": "admin",
+      "codename": "view_logentry",
+      "full_codename": "admin.view_logentry",
+      "name": "Can view log entry"
+    },
+    {
+      "app_label": "audit",
+      "codename": "add_auditlog",
+      "full_codename": "audit.add_auditlog",
+      "name": "Can add Audit log"
+    },
+    {
+      "app_label": "audit",
+      "codename": "change_auditlog",
+      "full_codename": "audit.change_auditlog",
+      "name": "Can change Audit log"
+    },
+    {
+      "app_label": "audit",
+      "codename": "delete_auditlog",
+      "full_codename": "audit.delete_auditlog",
+      "name": "Can delete Audit log"
+    },
+    {
+      "app_label": "audit",
+      "codename": "view_auditlog",
+      "full_codename": "audit.view_auditlog",
+      "name": "Can view Audit log"
+    },
+    {
+      "app_label": "auth",
+      "codename": "add_group",
+      "full_codename": "auth.add_group",
+      "name": "Can add group"
+    },
+    {
+      "app_label": "auth",
+      "codename": "add_permission",
+      "full_codename": "auth.add_permission",
+      "name": "Can add permission"
+    },
+    {
+      "app_label": "auth",
+      "codename": "change_group",
+      "full_codename": "auth.change_group",
+      "name": "Can change group"
+    },
+    {
+      "app_label": "auth",
+      "codename": "change_permission",
+      "full_codename": "auth.change_permission",
+      "name": "Can change permission"
+    },
+    {
+      "app_label": "auth",
+      "codename": "delete_group",
+      "full_codename": "auth.delete_group",
+      "name": "Can delete group"
+    },
+    {
+      "app_label": "auth",
+      "codename": "delete_permission",
+      "full_codename": "auth.delete_permission",
+      "name": "Can delete permission"
+    },
+    {
+      "app_label": "auth",
+      "codename": "view_group",
+      "full_codename": "auth.view_group",
+      "name": "Can view group"
+    },
+    {
+      "app_label": "auth",
+      "codename": "view_permission",
+      "full_codename": "auth.view_permission",
+      "name": "Can view permission"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "add_token",
+      "full_codename": "authtoken.add_token",
+      "name": "Can add Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "add_tokenproxy",
+      "full_codename": "authtoken.add_tokenproxy",
+      "name": "Can add Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "change_token",
+      "full_codename": "authtoken.change_token",
+      "name": "Can change Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "change_tokenproxy",
+      "full_codename": "authtoken.change_tokenproxy",
+      "name": "Can change Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "delete_token",
+      "full_codename": "authtoken.delete_token",
+      "name": "Can delete Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "delete_tokenproxy",
+      "full_codename": "authtoken.delete_tokenproxy",
+      "name": "Can delete Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "view_token",
+      "full_codename": "authtoken.view_token",
+      "name": "Can view Token"
+    },
+    {
+      "app_label": "authtoken",
+      "codename": "view_tokenproxy",
+      "full_codename": "authtoken.view_tokenproxy",
+      "name": "Can view Token"
+    },
+    {
+      "app_label": "contenttypes",
+      "codename": "add_contenttype",
+      "full_codename": "contenttypes.add_contenttype",
+      "name": "Can add content type"
+    },
+    {
+      "app_label": "contenttypes",
+      "codename": "change_contenttype",
+      "full_codename": "contenttypes.change_contenttype",
+      "name": "Can change content type"
+    },
+    {
+      "app_label": "contenttypes",
+      "codename": "delete_contenttype",
+      "full_codename": "contenttypes.delete_contenttype",
+      "name": "Can delete content type"
+    },
+    {
+      "app_label": "contenttypes",
+      "codename": "view_contenttype",
+      "full_codename": "contenttypes.view_contenttype",
+      "name": "Can view content type"
+    },
+    {
+      "app_label": "documents",
+      "codename": "add_document",
+      "full_codename": "documents.add_document",
+      "name": "Can add Document"
+    },
+    {
+      "app_label": "documents",
+      "codename": "change_document",
+      "full_codename": "documents.change_document",
+      "name": "Can change Document"
+    },
+    {
+      "app_label": "documents",
+      "codename": "delete_document",
+      "full_codename": "documents.delete_document",
+      "name": "Can delete Document"
+    },
+    {
+      "app_label": "documents",
+      "codename": "delete_sensitive_document",
+      "full_codename": "documents.delete_sensitive_document",
+      "name": "Can delete sensitive documents"
+    },
+    {
+      "app_label": "documents",
+      "codename": "upload_final_document",
+      "full_codename": "documents.upload_final_document",
+      "name": "Can upload final documents"
+    },
+    {
+      "app_label": "documents",
+      "codename": "verify_document",
+      "full_codename": "documents.verify_document",
+      "name": "Can verify documents"
+    },
+    {
+      "app_label": "documents",
+      "codename": "view_document",
+      "full_codename": "documents.view_document",
+      "name": "Can view Document"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "add_notification",
+      "full_codename": "notifications.add_notification",
+      "name": "Can add Notification"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "add_notificationtemplate",
+      "full_codename": "notifications.add_notificationtemplate",
+      "name": "Can add Notification template"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "change_notification",
+      "full_codename": "notifications.change_notification",
+      "name": "Can change Notification"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "change_notificationtemplate",
+      "full_codename": "notifications.change_notificationtemplate",
+      "name": "Can change Notification template"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "delete_notification",
+      "full_codename": "notifications.delete_notification",
+      "name": "Can delete Notification"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "delete_notificationtemplate",
+      "full_codename": "notifications.delete_notificationtemplate",
+      "name": "Can delete Notification template"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "send_manual_notification",
+      "full_codename": "notifications.send_manual_notification",
+      "name": "Can send manual notifications"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "view_notification",
+      "full_codename": "notifications.view_notification",
+      "name": "Can view Notification"
+    },
+    {
+      "app_label": "notifications",
+      "codename": "view_notificationtemplate",
+      "full_codename": "notifications.view_notificationtemplate",
+      "name": "Can view Notification template"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_missingdocumentrequest",
+      "full_codename": "orders.add_missingdocumentrequest",
+      "name": "Can add Missing document request"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_order",
+      "full_codename": "orders.add_order",
+      "name": "Can add Order"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_orderassignmenthistory",
+      "full_codename": "orders.add_orderassignmenthistory",
+      "name": "Can add order assignment history"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_orderissue",
+      "full_codename": "orders.add_orderissue",
+      "name": "Can add order issue"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_ordernote",
+      "full_codename": "orders.add_ordernote",
+      "name": "Can add Order note"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_orderstatuslog",
+      "full_codename": "orders.add_orderstatuslog",
+      "name": "Can add Order status log"
+    },
+    {
+      "app_label": "orders",
+      "codename": "add_rating",
+      "full_codename": "orders.add_rating",
+      "name": "Can add Rating"
+    },
+    {
+      "app_label": "orders",
+      "codename": "assign_order",
+      "full_codename": "orders.assign_order",
+      "name": "Can assign orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "cancel_order",
+      "full_codename": "orders.cancel_order",
+      "name": "Can cancel orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_missingdocumentrequest",
+      "full_codename": "orders.change_missingdocumentrequest",
+      "name": "Can change Missing document request"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_order",
+      "full_codename": "orders.change_order",
+      "name": "Can change Order"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_orderassignmenthistory",
+      "full_codename": "orders.change_orderassignmenthistory",
+      "name": "Can change order assignment history"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_orderissue",
+      "full_codename": "orders.change_orderissue",
+      "name": "Can change order issue"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_ordernote",
+      "full_codename": "orders.change_ordernote",
+      "name": "Can change Order note"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_orderstatuslog",
+      "full_codename": "orders.change_orderstatuslog",
+      "name": "Can change Order status log"
+    },
+    {
+      "app_label": "orders",
+      "codename": "change_rating",
+      "full_codename": "orders.change_rating",
+      "name": "Can change Rating"
+    },
+    {
+      "app_label": "orders",
+      "codename": "complete_order",
+      "full_codename": "orders.complete_order",
+      "name": "Can complete orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_missingdocumentrequest",
+      "full_codename": "orders.delete_missingdocumentrequest",
+      "name": "Can delete Missing document request"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_order",
+      "full_codename": "orders.delete_order",
+      "name": "Can delete Order"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_orderassignmenthistory",
+      "full_codename": "orders.delete_orderassignmenthistory",
+      "name": "Can delete order assignment history"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_orderissue",
+      "full_codename": "orders.delete_orderissue",
+      "name": "Can delete order issue"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_ordernote",
+      "full_codename": "orders.delete_ordernote",
+      "name": "Can delete Order note"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_orderstatuslog",
+      "full_codename": "orders.delete_orderstatuslog",
+      "name": "Can delete Order status log"
+    },
+    {
+      "app_label": "orders",
+      "codename": "delete_rating",
+      "full_codename": "orders.delete_rating",
+      "name": "Can delete Rating"
+    },
+    {
+      "app_label": "orders",
+      "codename": "export_order_reports",
+      "full_codename": "orders.export_order_reports",
+      "name": "Can export order reports"
+    },
+    {
+      "app_label": "orders",
+      "codename": "manage_order_workflow",
+      "full_codename": "orders.manage_order_workflow",
+      "name": "Can manage order workflow"
+    },
+    {
+      "app_label": "orders",
+      "codename": "process_order",
+      "full_codename": "orders.process_order",
+      "name": "Can process provider work"
+    },
+    {
+      "app_label": "orders",
+      "codename": "reject_order",
+      "full_codename": "orders.reject_order",
+      "name": "Can reject orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "request_missing_documents",
+      "full_codename": "orders.request_missing_documents",
+      "name": "Can request missing documents"
+    },
+    {
+      "app_label": "orders",
+      "codename": "review_order",
+      "full_codename": "orders.review_order",
+      "name": "Can review orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "submit_order",
+      "full_codename": "orders.submit_order",
+      "name": "Can submit orders"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_missingdocumentrequest",
+      "full_codename": "orders.view_missingdocumentrequest",
+      "name": "Can view Missing document request"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_order",
+      "full_codename": "orders.view_order",
+      "name": "Can view Order"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_orderassignmenthistory",
+      "full_codename": "orders.view_orderassignmenthistory",
+      "name": "Can view order assignment history"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_orderissue",
+      "full_codename": "orders.view_orderissue",
+      "name": "Can view order issue"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_ordernote",
+      "full_codename": "orders.view_ordernote",
+      "name": "Can view Order note"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_orderstatuslog",
+      "full_codename": "orders.view_orderstatuslog",
+      "name": "Can view Order status log"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_rating",
+      "full_codename": "orders.view_rating",
+      "name": "Can view Rating"
+    },
+    {
+      "app_label": "orders",
+      "codename": "view_reports_dashboard",
+      "full_codename": "orders.view_reports_dashboard",
+      "name": "Can view reports dashboard"
+    },
+    {
+      "app_label": "payment",
+      "codename": "add_payment",
+      "full_codename": "payment.add_payment",
+      "name": "Can add Payment"
+    },
+    {
+      "app_label": "payment",
+      "codename": "change_payment",
+      "full_codename": "payment.change_payment",
+      "name": "Can change Payment"
+    },
+    {
+      "app_label": "payment",
+      "codename": "create_payment_record",
+      "full_codename": "payment.create_payment_record",
+      "name": "Can create payment records"
+    },
+    {
+      "app_label": "payment",
+      "codename": "delete_payment",
+      "full_codename": "payment.delete_payment",
+      "name": "Can delete Payment"
+    },
+    {
+      "app_label": "payment",
+      "codename": "refund_payment",
+      "full_codename": "payment.refund_payment",
+      "name": "Can refund or adjust payments"
+    },
+    {
+      "app_label": "payment",
+      "codename": "view_payment",
+      "full_codename": "payment.view_payment",
+      "name": "Can view Payment"
+    },
+    {
+      "app_label": "payment",
+      "codename": "view_payment_status",
+      "full_codename": "payment.view_payment_status",
+      "name": "Can view payment status"
+    },
+    {
+      "app_label": "providers",
+      "codename": "add_providerprofile",
+      "full_codename": "providers.add_providerprofile",
+      "name": "Can add provider profile"
+    },
+    {
+      "app_label": "providers",
+      "codename": "change_providerprofile",
+      "full_codename": "providers.change_providerprofile",
+      "name": "Can change provider profile"
+    },
+    {
+      "app_label": "providers",
+      "codename": "delete_providerprofile",
+      "full_codename": "providers.delete_providerprofile",
+      "name": "Can delete provider profile"
+    },
+    {
+      "app_label": "providers",
+      "codename": "view_providerprofile",
+      "full_codename": "providers.view_providerprofile",
+      "name": "Can view provider profile"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "add_advertisement",
+      "full_codename": "public_site.add_advertisement",
+      "name": "Can add Advertisement"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "add_missingservicerequest",
+      "full_codename": "public_site.add_missingservicerequest",
+      "name": "Can add Missing service request"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "add_publicpagecontent",
+      "full_codename": "public_site.add_publicpagecontent",
+      "name": "Can add Public page content"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "add_sitetheme",
+      "full_codename": "public_site.add_sitetheme",
+      "name": "Can add Site theme"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "change_advertisement",
+      "full_codename": "public_site.change_advertisement",
+      "name": "Can change Advertisement"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "change_missingservicerequest",
+      "full_codename": "public_site.change_missingservicerequest",
+      "name": "Can change Missing service request"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "change_publicpagecontent",
+      "full_codename": "public_site.change_publicpagecontent",
+      "name": "Can change Public page content"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "change_sitetheme",
+      "full_codename": "public_site.change_sitetheme",
+      "name": "Can change Site theme"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "delete_advertisement",
+      "full_codename": "public_site.delete_advertisement",
+      "name": "Can delete Advertisement"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "delete_missingservicerequest",
+      "full_codename": "public_site.delete_missingservicerequest",
+      "name": "Can delete Missing service request"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "delete_publicpagecontent",
+      "full_codename": "public_site.delete_publicpagecontent",
+      "name": "Can delete Public page content"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "delete_sitetheme",
+      "full_codename": "public_site.delete_sitetheme",
+      "name": "Can delete Site theme"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "view_advertisement",
+      "full_codename": "public_site.view_advertisement",
+      "name": "Can view Advertisement"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "view_missingservicerequest",
+      "full_codename": "public_site.view_missingservicerequest",
+      "name": "Can view Missing service request"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "view_publicpagecontent",
+      "full_codename": "public_site.view_publicpagecontent",
+      "name": "Can view Public page content"
+    },
+    {
+      "app_label": "public_site",
+      "codename": "view_sitetheme",
+      "full_codename": "public_site.view_sitetheme",
+      "name": "Can view Site theme"
+    },
+    {
+      "app_label": "services",
+      "codename": "add_address",
+      "full_codename": "services.add_address",
+      "name": "Can add address"
+    },
+    {
+      "app_label": "services",
+      "codename": "add_service",
+      "full_codename": "services.add_service",
+      "name": "Can add Service"
+    },
+    {
+      "app_label": "services",
+      "codename": "add_servicecategory",
+      "full_codename": "services.add_servicecategory",
+      "name": "Can add Service category"
+    },
+    {
+      "app_label": "services",
+      "codename": "add_serviceproviderassignment",
+      "full_codename": "services.add_serviceproviderassignment",
+      "name": "Can add service provider assignment"
+    },
+    {
+      "app_label": "services",
+      "codename": "add_servicerequireddocument",
+      "full_codename": "services.add_servicerequireddocument",
+      "name": "Can add service required document"
+    },
+    {
+      "app_label": "services",
+      "codename": "change_address",
+      "full_codename": "services.change_address",
+      "name": "Can change address"
+    },
+    {
+      "app_label": "services",
+      "codename": "change_service",
+      "full_codename": "services.change_service",
+      "name": "Can change Service"
+    },
+    {
+      "app_label": "services",
+      "codename": "change_servicecategory",
+      "full_codename": "services.change_servicecategory",
+      "name": "Can change Service category"
+    },
+    {
+      "app_label": "services",
+      "codename": "change_serviceproviderassignment",
+      "full_codename": "services.change_serviceproviderassignment",
+      "name": "Can change service provider assignment"
+    },
+    {
+      "app_label": "services",
+      "codename": "change_servicerequireddocument",
+      "full_codename": "services.change_servicerequireddocument",
+      "name": "Can change service required document"
+    },
+    {
+      "app_label": "services",
+      "codename": "delete_address",
+      "full_codename": "services.delete_address",
+      "name": "Can delete address"
+    },
+    {
+      "app_label": "services",
+      "codename": "delete_service",
+      "full_codename": "services.delete_service",
+      "name": "Can delete Service"
+    },
+    {
+      "app_label": "services",
+      "codename": "delete_servicecategory",
+      "full_codename": "services.delete_servicecategory",
+      "name": "Can delete Service category"
+    },
+    {
+      "app_label": "services",
+      "codename": "delete_serviceproviderassignment",
+      "full_codename": "services.delete_serviceproviderassignment",
+      "name": "Can delete service provider assignment"
+    },
+    {
+      "app_label": "services",
+      "codename": "delete_servicerequireddocument",
+      "full_codename": "services.delete_servicerequireddocument",
+      "name": "Can delete service required document"
+    },
+    {
+      "app_label": "services",
+      "codename": "manage_service_prices",
+      "full_codename": "services.manage_service_prices",
+      "name": "Can manage services and prices"
+    },
+    {
+      "app_label": "services",
+      "codename": "view_address",
+      "full_codename": "services.view_address",
+      "name": "Can view address"
+    },
+    {
+      "app_label": "services",
+      "codename": "view_service",
+      "full_codename": "services.view_service",
+      "name": "Can view Service"
+    },
+    {
+      "app_label": "services",
+      "codename": "view_servicecategory",
+      "full_codename": "services.view_servicecategory",
+      "name": "Can view Service category"
+    },
+    {
+      "app_label": "services",
+      "codename": "view_serviceproviderassignment",
+      "full_codename": "services.view_serviceproviderassignment",
+      "name": "Can view service provider assignment"
+    },
+    {
+      "app_label": "services",
+      "codename": "view_servicerequireddocument",
+      "full_codename": "services.view_servicerequireddocument",
+      "name": "Can view service required document"
+    },
+    {
+      "app_label": "sessions",
+      "codename": "add_session",
+      "full_codename": "sessions.add_session",
+      "name": "Can add session"
+    },
+    {
+      "app_label": "sessions",
+      "codename": "change_session",
+      "full_codename": "sessions.change_session",
+      "name": "Can change session"
+    },
+    {
+      "app_label": "sessions",
+      "codename": "delete_session",
+      "full_codename": "sessions.delete_session",
+      "name": "Can delete session"
+    },
+    {
+      "app_label": "sessions",
+      "codename": "view_session",
+      "full_codename": "sessions.view_session",
+      "name": "Can view session"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "add_blacklistedtoken",
+      "full_codename": "token_blacklist.add_blacklistedtoken",
+      "name": "Can add Blacklisted Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "add_outstandingtoken",
+      "full_codename": "token_blacklist.add_outstandingtoken",
+      "name": "Can add Outstanding Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "change_blacklistedtoken",
+      "full_codename": "token_blacklist.change_blacklistedtoken",
+      "name": "Can change Blacklisted Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "change_outstandingtoken",
+      "full_codename": "token_blacklist.change_outstandingtoken",
+      "name": "Can change Outstanding Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "delete_blacklistedtoken",
+      "full_codename": "token_blacklist.delete_blacklistedtoken",
+      "name": "Can delete Blacklisted Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "delete_outstandingtoken",
+      "full_codename": "token_blacklist.delete_outstandingtoken",
+      "name": "Can delete Outstanding Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "view_blacklistedtoken",
+      "full_codename": "token_blacklist.view_blacklistedtoken",
+      "name": "Can view Blacklisted Token"
+    },
+    {
+      "app_label": "token_blacklist",
+      "codename": "view_outstandingtoken",
+      "full_codename": "token_blacklist.view_outstandingtoken",
+      "name": "Can view Outstanding Token"
+    }
+  ],
+  "status_values": [
+    {
+      "value": "NEW",
+      "label": "New"
+    },
+    {
+      "value": "UNDER_REVIEW",
+      "label": "Under review"
+    },
+    {
+      "value": "WAITING_CUSTOMER",
+      "label": "Waiting customer"
+    },
+    {
+      "value": "ASSIGNED",
+      "label": "Assigned"
+    },
+    {
+      "value": "IN_PROGRESS",
+      "label": "In progress"
+    },
+    {
+      "value": "WAITING_GOVERNMENT",
+      "label": "Waiting government"
+    },
+    {
+      "value": "READY_FOR_DELIVERY",
+      "label": "Ready for delivery"
+    },
+    {
+      "value": "COMPLETED",
+      "label": "Completed"
+    },
+    {
+      "value": "REJECTED",
+      "label": "Rejected"
+    },
+    {
+      "value": "CANCELLED",
+      "label": "Cancelled"
+    },
+    {
+      "value": "ARCHIVED",
+      "label": "Archived"
+    }
+  ],
+  "model_fields": {
+    "Order": [
+      {
+        "name": "id",
+        "type": "BigAutoField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "order_number",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 32
+      },
+      {
+        "name": "customer",
+        "type": "ForeignKey",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "organization",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "branch",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "service",
+        "type": "ForeignKey",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "service_name_snapshot",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "service_category_name_snapshot",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "organization_name_snapshot",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "status",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 30
+      },
+      {
+        "name": "priority",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 20
+      },
+      {
+        "name": "assigned_provider",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "assigned_provider_organization",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "assigned_by",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "assigned_employee",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "city",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 120
+      },
+      {
+        "name": "expected_delivery_date",
+        "type": "DateField",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "final_price",
+        "type": "DecimalField",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "customer_notes",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "missing_document_types",
+        "type": "JSONField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "internal_notes",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "rejection_reason",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "cancellation_reason",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "created_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "updated_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "completed_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "cancelled_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "archived_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": true,
+        "max_length": null
+      }
+    ],
+    "Service": [
+      {
+        "name": "service_id",
+        "type": "BigAutoField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "service_number",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 30
+      },
+      {
+        "name": "category",
+        "type": "ForeignKey",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "organization",
+        "type": "ForeignKey",
+        "required": false,
+        "null": true,
+        "max_length": null
+      },
+      {
+        "name": "scope",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 30
+      },
+      {
+        "name": "name_ar",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "name_en",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "slug",
+        "type": "SlugField",
+        "required": true,
+        "null": false,
+        "max_length": 255
+      },
+      {
+        "name": "short_description_ar",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 300
+      },
+      {
+        "name": "short_description_en",
+        "type": "CharField",
+        "required": false,
+        "null": false,
+        "max_length": 300
+      },
+      {
+        "name": "description_ar",
+        "type": "TextField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "description_en",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "image",
+        "type": "FileField",
+        "required": false,
+        "null": true,
+        "max_length": 100
+      },
+      {
+        "name": "required_information_schema",
+        "type": "JSONField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "price_type",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 20
+      },
+      {
+        "name": "base_price",
+        "type": "DecimalField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "government_fee",
+        "type": "DecimalField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "service_fee",
+        "type": "DecimalField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "estimated_duration",
+        "type": "PositiveIntegerField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "estimated_duration_unit",
+        "type": "CharField",
+        "required": true,
+        "null": false,
+        "max_length": 10
+      },
+      {
+        "name": "terms_ar",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "terms_en",
+        "type": "TextField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "is_online",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "requires_appointment",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "requires_manual_review",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "provider_required",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "is_featured",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "is_active",
+        "type": "BooleanField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "display_order",
+        "type": "PositiveIntegerField",
+        "required": true,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "created_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      },
+      {
+        "name": "updated_at",
+        "type": "DateTimeField",
+        "required": false,
+        "null": false,
+        "max_length": null
+      }
+    ]
+  },
+  "serializer_fields": {
+    "PublicOrderCreateSerializer": [
+      {
+        "name": "service",
+        "type": "PrimaryKeyRelatedField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "organization",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      },
+      {
+        "name": "branch_id",
+        "type": "PrimaryKeyRelatedField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "full_name",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 255
+      },
+      {
+        "name": "phone",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 30
+      },
+      {
+        "name": "national_id",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": 32
+      },
+      {
+        "name": "city",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 120
+      },
+      {
+        "name": "notes",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      },
+      {
+        "name": "consent",
+        "type": "BooleanField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "document_types",
+        "type": "ListField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "documents",
+        "type": "ListField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      }
+    ],
+    "DocumentUploadSerializer": [
+      {
+        "name": "id",
+        "type": "ReadOnlyField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "document_type",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 120
+      },
+      {
+        "name": "file",
+        "type": "FileField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "is_final_document",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "verification_note",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      }
+    ],
+    "ServiceDetailSerializer": [
+      {
+        "name": "id",
+        "type": "ReadOnlyField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "category",
+        "type": "ServiceCategorySerializer",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "organization_id",
+        "type": "IntegerField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "scope",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "name_ar",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 255
+      },
+      {
+        "name": "name_en",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 255
+      },
+      {
+        "name": "display_name",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "slug",
+        "type": "SlugField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": 255
+      },
+      {
+        "name": "description_ar",
+        "type": "CharField",
+        "required": true,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "description_en",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      },
+      {
+        "name": "estimated_duration",
+        "type": "IntegerField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "base_price",
+        "type": "DecimalField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "government_fee",
+        "type": "DecimalField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "service_fee",
+        "type": "DecimalField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "total_fee",
+        "type": "DecimalField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "effective_total_fee",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "is_featured",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "is_active",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "short_description_ar",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": 300
+      },
+      {
+        "name": "short_description_en",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": 300
+      },
+      {
+        "name": "required_information_schema",
+        "type": "JSONField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "price_type",
+        "type": "ChoiceField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "estimated_duration_unit",
+        "type": "ChoiceField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "steps_en",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "terms_ar",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      },
+      {
+        "name": "terms_en",
+        "type": "CharField",
+        "required": false,
+        "allow_blank": true,
+        "max_length": null
+      },
+      {
+        "name": "is_online",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "requires_appointment",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "requires_manual_review",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "provider_required",
+        "type": "BooleanField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "display_order",
+        "type": "IntegerField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "required_documents",
+        "type": "ListSerializer",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "steps",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "prerequisite_services",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "recommended_services",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      },
+      {
+        "name": "related_services",
+        "type": "SerializerMethodField",
+        "required": false,
+        "allow_blank": false,
+        "max_length": null
+      }
+    ]
+  },
+  "workflow_actions": [
+    {
+      "from_status": "NEW",
+      "to_status": "UNDER_REVIEW",
+      "action": "start_review",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "internal_actor_required"
+      ],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "NEW",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin",
+        "customer"
+      ],
+      "validation_checks": [
+        "customer_owns_order"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "UNDER_REVIEW",
+      "to_status": "WAITING_CUSTOMER",
+      "action": "request_missing_documents",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "note_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "UNDER_REVIEW",
+      "to_status": "ASSIGNED",
+      "action": "assign_provider",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "provider_required",
+        "required_documents_approved",
+        "provider_approved",
+        "provider_available",
+        "provider_service_match"
+      ],
+      "reason_required": false,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "UNDER_REVIEW",
+      "to_status": "REJECTED",
+      "action": "reject_order",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "reason_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "UNDER_REVIEW",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "assigned_employee_or_unassigned"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "WAITING_CUSTOMER",
+      "to_status": "UNDER_REVIEW",
+      "action": "resume_review",
+      "allowed_roles": [
+        "admin",
+        "customer",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "all_missing_documents_uploaded"
+      ],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "WAITING_CUSTOMER",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "assigned_employee_or_unassigned"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "ASSIGNED",
+      "to_status": "IN_PROGRESS",
+      "action": "provider_start_work",
+      "allowed_roles": [
+        "provider"
+      ],
+      "validation_checks": [
+        "assigned_provider_only"
+      ],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "ASSIGNED",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "IN_PROGRESS",
+      "to_status": "WAITING_GOVERNMENT",
+      "action": "provider_pause_for_government",
+      "allowed_roles": [
+        "provider"
+      ],
+      "validation_checks": [
+        "assigned_provider_only"
+      ],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "IN_PROGRESS",
+      "to_status": "READY_FOR_DELIVERY",
+      "action": "mark_ready_for_delivery",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "provider",
+        "support"
+      ],
+      "validation_checks": [
+        "final_document_required",
+        "required_documents_approved"
+      ],
+      "reason_required": false,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "IN_PROGRESS",
+      "to_status": "REJECTED",
+      "action": "reject_order",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "reason_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "IN_PROGRESS",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "WAITING_GOVERNMENT",
+      "to_status": "IN_PROGRESS",
+      "action": "provider_resume_work",
+      "allowed_roles": [
+        "provider"
+      ],
+      "validation_checks": [
+        "assigned_provider_only"
+      ],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "WAITING_GOVERNMENT",
+      "to_status": "READY_FOR_DELIVERY",
+      "action": "mark_ready_for_delivery",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "provider",
+        "support"
+      ],
+      "validation_checks": [
+        "final_document_required",
+        "required_documents_approved"
+      ],
+      "reason_required": false,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "WAITING_GOVERNMENT",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "READY_FOR_DELIVERY",
+      "to_status": "UNDER_REVIEW",
+      "action": "return_to_internal_review",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "reason_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": false,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "READY_FOR_DELIVERY",
+      "to_status": "IN_PROGRESS",
+      "action": "return_to_provider",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "assigned_provider_required",
+        "reason_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": false,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "READY_FOR_DELIVERY",
+      "to_status": "COMPLETED",
+      "action": "complete_order",
+      "allowed_roles": [
+        "admin",
+        "employee",
+        "support"
+      ],
+      "validation_checks": [
+        "final_document_verified_or_admin_override"
+      ],
+      "reason_required": false,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "READY_FOR_DELIVERY",
+      "to_status": "CANCELLED",
+      "action": "cancel_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": false
+    },
+    {
+      "from_status": "COMPLETED",
+      "to_status": "UNDER_REVIEW",
+      "action": "reopen_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [
+        "reason_required"
+      ],
+      "reason_required": true,
+      "notification_trigger": true,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "COMPLETED",
+      "to_status": "ARCHIVED",
+      "action": "archive_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "REJECTED",
+      "to_status": "ARCHIVED",
+      "action": "archive_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": true
+    },
+    {
+      "from_status": "CANCELLED",
+      "to_status": "ARCHIVED",
+      "action": "archive_order",
+      "allowed_roles": [
+        "admin"
+      ],
+      "validation_checks": [],
+      "reason_required": false,
+      "notification_trigger": false,
+      "generic_status_update": true
+    }
+  ],
+  "frontend_buttons": [
+    {
+      "file": "src\\pages\\admin\\AdminCmsPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminCmsPage.jsx",
+      "label": "+ إعداد جديد"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminCmsPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminCmsPage.jsx",
+      "label": "{submitting && } {selectedSetting ? 'حفظ التعديلات' : 'إضافة الإعداد'}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminOrderDetailsPage.jsx",
+      "label": "{submitting === 'status' ? 'جارٍ التحديث...' : 'تحديث الحالة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminOrderDetailsPage.jsx",
+      "label": "{submitting === 'assign' ? 'جارٍ التعيين...' : 'تعيين المزوّد'}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminOrderDetailsPage.jsx",
+      "label": "{submitting === 'note' ? 'جارٍ الحفظ...' : 'حفظ الملاحظة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminOrderDetailsPage.jsx",
+      "label": "setConfirmComplete(true)} type=\"button\"> إكمال الطلب"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminOrderDetailsPage.jsx",
+      "label": "setConfirmReject(true)} type=\"button\"> رفض الطلب"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "{label}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openServiceEditor(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openConfirm('Disable service', 'Used services are only disabled, never removed from history.', async () => { await api.deleteAdminService(row.id) reloadServices() setConfirmState({ open: false, title: '', description: '', onConfirm: null }) }) } type=\"button\" > Disable"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openDocumentEditor(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openConfirm('Disable document rule', 'Orders keep their uploaded files. Only the future requirement is disabled.', async () => { await api.deleteAdminServiceDocument(row.id) reloadDocuments() setConfirmState({ open: false, title: '', description: '', onConfirm: null }) }) } type=\"button\" > Disable"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openAssignmentEditor(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openConfirm('Disable assignment rule', 'This keeps audit history and only stops future matching.', async () => { await api.deleteAdminServiceAssignment(row.id) reloadAssignments() setConfirmState({ open: false, title: '', description: '', onConfirm: null }) }) } type=\"button\" > Disable"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openProviderEditor(row.id)} type=\"button\"> Manage"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openTemplateEditor(row.id || row.template_id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openConfirm('Disable template', 'This keeps the template for audit but stops using it.', async () => { await api.deleteAdminNotificationTemplate(row.id || row.template_id) reloadTemplates() setConfirmState({ open: false, title: '', description: '', onConfirm: null }) }) } type=\"button\" > Disable"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openPaymentEditor(row.id)} type=\"button\"> Update"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openUserEditor(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openConfirm('Deactivate user', 'This keeps the account for audit and blocks future access.', async () => { await api.deleteAdminUser(row.id) reloadUsers() setConfirmState({ open: false, title: '', description: '', onConfirm: null }) }) } type=\"button\" > Deactivate"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openSettingEditor(row.id || row.setting_id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openServiceEditor()} type=\"button\"> New service"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openDocumentEditor()} type=\"button\"> New document rule"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openAssignmentEditor()} type=\"button\"> New assignment rule"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openTemplateEditor()} type=\"button\"> New template"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openUserEditor()} type=\"button\"> New user"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "reloadAudit()} type=\"button\"> Refresh logs"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "setAuditFilters(DEFAULT_AUDIT_FILTERS)} type=\"button\"> Clear filters"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "openSettingEditor()} type=\"button\"> New setting"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save service"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save document rule"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save assignment rule"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Close"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save approval decision"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save activation"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Preview"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save template"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Update payment status"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save user"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminRuleManagementPage.jsx",
+      "label": "Save setting"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "{saving && } حفظ الصلاحيات"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\" > تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "setPendingDelete(row)} type=\"button\" > تعطيل"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "+ مستخدم تشغيلي جديد"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "{submitting && } {selectedUser ? 'حفظ التعديلات' : 'إضافة المستخدم'}"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "إغلاق"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "setActiveTab('info')} type=\"button\" > البيانات"
+    },
+    {
+      "file": "src\\pages\\admin\\AdminUsersRolesPage.jsx",
+      "label": "setActiveTab('perms')} type=\"button\" > الصلاحيات"
+    },
+    {
+      "file": "src\\pages\\admin\\AdvertisementManagerPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\AdvertisementManagerPage.jsx",
+      "label": "handleDelete(row.id)} type=\"button\"> حذف"
+    },
+    {
+      "file": "src\\pages\\admin\\AdvertisementManagerPage.jsx",
+      "label": "إعلان جديد"
+    },
+    {
+      "file": "src\\pages\\admin\\AdvertisementManagerPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\AdvertisementManagerPage.jsx",
+      "label": "{selectedAdvertisement ? 'حفظ التعديلات' : 'إضافة الإعلان'}"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "{label}"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "+ New {currentConfig.title}"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "openEdit(row)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "setPendingDelete(row)} type=\"button\"> Deactivate"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\admin\\HelpGuideManagementPage.jsx",
+      "label": "{selectedRecord ? 'Save changes' : 'Create entry'}"
+    },
+    {
+      "file": "src\\pages\\admin\\HomepageContentEditorPage.jsx",
+      "label": "حفظ المحتوى"
+    },
+    {
+      "file": "src\\pages\\admin\\PaymentsManagementPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> تعديل الحالة"
+    },
+    {
+      "file": "src\\pages\\admin\\PaymentsManagementPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\PaymentsManagementPage.jsx",
+      "label": "{submitting && } تحديث الحالة"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "handleApprovalChange(row, row.is_approved ? 'reject' : 'approve')} type=\"button\" > {row.is_approved ? 'إلغاء الاعتماد' : 'اعتماد'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "handleActivationChange(row, !row.account_active)} type=\"button\" > {row.account_active ? 'إيقاف الحساب' : 'تفعيل الحساب'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "setPendingDelete(row)} type=\"button\" > تعطيل"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "+ مزود جديد"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\ProvidersManagementPage.jsx",
+      "label": "{submitting && } {selectedProvider ? 'حفظ التعديلات' : 'إضافة المزود'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ServiceProviderAssignmentsPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServiceProviderAssignmentsPage.jsx",
+      "label": "setPendingDelete(row.id)} type=\"button\" > حذف"
+    },
+    {
+      "file": "src\\pages\\admin\\ServiceProviderAssignmentsPage.jsx",
+      "label": "+ ربط جديد"
+    },
+    {
+      "file": "src\\pages\\admin\\ServiceProviderAssignmentsPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\ServiceProviderAssignmentsPage.jsx",
+      "label": "{submitting && } {selectedAssignment ? 'حفظ التعديلات' : 'ربط الخدمة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "+ حقل مطلوب"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "onRemoveField(field.row_id)} type=\"button\" > حذف الحقل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openCategoryForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "setPendingDelete({ type: 'category', item: row })} type=\"button\" > تعطيل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openServiceForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "setPendingDelete({ type: 'service', item: row })} type=\"button\" > تعطيل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openDocumentForm(row.id)} type=\"button\"> تعديل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "setPendingDelete({ type: 'document', item: row })} type=\"button\" > تعطيل"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openCategoryForm()} type=\"button\"> + فئة جديدة"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openServiceForm()} type=\"button\"> + خدمة جديدة"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "openDocumentForm()} type=\"button\"> + وثيقة مطلوبة"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "{submitting && } {selectedCategory ? 'حفظ التعديلات' : 'إضافة الفئة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "{submitting && } {selectedService ? 'حفظ التعديلات' : 'إضافة الخدمة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "إلغاء"
+    },
+    {
+      "file": "src\\pages\\admin\\ServicesManagementPage.jsx",
+      "label": "{submitting && } {selectedDocument ? 'حفظ التعديلات' : 'إضافة الوثيقة'}"
+    },
+    {
+      "file": "src\\pages\\admin\\ThemeSettingsPage.jsx",
+      "label": "حفظ إعدادات المظهر"
+    },
+    {
+      "file": "src\\pages\\customer\\CustomerCreateOrderPage.jsx",
+      "label": "حفظ كمسودة"
+    },
+    {
+      "file": "src\\pages\\customer\\CustomerCreateOrderPage.jsx",
+      "label": "إرسال الطلب"
+    },
+    {
+      "file": "src\\pages\\customer\\CustomerOrderDetailsPage.jsx",
+      "label": "رفع الوثيقة"
+    },
+    {
+      "file": "src\\pages\\customer\\CustomerOrderDetailsPage.jsx",
+      "label": "إرسال التقييم"
+    },
+    {
+      "file": "src\\pages\\customer\\CustomerOrderDetailsPage.jsx",
+      "label": "setConfirmCancel(true)} type=\"button\"> إلغاء الطلب"
+    },
+    {
+      "file": "src\\pages\\customer\\MissingDocumentsResponsePage.jsx",
+      "label": "{isSubmitting ? 'جارٍ الرفع...' : 'رفع المستندات وإعادة الإرسال'}"
+    },
+    {
+      "file": "src\\pages\\customer\\ProfilePage.jsx",
+      "label": "حفظ التعديلات"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "بدء المراجعة"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "إرسال الطلب"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "تعيين المزوّد"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "اعتماد النتيجة وإكمال الطلب"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "إعادة إلى المزوّد"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "إعادة إلى المراجعة الداخلية"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "حفظ الملاحظة"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "إرسال الإشعار"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeOrderReviewPage.jsx",
+      "label": "setConfirmReject(true)} type=\"button\"> رفض الطلب"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeReviewQueuePage.jsx",
+      "label": "إعادة ضبط الفلاتر"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeVerifyDocumentsPage.jsx",
+      "label": "setSelectedDocumentId(document.id)} type=\"button\" > {document.original_filename} {document.order?.order_number}"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeVerifyDocumentsPage.jsx",
+      "label": "submitVerification(true)} type=\"button\"> اعتماد الوثيقة"
+    },
+    {
+      "file": "src\\pages\\employee\\EmployeeVerifyDocumentsPage.jsx",
+      "label": "submitVerification(false)} type=\"button\" > رفض الوثيقة وطلب استبدالها"
+    },
+    {
+      "file": "src\\pages\\provider\\ProviderOrderDetailsPage.jsx",
+      "label": "تحديث الحالة"
+    },
+    {
+      "file": "src\\pages\\provider\\ProviderOrderDetailsPage.jsx",
+      "label": "إضافة ملاحظة"
+    },
+    {
+      "file": "src\\pages\\provider\\ProviderOrderDetailsPage.jsx",
+      "label": "رفع النتيجة"
+    },
+    {
+      "file": "src\\pages\\public\\ContactPage.jsx",
+      "label": "{isArabic ? 'إرسال' : 'Send'}"
+    },
+    {
+      "file": "src\\pages\\public\\LoginPage.jsx",
+      "label": "{isSubmitting ? (isArabic ? 'جارٍ تسجيل الدخول...' : 'Signing in...') : isArabic ? 'دخول' : 'Sign in'}"
+    },
+    {
+      "file": "src\\pages\\public\\RegisterPage.jsx",
+      "label": "{isSubmitting ? (isArabic ? 'جارٍ إنشاء الحساب...' : 'Creating account...') : isArabic ? 'إنشاء الحساب' : 'Create account'}"
+    },
+    {
+      "file": "src\\pages\\public\\TrackOrderPage.jsx",
+      "label": "{isSubmitting ? (isArabic ? 'جارٍ البحث...' : 'Searching...') : isArabic ? 'عرض الحالة' : 'Show status'}"
+    },
+    {
+      "file": "src\\pages\\shared\\MissingServiceRequestsPage.jsx",
+      "label": "setSelectedId(row.id)} type=\"button\" > فتح"
+    },
+    {
+      "file": "src\\pages\\shared\\MissingServiceRequestsPage.jsx",
+      "label": "{saving ? 'جارٍ الحفظ...' : 'حفظ التحديث'}"
+    },
+    {
+      "file": "src\\pages\\shared\\MissingServiceRequestsPage.jsx",
+      "label": "تحديث القائمة"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "handleMove(row, -1)} type=\"button\">"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "handleMove(row, 1)} type=\"button\">"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "setPendingDeactivate(row)} type=\"button\" > Deactivate"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "+ New Category"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceCategoryManagementPage.jsx",
+      "label": "{submitting && } {selectedCategory ? 'Save Changes' : 'Create Category'}"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceRelationsManagementPage.jsx",
+      "label": "openEditForm(row.id)} type=\"button\"> Edit"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceRelationsManagementPage.jsx",
+      "label": "setPendingDeactivate(row)} type=\"button\" > Deactivate"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceRelationsManagementPage.jsx",
+      "label": "+ New Relation"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceRelationsManagementPage.jsx",
+      "label": "Cancel"
+    },
+    {
+      "file": "src\\pages\\shared\\ServiceRelationsManagementPage.jsx",
+      "label": "{submitting && } {selectedRelation ? 'Save Changes' : 'Create Relation'}"
+    }
+  ]
+}

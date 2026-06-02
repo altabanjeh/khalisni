@@ -4,9 +4,11 @@ import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import FileUploader from '../../components/FileUploader'
 import DynamicServiceFields from '../../components/DynamicServiceFields'
+import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
+import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatCurrency } from '../../utils/format'
@@ -65,6 +67,7 @@ function CustomerCreateOrderPage() {
   )
   const requiredDocuments = selectedServiceDetails?.required_documents || []
   const schemaFields = getServiceSchemaFields(selectedServiceDetails)
+  useRegisterPageHelp({ serviceId: selectedService?.id || '' })
 
   useEffect(() => {
     const storedDraft = localStorage.getItem(draftStorageKey)
@@ -190,10 +193,12 @@ function CustomerCreateOrderPage() {
               <Save className="h-4 w-4" />
               حفظ كمسودة
             </button>
+            <InlineHelp actionKey="save_draft" className="self-center" />
             <button className="btn-primary" form="client-create-order" type="submit">
               <CheckCircle2 className="h-4 w-4" />
               إرسال الطلب
             </button>
+            <InlineHelp actionKey="submit_order" className="self-center" />
           </>
         }
         description="أدخل الخدمة المطلوبة، راجع الوثائق الإلزامية، ثم أرسل الطلب إلى فريق العمليات. تم تنظيم الشاشة وفق معيار العميل في ملف التوحيد."
@@ -209,7 +214,9 @@ function CustomerCreateOrderPage() {
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار تصنيف الخدمة</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-ink">تصنيف الخدمة</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="category_slug">تصنيف الخدمة</HelpLabel>
+                </label>
                 <select className="field" {...register('category_slug', { required: 'اختر تصنيف الخدمة' })}>
                   <option value="">اختر التصنيف</option>
                   {categories.map((category) => (
@@ -228,7 +235,9 @@ function CustomerCreateOrderPage() {
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار الخدمة والبيانات الأساسية</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-ink">الخدمة</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="service">الخدمة</HelpLabel>
+                </label>
                 <select className="field" {...register('service', { required: 'اختر الخدمة المطلوبة' })}>
                   <option value="">اختر الخدمة</option>
                   {filteredServices.map((service) => (
@@ -241,24 +250,32 @@ function CustomerCreateOrderPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-ink">الاسم الكامل</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="full_name">الاسم الكامل</HelpLabel>
+                </label>
                 <input className="field" {...register('full_name', { required: 'الاسم الكامل مطلوب' })} />
                 {errors.full_name ? <p className="mt-2 text-sm text-danger">{errors.full_name.message}</p> : null}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-ink">رقم الهاتف</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="phone">رقم الهاتف</HelpLabel>
+                </label>
                 <input className="field" {...register('phone', { required: 'رقم الهاتف مطلوب' })} />
                 {errors.phone ? <p className="mt-2 text-sm text-danger">{errors.phone.message}</p> : null}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-ink">الرقم الوطني</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="national_id">الرقم الوطني</HelpLabel>
+                </label>
                 <input className="field" {...register('national_id')} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-ink">المدينة</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="city">المدينة</HelpLabel>
+                </label>
                 <input className="field" {...register('city', { required: 'المدينة مطلوبة' })} />
                 {errors.city ? <p className="mt-2 text-sm text-danger">{errors.city.message}</p> : null}
               </div>
@@ -291,7 +308,7 @@ function CustomerCreateOrderPage() {
                         accept={buildAcceptValue(document)}
                         error={errors[fieldName]}
                         hint={buildUploadHint(document)}
-                        label={label}
+                        label={<HelpLabel fieldKey="documents">{label}</HelpLabel>}
                         registration={register(fieldName, {
                           validate: (fileList) =>
                             validateSingleFileList(
@@ -309,7 +326,7 @@ function CustomerCreateOrderPage() {
                   accept={buildAcceptValue()}
                   error={errors.documents}
                   hint={buildUploadHint()}
-                  label="رفع الوثائق"
+                  label={<HelpLabel fieldKey="documents">رفع الوثائق</HelpLabel>}
                   multiple
                   name="documents"
                   register={register}
@@ -319,12 +336,17 @@ function CustomerCreateOrderPage() {
                 />
               )}
               <div>
-                <label className="mb-2 block text-sm font-semibold text-ink">ملاحظات إضافية</label>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="notes">ملاحظات إضافية</HelpLabel>
+                </label>
                 <textarea className="field min-h-28" {...register('notes')} />
               </div>
               <label className="flex items-start gap-3 rounded-3xl border border-border bg-white px-4 py-4 text-sm">
                 <input className="mt-1" type="checkbox" {...register('consent', { required: 'يجب الموافقة على الشروط' })} />
-                <span>أوافق على استخدام الوثائق والبيانات لإتمام الخدمة فقط وإشعاري بأي نواقص مطلوبة.</span>
+                <span className="inline-flex items-center gap-2">
+                  <span>أوافق على استخدام الوثائق والبيانات لإتمام الخدمة فقط وإشعاري بأي نواقص مطلوبة.</span>
+                  <InlineHelp fieldKey="consent" title="الموافقة" />
+                </span>
               </label>
               {errors.consent ? <p className="text-sm text-danger">{errors.consent.message}</p> : null}
               {errors.root?.server ? <p className="text-sm text-danger">{errors.root.server.message}</p> : null}

@@ -46,9 +46,13 @@ class HelpGuide(models.Model):
     step_by_step_guide = models.TextField(blank=True)
     expected_result = models.TextField(blank=True)
     common_errors = models.TextField(blank=True)
+    when_to_use = models.TextField(blank=True)
+    main_workflow = models.CharField(max_length=120, blank=True)
+    next_step = models.TextField(blank=True)
     related_screen = models.CharField(max_length=100, blank=True)
     related_permission = models.CharField(max_length=120, blank=True)
     search_keywords = models.TextField(blank=True)
+    internal_notes = models.TextField(blank=True)
     display_order = models.PositiveIntegerField(default=0, db_index=True)
     is_active = models.BooleanField(default=True, db_index=True)
     created_by = models.ForeignKey(
@@ -90,3 +94,154 @@ class HelpGuide(models.Model):
         _validate_permission_key(self.permission_key, field_name="permission_key")
         _validate_permission_key(self.related_permission, field_name="related_permission")
 
+
+class HelpGuideBase(models.Model):
+    screen_key = models.CharField(max_length=100, blank=True, db_index=True)
+    role = models.CharField(
+        max_length=40,
+        choices=HelpGuide.Audience.choices,
+        default=HelpGuide.Audience.ALL_USERS,
+        db_index=True,
+    )
+    permission_key = models.CharField(max_length=120, blank=True, db_index=True)
+    search_keywords = models.TextField(blank=True)
+    internal_notes = models.TextField(blank=True)
+    display_order = models.PositiveIntegerField(default=0, db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="%(class)s_created_entries",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="%(class)s_updated_entries",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+    def clean(self):
+        _validate_permission_key(self.permission_key, field_name="permission_key")
+
+
+class HelpGuideAction(HelpGuideBase):
+    button_key = models.CharField(max_length=120, db_index=True)
+    button_label = models.CharField(max_length=255)
+    purpose = models.TextField(blank=True)
+    when_to_use = models.TextField(blank=True)
+    action_result = models.TextField(blank=True)
+    status_before = models.CharField(max_length=40, blank=True, db_index=True)
+    status_after = models.CharField(max_length=40, blank=True, db_index=True)
+    notification_triggered = models.TextField(blank=True)
+    warning_message = models.TextField(blank=True)
+    common_errors = models.TextField(blank=True)
+    safety_rule = models.TextField(blank=True)
+    confirmation_message = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["screen_key", "display_order", "button_label", "id"]
+        indexes = [
+            models.Index(fields=["screen_key", "role", "is_active"]),
+            models.Index(fields=["screen_key", "status_before", "is_active"]),
+            models.Index(fields=["button_key", "role", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.button_label} ({self.screen_key or 'general'} / {self.role})"
+
+
+class HelpGuideField(HelpGuideBase):
+    field_key = models.CharField(max_length=120, db_index=True)
+    field_label = models.CharField(max_length=255)
+    model_name = models.CharField(max_length=120, blank=True)
+    model_field = models.CharField(max_length=120, blank=True)
+    purpose = models.TextField(blank=True)
+    required = models.BooleanField(default=False)
+    editable = models.BooleanField(default=True)
+    data_type = models.CharField(max_length=50, blank=True)
+    accepted_format = models.TextField(blank=True)
+    valid_example = models.TextField(blank=True)
+    invalid_example = models.TextField(blank=True)
+    validation_rule = models.TextField(blank=True)
+    error_explanation = models.TextField(blank=True)
+    placeholder_text = models.TextField(blank=True)
+    tooltip_text = models.TextField(blank=True)
+    default_value = models.TextField(blank=True)
+    max_length = models.PositiveIntegerField(null=True, blank=True)
+    who_can_edit = models.TextField(blank=True)
+    locked_when = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["screen_key", "display_order", "field_label", "id"]
+        indexes = [
+            models.Index(fields=["screen_key", "role", "is_active"]),
+            models.Index(fields=["field_key", "role", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.field_label} ({self.screen_key or 'general'} / {self.role})"
+
+
+class HelpGuideService(HelpGuideBase):
+    service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.CASCADE,
+        related_name="help_guides",
+    )
+    description = models.TextField(blank=True)
+    who_can_use = models.TextField(blank=True)
+    required_documents = models.TextField(blank=True)
+    optional_documents = models.TextField(blank=True)
+    required_data = models.TextField(blank=True)
+    prerequisites = models.TextField(blank=True)
+    related_services = models.TextField(blank=True)
+    workflow_summary = models.TextField(blank=True)
+    final_output = models.TextField(blank=True)
+    common_errors = models.TextField(blank=True)
+    common_rejection_reasons = models.TextField(blank=True)
+    common_missing_document_reasons = models.TextField(blank=True)
+    estimated_processing_time = models.TextField(blank=True)
+    price_rule = models.TextField(blank=True)
+    provider_requirement = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["service_id", "display_order", "role", "id"]
+        indexes = [
+            models.Index(fields=["service", "role", "is_active"]),
+            models.Index(fields=["screen_key", "role", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.service_id} / {self.role}"
+
+
+class HelpGuideWorkflow(HelpGuideBase):
+    workflow_key = models.CharField(max_length=120, db_index=True)
+    current_status = models.CharField(max_length=40, blank=True, db_index=True)
+    action_key = models.CharField(max_length=120, blank=True, db_index=True)
+    action_label = models.CharField(max_length=255, blank=True)
+    next_status = models.CharField(max_length=40, blank=True, db_index=True)
+    required_fields = models.TextField(blank=True)
+    system_effect = models.TextField(blank=True)
+    notification_effect = models.TextField(blank=True)
+    blocked_cases = models.TextField(blank=True)
+    correction_process = models.TextField(blank=True)
+    button_key = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        ordering = ["screen_key", "display_order", "current_status", "workflow_key", "id"]
+        indexes = [
+            models.Index(fields=["screen_key", "current_status", "is_active"]),
+            models.Index(fields=["workflow_key", "role", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.workflow_key} ({self.current_status} -> {self.next_status})"

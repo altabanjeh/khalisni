@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import FileUploader from '../../components/FileUploader'
+import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
@@ -69,7 +70,7 @@ function CustomerOrderDetailsPage() {
     [order?.service?.slug],
     null,
   )
-  useRegisterPageHelp({ workflowStatus: order?.status || '' })
+  useRegisterPageHelp({ workflowStatus: order?.status || '', serviceId: order?.service?.id || '' })
 
   if (loading || !order) return <LoadingSpinner />
 
@@ -143,6 +144,7 @@ function CustomerOrderDetailsPage() {
               <UploadCloud className="h-4 w-4" />
               فتح شاشة النواقص
             </Link>
+            <InlineHelp actionKey="open_missing_documents" className="self-center" />
           </div>
         </div>
       ) : null}
@@ -193,6 +195,9 @@ function CustomerOrderDetailsPage() {
               description="إذا كنت تعرف نوع المستند المطلوب، يمكنك رفعه مباشرة من هذه الشاشة."
             >
               <form className="space-y-4" onSubmit={uploadForm.handleSubmit(handleUpload)}>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="document_type">نوع الوثيقة</HelpLabel>
+                </label>
                 <select className="field" {...uploadForm.register('document_type', { required: 'اختر نوع الوثيقة' })}>
                   <option value="">اختر نوع الوثيقة</option>
                   {missingDocumentTypes.map((item) => {
@@ -213,7 +218,7 @@ function CustomerOrderDetailsPage() {
                   accept={buildAcceptValue(selectedRequirement)}
                   error={uploadForm.formState.errors.file}
                   hint={buildUploadHint(selectedRequirement)}
-                  label="الملف"
+                  label={<HelpLabel fieldKey="file">الملف</HelpLabel>}
                   registration={uploadForm.register('file', {
                     validate: (fileList) => validateSingleFileList(fileList, selectedRequirement, 'الملف مطلوب'),
                   })}
@@ -226,6 +231,7 @@ function CustomerOrderDetailsPage() {
                 <button className="btn-secondary w-full" type="submit">
                   رفع الوثيقة
                 </button>
+                <InlineHelp actionKey="upload_customer_document" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
@@ -237,6 +243,9 @@ function CustomerOrderDetailsPage() {
               description="يساعدنا تقييمك في تحسين جودة التنفيذ ومتابعة أداء المزوّد."
             >
               <form className="space-y-4" onSubmit={ratingForm.handleSubmit(handleRating)}>
+                <label className="mb-2 block text-sm font-semibold text-ink">
+                  <HelpLabel fieldKey="score">التقييم</HelpLabel>
+                </label>
                 <input
                   className="field"
                   max="5"
@@ -249,14 +258,18 @@ function CustomerOrderDetailsPage() {
                 <button className="btn-primary w-full" type="submit">
                   إرسال التقييم
                 </button>
+                <InlineHelp actionKey="submit_rating" className="mt-2" />
               </form>
             </SectionCard>
           ) : null}
 
           {allowedActions.can_cancel ? (
-            <button className="btn-danger w-full" onClick={() => setConfirmCancel(true)} type="button">
-              إلغاء الطلب
-            </button>
+            <div className="space-y-2">
+              <button className="btn-danger w-full" onClick={() => setConfirmCancel(true)} type="button">
+                إلغاء الطلب
+              </button>
+              <InlineHelp actionKey="cancel_order" />
+            </div>
           ) : null}
         </div>
       </div>

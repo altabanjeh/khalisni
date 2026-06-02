@@ -186,6 +186,62 @@ let mockHelpGuides = [
     is_active: true,
   },
 ]
+let mockHelpActions = [
+  {
+    id: 1,
+    screen_key: 'customer_orders',
+    button_key: 'open_order',
+    button_label: 'فتح التفاصيل',
+    role: 'customer',
+    role_label: 'Customer',
+    purpose: 'يفتح شاشة تفاصيل الطلب.',
+    when_to_use: 'استخدمه عند اختيار الطلب الصحيح.',
+    action_result: 'ينتقل المستخدم إلى شاشة تفاصيل الطلب.',
+    warning_message: '',
+    display_order: 10,
+    source: 'registry',
+  },
+]
+let mockHelpFields = [
+  {
+    id: 1,
+    screen_key: 'customer_create_order',
+    field_key: 'service',
+    field_label: 'الخدمة',
+    role: 'customer',
+    role_label: 'Customer',
+    required: true,
+    purpose: 'تحدد الخدمة المطلوب تنفيذها.',
+    accepted_format: 'اختر خدمة فعالة من القائمة.',
+    valid_example: 'تجديد سجل تجاري',
+    error_explanation: 'اختيار خدمة غير مناسبة يؤدي إلى مستندات أو سعر غير صحيح.',
+    tooltip_text: 'اختر الخدمة الدقيقة لأن المتطلبات تعتمد عليها.',
+    display_order: 10,
+    source: 'registry',
+  },
+]
+let mockHelpWorkflows = [
+  {
+    id: 1,
+    screen_key: 'employee_order_review',
+    workflow_key: 'under_review__assign_provider',
+    current_status: 'UNDER_REVIEW',
+    current_status_label: 'Under review',
+    action_key: 'assign_provider',
+    action_label: 'Assign provider',
+    next_status: 'ASSIGNED',
+    next_status_label: 'Assigned',
+    role: 'employee',
+    role_label: 'Employee',
+    required_fields: ['Provider', 'Approved documents'],
+    system_effect: 'Order is assigned to a provider.',
+    notification_effect: 'Provider notification is triggered.',
+    blocked_cases: ['Missing approved required documents'],
+    correction_process: ['Approve documents first, then retry assignment.'],
+    display_order: 10,
+    source: 'registry',
+  },
+]
 const mockHelpGuideMetadata = {
   screens: HELP_SCREEN_REGISTRY.map((item) => ({
     screen_key: item.screen_key,
@@ -485,9 +541,39 @@ export const api = {
         screen_key: params?.screen_key || '',
         screen_label: HELP_SCREEN_REGISTRY.find((item) => item.screen_key === params?.screen_key)?.label || '',
         workflow_status: params?.workflow_status || '',
+        fields: mockHelpFields.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+        actions: mockHelpActions.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+        service: null,
+        workflows: mockHelpWorkflows.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
         results: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
       },
     ),
+  searchHelp: async (params = {}) =>
+    withTestValue(() => helpGuidesApi.searchHelp(params), {
+      query: params?.q || '',
+      screens: mockHelpGuides,
+      actions: mockHelpActions,
+      fields: mockHelpFields,
+      services: [],
+      workflows: mockHelpWorkflows,
+    }),
+  getFieldHelp: async (params = {}) =>
+    withTestValue(
+      () => helpGuidesApi.getFieldHelp(params),
+      mockHelpFields.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+    ),
+  getActionHelp: async (params = {}) =>
+    withTestValue(
+      () => helpGuidesApi.getActionHelp(params),
+      mockHelpActions.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+    ),
+  getWorkflowHelp: async (params = {}) =>
+    withTestValue(
+      () => helpGuidesApi.getWorkflowHelp(params),
+      mockHelpWorkflows.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+    ),
+  getServiceHelp: async (serviceId, params = {}) =>
+    withTestValue(() => helpGuidesApi.getServiceHelp(serviceId, params), null),
   getHelpGuides: async (params = {}) =>
     withTestValue(
       () => helpGuidesApi.getHelpGuides(params),
@@ -502,9 +588,11 @@ export const api = {
       }),
     ),
   getHelpGuideMetadata: async () => withTestValue(() => helpGuidesApi.getHelpGuideMetadata(), mockHelpGuideMetadata),
-  createHelpGuide: async (payload) =>
+  getAdminHelpScreens: async (params = {}) =>
+    withTestValue(() => helpGuidesApi.getAdminHelpScreens(params), mockHelpGuides),
+  createAdminHelpScreen: async (payload) =>
     withTestValue(
-      () => helpGuidesApi.createHelpGuide(payload),
+      () => helpGuidesApi.createAdminHelpScreen(payload),
       (() => {
         const nextId = (mockHelpGuides.at(-1)?.id || 0) + 1
         const created = {
@@ -527,9 +615,9 @@ export const api = {
         return created
       })(),
     ),
-  updateHelpGuide: async (id, payload) =>
+  updateAdminHelpScreen: async (id, payload) =>
     withTestValue(
-      () => helpGuidesApi.updateHelpGuide(id, payload),
+      () => helpGuidesApi.updateAdminHelpScreen(id, payload),
       (() => {
         mockHelpGuides = mockHelpGuides.map((guide) =>
           guide.id === Number(id)
@@ -554,9 +642,9 @@ export const api = {
         return mockHelpGuides.find((guide) => guide.id === Number(id)) || null
       })(),
     ),
-  deleteHelpGuide: async (id) =>
+  deleteAdminHelpScreen: async (id) =>
     withTestValue(
-      () => helpGuidesApi.deleteHelpGuide(id),
+      () => helpGuidesApi.deleteAdminHelpScreen(id),
       (() => {
         mockHelpGuides = mockHelpGuides.map((guide) =>
           guide.id === Number(id) ? { ...guide, is_active: false } : guide,
@@ -564,6 +652,22 @@ export const api = {
         return null
       })(),
     ),
+  getAdminHelpFields: async () => withTestValue(() => helpGuidesApi.getAdminHelpFields(), mockHelpFields),
+  createAdminHelpField: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpField(payload), { id: Date.now(), ...payload }),
+  updateAdminHelpField: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpField(id, payload), { id: Number(id), ...payload }),
+  deleteAdminHelpField: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpField(id), null),
+  getAdminHelpActions: async () => withTestValue(() => helpGuidesApi.getAdminHelpActions(), mockHelpActions),
+  createAdminHelpAction: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpAction(payload), { id: Date.now(), ...payload }),
+  updateAdminHelpAction: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpAction(id, payload), { id: Number(id), ...payload }),
+  deleteAdminHelpAction: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpAction(id), null),
+  getAdminHelpServices: async () => withTestValue(() => helpGuidesApi.getAdminHelpServices(), []),
+  createAdminHelpService: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpService(payload), { id: Date.now(), ...payload }),
+  updateAdminHelpService: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpService(id, payload), { id: Number(id), ...payload }),
+  deleteAdminHelpService: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpService(id), null),
+  getAdminHelpWorkflows: async () => withTestValue(() => helpGuidesApi.getAdminHelpWorkflows(), mockHelpWorkflows),
+  createAdminHelpWorkflow: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpWorkflow(payload), { id: Date.now(), ...payload }),
+  updateAdminHelpWorkflow: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpWorkflow(id, payload), { id: Number(id), ...payload }),
+  deleteAdminHelpWorkflow: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpWorkflow(id), null),
 
   getAvailablePermissions: async () => withTestValue(() => servicesApi.getAvailablePermissions(), {}),
   getUserPermissions: (userId) => servicesApi.getUserPermissions(userId),

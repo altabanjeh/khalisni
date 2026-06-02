@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
 import FileUploader from '../../components/FileUploader'
+import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
@@ -37,7 +38,7 @@ function MissingDocumentsResponsePage() {
     [order?.service?.slug],
     null,
   )
-  useRegisterPageHelp({ workflowStatus: order?.status || '' })
+  useRegisterPageHelp({ workflowStatus: order?.status || '', serviceId: order?.service?.id || '' })
 
   if (loading) return <LoadingSpinner />
 
@@ -126,7 +127,7 @@ function MissingDocumentsResponsePage() {
                   accept={buildAcceptValue(requirement)}
                   error={errors[`file_${index}`]}
                   hint={buildUploadHint(requirement)}
-                  label={label}
+                  label={<HelpLabel fieldKey="missing_document_file">{label}</HelpLabel>}
                   registration={register(`file_${index}`, {
                     validate: (fileList) => validateSingleFileList(fileList, requirement, 'هذا المستند مطلوب قبل إعادة الإرسال'),
                   })}
@@ -139,10 +140,13 @@ function MissingDocumentsResponsePage() {
         {errors.root?.server ? <p className="text-sm text-danger">{errors.root.server.message}</p> : null}
 
         <div className="sticky bottom-4 flex justify-start">
-          <button className="btn-primary" disabled={isSubmitting} type="submit">
-            <UploadCloud className="h-4 w-4" />
-            {isSubmitting ? 'جارٍ الرفع...' : 'رفع المستندات وإعادة الإرسال'}
-          </button>
+          <div className="space-y-2">
+            <button className="btn-primary" disabled={isSubmitting} type="submit">
+              <UploadCloud className="h-4 w-4" />
+              {isSubmitting ? 'جارٍ الرفع...' : 'رفع المستندات وإعادة الإرسال'}
+            </button>
+            <InlineHelp actionKey="resubmit_missing_documents" />
+          </div>
         </div>
 
       </form>

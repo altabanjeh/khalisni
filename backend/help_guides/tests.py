@@ -3,7 +3,8 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser
-from help_guides.models import HelpGuide
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField
+from services.models import Service, ServiceCategory
 
 
 class HelpGuideApiTests(APITestCase):
@@ -50,6 +51,21 @@ class HelpGuideApiTests(APITestCase):
         verify_permission = Permission.objects.get(content_type__app_label="documents", codename="verify_document")
         self.employee.user_permissions.add(review_permission, verify_permission)
         self.support.user_permissions.add(review_permission)
+        self.category = ServiceCategory.objects.create(
+            name_ar="وثائق",
+            name_en="Documents",
+            slug="documents",
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name_ar="خدمة اختبار",
+            name_en="Test Service",
+            slug="test-service",
+            description_ar="وصف خدمة اختبار",
+            required_information_schema=[
+                {"key": "passport_number", "label": "Passport number", "required": True},
+            ],
+        )
 
     def _create_guide(self, **overrides):
         payload = {
@@ -193,3 +209,118 @@ class HelpGuideApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["title"] for item in response.data], ["Dashboard guide"])
+
+    def test_field_action_and_workflow_help_endpoints_return_contextual_rows(self):
+        HelpGuideField.objects.create(
+            screen_key="customer_create_order",
+            field_key="full_name",
+            field_label="Full name",
+            role="customer",
+            purpose="Customer full name",
+            required=True,
+        )
+        HelpGuideAction.objects.create(
+            screen_key="employee_order_review",
+            button_key="request_missing_documents",
+            button_label="Request missing documents",
+            role="employee",
+            permission_key="orders.request_missing_documents",
+            purpose="Ask the customer for missing files",
+        )
+        self.employee.user_permissions.add(
+            Permission.objects.get(content_type__app_label="orders", codename="request_missing_documents")
+        )
+
+        self.client.force_authenticate(self.employee)
+        fields_response = self.client.get("/api/help/fields/?screen_key=customer_create_order")
+        actions_response = self.client.get("/api/help/actions/?screen_key=employee_order_review&workflow_status=UNDER_REVIEW")
+        workflows_response = self.client.get("/api/help/workflows/?screen_key=employee_order_review&status=UNDER_REVIEW")
+
+        self.assertEqual(fields_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(actions_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(workflows_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(any(item["field_key"] == "full_name" for item in fields_response.data))
+        self.assertTrue(any(item["button_key"] == "request_missing_documents" for item in actions_response.data))
+        self.assertTrue(any(item["current_status"] == "UNDER_REVIEW" for item in workflows_response.data))
+
+    def test_service_help_returns_generated_fallback(self):
+        self.client.force_authenticate(self.customer)
+        response = self.client.get(f"/api/help/services/{self.service.pk}/?screen_key=customer_create_order")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["service_id"], self.service.pk)
+        self.assertEqual(response.data["service_name"], self.service.name_ar)
+        self.assertEqual(response.data["source"], "registry")
+        self.assertTrue(response.data["required_data"])
+
+    def test_search_respects_user_role_for_structured_results(self):
+        HelpGuideAction.objects.create(
+            screen_key="employee_order_review",
+            button_key="employee_secret_action",
+            button_label="Employee only action",
+            role="employee",
+            purpose="Hidden from customers",
+            search_keywords="private employee action",
+        )
+
+        self.client.force_authenticate(self.customer)
+        customer_response = self.client.get("/api/help/search/?q=private employee action")
+        self.client.force_authenticate(self.employee)
+        employee_response = self.client.get("/api/help/search/?q=private employee action")
+
+        self.assertEqual(customer_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(employee_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(customer_response.data["actions"], [])
+        self.assertEqual(len(employee_response.data["actions"]), 1)
+
+    def test_normal_user_cannot_access_admin_help_endpoints(self):
+        self.client.force_authenticate(self.customer)
+
+        list_response = self.client.get("/api/help/admin/fields/")
+        create_response = self.client.post(
+            "/api/help/admin/actions/",
+            {
+                "screen_key": "customer_orders",
+                "button_key": "x",
+                "button_label": "X",
+                "role": "customer",
+            },
+            format="json",
+        )
+
+        self.assertEqual(list_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_preview_role_filters_current_help(self):
+        self._create_guide(screen_key="preview_screen", route_path="/preview", role="customer", title="Customer preview guide")
+        self._create_guide(screen_key="preview_screen", route_path="/preview", role="employee", title="Employee preview guide")
+
+        self.client.force_authenticate(self.admin)
+        response = self.client.get("/api/help/current/?screen_key=preview_screen&preview_role=customer")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["title"] for item in response.data["screen_guides"]], ["Customer preview guide"])
+        self.assertEqual(response.data["preview_role"], "customer")
+
+    def test_inactive_field_help_is_hidden(self):
+        HelpGuideField.objects.create(
+            screen_key="customer_create_order",
+            field_key="active_field",
+            field_label="Active field",
+            role="customer",
+            is_active=True,
+        )
+        HelpGuideField.objects.create(
+            screen_key="customer_create_order",
+            field_key="inactive_field",
+            field_label="Inactive field",
+            role="customer",
+            is_active=False,
+        )
+
+        self.client.force_authenticate(self.customer)
+        response = self.client.get("/api/help/fields/?screen_key=customer_create_order")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(any(item["field_key"] == "active_field" for item in response.data))
+        self.assertFalse(any(item["field_key"] == "inactive_field" for item in response.data))
