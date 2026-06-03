@@ -34,8 +34,10 @@ import ProtectedRoute from './ProtectedRoute'
 import HomePage from '../pages/public/HomePage'
 import ServicesPage from '../pages/public/ServicesPage'
 import ServiceDetailsPage from '../pages/public/ServiceDetailsPage'
+import ForgotPasswordPage from '../pages/public/ForgotPasswordPage'
 import LoginPage from '../pages/public/LoginPage'
 import RegisterPage from '../pages/public/RegisterPage'
+import ResetPasswordPage from '../pages/public/ResetPasswordPage'
 
 const CreateOrderPage = lazy(() => import('../pages/public/CreateOrderPage'))
 const TrackOrderPage = lazy(() => import('../pages/public/TrackOrderPage'))
@@ -154,6 +156,8 @@ function AppRoutes() {
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 

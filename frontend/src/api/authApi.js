@@ -9,6 +9,14 @@ export const authApi = {
     return http.post('/auth/login/', payload)
   },
 
+  forgotPassword(payload) {
+    return http.post('/auth/forgot-password/', payload)
+  },
+
+  resetPassword(token, payload) {
+    return http.post(`/auth/reset-password/${encodeURIComponent(token)}/`, payload)
+  },
+
   logout(refresh) {
     return http.post('/auth/logout/', { refresh })
   },

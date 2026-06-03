@@ -6,6 +6,9 @@ export const authApi = {
   login(payload: LoginPayload) {
     return apiClient.post<LoginResponse>('/auth/login/', payload).then((res) => res.data);
   },
+  forgotPassword(email: string) {
+    return apiClient.post<{ detail: string }>('/auth/forgot-password/', { email }).then((res) => res.data);
+  },
   logout(refresh?: string | null) {
     return apiClient.post('/auth/logout/', { refresh }).then((res) => res.data);
   },

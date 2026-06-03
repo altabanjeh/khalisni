@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
 from core.serializer_mixins import PkAsIdMixin
@@ -103,6 +105,26 @@ class RegisterSerializer(serializers.ModelSerializer):
             national_id=validated_data.get("national_id", ""),
             role=CustomUser.Role.CUSTOMER,
         )
+
+
+class ForgotPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, min_length=8, trim_whitespace=False)
+    confirm_new_password = serializers.CharField(write_only=True, min_length=8, trim_whitespace=False)
+
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["confirm_new_password"]:
+            raise serializers.ValidationError({"confirm_new_password": "Passwords do not match."})
+
+        user = self.context["user"]
+        try:
+            validate_password(attrs["new_password"], user=user)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"new_password": list(exc.messages)}) from exc
+        return attrs
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

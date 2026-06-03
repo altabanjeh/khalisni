@@ -5,12 +5,22 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
+from accounts.password_reset import (
+    INVALID_RESET_TOKEN_MESSAGE,
+    PASSWORD_RESET_SUCCESS_MESSAGE,
+    InvalidPasswordResetToken,
+    request_password_reset,
+    reset_password_with_token,
+    validate_password_reset_token,
+)
 from accounts.serializers import (
     AdminUserSerializer,
     CustomTokenObtainPairSerializer,
     CustomerProfileAdminSerializer,
     CustomerProfileSerializer,
+    ForgotPasswordRequestSerializer,
     RegisterSerializer,
+    ResetPasswordSerializer,
     SafeSystemSettingSerializer,
     UserSerializer,
 )
@@ -86,6 +96,46 @@ class MeAPIView(APIView):
 
     def get(self, request):
         return response.Response(UserSerializer(request.user).data)
+
+
+class ForgotPasswordAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = ForgotPasswordRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        message = request_password_reset(email=serializer.validated_data["email"], request=request)
+        return response.Response({"detail": message}, status=status.HTTP_200_OK)
+
+
+class ResetPasswordAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, token):
+        try:
+            token_record = validate_password_reset_token(token)
+        except InvalidPasswordResetToken:
+            return response.Response(
+                {"detail": INVALID_RESET_TOKEN_MESSAGE},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = ResetPasswordSerializer(data=request.data, context={"user": token_record.user})
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            reset_password_with_token(
+                token_record=token_record,
+                raw_password=serializer.validated_data["new_password"],
+                request=request,
+            )
+        except InvalidPasswordResetToken:
+            return response.Response(
+                {"detail": INVALID_RESET_TOKEN_MESSAGE},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return response.Response({"detail": PASSWORD_RESET_SUCCESS_MESSAGE}, status=status.HTTP_200_OK)
 
 
 class CustomerProfileAPIView(generics.UpdateAPIView):

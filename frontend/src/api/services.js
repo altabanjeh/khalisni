@@ -305,6 +305,14 @@ export const api = {
       role: 'customer',
     }),
   login: authApi.login,
+  forgotPassword: async (payload) =>
+    withTestValue(() => authApi.forgotPassword(payload), {
+      detail: 'If this email is registered, a password reset link has been sent.',
+    }),
+  resetPassword: async (token, payload) =>
+    withTestValue(() => authApi.resetPassword(token, payload), {
+      detail: 'Your password has been reset. You can now log in.',
+    }),
   logout: authApi.logout,
   me: async () => withTestValue(() => authApi.me(), null),
   updateProfile: authApi.updateProfile,

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from accounts.models import CustomUser, CustomerProfile, SystemSetting
+from accounts.models import CustomUser, CustomerProfile, PasswordResetToken, SystemSetting
 
 
 @admin.register(CustomUser)
@@ -40,3 +40,11 @@ class SystemSettingAdmin(admin.ModelAdmin):
     list_display = ("key", "updated_at")
     search_fields = ("key", "description")
     readonly_fields = ("updated_at",)
+
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    list_display = ("user", "created_at", "expires_at", "used_at", "request_ip")
+    list_filter = ("created_at", "expires_at", "used_at")
+    search_fields = ("user__email", "user__full_name", "request_ip")
+    readonly_fields = ("user", "token_hash", "created_at", "expires_at", "used_at", "request_ip", "user_agent")

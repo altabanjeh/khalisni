@@ -1,10 +1,20 @@
+import hashlib
+import re
+from datetime import timedelta
+
 from django.core.management import call_command
+from django.core import mail
+from django.core.cache import cache
 from django.contrib.auth.models import Permission
+from django.test import override_settings
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, PasswordResetToken
+from accounts.password_reset import FORGOT_PASSWORD_RESPONSE_MESSAGE, PASSWORD_RESET_SUCCESS_MESSAGE
+from audit.models import AuditLog
 from orders.models import Order
 from public_site.models import Advertisement, PublicPageContent, SiteTheme
 from services.models import Service, ServiceCategory
@@ -438,3 +448,172 @@ class SeedCommandTests(TestCase):
 
         admin_user.refresh_from_db()
         self.assertTrue(admin_user.check_password("Admin@123"))
+
+
+@override_settings(
+    FRONTEND_BASE_URL="https://portal.example.com",
+    PASSWORD_RESET_RATE_LIMIT_EMAIL=2,
+    PASSWORD_RESET_RATE_LIMIT_IP=2,
+    PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS=1800,
+)
+class PasswordResetTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.customer = CustomUser.objects.create_user(
+            email="reset-customer@example.com",
+            password="Password@123",
+            full_name="Reset Customer",
+            phone="0794000001",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.admin = CustomUser.objects.create_user(
+            email="reset-admin@example.com",
+            password="Password@123",
+            full_name="Reset Admin",
+            phone="0794000002",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        cache.clear()
+        if hasattr(mail, "outbox"):
+            mail.outbox.clear()
+
+    def _extract_token_from_email(self, email_body):
+        match = re.search(r"/reset-password/([^/\s]+)", email_body)
+        self.assertIsNotNone(match)
+        return match.group(1)
+
+    def test_forgot_password_returns_same_message_and_stores_only_token_hash(self):
+        response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.customer.email},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], FORGOT_PASSWORD_RESPONSE_MESSAGE)
+        self.assertEqual(len(mail.outbox), 1)
+
+        token_record = PasswordResetToken.objects.get(user=self.customer)
+        raw_token = self._extract_token_from_email(mail.outbox[0].body)
+        self.assertNotEqual(token_record.token_hash, raw_token)
+        self.assertEqual(len(token_record.token_hash), 64)
+        self.assertIsNone(token_record.used_at)
+        self.assertGreater(token_record.expires_at, timezone.now())
+        self.assertEqual(token_record.request_ip, "127.0.0.1")
+        self.assertTrue(
+            AuditLog.objects.filter(action="password_reset_request", entity_type="PasswordResetRequest").exists()
+        )
+
+    def test_forgot_password_for_unknown_or_non_customer_email_keeps_response_generic(self):
+        unknown_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": "missing@example.com"},
+            format="json",
+        )
+        admin_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.admin.email},
+            format="json",
+        )
+
+        self.assertEqual(unknown_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(unknown_response.data["detail"], FORGOT_PASSWORD_RESPONSE_MESSAGE)
+        self.assertEqual(admin_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(admin_response.data["detail"], FORGOT_PASSWORD_RESPONSE_MESSAGE)
+        self.assertEqual(PasswordResetToken.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_forgot_password_is_rate_limited_by_email_and_ip(self):
+        for _ in range(3):
+            response = self.client.post(
+                "/api/auth/forgot-password/",
+                {"email": self.customer.email},
+                format="json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["detail"], FORGOT_PASSWORD_RESPONSE_MESSAGE)
+
+        self.assertEqual(PasswordResetToken.objects.count(), 2)
+        self.assertEqual(len(mail.outbox), 2)
+        last_audit = AuditLog.objects.filter(action="password_reset_request").latest("created_at")
+        self.assertEqual(last_audit.new_values["rate_limited"], True)
+
+    def test_reset_password_is_single_use_invalidates_other_tokens_and_sends_notification(self):
+        first_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.customer.email},
+            format="json",
+        )
+        second_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.customer.email},
+            format="json",
+        )
+        self.assertEqual(first_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_200_OK)
+
+        first_token = self._extract_token_from_email(mail.outbox[0].body)
+        first_record = PasswordResetToken.objects.order_by("created_at").first()
+        second_record = PasswordResetToken.objects.order_by("created_at").last()
+
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(
+                f"/api/auth/reset-password/{first_token}/",
+                {
+                    "new_password": "NewPassword@123",
+                    "confirm_new_password": "NewPassword@123",
+                },
+                format="json",
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], PASSWORD_RESET_SUCCESS_MESSAGE)
+        self.assertNotIn("access", response.data)
+        self.assertNotIn("refresh", response.data)
+
+        self.customer.refresh_from_db()
+        first_record.refresh_from_db()
+        second_record.refresh_from_db()
+        self.assertTrue(self.customer.check_password("NewPassword@123"))
+        self.assertFalse(self.customer.check_password("Password@123"))
+        self.assertIsNotNone(first_record.used_at)
+        self.assertIsNotNone(second_record.used_at)
+        self.assertEqual(len(mail.outbox), 3)
+        self.assertIn("password was changed successfully", mail.outbox[2].body)
+        self.assertNotIn("NewPassword@123", mail.outbox[2].body)
+        self.assertTrue(AuditLog.objects.filter(action="password_reset_success", entity_id=str(self.customer.pk)).exists())
+
+        reused_response = self.client.post(
+            f"/api/auth/reset-password/{first_token}/",
+            {
+                "new_password": "AnotherPassword@123",
+                "confirm_new_password": "AnotherPassword@123",
+            },
+            format="json",
+        )
+        self.assertEqual(reused_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid or has expired", reused_response.data["detail"])
+
+    def test_reset_password_rejects_expired_token(self):
+        raw_token = "expired-token"
+        PasswordResetToken.objects.create(
+            user=self.customer,
+            token_hash=hashlib.sha256(raw_token.encode("utf-8")).hexdigest(),
+            expires_at=timezone.now() - timedelta(minutes=1),
+            request_ip="127.0.0.1",
+        )
+
+        response = self.client.post(
+            f"/api/auth/reset-password/{raw_token}/",
+            {
+                "new_password": "NewPassword@123",
+                "confirm_new_password": "NewPassword@123",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid or has expired", response.data["detail"])
+        self.customer.refresh_from_db()
+        self.assertTrue(self.customer.check_password("Password@123"))

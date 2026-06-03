@@ -75,6 +75,7 @@ ALLOWED_HOSTS = sorted(
 )
 CORS_ALLOWED_ORIGINS = _cors_allowed_origins
 CSRF_TRUSTED_ORIGINS = _csrf_trusted_origins
+FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", (_cors_allowed_origins[0] if _cors_allowed_origins else "http://localhost:5173"))
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -281,3 +282,20 @@ ALLOWED_UPLOAD_MIME_TYPES = [
 ]
 
 FILE_UPLOAD_MAX_SIZE = int(os.getenv("FILE_UPLOAD_MAX_SIZE", str(10 * 1024 * 1024)))
+
+EMAIL_BACKEND = os.getenv(
+    "DJANGO_EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "no-reply@khalisni.local")
+EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.getenv("DJANGO_EMAIL_PORT", "25"))
+EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = _get_bool_env("DJANGO_EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = _get_bool_env("DJANGO_EMAIL_USE_SSL", False)
+
+PASSWORD_RESET_TOKEN_TTL_SECONDS = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_SECONDS", "1800"))
+PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", "1800"))
+PASSWORD_RESET_RATE_LIMIT_EMAIL = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_EMAIL", "3"))
+PASSWORD_RESET_RATE_LIMIT_IP = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_IP", "10"))

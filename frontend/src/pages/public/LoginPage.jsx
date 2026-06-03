@@ -18,6 +18,7 @@ function LoginPage() {
   const [error, setError] = useState('')
   const nextPath = getSafeNextPath(searchParams.get('next'))
   const registered = searchParams.get('registered') === '1'
+  const passwordResetComplete = searchParams.get('reset') === '1'
   const {
     register,
     handleSubmit,
@@ -55,6 +56,11 @@ function LoginPage() {
             : 'Your account was created successfully. Sign in now to continue your service request.'}
         </div>
       ) : null}
+      {passwordResetComplete ? (
+        <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          {isArabic ? 'تم تعيين كلمة المرور. يمكنك تسجيل الدخول الآن.' : 'Your password has been reset. You can now log in.'}
+        </div>
+      ) : null}
       <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
@@ -63,6 +69,14 @@ function LoginPage() {
         <div>
           <label className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
           <input autoComplete="current-password" className="field" type="password" {...register('password')} />
+        </div>
+        <div className="text-right">
+          <Link
+            className="text-sm font-semibold text-brand-700 hover:text-brand-800"
+            to={nextPath ? `/forgot-password?next=${encodeURIComponent(nextPath)}` : '/forgot-password'}
+          >
+            {isArabic ? 'نسيت كلمة المرور؟' : 'Forgot your password?'}
+          </Link>
         </div>
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         <button className="btn-primary w-full" disabled={isSubmitting}>

@@ -8,10 +8,12 @@ from accounts.views import (
     AvailablePermissionsAPIView,
     CustomerProfileAdminViewSet,
     CustomerProfileAPIView,
+    ForgotPasswordAPIView,
     LoginAPIView,
     LogoutAPIView,
     MeAPIView,
     RegisterAPIView,
+    ResetPasswordAPIView,
     SystemSettingViewSet,
 )
 
@@ -25,6 +27,8 @@ urlpatterns = [
     path("auth/register/", RegisterAPIView.as_view()),
     path("auth/login/", LoginAPIView.as_view()),
     path("auth/logout/", LogoutAPIView.as_view()),
+    path("auth/forgot-password/", ForgotPasswordAPIView.as_view()),
+    path("auth/reset-password/<str:token>/", ResetPasswordAPIView.as_view()),
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("auth/me/", MeAPIView.as_view()),
     path("customer/profile/", CustomerProfileAPIView.as_view()),

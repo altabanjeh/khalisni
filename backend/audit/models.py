@@ -17,6 +17,8 @@ class AuditLog(models.Model):
 
         LOGIN = "login", "Login"
         LOGOUT = "logout", "Logout"
+        PASSWORD_RESET_REQUEST = "password_reset_request", "Password reset request"
+        PASSWORD_RESET_SUCCESS = "password_reset_success", "Password reset success"
 
         STATUS_CHANGE = "status_change", "Status change"
         ASSIGN = "assign", "Assign"
