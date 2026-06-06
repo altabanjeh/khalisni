@@ -48,7 +48,7 @@ class HelpGuide(models.Model):
         AUDITOR = "auditor", "Auditor"
 
     help_guide_id = models.BigAutoField(primary_key=True)
-    slug = models.SlugField(max_length=160, unique=True, db_index=True)
+    slug = models.SlugField(max_length=160, unique=True, db_index=False)
     screen_key = models.CharField(max_length=100, blank=True, db_index=True)
     route_path = models.CharField(max_length=255, blank=True)
     category = models.CharField(max_length=40, choices=Category.choices, default=Category.GENERAL, db_index=True)
@@ -94,8 +94,8 @@ class HelpGuide(models.Model):
     class Meta:
         ordering = ["display_order", "title", "help_guide_id"]
         indexes = [
-            models.Index(fields=["slug", "is_active"]),
-            models.Index(fields=["category", "role", "is_active"]),
+            models.Index(fields=["slug", "is_active"], name="help_guides_slug_active_idx"),
+            models.Index(fields=["category", "role", "is_active"], name="help_guides_cat_role_idx"),
             models.Index(fields=["screen_key", "role", "is_active"]),
             models.Index(fields=["screen_key", "workflow_status", "is_active"]),
             models.Index(fields=["role", "permission_key", "is_active"]),
@@ -140,7 +140,7 @@ class HelpGuideScreenshot(models.Model):
     class Meta:
         ordering = ["display_order", "screenshot_id"]
         indexes = [
-            models.Index(fields=["help_guide", "is_active", "display_order"]),
+            models.Index(fields=["help_guide", "is_active", "display_order"], name="help_guide_shot_idx"),
         ]
 
     def __str__(self):

@@ -286,6 +286,8 @@ def seed_manual_library(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
+
     dependencies = [
         ("help_guides", "0003_helpguide_internal_notes_helpguide_main_workflow_and_more"),
     ]
@@ -321,7 +323,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="helpguide",
             name="slug",
-            field=models.SlugField(blank=True, db_index=True, max_length=160, null=True),
+            field=models.SlugField(blank=True, db_index=False, max_length=160, null=True),
         ),
         migrations.AddField(
             model_name="helpguide",
@@ -369,9 +371,4 @@ class Migration(migrations.Migration):
             index=models.Index(fields=["help_guide", "is_active", "display_order"], name="help_guide_shot_idx"),
         ),
         migrations.RunPython(seed_manual_library, migrations.RunPython.noop),
-        migrations.AlterField(
-            model_name="helpguide",
-            name="slug",
-            field=models.SlugField(db_index=True, max_length=160, unique=True),
-        ),
     ]
