@@ -2,6 +2,7 @@ import { CheckCircle2, FilePlus2, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
+import ContextHelpButton from '../../components/ContextHelpButton'
 import FileUploader from '../../components/FileUploader'
 import DynamicServiceFields from '../../components/DynamicServiceFields'
 import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
@@ -189,6 +190,7 @@ function CustomerCreateOrderPage() {
       <PageHeader
         actions={
           <>
+            <ContextHelpButton label="Open help for creating a new service request" />
             <button className="btn-secondary" onClick={saveDraft} type="button">
               <Save className="h-4 w-4" />
               حفظ كمسودة

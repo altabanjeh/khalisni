@@ -6,7 +6,7 @@ import { api } from '../api/services'
 import { useAuth } from './AuthContext'
 import { matchHelpScreen } from '../help/screenRegistry'
 
-const HelpGuideContext = createContext(null)
+export const HelpGuideContext = createContext(null)
 
 const defaultPageHelp = {
   workflowStatus: '',
@@ -104,13 +104,15 @@ export function useHelpGuideContext() {
 }
 
 export function useRegisterPageHelp({ workflowStatus = '', serviceId = '' } = {}) {
-  const { clearPageHelp, setPageHelp } = useHelpGuideContext()
+  const context = useContext(HelpGuideContext)
 
   useEffect(() => {
+    if (!context) return undefined
+    const { clearPageHelp, setPageHelp } = context
     setPageHelp({ workflowStatus: workflowStatus || '', serviceId: serviceId || '' })
 
     return () => {
       clearPageHelp()
     }
-  }, [clearPageHelp, serviceId, setPageHelp, workflowStatus])
+  }, [context, serviceId, workflowStatus])
 }

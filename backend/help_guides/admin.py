@@ -1,15 +1,24 @@
 from django.contrib import admin
 
-from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideService, HelpGuideWorkflow
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
+
+
+class HelpGuideScreenshotInline(admin.TabularInline):
+    model = HelpGuideScreenshot
+    extra = 0
+    fields = ("caption", "image", "static_path", "placeholder_label", "step_reference", "display_order", "is_active")
+    ordering = ("display_order", "screenshot_id")
 
 
 @admin.register(HelpGuide)
 class HelpGuideAdmin(admin.ModelAdmin):
-    list_display = ("title", "screen_key", "role", "workflow_status", "permission_key", "display_order", "is_active")
-    list_filter = ("role", "is_active", "screen_key", "workflow_status")
-    search_fields = ("title", "screen_key", "short_description", "purpose", "step_by_step_guide", "search_keywords")
+    inlines = [HelpGuideScreenshotInline]
+    list_display = ("title", "slug", "category", "screen_key", "role", "workflow_status", "permission_key", "display_order", "is_active")
+    list_filter = ("category", "role", "is_active", "screen_key", "workflow_status", "is_quick_link")
+    search_fields = ("title", "slug", "screen_key", "short_description", "purpose", "step_by_step_guide", "search_keywords")
     ordering = ("screen_key", "display_order", "title")
     readonly_fields = ("created_at", "updated_at")
+    filter_horizontal = ("related_guides",)
 
 
 @admin.register(HelpGuideAction)
@@ -42,3 +51,11 @@ class HelpGuideWorkflowAdmin(admin.ModelAdmin):
     list_filter = ("role", "screen_key", "current_status", "next_status", "is_active")
     search_fields = ("workflow_key", "action_key", "action_label", "system_effect", "search_keywords")
     ordering = ("screen_key", "display_order", "workflow_key")
+
+
+@admin.register(HelpGuideScreenshot)
+class HelpGuideScreenshotAdmin(admin.ModelAdmin):
+    list_display = ("caption", "help_guide", "step_reference", "display_order", "is_active")
+    list_filter = ("is_active", "help_guide__category")
+    search_fields = ("caption", "placeholder_label", "static_path", "help_guide__title", "help_guide__slug")
+    ordering = ("help_guide", "display_order", "screenshot_id")

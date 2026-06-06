@@ -13,6 +13,10 @@ export const helpGuidesApi = {
     return http.get(`/help/current/${buildQuery(params)}`)
   },
 
+  async getHelpGuideIndex(params = {}) {
+    return http.get(`/help/index/${buildQuery(params)}`)
+  },
+
   async searchHelp(params = {}) {
     return http.get(`/help/search/${buildQuery(params)}`)
   },
@@ -115,6 +119,22 @@ export const helpGuidesApi = {
 
   deleteAdminHelpWorkflow(id) {
     return http.delete(`/help/admin/workflows/${id}/`)
+  },
+
+  async getAdminHelpScreenshots(params = {}) {
+    return unwrapList(await http.get(`/help/admin/screenshots/${buildQuery(params)}`)).map(normalizeRecord)
+  },
+
+  async createAdminHelpScreenshot(payload) {
+    return normalizeRecord(await http.post('/help/admin/screenshots/', payload))
+  },
+
+  async updateAdminHelpScreenshot(id, payload) {
+    return normalizeRecord(await http.patch(`/help/admin/screenshots/${id}/`, payload))
+  },
+
+  deleteAdminHelpScreenshot(id) {
+    return http.delete(`/help/admin/screenshots/${id}/`)
   },
 
   getHelpGuideMetadata() {

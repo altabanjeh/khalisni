@@ -22,6 +22,13 @@ from organizations.selectors import (
 from services.models import Service
 
 
+def _guide_queryset():
+    return HelpGuide.objects.prefetch_related(
+        "screenshots",
+        "related_guides",
+    )
+
+
 def get_user_audience_codes(user) -> set[str]:
     audience_codes: set[str] = set()
     if not user or not getattr(user, "is_authenticated", False):
@@ -77,7 +84,7 @@ def _apply_visibility_filters(queryset, *, user, preview_role: str = "", include
 
 def get_readable_help_guides_queryset(user, *, preview_role: str = "", include_permission_restricted: bool = False):
     return _apply_visibility_filters(
-        HelpGuide.objects.all(),
+        _guide_queryset(),
         user=user,
         preview_role=preview_role,
         include_permission_restricted=include_permission_restricted,
@@ -302,6 +309,60 @@ def build_contextual_help_payload(user, *, screen_key: str, workflow_status: str
     }
 
 
+def get_manual_index_guides(
+    user,
+    *,
+    category: str = "",
+    search: str = "",
+    slug: str = "",
+    preview_role: str = "",
+    include_permission_restricted: bool = False,
+):
+    queryset = get_readable_help_guides_queryset(
+        user,
+        preview_role=preview_role,
+        include_permission_restricted=include_permission_restricted,
+    ).order_by("category", "display_order", "title", "help_guide_id")
+
+    if category:
+        queryset = queryset.filter(category=category)
+    if slug:
+        queryset = queryset.filter(slug=slug)
+    if search:
+        normalized_search = str(search).strip()
+        queryset = queryset.filter(
+            Q(title__icontains=normalized_search)
+            | Q(short_description__icontains=normalized_search)
+            | Q(purpose__icontains=normalized_search)
+            | Q(before_you_start__icontains=normalized_search)
+            | Q(step_by_step_guide__icontains=normalized_search)
+            | Q(expected_result__icontains=normalized_search)
+            | Q(common_errors__icontains=normalized_search)
+            | Q(troubleshooting__icontains=normalized_search)
+            | Q(search_keywords__icontains=normalized_search)
+            | Q(slug__icontains=normalized_search)
+            | Q(screen_key__icontains=normalized_search)
+        )
+    return list(queryset)
+
+
+def get_manual_quick_links(
+    user,
+    *,
+    preview_role: str = "",
+    include_permission_restricted: bool = False,
+):
+    return list(
+        get_readable_help_guides_queryset(
+            user,
+            preview_role=preview_role,
+            include_permission_restricted=include_permission_restricted,
+        )
+        .filter(is_quick_link=True)
+        .order_by("display_order", "title", "help_guide_id")
+    )
+
+
 def _search_matches(row, query: str, keys: list[str]) -> bool:
     haystack = " ".join(str(row.get(key, "")) for key in keys).lower()
     return query in haystack
@@ -322,13 +383,16 @@ def search_help_content(user, *, query: str, preview_role: str = "", include_per
         row = {
             "id": guide.pk,
             "screen_key": guide.screen_key,
+            "slug": guide.slug,
+            "category": guide.category,
             "title": guide.title,
             "short_description": guide.short_description,
             "purpose": guide.purpose,
+            "troubleshooting": guide.troubleshooting,
             "search_keywords": guide.search_keywords,
             "role": guide.role,
         }
-        if _search_matches(row, normalized_query, ["screen_key", "title", "short_description", "purpose", "search_keywords"]):
+        if _search_matches(row, normalized_query, ["screen_key", "slug", "category", "title", "short_description", "purpose", "troubleshooting", "search_keywords"]):
             results["screens"].append(guide)
 
     for model, bucket, keys in (

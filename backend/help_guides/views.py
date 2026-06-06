@@ -1,13 +1,16 @@
+from django.db.models import Q
 from rest_framework import permissions, response, status, viewsets
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageHelpGuides
-from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideService, HelpGuideWorkflow
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
 from help_guides.selectors import (
     build_contextual_help_payload,
     get_action_guides_for_context,
     get_field_guides_for_context,
+    get_manual_index_guides,
+    get_manual_quick_links,
     get_readable_entity_queryset,
     get_readable_help_guides_queryset,
     get_service_guide_for_context,
@@ -20,6 +23,7 @@ from help_guides.serializers import (
     HelpGuideFieldAdminSerializer,
     HelpGuideMetadataSerializer,
     HelpGuideReadOnlySerializer,
+    HelpGuideScreenshotAdminSerializer,
     HelpGuideServiceAdminSerializer,
     HelpGuideWorkflowAdminSerializer,
     build_help_guide_metadata,
@@ -182,11 +186,53 @@ class HelpGuideSearchAPIView(APIView):
         )
 
 
-class HelpGuideMetadataAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated, CanManageHelpGuides]
+class HelpGuideIndexAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        serializer = HelpGuideMetadataSerializer(build_help_guide_metadata())
+        preview_role = _preview_role(request) if CanManageHelpGuides().has_permission(request, self) else ""
+        include_permission_restricted = _include_preview_permissions(request, self)
+        search = str(request.query_params.get("q", "") or request.query_params.get("search", "")).strip()
+        category = str(request.query_params.get("category", "")).strip()
+        slug = str(request.query_params.get("slug", "")).strip()
+        guides = get_manual_index_guides(
+            request.user,
+            category=category,
+            search=search,
+            slug=slug,
+            preview_role=preview_role,
+            include_permission_restricted=include_permission_restricted,
+        )
+        quick_links = get_manual_quick_links(
+            request.user,
+            preview_role=preview_role,
+            include_permission_restricted=include_permission_restricted,
+        )
+        metadata = build_help_guide_metadata(
+            can_manage_help_guides=CanManageHelpGuides().has_permission(request, self),
+        )
+        return response.Response(
+            {
+                "query": search,
+                "category": category,
+                "slug": slug,
+                "preview_role": preview_role,
+                "guides": [serialize_screen_guide(item) for item in guides],
+                "quick_links": [serialize_screen_guide(item) for item in quick_links],
+                **HelpGuideMetadataSerializer(metadata).data,
+            }
+        )
+
+
+class HelpGuideMetadataAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = HelpGuideMetadataSerializer(
+            build_help_guide_metadata(
+                can_manage_help_guides=CanManageHelpGuides().has_permission(request, self),
+            )
+        )
         return response.Response(serializer.data)
 
 
@@ -237,7 +283,7 @@ class BaseAdminGuideViewSet(viewsets.ModelViewSet):
 
 class HelpGuideViewSet(BaseAdminGuideViewSet):
     permission_classes = [CanManageHelpGuidesOrReadOnly]
-    queryset = HelpGuide.objects.all()
+    queryset = HelpGuide.objects.prefetch_related("screenshots", "related_guides").all()
     serializer_class = HelpGuideAdminSerializer
     ordering = ("screen_key", "display_order", "title", "help_guide_id")
     search_fields = [
@@ -263,15 +309,30 @@ class HelpGuideViewSet(BaseAdminGuideViewSet):
         else:
             queryset = get_readable_help_guides_queryset(self.request.user)
         screen_key = str(self.request.query_params.get("screen_key", "")).strip()
+        category = str(self.request.query_params.get("category", "")).strip()
+        slug = str(self.request.query_params.get("slug", "")).strip()
         role = str(self.request.query_params.get("role", "")).strip()
         workflow_status = str(self.request.query_params.get("workflow_status", "")).strip()
+        search = str(self.request.query_params.get("search", "") or self.request.query_params.get("q", "")).strip()
         is_active = self.request.query_params.get("is_active")
         if screen_key:
             queryset = queryset.filter(screen_key=screen_key)
+        if category:
+            queryset = queryset.filter(category=category)
+        if slug:
+            queryset = queryset.filter(slug=slug)
         if role:
             queryset = queryset.filter(role=role)
         if workflow_status:
             queryset = queryset.filter(workflow_status=workflow_status)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search)
+                | Q(short_description__icontains=search)
+                | Q(purpose__icontains=search)
+                | Q(search_keywords__icontains=search)
+                | Q(slug__icontains=search)
+            )
         if is_active not in (None, ""):
             queryset = queryset.filter(is_active=str(is_active).lower() == "true")
         return queryset
@@ -299,3 +360,9 @@ class HelpGuideWorkflowAdminViewSet(BaseAdminGuideViewSet):
     queryset = HelpGuideWorkflow.objects.all()
     serializer_class = HelpGuideWorkflowAdminSerializer
     ordering = ("screen_key", "display_order", "workflow_key", "id")
+
+
+class HelpGuideScreenshotAdminViewSet(BaseAdminGuideViewSet):
+    queryset = HelpGuideScreenshot.objects.select_related("help_guide").all()
+    serializer_class = HelpGuideScreenshotAdminSerializer
+    ordering = ("help_guide_id", "display_order", "screenshot_id")

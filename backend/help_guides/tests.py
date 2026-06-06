@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser
-from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot
 from services.models import Service, ServiceCategory
 
 
@@ -68,9 +68,12 @@ class HelpGuideApiTests(APITestCase):
         )
 
     def _create_guide(self, **overrides):
+        next_index = HelpGuide.objects.count() + 1
         payload = {
+            "slug": f"customer-orders-guide-{next_index}",
             "screen_key": "test_customer_orders",
             "route_path": "/test/customer/orders",
+            "category": "customer",
             "role": "customer",
             "permission_key": "",
             "workflow_status": "",
@@ -81,6 +84,7 @@ class HelpGuideApiTests(APITestCase):
             "step_by_step_guide": "1. Step one\n2. Step two",
             "expected_result": "Expected result",
             "common_errors": "Common error",
+            "troubleshooting": "Troubleshooting note",
             "related_screen": "",
             "related_permission": "",
             "search_keywords": "orders customer",
@@ -108,6 +112,8 @@ class HelpGuideApiTests(APITestCase):
             {
                 "screen_key": "admin_help_guides",
                 "route_path": "/admin/help-guides",
+                "slug": "manage-help-content",
+                "category": "settings",
                 "role": "admin",
                 "permission_key": "help_guides.manage_help_guides",
                 "workflow_status": "",
@@ -118,6 +124,7 @@ class HelpGuideApiTests(APITestCase):
                 "step_by_step_guide": "1. Create entry\n2. Save entry",
                 "expected_result": "The guide is visible to admins.",
                 "common_errors": "Wrong role selected",
+                "troubleshooting": "Check the target role again.",
                 "related_screen": "admin_users_roles",
                 "related_permission": "help_guides.manage_help_guides",
                 "search_keywords": "admin help",
@@ -324,3 +331,56 @@ class HelpGuideApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(any(item["field_key"] == "active_field" for item in response.data))
         self.assertFalse(any(item["field_key"] == "inactive_field" for item in response.data))
+
+    def test_manual_index_returns_category_filtered_guides_and_quick_links(self):
+        customer_guide = self._create_guide(
+            slug="customer-create-order-guide",
+            screen_key="customer_create_order",
+            category="customer",
+            title="Create order guide",
+            is_quick_link=True,
+        )
+        self._create_guide(
+            slug="employee-review-guide",
+            screen_key="employee_order_review",
+            category="employee",
+            role="employee",
+            title="Employee review guide",
+        )
+
+        self.client.force_authenticate(self.customer)
+        response = self.client.get("/api/help/index/?category=customer")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(any(item["slug"] == customer_guide.slug for item in response.data["guides"]))
+        self.assertTrue(any(item["slug"] == customer_guide.slug for item in response.data["quick_links"]))
+        self.assertTrue(all(item["category"] == "customer" for item in response.data["guides"]))
+        self.assertTrue(response.data["categories"])
+
+    def test_current_help_includes_placeholder_screenshot_payload(self):
+        guide = self._create_guide(screen_key="customer_orders", slug="customer-orders-with-shot")
+        HelpGuideScreenshot.objects.create(
+            help_guide=guide,
+            caption="Customer orders placeholder",
+            placeholder_label="Screenshot required: Customer orders",
+            alt_text="Customer orders",
+            step_reference="overview",
+        )
+
+        self.client.force_authenticate(self.customer)
+        response = self.client.get("/api/help/current/?screen_key=customer_orders")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        screenshots = response.data["screen_guides"][0]["screenshots"]
+        self.assertEqual(len(screenshots), 1)
+        self.assertTrue(screenshots[0]["is_placeholder"])
+        self.assertEqual(screenshots[0]["placeholder_label"], "Screenshot required: Customer orders")
+
+    def test_metadata_endpoint_is_available_to_authenticated_users(self):
+        self.client.force_authenticate(self.customer)
+
+        response = self.client.get("/api/help/metadata/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("categories", response.data)
+        self.assertFalse(response.data["can_manage_help_guides"])

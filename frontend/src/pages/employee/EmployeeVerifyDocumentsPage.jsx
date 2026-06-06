@@ -2,6 +2,7 @@ import { Eye, ShieldCheck, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
+import ContextHelpButton from '../../components/ContextHelpButton'
 import EmptyState from '../../components/EmptyState'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
@@ -84,6 +85,7 @@ function EmployeeVerifyDocumentsPage() {
   return (
     <div className="page-section">
       <PageHeader
+        actions={<ContextHelpButton label="Open help for verifying documents" />}
         description="راجع الوثائق التي ما زالت بانتظار التحقق، ثم اعتمدها أو ارفضها مع سبب واضح حتى تبقى المراجعة قابلة للتتبع."
         eyebrow="التحقق من الوثائق"
         icon={ShieldCheck}

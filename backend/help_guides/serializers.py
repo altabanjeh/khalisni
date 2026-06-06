@@ -1,8 +1,9 @@
+from django.templatetags.static import static
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 
 from core.serializer_mixins import PkAsIdMixin
-from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideService, HelpGuideWorkflow
+from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
 from help_guides.screen_registry import HELP_SCREEN_REGISTRY, get_help_screen_label
 from orders.models import Order
 
@@ -31,13 +32,66 @@ def _normalize_status_label(status_value: str) -> str:
     return dict(Order.Status.choices).get(status_value, status_value)
 
 
+def _serialize_related_pages(obj):
+    related_guides = _get_value(obj, "related_guides", [])
+    if hasattr(related_guides, "all"):
+        related_guides = related_guides.all()
+    serialized = []
+    for guide in related_guides or []:
+        serialized.append(
+            {
+                "id": _get_value(guide, "id", _get_value(guide, "pk")),
+                "slug": _get_value(guide, "slug"),
+                "title": _get_value(guide, "title"),
+                "screen_key": _get_value(guide, "screen_key"),
+                "screen_label": _normalize_screen_label(guide),
+                "category": _get_value(guide, "category"),
+            }
+        )
+    return serialized
+
+
+def _serialize_screenshots(obj):
+    screenshots = _get_value(obj, "screenshots", [])
+    if hasattr(screenshots, "all"):
+        screenshots = screenshots.all()
+    serialized = []
+    for screenshot in screenshots or []:
+        if not bool(_get_value(screenshot, "is_active", True)):
+            continue
+        image = _get_value(screenshot, "image")
+        static_path = _get_value(screenshot, "static_path")
+        image_url = ""
+        if image and getattr(image, "url", ""):
+            image_url = image.url
+        elif static_path:
+            image_url = static(static_path)
+
+        serialized.append(
+            {
+                "id": _get_value(screenshot, "id", _get_value(screenshot, "pk")),
+                "caption": _get_value(screenshot, "caption"),
+                "alt_text": _get_value(screenshot, "alt_text"),
+                "step_reference": _get_value(screenshot, "step_reference"),
+                "image_url": image_url,
+                "static_path": static_path,
+                "placeholder_label": _get_value(screenshot, "placeholder_label"),
+                "is_placeholder": not bool(image_url),
+                "display_order": _get_value(screenshot, "display_order", 0),
+            }
+        )
+    return serialized
+
+
 def serialize_screen_guide(obj):
     workflow_status = _get_value(obj, "workflow_status")
     return {
         "id": _get_value(obj, "id", _get_value(obj, "pk")),
+        "slug": _get_value(obj, "slug"),
         "screen_key": _get_value(obj, "screen_key"),
         "screen_label": _normalize_screen_label(obj),
         "route_path": _get_value(obj, "route_path"),
+        "category": _get_value(obj, "category"),
         "role": _get_value(obj, "role"),
         "role_label": _normalize_role_label(obj),
         "workflow_status": workflow_status,
@@ -46,17 +100,25 @@ def serialize_screen_guide(obj):
         "short_description": _get_value(obj, "short_description"),
         "purpose": _get_value(obj, "purpose"),
         "before_you_start": _get_value(obj, "before_you_start"),
+        "before_you_start_items": _split_text_lines(_get_value(obj, "before_you_start")),
         "step_by_step_guide": _get_value(obj, "step_by_step_guide"),
         "steps": _split_text_lines(_get_value(obj, "step_by_step_guide")),
         "when_to_use": _get_value(obj, "when_to_use"),
         "main_workflow": _get_value(obj, "main_workflow"),
         "expected_result": _get_value(obj, "expected_result"),
+        "expected_result_items": _split_text_lines(_get_value(obj, "expected_result")),
         "common_errors": _get_value(obj, "common_errors"),
         "common_error_items": _split_text_lines(_get_value(obj, "common_errors")),
         "next_step": _get_value(obj, "next_step"),
+        "next_step_items": _split_text_lines(_get_value(obj, "next_step")),
+        "troubleshooting": _get_value(obj, "troubleshooting"),
+        "troubleshooting_items": _split_text_lines(_get_value(obj, "troubleshooting")),
         "related_screen": _get_value(obj, "related_screen"),
         "related_screen_label": get_help_screen_label(_get_value(obj, "related_screen")),
         "related_permission": _get_value(obj, "related_permission"),
+        "related_pages": _serialize_related_pages(obj),
+        "screenshots": _serialize_screenshots(obj),
+        "is_quick_link": bool(_get_value(obj, "is_quick_link", False)),
         "display_order": _get_value(obj, "display_order", 0),
         "source": _get_value(obj, "source", "database"),
     }
@@ -204,14 +266,19 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
     screen_label = serializers.SerializerMethodField()
     role_label = serializers.SerializerMethodField()
     workflow_status_label = serializers.SerializerMethodField()
+    screenshots = serializers.SerializerMethodField()
+    related_pages = serializers.SerializerMethodField()
+    related_guides = serializers.PrimaryKeyRelatedField(many=True, queryset=HelpGuide.objects.all(), required=False)
 
     class Meta:
         model = HelpGuide
         fields = (
             "id",
+            "slug",
             "screen_key",
             "screen_label",
             "route_path",
+            "category",
             "role",
             "role_label",
             "permission_key",
@@ -227,10 +294,15 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
             "expected_result",
             "common_errors",
             "next_step",
+            "troubleshooting",
             "related_screen",
             "related_permission",
+            "related_guides",
+            "related_pages",
             "search_keywords",
             "internal_notes",
+            "is_quick_link",
+            "screenshots",
             "display_order",
             "is_active",
             "created_by",
@@ -241,6 +313,12 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
             "updated_at",
         )
         read_only_fields = ("created_by", "updated_by", "created_at", "updated_at", "created_by_name", "updated_by_name")
+
+    def validate_slug(self, value):
+        value = str(value or "").strip()
+        if not value:
+            raise serializers.ValidationError("Slug is required.")
+        return value
 
     def validate_related_permission(self, value):
         if not value:
@@ -260,6 +338,12 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
 
     def get_workflow_status_label(self, obj):
         return _normalize_status_label(obj.workflow_status)
+
+    def get_screenshots(self, obj):
+        return _serialize_screenshots(obj)
+
+    def get_related_pages(self, obj):
+        return _serialize_related_pages(obj)
 
 
 class HelpGuideReadOnlySerializer(HelpGuideAdminSerializer):
@@ -337,15 +421,44 @@ class HelpGuideWorkflowAdminSerializer(BaseGuideAdminSerializer):
         return _normalize_status_label(obj.next_status)
 
 
+class HelpGuideScreenshotAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+    help_guide_title = serializers.CharField(source="help_guide.title", read_only=True)
+    help_guide_slug = serializers.CharField(source="help_guide.slug", read_only=True)
+
+    class Meta:
+        model = HelpGuideScreenshot
+        fields = (
+            "id",
+            "help_guide",
+            "help_guide_title",
+            "help_guide_slug",
+            "caption",
+            "image",
+            "static_path",
+            "placeholder_label",
+            "alt_text",
+            "step_reference",
+            "display_order",
+            "is_active",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("created_at", "updated_at", "help_guide_title", "help_guide_slug")
+
+
 class HelpGuideMetadataSerializer(serializers.Serializer):
     screens = serializers.ListField()
     roles = serializers.ListField()
+    categories = serializers.ListField()
     workflow_statuses = serializers.ListField()
+    can_manage_help_guides = serializers.BooleanField()
 
 
-def build_help_guide_metadata():
+def build_help_guide_metadata(*, can_manage_help_guides: bool = False):
     return {
         "screens": HELP_SCREEN_REGISTRY,
         "roles": [{"value": value, "label": label} for value, label in HelpGuide.Audience.choices],
+        "categories": [{"value": value, "label": label} for value, label in HelpGuide.Category.choices],
         "workflow_statuses": [{"value": value, "label": label} for value, label in Order.Status.choices],
+        "can_manage_help_guides": can_manage_help_guides,
     }

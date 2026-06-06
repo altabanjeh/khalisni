@@ -1,4 +1,7 @@
 const HELP_SCREEN_REGISTRY = [
+  { screen_key: 'manual_navigation', label: 'How to Navigate the System', pattern: /^\/help\/manual\/navigation\/?$/ },
+  { screen_key: 'manual_account_access', label: 'Login and Account Access', pattern: /^\/login\/?$/ },
+  { screen_key: 'manual_add_screenshots', label: 'How to Add Screenshots to the Manual', pattern: /^\/help\/manual\/screenshots\/?$/ },
   { screen_key: 'customer_missing_documents', label: 'استكمال المستندات الناقصة', pattern: /^\/customer\/orders\/[^/]+\/missing-docs\/?$/ },
   { screen_key: 'customer_order_details', label: 'تفاصيل الطلب للعميل', pattern: /^\/customer\/orders\/[^/]+\/?$/ },
   { screen_key: 'customer_create_order', label: 'إنشاء طلب جديد', pattern: /^\/customer\/orders\/new\/?$/ },
@@ -52,4 +55,3 @@ export function getHelpScreenLabel(screenKey) {
 }
 
 export { HELP_SCREEN_LABELS, HELP_SCREEN_REGISTRY }
-

@@ -163,9 +163,11 @@ const mockNotificationTemplates = [
 let mockHelpGuides = [
   {
     id: 1,
+    slug: 'customer-orders-guide',
     screen_key: 'customer_orders',
     screen_label: 'طلباتي',
     route_path: '/customer/orders',
+    category: 'customer',
     role: 'customer',
     role_label: 'Customer',
     workflow_status: '',
@@ -179,10 +181,42 @@ let mockHelpGuides = [
     expected_result: 'تصل إلى الطلب المطلوب وتعرف حالته الحالية.',
     common_errors: 'فتح طلب مشابه بالخطأ',
     common_error_items: ['فتح طلب مشابه بالخطأ'],
+    troubleshooting: 'جرّب البحث برقم الطلب ثم أعد فتح القائمة إذا لم يظهر الطلب المتوقع.',
+    troubleshooting_items: ['جرّب البحث برقم الطلب ثم أعد فتح القائمة إذا لم يظهر الطلب المتوقع.'],
     related_screen: 'customer_order_details',
     related_permission: '',
+    related_pages: [],
+    screenshots: [
+      {
+        id: 1,
+        caption: 'Customer orders list',
+        image_url: '',
+        placeholder_label: 'Screenshot required: Customer orders list',
+        alt_text: 'Customer orders list',
+        step_reference: 'overview',
+        is_placeholder: true,
+        display_order: 1,
+      },
+    ],
     display_order: 10,
     permission_key: '',
+    is_quick_link: true,
+    is_active: true,
+  },
+]
+let mockHelpScreenshots = [
+  {
+    id: 1,
+    help_guide: 1,
+    help_guide_title: 'متابعة الطلبات',
+    help_guide_slug: 'customer-orders-guide',
+    caption: 'Customer orders list',
+    image: null,
+    static_path: '',
+    placeholder_label: 'Screenshot required: Customer orders list',
+    alt_text: 'Customer orders list',
+    step_reference: 'overview',
+    display_order: 1,
     is_active: true,
   },
 ]
@@ -256,6 +290,18 @@ const mockHelpGuideMetadata = {
     { value: 'support', label: 'Support' },
     { value: 'provider', label: 'Provider' },
   ],
+  categories: [
+    { value: 'navigation', label: 'Navigation' },
+    { value: 'account', label: 'Account access' },
+    { value: 'customer', label: 'Customer' },
+    { value: 'employee', label: 'Employee' },
+    { value: 'provider', label: 'Provider' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'reports', label: 'Reports' },
+    { value: 'settings', label: 'Settings' },
+    { value: 'manual', label: 'Manual maintenance' },
+    { value: 'general', label: 'General' },
+  ],
   workflow_statuses: [
     { value: 'NEW', label: 'New' },
     { value: 'UNDER_REVIEW', label: 'Under review' },
@@ -265,6 +311,7 @@ const mockHelpGuideMetadata = {
     { value: 'READY_FOR_DELIVERY', label: 'Ready for delivery' },
     { value: 'COMPLETED', label: 'Completed' },
   ],
+  can_manage_help_guides: true,
 }
 const mockPublicAdvertisements = [
   {
@@ -554,8 +601,27 @@ export const api = {
         service: null,
         workflows: mockHelpWorkflows.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
         results: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
+        screen_guides: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
       },
     ),
+  getHelpGuideIndex: async (params = {}) =>
+    withTestValue(() => helpGuidesApi.getHelpGuideIndex(params), {
+      query: params?.q || params?.search || '',
+      category: params?.category || '',
+      slug: params?.slug || '',
+      preview_role: params?.preview_role || '',
+      guides: mockHelpGuides.filter((guide) => {
+        if (params?.category && guide.category !== params.category) return false
+        if (params?.slug && guide.slug !== params.slug) return false
+        const search = String(params?.q || params?.search || '').trim().toLowerCase()
+        if (!search) return true
+        return [guide.title, guide.short_description, guide.purpose, guide.slug]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(search))
+      }),
+      quick_links: mockHelpGuides.filter((guide) => guide.is_quick_link),
+      ...mockHelpGuideMetadata,
+    }),
   searchHelp: async (params = {}) =>
     withTestValue(() => helpGuidesApi.searchHelp(params), {
       query: params?.q || '',
@@ -676,6 +742,32 @@ export const api = {
   createAdminHelpWorkflow: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpWorkflow(payload), { id: Date.now(), ...payload }),
   updateAdminHelpWorkflow: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpWorkflow(id, payload), { id: Number(id), ...payload }),
   deleteAdminHelpWorkflow: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpWorkflow(id), null),
+  getAdminHelpScreenshots: async () => withTestValue(() => helpGuidesApi.getAdminHelpScreenshots(), mockHelpScreenshots),
+  createAdminHelpScreenshot: async (payload) =>
+    withTestValue(
+      () => helpGuidesApi.createAdminHelpScreenshot(payload),
+      (() => {
+        const created = { id: Date.now(), ...payload }
+        mockHelpScreenshots = [created, ...mockHelpScreenshots]
+        return created
+      })(),
+    ),
+  updateAdminHelpScreenshot: async (id, payload) =>
+    withTestValue(
+      () => helpGuidesApi.updateAdminHelpScreenshot(id, payload),
+      (() => {
+        mockHelpScreenshots = mockHelpScreenshots.map((item) => (item.id === Number(id) ? { ...item, ...payload } : item))
+        return mockHelpScreenshots.find((item) => item.id === Number(id)) || null
+      })(),
+    ),
+  deleteAdminHelpScreenshot: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.deleteAdminHelpScreenshot(id),
+      (() => {
+        mockHelpScreenshots = mockHelpScreenshots.filter((item) => item.id !== Number(id))
+        return null
+      })(),
+    ),
 
   getAvailablePermissions: async () => withTestValue(() => servicesApi.getAvailablePermissions(), {}),
   getUserPermissions: (userId) => servicesApi.getUserPermissions(userId),

@@ -1,5 +1,8 @@
+import { LineChart } from 'lucide-react'
+import ContextHelpButton from '../../components/ContextHelpButton'
 import DataTable from '../../components/DataTable'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatCurrency } from '../../utils/format'
@@ -11,7 +14,15 @@ function ReportsPage() {
   if (dailyLoading || weeklyLoading || !daily || !weekly) return <LoadingSpinner />
 
   return (
-    <div className="space-y-6">
+    <div className="page-section space-y-6">
+      <PageHeader
+        actions={<ContextHelpButton label="Open help for admin reports" />}
+        description="Use these report blocks to understand daily demand, provider performance, category throughput, and revenue movement before making admin decisions."
+        eyebrow="Admin Reports"
+        icon={LineChart}
+        title="Production and Operations Reports"
+      />
+
       <section className="grid gap-4 md:grid-cols-3">
         <div className="glass-panel p-5">
           <p className="text-sm text-slate-500">تقرير اليوم</p>

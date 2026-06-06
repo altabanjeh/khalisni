@@ -1,4 +1,7 @@
 HELP_SCREEN_REGISTRY = [
+    {"screen_key": "manual_navigation", "route_path": "/help/manual/navigation", "label": "How To Navigate The System"},
+    {"screen_key": "manual_account_access", "route_path": "/login", "label": "Login And Account Access"},
+    {"screen_key": "manual_add_screenshots", "route_path": "/help/manual/screenshots", "label": "How To Add Screenshots To The Manual"},
     {"screen_key": "customer_dashboard", "route_path": "/customer", "label": "Customer Dashboard"},
     {"screen_key": "customer_create_order", "route_path": "/customer/orders/new", "label": "Customer Create Order"},
     {"screen_key": "customer_orders", "route_path": "/customer/orders", "label": "Customer Orders"},
@@ -93,4 +96,3 @@ HELP_SCREEN_MAP = {item["screen_key"]: item for item in HELP_SCREEN_REGISTRY}
 
 def get_help_screen_label(screen_key: str) -> str:
     return HELP_SCREEN_MAP.get(screen_key, {}).get("label", screen_key or "General")
-

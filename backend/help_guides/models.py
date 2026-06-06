@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import slugify
 
 
 def _validate_permission_key(value: str, *, field_name: str) -> None:
@@ -15,6 +16,19 @@ def _validate_permission_key(value: str, *, field_name: str) -> None:
 
 
 class HelpGuide(models.Model):
+    class Category(models.TextChoices):
+        NAVIGATION = "navigation", "Navigation"
+        ACCOUNT = "account", "Account access"
+        CUSTOMER = "customer", "Customer"
+        EMPLOYEE = "employee", "Employee"
+        SUPPORT = "support", "Support"
+        PROVIDER = "provider", "Provider"
+        ADMIN = "admin", "Admin"
+        REPORTS = "reports", "Reports"
+        SETTINGS = "settings", "Settings"
+        MANUAL = "manual", "Manual maintenance"
+        GENERAL = "general", "General"
+
     class Audience(models.TextChoices):
         ALL_USERS = "all_users", "All users"
         ADMIN = "admin", "Admin"
@@ -34,8 +48,10 @@ class HelpGuide(models.Model):
         AUDITOR = "auditor", "Auditor"
 
     help_guide_id = models.BigAutoField(primary_key=True)
+    slug = models.SlugField(max_length=160, unique=True, db_index=True)
     screen_key = models.CharField(max_length=100, blank=True, db_index=True)
     route_path = models.CharField(max_length=255, blank=True)
+    category = models.CharField(max_length=40, choices=Category.choices, default=Category.GENERAL, db_index=True)
     role = models.CharField(max_length=40, choices=Audience.choices, default=Audience.ALL_USERS, db_index=True)
     permission_key = models.CharField(max_length=120, blank=True, db_index=True)
     workflow_status = models.CharField(max_length=40, blank=True, db_index=True)
@@ -49,10 +65,12 @@ class HelpGuide(models.Model):
     when_to_use = models.TextField(blank=True)
     main_workflow = models.CharField(max_length=120, blank=True)
     next_step = models.TextField(blank=True)
+    troubleshooting = models.TextField(blank=True)
     related_screen = models.CharField(max_length=100, blank=True)
     related_permission = models.CharField(max_length=120, blank=True)
     search_keywords = models.TextField(blank=True)
     internal_notes = models.TextField(blank=True)
+    is_quick_link = models.BooleanField(default=False, db_index=True)
     display_order = models.PositiveIntegerField(default=0, db_index=True)
     is_active = models.BooleanField(default=True, db_index=True)
     created_by = models.ForeignKey(
@@ -69,12 +87,15 @@ class HelpGuide(models.Model):
         on_delete=models.SET_NULL,
         related_name="updated_help_guides",
     )
+    related_guides = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="referenced_by")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["display_order", "title", "help_guide_id"]
         indexes = [
+            models.Index(fields=["slug", "is_active"]),
+            models.Index(fields=["category", "role", "is_active"]),
             models.Index(fields=["screen_key", "role", "is_active"]),
             models.Index(fields=["screen_key", "workflow_status", "is_active"]),
             models.Index(fields=["role", "permission_key", "is_active"]),
@@ -91,8 +112,53 @@ class HelpGuide(models.Model):
         return self.pk
 
     def clean(self):
+        if not self.slug:
+            base_slug = slugify(self.title or self.screen_key or "help-guide")[:140] or "help-guide"
+            self.slug = base_slug
         _validate_permission_key(self.permission_key, field_name="permission_key")
         _validate_permission_key(self.related_permission, field_name="related_permission")
+
+
+class HelpGuideScreenshot(models.Model):
+    screenshot_id = models.BigAutoField(primary_key=True)
+    help_guide = models.ForeignKey(
+        HelpGuide,
+        on_delete=models.CASCADE,
+        related_name="screenshots",
+    )
+    caption = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="manual/screenshots/uploads/", blank=True, null=True)
+    static_path = models.CharField(max_length=255, blank=True)
+    placeholder_label = models.CharField(max_length=255, blank=True)
+    alt_text = models.CharField(max_length=255, blank=True)
+    step_reference = models.CharField(max_length=80, blank=True)
+    display_order = models.PositiveIntegerField(default=0, db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["display_order", "screenshot_id"]
+        indexes = [
+            models.Index(fields=["help_guide", "is_active", "display_order"]),
+        ]
+
+    def __str__(self):
+        return f"{self.help_guide.title} / {self.caption}"
+
+    @property
+    def id(self):
+        return self.pk
+
+    def clean(self):
+        if not self.image and not self.static_path and not self.placeholder_label:
+            raise ValidationError(
+                {
+                    "placeholder_label": (
+                        "Provide an uploaded image, a static path, or a placeholder label for the screenshot entry."
+                    )
+                }
+            )
 
 
 class HelpGuideBase(models.Model):

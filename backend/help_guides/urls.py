@@ -7,8 +7,10 @@ from help_guides.views import (
     HelpGuideCurrentAPIView,
     HelpGuideFieldAdminViewSet,
     HelpGuideFieldsAPIView,
+    HelpGuideIndexAPIView,
     HelpGuideMetadataAPIView,
     HelpGuideSearchAPIView,
+    HelpGuideScreenshotAdminViewSet,
     HelpGuideServiceAPIView,
     HelpGuideServiceAdminViewSet,
     HelpGuideViewSet,
@@ -23,11 +25,13 @@ admin_router = DefaultRouter()
 admin_router.register("help/admin/screens", HelpGuideViewSet, basename="admin-help-screens")
 admin_router.register("help/admin/actions", HelpGuideActionAdminViewSet, basename="admin-help-actions")
 admin_router.register("help/admin/fields", HelpGuideFieldAdminViewSet, basename="admin-help-fields")
+admin_router.register("help/admin/screenshots", HelpGuideScreenshotAdminViewSet, basename="admin-help-screenshots")
 admin_router.register("help/admin/services", HelpGuideServiceAdminViewSet, basename="admin-help-services")
 admin_router.register("help/admin/workflows", HelpGuideWorkflowAdminViewSet, basename="admin-help-workflows")
 
 urlpatterns = [
     path("help/current/", HelpGuideCurrentAPIView.as_view(), name="help-current"),
+    path("help/index/", HelpGuideIndexAPIView.as_view(), name="help-index"),
     path("help/fields/", HelpGuideFieldsAPIView.as_view(), name="help-fields"),
     path("help/actions/", HelpGuideActionsAPIView.as_view(), name="help-actions"),
     path("help/services/<int:service_id>/", HelpGuideServiceAPIView.as_view(), name="help-service"),

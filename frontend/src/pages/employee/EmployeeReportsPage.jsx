@@ -1,4 +1,5 @@
 import { LineChart } from 'lucide-react'
+import ContextHelpButton from '../../components/ContextHelpButton'
 import DataTable from '../../components/DataTable'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
@@ -18,6 +19,7 @@ function EmployeeReportsPage() {
   return (
     <div className="page-section">
       <PageHeader
+        actions={<ContextHelpButton label="Open help for employee reports" />}
         description="يعرض هذا التقرير حجم المراجعات، الطلبات المتأخرة، طلبات النواقص، والإغلاقات التي تمت ضمن الفترة الحالية."
         eyebrow="تقارير الموظف"
         icon={LineChart}

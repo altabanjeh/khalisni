@@ -1,5 +1,5 @@
 import { Bell, BookOpenText, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import HelpGuidePanel from './HelpGuidePanel'
@@ -19,6 +19,15 @@ function Topbar({ title, onMenuClick }) {
   function handleNotificationNavigate() {
     setNotificationsOpen(false)
   }
+
+  useEffect(() => {
+    function handleOpenHelp() {
+      setHelpOpen(true)
+    }
+
+    window.addEventListener('khalisni:open-help', handleOpenHelp)
+    return () => window.removeEventListener('khalisni:open-help', handleOpenHelp)
+  }, [])
 
   return (
     <header className="glass-panel relative flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center md:justify-between">

@@ -1,6 +1,6 @@
 import { CircleHelp } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { useHelpGuideContext } from '../context/HelpGuideContext'
+import { useContext, useMemo, useState } from 'react'
+import { HelpGuideContext } from '../context/HelpGuideContext'
 
 function buildFieldMessage(guide) {
   if (!guide) return ''
@@ -20,10 +20,12 @@ function buildActionMessage(guide) {
 }
 
 function InlineHelp({ actionKey = '', fieldKey = '', fallbackText = '', title = '', className = '' }) {
-  const { findActionHelp, findFieldHelp } = useHelpGuideContext()
+  const helpContext = useContext(HelpGuideContext)
   const [open, setOpen] = useState(false)
 
-  const guide = fieldKey ? findFieldHelp(fieldKey) : findActionHelp(actionKey)
+  const guide = fieldKey
+    ? helpContext?.findFieldHelp?.(fieldKey)
+    : helpContext?.findActionHelp?.(actionKey)
   const message = useMemo(() => {
     if (fieldKey) return buildFieldMessage(guide) || fallbackText
     return buildActionMessage(guide) || fallbackText

@@ -1,4 +1,4 @@
-import { BookOpenText, Boxes, FileCog, FormInput, GitBranch, Search } from 'lucide-react'
+import { BookOpenText, Boxes, FileCog, FormInput, GitBranch, ImagePlus, Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -13,6 +13,7 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 
 const TABS = [
   { id: 'screens', label: 'Screen Guides', icon: BookOpenText },
+  { id: 'screenshots', label: 'Screenshots', icon: ImagePlus },
   { id: 'fields', label: 'Field Guides', icon: FormInput },
   { id: 'actions', label: 'Action Guides', icon: Boxes },
   { id: 'services', label: 'Service Guides', icon: FileCog },
@@ -21,8 +22,10 @@ const TABS = [
 
 const DEFAULT_VALUES = {
   screens: {
+    slug: '',
     screen_key: '',
     route_path: '',
+    category: 'general',
     role: 'all_users',
     permission_key: '',
     workflow_status: '',
@@ -36,10 +39,23 @@ const DEFAULT_VALUES = {
     expected_result: '',
     common_errors: '',
     next_step: '',
+    troubleshooting: '',
     related_screen: '',
     related_permission: '',
     search_keywords: '',
     internal_notes: '',
+    is_quick_link: false,
+    display_order: 0,
+    is_active: true,
+  },
+  screenshots: {
+    help_guide: '',
+    caption: '',
+    image: null,
+    static_path: '',
+    placeholder_label: '',
+    alt_text: '',
+    step_reference: '',
     display_order: 0,
     is_active: true,
   },
@@ -194,6 +210,7 @@ function HelpGuideManagementPage() {
   const { data: permissions = {}, loading: permissionsLoading } = useAsyncData(() => api.getAvailablePermissions(), [], {})
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
   const { data: screens = [], loading: screensLoading, reload: reloadScreens } = useAsyncData(() => api.getAdminHelpScreens(), [], [])
+  const { data: screenshots = [], loading: screenshotsLoading, reload: reloadScreenshots } = useAsyncData(() => api.getAdminHelpScreenshots(), [], [])
   const { data: fields = [], loading: fieldsLoading, reload: reloadFields } = useAsyncData(() => api.getAdminHelpFields(), [], [])
   const { data: actions = [], loading: actionsLoading, reload: reloadActions } = useAsyncData(() => api.getAdminHelpActions(), [], [])
   const { data: serviceGuides = [], loading: serviceGuidesLoading, reload: reloadServiceGuides } = useAsyncData(
@@ -210,6 +227,7 @@ function HelpGuideManagementPage() {
   const permissionOptions = useMemo(() => flattenPermissionOptions(permissions), [permissions])
   const screenOptions = useMemo(() => metadata.screens || [], [metadata.screens])
   const roleOptions = useMemo(() => metadata.roles || [], [metadata.roles])
+  const categoryOptions = useMemo(() => metadata.categories || [], [metadata.categories])
   const workflowOptions = useMemo(() => metadata.workflow_statuses || [], [metadata.workflow_statuses])
 
   const entityConfig = useMemo(
@@ -224,14 +242,17 @@ function HelpGuideManagementPage() {
         summary: (row) => row.title,
         columns: [
           { key: 'title', label: 'Title' },
+          { key: 'category', label: 'Category' },
           { key: 'screen_label', label: 'Screen', render: (row) => row.screen_label || getHelpScreenLabel(row.screen_key) },
           { key: 'role_label', label: 'Role', render: (row) => row.role_label || row.role },
           { key: 'workflow_status_label', label: 'Workflow', render: (row) => row.workflow_status_label || row.workflow_status || 'General' },
           { key: 'display_order', label: 'Order' },
         ],
         fields: [
+          { name: 'slug', label: 'Slug', type: 'text' },
           { name: 'screen_key', label: 'Screen', type: 'select', options: screenOptions, optionValue: 'screen_key', optionLabel: 'label' },
           { name: 'role', label: 'Role', type: 'select', options: roleOptions, optionValue: 'value', optionLabel: 'label' },
+          { name: 'category', label: 'Category', type: 'select', options: categoryOptions, optionValue: 'value', optionLabel: 'label' },
           { name: 'permission_key', label: 'Permission', type: 'select', options: permissionOptions, optionValue: 'value', optionLabel: 'label', optional: true },
           { name: 'workflow_status', label: 'Workflow status', type: 'select', options: workflowOptions, optionValue: 'value', optionLabel: 'label', optional: true },
           { name: 'title', label: 'Title', type: 'text' },
@@ -245,10 +266,38 @@ function HelpGuideManagementPage() {
           { name: 'expected_result', label: 'Expected result', type: 'textarea' },
           { name: 'common_errors', label: 'Common problems', type: 'textarea' },
           { name: 'next_step', label: 'Next step', type: 'textarea' },
+          { name: 'troubleshooting', label: 'Troubleshooting', type: 'textarea' },
           { name: 'related_screen', label: 'Related screen', type: 'select', options: screenOptions, optionValue: 'screen_key', optionLabel: 'label', optional: true },
           { name: 'related_permission', label: 'Related permission', type: 'select', options: permissionOptions, optionValue: 'value', optionLabel: 'label', optional: true },
           { name: 'search_keywords', label: 'Search keywords', type: 'text' },
           { name: 'internal_notes', label: 'Internal notes', type: 'textarea' },
+          { name: 'is_quick_link', label: 'Show as quick link', type: 'checkbox' },
+          { name: 'display_order', label: 'Display order', type: 'number' },
+          { name: 'is_active', label: 'Active', type: 'checkbox' },
+        ],
+      },
+      screenshots: {
+        title: 'Screenshot',
+        rows: screenshots,
+        reload: reloadScreenshots,
+        create: api.createAdminHelpScreenshot,
+        update: api.updateAdminHelpScreenshot,
+        remove: api.deleteAdminHelpScreenshot,
+        summary: (row) => row.caption,
+        columns: [
+          { key: 'caption', label: 'Caption' },
+          { key: 'help_guide_title', label: 'Guide' },
+          { key: 'step_reference', label: 'Step' },
+          { key: 'display_order', label: 'Order' },
+        ],
+        fields: [
+          { name: 'help_guide', label: 'Guide page', type: 'select', options: screens, optionValue: 'id', optionLabel: 'title' },
+          { name: 'caption', label: 'Caption', type: 'text' },
+          { name: 'image', label: 'Upload image', type: 'file', hint: 'Optional. Use this for real screenshots; keep blank when using a placeholder or static path.' },
+          { name: 'static_path', label: 'Static path', type: 'text' },
+          { name: 'placeholder_label', label: 'Placeholder label', type: 'text' },
+          { name: 'alt_text', label: 'Alt text', type: 'text' },
+          { name: 'step_reference', label: 'Step reference', type: 'text' },
           { name: 'display_order', label: 'Display order', type: 'number' },
           { name: 'is_active', label: 'Active', type: 'checkbox' },
         ],
@@ -415,13 +464,16 @@ function HelpGuideManagementPage() {
       actions,
       fields,
       permissionOptions,
+      categoryOptions,
       reloadActions,
       reloadFields,
       reloadScreens,
+      reloadScreenshots,
       reloadServiceGuides,
       reloadWorkflows,
       roleOptions,
       screens,
+      screenshots,
       screenOptions,
       serviceGuides,
       services,
@@ -433,7 +485,15 @@ function HelpGuideManagementPage() {
   const currentConfig = entityConfig[activeTab]
 
   useEffect(() => {
-    form.reset(selectedRecord ? { ...DEFAULT_VALUES[activeTab], ...selectedRecord } : DEFAULT_VALUES[activeTab])
+    form.reset(
+      selectedRecord
+        ? {
+            ...DEFAULT_VALUES[activeTab],
+            ...selectedRecord,
+            ...(activeTab === 'screenshots' ? { image: null } : {}),
+          }
+        : DEFAULT_VALUES[activeTab],
+    )
   }, [activeTab, form, selectedRecord])
 
   const filteredRows = useMemo(() => {
@@ -467,10 +527,36 @@ function HelpGuideManagementPage() {
   async function handleSubmit(values) {
     setSubmitting(true)
     try {
-      const payload = {
-        ...values,
-        display_order: Number(values.display_order || 0),
-        max_length: values.max_length === '' ? null : Number(values.max_length || 0),
+      const payload =
+        activeTab === 'screenshots'
+          ? (() => {
+              const formData = new FormData()
+              Object.entries(values).forEach(([key, value]) => {
+                if (key === 'image') {
+                  if (value?.[0]) formData.append('image', value[0])
+                  return
+                }
+                if (value == null || value === '') return
+                if (typeof value === 'boolean') {
+                  formData.append(key, value ? 'true' : 'false')
+                  return
+                }
+                formData.append(key, String(value))
+              })
+              if (!values.placeholder_label && !values.static_path && !values.image?.[0]) {
+                formData.append('placeholder_label', 'Screenshot required')
+              }
+              return formData
+            })()
+          : {
+              ...values,
+              display_order: Number(values.display_order || 0),
+              max_length: Object.prototype.hasOwnProperty.call(values, 'max_length')
+                ? values.max_length === '' ? null : Number(values.max_length || 0)
+                : undefined,
+            }
+      if (!(payload instanceof FormData) && payload.max_length === undefined) {
+        delete payload.max_length
       }
       if (selectedRecord?.id) {
         await currentConfig.update(selectedRecord.id, payload)
@@ -501,7 +587,7 @@ function HelpGuideManagementPage() {
     }
   }
 
-  const loading = metadataLoading || permissionsLoading || servicesLoading || screensLoading || fieldsLoading || actionsLoading || serviceGuidesLoading || workflowsLoading
+  const loading = metadataLoading || permissionsLoading || servicesLoading || screensLoading || screenshotsLoading || fieldsLoading || actionsLoading || serviceGuidesLoading || workflowsLoading
   const previewValues = form.watch()
 
   return (
@@ -614,6 +700,14 @@ function HelpGuideManagementPage() {
                 return (
                   <Field key={field.name} hint={field.hint} label={field.label}>
                     <textarea className="field min-h-24" {...form.register(field.name)} />
+                  </Field>
+                )
+              }
+
+              if (field.type === 'file') {
+                return (
+                  <Field key={field.name} hint={field.hint} label={field.label}>
+                    <input accept="image/*" className="field" type="file" {...form.register(field.name)} />
                   </Field>
                 )
               }
