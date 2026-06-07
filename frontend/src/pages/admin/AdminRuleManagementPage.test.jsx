@@ -10,11 +10,11 @@ test('admin rule management page renders safe management sections', async () => 
   )
 
   await waitFor(() => {
-    expect(screen.getByText('Rule Management')).toBeInTheDocument()
+    expect(screen.getByText('إدارة القواعد')).toBeInTheDocument()
   })
 
-  expect(screen.getByText('Services and pricing')).toBeInTheDocument()
-  expect(screen.getByText('Required documents')).toBeInTheDocument()
-  expect(screen.getByText('System settings')).toBeInTheDocument()
+  expect(screen.getByText('الخدمات والأسعار')).toBeInTheDocument()
+  expect(screen.getByText('المستندات المطلوبة')).toBeInTheDocument()
+  expect(screen.getByText('إعدادات النظام')).toBeInTheDocument()
   expect(screen.queryByText(/JSON/i)).not.toBeInTheDocument()
 })

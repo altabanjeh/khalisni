@@ -18,18 +18,20 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
+import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getLocalizedField } from '../../utils/i18n'
 
 const SERVICE_TABS = [
-  { id: 'services', label: 'Services and pricing', icon: SlidersHorizontal },
-  { id: 'documents', label: 'Required documents', icon: FileCheck2 },
-  { id: 'providers', label: 'Provider rules', icon: BriefcaseBusiness },
-  { id: 'workflow', label: 'Workflow rules', icon: Workflow },
-  { id: 'notifications', label: 'Notification templates', icon: BellRing },
-  { id: 'payments', label: 'Payments', icon: CreditCard },
-  { id: 'users', label: 'Users and roles', icon: UsersRound },
-  { id: 'audit', label: 'Audit logs', icon: ShieldCheck },
-  { id: 'settings', label: 'System settings', icon: Settings },
+  { id: 'services', icon: SlidersHorizontal },
+  { id: 'documents', icon: FileCheck2 },
+  { id: 'providers', icon: BriefcaseBusiness },
+  { id: 'workflow', icon: Workflow },
+  { id: 'notifications', icon: BellRing },
+  { id: 'payments', icon: CreditCard },
+  { id: 'users', icon: UsersRound },
+  { id: 'audit', icon: ShieldCheck },
+  { id: 'settings', icon: Settings },
 ]
 
 const DEFAULT_SERVICE_FORM = {
@@ -124,28 +126,48 @@ const PAYMENT_STATUS_OPTIONS = ['pending', 'processing', 'paid', 'failed', 'canc
 const SYSTEM_SETTING_KEYS = ['site.homepage', 'site.contact']
 const SETTING_DEFINITIONS = {
   'site.homepage': {
-    label: 'Homepage content',
-    help_text: 'Edit only the safe public text shown on the home page.',
-    warning: '',
+    label: { ar: 'محتوى الصفحة الرئيسية', en: 'Homepage content' },
+    help_text: { ar: 'عدّل النصوص العامة الآمنة الظاهرة في الصفحة الرئيسية فقط.', en: 'Edit only the safe public text shown on the home page.' },
+    warning: { ar: '', en: '' },
     fields: [
-      { key: 'hero_title', label: 'Main title', control: 'text', help_text: 'Short headline shown at the top of the home page.' },
-      { key: 'hero_subtitle', label: 'Supporting text', control: 'textarea', help_text: 'Short supporting description below the title.' },
+      {
+        key: 'hero_title',
+        label: { ar: 'العنوان الرئيسي', en: 'Main title' },
+        control: 'text',
+        help_text: { ar: 'عنوان قصير يظهر أعلى الصفحة الرئيسية.', en: 'Short headline shown at the top of the home page.' },
+      },
+      {
+        key: 'hero_subtitle',
+        label: { ar: 'النص الداعم', en: 'Supporting text' },
+        control: 'textarea',
+        help_text: { ar: 'وصف داعم قصير أسفل العنوان.', en: 'Short supporting description below the title.' },
+      },
     ],
   },
   'site.contact': {
-    label: 'Contact details',
-    help_text: 'Public contact details used by clients when they need help.',
-    warning: 'Changes appear to clients immediately.',
+    label: { ar: 'بيانات التواصل', en: 'Contact details' },
+    help_text: { ar: 'بيانات التواصل العامة التي يستخدمها العملاء عند الحاجة للمساعدة.', en: 'Public contact details used by clients when they need help.' },
+    warning: { ar: 'تظهر التغييرات للعملاء فوراً.', en: 'Changes appear to clients immediately.' },
     fields: [
-      { key: 'phone', label: 'Phone number', control: 'text', help_text: 'Visible customer support phone number.' },
-      { key: 'email', label: 'Email address', control: 'email', help_text: 'Visible customer support email address.' },
+      {
+        key: 'phone',
+        label: { ar: 'رقم الهاتف', en: 'Phone number' },
+        control: 'text',
+        help_text: { ar: 'رقم هاتف دعم العملاء الظاهر للجمهور.', en: 'Visible customer support phone number.' },
+      },
+      {
+        key: 'email',
+        label: { ar: 'البريد الإلكتروني', en: 'Email address' },
+        control: 'email',
+        help_text: { ar: 'بريد دعم العملاء الظاهر للجمهور.', en: 'Visible customer support email address.' },
+      },
     ],
   },
 }
 
-function formatDateTime(value) {
-  if (!value) return 'Not available'
-  return new Date(value).toLocaleString()
+function formatDateTime(value, locale, fallback) {
+  if (!value) return fallback
+  return new Date(value).toLocaleString(locale)
 }
 
 function buildDocumentType(currentValue, values) {
@@ -219,6 +241,50 @@ function TabButton({ active, icon: Icon, label, onClick }) {
 }
 
 function AdminRuleManagementPage() {
+  const { isArabic, language, locale } = useLanguage()
+  const tx = (ar, en) => (isArabic ? ar : en)
+  const localizeSettingValue = (value) => (typeof value === 'string' ? value : tx(value?.ar || '', value?.en || ''))
+  const getLocalizedName = (record, arField = 'name_ar', enField = 'name_en', fallback = '') =>
+    getLocalizedField(record, { ar: arField, en: enField }, language, fallback)
+  const roleLabels = {
+    customer: tx('عميل', 'Customer'),
+    employee: tx('موظف', 'Employee'),
+    support: tx('دعم', 'Support'),
+    provider: tx('مزود خدمة', 'Provider'),
+    admin: tx('مدير', 'Admin'),
+  }
+  const paymentStatusLabels = {
+    pending: tx('قيد الانتظار', 'Pending'),
+    processing: tx('قيد المعالجة', 'Processing'),
+    paid: tx('مدفوع', 'Paid'),
+    failed: tx('فشل', 'Failed'),
+    cancelled: tx('ملغي', 'Cancelled'),
+    refunded: tx('مسترد', 'Refunded'),
+    partially_refunded: tx('مسترد جزئياً', 'Partially refunded'),
+  }
+  const channelLabels = {
+    system: tx('النظام', 'System'),
+    email: tx('البريد الإلكتروني', 'Email'),
+    sms: tx('رسائل SMS', 'SMS'),
+    whatsapp: tx('واتساب', 'WhatsApp'),
+  }
+  const durationUnitLabels = {
+    hours: tx('ساعات', 'Hours'),
+    days: tx('أيام', 'Days'),
+    weeks: tx('أسابيع', 'Weeks'),
+  }
+  const tabLabels = {
+    services: tx('الخدمات والأسعار', 'Services and pricing'),
+    documents: tx('المستندات المطلوبة', 'Required documents'),
+    providers: tx('قواعد المزودين', 'Provider rules'),
+    workflow: tx('قواعد سير العمل', 'Workflow rules'),
+    notifications: tx('قوالب الإشعارات', 'Notification templates'),
+    payments: tx('المدفوعات', 'Payments'),
+    users: tx('المستخدمون والأدوار', 'Users and roles'),
+    audit: tx('سجلات التدقيق', 'Audit logs'),
+    settings: tx('إعدادات النظام', 'System settings'),
+  }
+
   const [activeTab, setActiveTab] = useState('services')
   const [feedback, setFeedback] = useState({})
   const [confirmState, setConfirmState] = useState({
@@ -544,7 +610,7 @@ function AdminRuleManagementPage() {
       }
       reloadServices()
       closeServiceEditor()
-      setSectionFeedback('services', 'success', 'Service rules saved.')
+      setSectionFeedback('services', 'success', tx('تم حفظ قواعد الخدمة.', 'Service rules saved.'))
     } catch (error) {
       setSectionFeedback('services', 'error', getDisplayError(error))
     }
@@ -566,7 +632,7 @@ function AdminRuleManagementPage() {
       }
       reloadDocuments()
       closeDocumentEditor()
-      setSectionFeedback('documents', 'success', 'Document rule saved.')
+      setSectionFeedback('documents', 'success', tx('تم حفظ قاعدة المستند.', 'Document rule saved.'))
     } catch (error) {
       setSectionFeedback('documents', 'error', getDisplayError(error))
     }
@@ -586,7 +652,7 @@ function AdminRuleManagementPage() {
       }
       reloadAssignments()
       closeAssignmentEditor()
-      setSectionFeedback('assignments', 'success', 'Provider rule saved.')
+      setSectionFeedback('assignments', 'success', tx('تم حفظ قاعدة المزود.', 'Provider rule saved.'))
     } catch (error) {
       setSectionFeedback('assignments', 'error', getDisplayError(error))
     }
@@ -600,7 +666,7 @@ function AdminRuleManagementPage() {
         reason: providerActionForm.approval_reason,
       })
       reloadProviders()
-      setSectionFeedback('providers', 'success', 'Provider approval decision saved.')
+      setSectionFeedback('providers', 'success', tx('تم حفظ قرار اعتماد المزود.', 'Provider approval decision saved.'))
     } catch (error) {
       setSectionFeedback('providers', 'error', getDisplayError(error))
     }
@@ -614,7 +680,7 @@ function AdminRuleManagementPage() {
         reason: providerActionForm.activation_reason,
       })
       reloadProviders()
-      setSectionFeedback('providers', 'success', 'Provider activation updated.')
+      setSectionFeedback('providers', 'success', tx('تم تحديث تفعيل المزود.', 'Provider activation updated.'))
     } catch (error) {
       setSectionFeedback('providers', 'error', getDisplayError(error))
     }
@@ -624,7 +690,7 @@ function AdminRuleManagementPage() {
     try {
       const preview = await api.previewNotificationTemplate(templateForm)
       setTemplatePreview(preview)
-      setSectionFeedback('notifications', 'success', 'Preview updated.')
+      setSectionFeedback('notifications', 'success', tx('تم تحديث المعاينة.', 'Preview updated.'))
     } catch (error) {
       setSectionFeedback('notifications', 'error', getDisplayError(error))
     }
@@ -639,7 +705,7 @@ function AdminRuleManagementPage() {
       }
       reloadTemplates()
       closeTemplateEditor()
-      setSectionFeedback('notifications', 'success', 'Notification template saved.')
+      setSectionFeedback('notifications', 'success', tx('تم حفظ قالب الإشعار.', 'Notification template saved.'))
     } catch (error) {
       setSectionFeedback('notifications', 'error', getDisplayError(error))
     }
@@ -651,7 +717,7 @@ function AdminRuleManagementPage() {
       await api.updateAdminPaymentStatus(selectedPayment.id, paymentForm)
       reloadPayments()
       closePaymentEditor()
-      setSectionFeedback('payments', 'success', 'Payment status updated safely.')
+      setSectionFeedback('payments', 'success', tx('تم تحديث حالة الدفع بأمان.', 'Payment status updated safely.'))
     } catch (error) {
       setSectionFeedback('payments', 'error', getDisplayError(error))
     }
@@ -668,7 +734,7 @@ function AdminRuleManagementPage() {
       }
       reloadUsers()
       closeUserEditor()
-      setSectionFeedback('users', 'success', 'User saved.')
+      setSectionFeedback('users', 'success', tx('تم حفظ المستخدم.', 'User saved.'))
     } catch (error) {
       setSectionFeedback('users', 'error', getDisplayError(error))
     }
@@ -688,7 +754,7 @@ function AdminRuleManagementPage() {
       }
       reloadSettings()
       closeSettingEditor()
-      setSectionFeedback('settings', 'success', 'System setting saved.')
+      setSectionFeedback('settings', 'success', tx('تم حفظ إعداد النظام.', 'System setting saved.'))
     } catch (error) {
       setSectionFeedback('settings', 'error', getDisplayError(error))
     }
@@ -697,25 +763,25 @@ function AdminRuleManagementPage() {
   if (busy) return <LoadingSpinner />
 
   const serviceColumns = [
-    { key: 'name_ar', label: 'Service' },
-    { key: 'category_name', label: 'Category' },
-    { key: 'base_price', label: 'Base price' },
-    { key: 'duration_display', label: 'Estimated duration' },
-    { key: 'provider_required', label: 'Provider required', render: (row) => (row.provider_required ? 'Yes' : 'No') },
-    { key: 'requires_manual_review', label: 'Employee review', render: (row) => (row.requires_manual_review ? 'Required' : 'Not required') },
-    { key: 'is_active', label: 'Status', render: (row) => (row.is_active ? 'Active' : 'Inactive') },
+    { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
+    { key: 'category_name', label: tx('التصنيف', 'Category') },
+    { key: 'base_price', label: tx('السعر الأساسي', 'Base price') },
+    { key: 'duration_display', label: tx('المدة التقديرية', 'Estimated duration') },
+    { key: 'provider_required', label: tx('يتطلب مزوداً', 'Provider required'), render: (row) => (row.provider_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
+    { key: 'requires_manual_review', label: tx('مراجعة الموظف', 'Employee review'), render: (row) => (row.requires_manual_review ? tx('مطلوبة', 'Required') : tx('غير مطلوبة', 'Not required')) },
+    { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openServiceEditor(row.id)} type="button">
-            Edit
+            {tx('تعديل', 'Edit')}
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
             onClick={() =>
-              openConfirm('Disable service', 'Used services are only disabled, never removed from history.', async () => {
+              openConfirm(tx('تعطيل الخدمة', 'Disable service'), tx('يتم تعطيل الخدمات المستخدمة فقط ولا تُحذف من السجل أبداً.', 'Used services are only disabled, never removed from history.'), async () => {
                 await api.deleteAdminService(row.id)
                 reloadServices()
                 setConfirmState({ open: false, title: '', description: '', onConfirm: null })
@@ -723,7 +789,7 @@ function AdminRuleManagementPage() {
             }
             type="button"
           >
-            Disable
+            {tx('تعطيل', 'Disable')}
           </button>
         </div>
       ),
@@ -731,23 +797,23 @@ function AdminRuleManagementPage() {
   ]
 
   const documentColumns = [
-    { key: 'service_name', label: 'Service' },
-    { key: 'name_ar', label: 'Document name' },
-    { key: 'is_required', label: 'Requirement', render: (row) => (row.is_required ? 'Required' : 'Optional') },
-    { key: 'allowed_extensions', label: 'File types', render: (row) => (row.allowed_extensions || []).join(', ') || 'Not set' },
-    { key: 'max_file_size', label: 'Max size', render: (row) => toMb(row.max_file_size) },
+    { key: 'service_name', label: tx('الخدمة', 'Service') },
+    { key: 'name', label: tx('اسم المستند', 'Document name'), render: (row) => getLocalizedName(row) },
+    { key: 'is_required', label: tx('المتطلب', 'Requirement'), render: (row) => (row.is_required ? tx('مطلوب', 'Required') : tx('اختياري', 'Optional')) },
+    { key: 'allowed_extensions', label: tx('أنواع الملفات', 'File types'), render: (row) => (row.allowed_extensions || []).join(', ') || tx('غير محدد', 'Not set') },
+    { key: 'max_file_size', label: tx('الحد الأقصى للحجم', 'Max size'), render: (row) => toMb(row.max_file_size) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openDocumentEditor(row.id)} type="button">
-            Edit
+            {tx('تعديل', 'Edit')}
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
             onClick={() =>
-              openConfirm('Disable document rule', 'Orders keep their uploaded files. Only the future requirement is disabled.', async () => {
+              openConfirm(tx('تعطيل قاعدة المستند', 'Disable document rule'), tx('تحتفظ الطلبات بملفاتها المرفوعة، ويتم فقط تعطيل المتطلب المستقبلي.', 'Orders keep their uploaded files. Only the future requirement is disabled.'), async () => {
                 await api.deleteAdminServiceDocument(row.id)
                 reloadDocuments()
                 setConfirmState({ open: false, title: '', description: '', onConfirm: null })
@@ -755,7 +821,7 @@ function AdminRuleManagementPage() {
             }
             type="button"
           >
-            Disable
+            {tx('تعطيل', 'Disable')}
           </button>
         </div>
       ),
@@ -763,23 +829,23 @@ function AdminRuleManagementPage() {
   ]
 
   const assignmentColumns = [
-    { key: 'service_name', label: 'Service' },
-    { key: 'provider_name', label: 'Provider' },
-    { key: 'provider_city', label: 'City' },
-    { key: 'provider_is_approved', label: 'Approved', render: (row) => (row.provider_is_approved ? 'Yes' : 'No') },
-    { key: 'is_active', label: 'Status', render: (row) => (row.is_active ? 'Active' : 'Inactive') },
+    { key: 'service_name', label: tx('الخدمة', 'Service') },
+    { key: 'provider_name', label: tx('مزود الخدمة', 'Provider') },
+    { key: 'provider_city', label: tx('المدينة', 'City') },
+    { key: 'provider_is_approved', label: tx('معتمد', 'Approved'), render: (row) => (row.provider_is_approved ? tx('نعم', 'Yes') : tx('لا', 'No')) },
+    { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openAssignmentEditor(row.id)} type="button">
-            Edit
+            {tx('تعديل', 'Edit')}
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
             onClick={() =>
-              openConfirm('Disable assignment rule', 'This keeps audit history and only stops future matching.', async () => {
+              openConfirm(tx('تعطيل قاعدة الإسناد', 'Disable assignment rule'), tx('يحتفظ هذا بسجل التدقيق ويوقف المطابقة المستقبلية فقط.', 'This keeps audit history and only stops future matching.'), async () => {
                 await api.deleteAdminServiceAssignment(row.id)
                 reloadAssignments()
                 setConfirmState({ open: false, title: '', description: '', onConfirm: null })
@@ -787,7 +853,7 @@ function AdminRuleManagementPage() {
             }
             type="button"
           >
-            Disable
+            {tx('تعطيل', 'Disable')}
           </button>
         </div>
       ),
@@ -795,47 +861,47 @@ function AdminRuleManagementPage() {
   ]
 
   const providerColumns = [
-    { key: 'full_name', label: 'Provider' },
-    { key: 'provider_type', label: 'Capability' },
-    { key: 'capability_summary', label: 'Services' },
-    { key: 'approval_status_label', label: 'Approval' },
-    { key: 'account_active', label: 'Account', render: (row) => (row.account_active ? 'Active' : 'Inactive') },
+    { key: 'full_name', label: tx('مزود الخدمة', 'Provider') },
+    { key: 'provider_type', label: tx('القدرة', 'Capability') },
+    { key: 'capability_summary', label: tx('الخدمات', 'Services') },
+    { key: 'approval_status_label', label: tx('الاعتماد', 'Approval') },
+    { key: 'account_active', label: tx('الحساب', 'Account'), render: (row) => (row.account_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openProviderEditor(row.id)} type="button">
-          Manage
+          {tx('إدارة', 'Manage')}
         </button>
       ),
     },
   ]
 
   const workflowColumns = [
-    { key: 'summary', label: 'Rule' },
-    { key: 'allowed_role_labels', label: 'Who can do it', render: (row) => row.allowed_role_labels.join(', ') },
-    { key: 'reason_required', label: 'Reason required', render: (row) => (row.reason_required ? 'Yes' : 'No') },
-    { key: 'notification_trigger', label: 'Sends notification', render: (row) => (row.notification_trigger ? 'Yes' : 'No') },
-    { key: 'change_request_supported', label: 'Direct edit', render: () => 'Not allowed' },
+    { key: 'summary', label: tx('القاعدة', 'Rule') },
+    { key: 'allowed_role_labels', label: tx('من يمكنه التنفيذ', 'Who can do it'), render: (row) => row.allowed_role_labels.join(', ') },
+    { key: 'reason_required', label: tx('يتطلب سبباً', 'Reason required'), render: (row) => (row.reason_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
+    { key: 'notification_trigger', label: tx('يرسل إشعاراً', 'Sends notification'), render: (row) => (row.notification_trigger ? tx('نعم', 'Yes') : tx('لا', 'No')) },
+    { key: 'change_request_supported', label: tx('تعديل مباشر', 'Direct edit'), render: () => tx('غير مسموح', 'Not allowed') },
   ]
 
   const templateColumns = [
-    { key: 'key', label: 'Template key' },
-    { key: 'channel', label: 'Channel' },
-    { key: 'title_ar', label: 'Arabic title' },
-    { key: 'is_active', label: 'Status', render: (row) => (row.is_active ? 'Active' : 'Inactive') },
+    { key: 'key', label: tx('مفتاح القالب', 'Template key') },
+    { key: 'channel', label: tx('القناة', 'Channel'), render: (row) => channelLabels[row.channel] || row.channel },
+    { key: 'title_ar', label: tx('العنوان العربي', 'Arabic title') },
+    { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openTemplateEditor(row.id || row.template_id)} type="button">
-            Edit
+            {tx('تعديل', 'Edit')}
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
             onClick={() =>
-              openConfirm('Disable template', 'This keeps the template for audit but stops using it.', async () => {
+              openConfirm(tx('تعطيل القالب', 'Disable template'), tx('يحتفظ هذا بالقالب لأغراض التدقيق ويوقف استخدامه.', 'This keeps the template for audit but stops using it.'), async () => {
                 await api.deleteAdminNotificationTemplate(row.id || row.template_id)
                 reloadTemplates()
                 setConfirmState({ open: false, title: '', description: '', onConfirm: null })
@@ -843,7 +909,7 @@ function AdminRuleManagementPage() {
             }
             type="button"
           >
-            Disable
+            {tx('تعطيل', 'Disable')}
           </button>
         </div>
       ),
@@ -851,40 +917,40 @@ function AdminRuleManagementPage() {
   ]
 
   const paymentColumns = [
-    { key: 'payment_number', label: 'Payment number' },
-    { key: 'order_number', label: 'Order' },
-    { key: 'customer_name', label: 'Customer' },
-    { key: 'status_label', label: 'Status' },
-    { key: 'amount', label: 'Amount' },
-    { key: 'reference_number', label: 'Reference' },
+    { key: 'payment_number', label: tx('رقم الدفعة', 'Payment number') },
+    { key: 'order_number', label: tx('الطلب', 'Order') },
+    { key: 'customer_name', label: tx('العميل', 'Customer') },
+    { key: 'status_label', label: tx('الحالة', 'Status') },
+    { key: 'amount', label: tx('المبلغ', 'Amount') },
+    { key: 'reference_number', label: tx('المرجع', 'Reference') },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openPaymentEditor(row.id)} type="button">
-          Update
+          {tx('تحديث', 'Update')}
         </button>
       ),
     },
   ]
 
   const userColumns = [
-    { key: 'full_name', label: 'User' },
-    { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role' },
-    { key: 'is_active', label: 'Status', render: (row) => (row.is_active ? 'Active' : 'Inactive') },
+    { key: 'full_name', label: tx('المستخدم', 'User') },
+    { key: 'email', label: tx('البريد الإلكتروني', 'Email') },
+    { key: 'role', label: tx('الدور', 'Role'), render: (row) => roleLabels[row.role] || row.role },
+    { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openUserEditor(row.id)} type="button">
-            Edit
+            {tx('تعديل', 'Edit')}
           </button>
           <button
             className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
             onClick={() =>
-              openConfirm('Deactivate user', 'This keeps the account for audit and blocks future access.', async () => {
+              openConfirm(tx('إلغاء تفعيل المستخدم', 'Deactivate user'), tx('يحتفظ هذا بالحساب لأغراض التدقيق ويمنع الوصول مستقبلاً.', 'This keeps the account for audit and blocks future access.'), async () => {
                 await api.deleteAdminUser(row.id)
                 reloadUsers()
                 setConfirmState({ open: false, title: '', description: '', onConfirm: null })
@@ -892,7 +958,7 @@ function AdminRuleManagementPage() {
             }
             type="button"
           >
-            Deactivate
+            {tx('إلغاء التفعيل', 'Deactivate')}
           </button>
         </div>
       ),
@@ -900,24 +966,24 @@ function AdminRuleManagementPage() {
   ]
 
   const auditColumns = [
-    { key: 'user_name', label: 'User' },
-    { key: 'module', label: 'Module' },
-    { key: 'action', label: 'Action' },
-    { key: 'status', label: 'Result' },
-    { key: 'message', label: 'Message' },
-    { key: 'created_at', label: 'Date', render: (row) => formatDateTime(row.created_at) },
+    { key: 'user_name', label: tx('المستخدم', 'User') },
+    { key: 'module', label: tx('الوحدة', 'Module') },
+    { key: 'action', label: tx('الإجراء', 'Action') },
+    { key: 'status', label: tx('النتيجة', 'Result') },
+    { key: 'message', label: tx('الرسالة', 'Message') },
+    { key: 'created_at', label: tx('التاريخ', 'Date'), render: (row) => formatDateTime(row.created_at, locale, tx('غير متوفر', 'Not available')) },
   ]
 
   const settingColumns = [
-    { key: 'label', label: 'Setting' },
-    { key: 'warning', label: 'Warning', render: (row) => row.warning || 'No warning' },
-    { key: 'updated_at', label: 'Last update', render: (row) => formatDateTime(row.updated_at) },
+    { key: 'label', label: tx('الإعداد', 'Setting') },
+    { key: 'warning', label: tx('تنبيه', 'Warning'), render: (row) => row.warning || tx('لا يوجد تنبيه', 'No warning') },
+    { key: 'updated_at', label: tx('آخر تحديث', 'Last update'), render: (row) => formatDateTime(row.updated_at, locale, tx('غير متوفر', 'Not available')) },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tx('الإجراءات', 'Actions'),
       render: (row) => (
         <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openSettingEditor(row.id || row.setting_id)} type="button">
-          Edit
+          {tx('تعديل', 'Edit')}
         </button>
       ),
     },
@@ -925,31 +991,38 @@ function AdminRuleManagementPage() {
 
   const settingDefinition = SETTING_DEFINITIONS[settingForm.key] || {
     label: settingForm.key,
-    help_text: 'Choose a safe setting and fill in the allowed fields only.',
+    help_text: tx('اختر إعداداً آمناً واملأ الحقول المسموح بها فقط.', 'Choose a safe setting and fill in the allowed fields only.'),
     warning: '',
     fields: [],
   }
 
   const currentSettingDefinition = {
     key: settingForm.key,
-    label: settingDefinition.label,
-    help_text: settingDefinition.help_text,
-    warning: settingDefinition.warning,
-    fields: settingDefinition.fields || [],
+    label: localizeSettingValue(settingDefinition.label),
+    help_text: localizeSettingValue(settingDefinition.help_text),
+    warning: localizeSettingValue(settingDefinition.warning),
+    fields: (settingDefinition.fields || []).map((field) => ({
+      ...field,
+      label: localizeSettingValue(field.label),
+      help_text: localizeSettingValue(field.help_text),
+    })),
   }
 
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        description="Safe business-rule management for non-technical admins. All changes stay inside audited workflows and restricted admin actions."
-        eyebrow="Admin Rules"
+        description={tx(
+          'إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.',
+          'Safe business-rule management for non-technical admins. All changes stay inside audited workflows and restricted admin actions.',
+        )}
+        eyebrow={tx('قواعد الإدارة', 'Admin Rules')}
         icon={FileStack}
-        title="Rule Management"
+        title={tx('إدارة القواعد', 'Rule Management')}
       />
 
       <div className="flex flex-wrap gap-3">
         {SERVICE_TABS.map((tab) => (
-          <TabButton key={tab.id} active={activeTab === tab.id} icon={tab.icon} label={tab.label} onClick={() => setActiveTab(tab.id)} />
+          <TabButton key={tab.id} active={activeTab === tab.id} icon={tab.icon} label={tabLabels[tab.id]} onClick={() => setActiveTab(tab.id)} />
         ))}
       </div>
 
@@ -957,14 +1030,22 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title="Service management"
-              text="Manage only business-facing service details. Internal identifiers stay hidden and used services are disabled instead of deleted."
+              title={tx('إدارة الخدمات', 'Service management')}
+              text={tx(
+                'أدر فقط تفاصيل الخدمات الظاهرة للأعمال. تبقى المعرفات الداخلية مخفية ويتم تعطيل الخدمات المستخدمة بدلاً من حذفها.',
+                'Manage only business-facing service details. Internal identifiers stay hidden and used services are disabled instead of deleted.',
+              )}
             />
             <button className="btn-primary" onClick={() => openServiceEditor()} type="button">
-              New service
+              {tx('خدمة جديدة', 'New service')}
             </button>
           </div>
-          <DataTable columns={serviceColumns} emptyDescription="Create the first service to start taking orders." emptyTitle="No services found" rows={services} />
+          <DataTable
+            columns={serviceColumns}
+            emptyDescription={tx('أنشئ أول خدمة لبدء استقبال الطلبات.', 'Create the first service to start taking orders.')}
+            emptyTitle={tx('لا توجد خدمات', 'No services found')}
+            rows={services}
+          />
           <SectionMessage message={feedback.services} />
         </section>
       ) : null}
@@ -973,15 +1054,23 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title="Required documents"
-              text="Define which files are required for each service using clear names, safe file types, and replacement rules."
-              warning="Admins cannot edit the actual uploaded files from this screen."
+              title={tx('المستندات المطلوبة', 'Required documents')}
+              text={tx(
+                'حدّد الملفات المطلوبة لكل خدمة باستخدام أسماء واضحة وأنواع ملفات آمنة وقواعد استبدال مناسبة.',
+                'Define which files are required for each service using clear names, safe file types, and replacement rules.',
+              )}
+              warning={tx('لا يمكن للمشرفين تعديل الملفات المرفوعة الفعلية من هذه الشاشة.', 'Admins cannot edit the actual uploaded files from this screen.')}
             />
             <button className="btn-primary" onClick={() => openDocumentEditor()} type="button">
-              New document rule
+              {tx('قاعدة مستند جديدة', 'New document rule')}
             </button>
           </div>
-          <DataTable columns={documentColumns} emptyDescription="Add the first document rule for a service." emptyTitle="No document rules found" rows={documents} />
+          <DataTable
+            columns={documentColumns}
+            emptyDescription={tx('أضف أول قاعدة مستند لخدمة ما.', 'Add the first document rule for a service.')}
+            emptyTitle={tx('لا توجد قواعد مستندات', 'No document rules found')}
+            rows={documents}
+          />
           <SectionMessage message={feedback.documents} />
         </section>
       ) : null}
@@ -991,23 +1080,39 @@ function AdminRuleManagementPage() {
           <div className="glass-panel p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <EmptyHelp
-                title="Provider assignment rules"
-                text="Link approved providers to services. Actual order reassignment stays on the order screen and requires a reason."
+                title={tx('قواعد إسناد المزودين', 'Provider assignment rules')}
+                text={tx(
+                  'اربط المزودين المعتمدين بالخدمات. يبقى إعادة إسناد الطلبات الفعلية ضمن شاشة الطلب ويتطلب سبباً.',
+                  'Link approved providers to services. Actual order reassignment stays on the order screen and requires a reason.',
+                )}
               />
               <button className="btn-primary" onClick={() => openAssignmentEditor()} type="button">
-                New assignment rule
+                {tx('قاعدة إسناد جديدة', 'New assignment rule')}
               </button>
             </div>
-            <DataTable columns={assignmentColumns} emptyDescription="Link providers to services before assigning live orders." emptyTitle="No provider assignment rules found" rows={assignments} />
+            <DataTable
+              columns={assignmentColumns}
+              emptyDescription={tx('اربط المزودين بالخدمات قبل إسناد الطلبات الفعلية.', 'Link providers to services before assigning live orders.')}
+              emptyTitle={tx('لا توجد قواعد إسناد للمزودين', 'No provider assignment rules found')}
+              rows={assignments}
+            />
             <SectionMessage message={feedback.assignments} />
           </div>
 
           <div className="glass-panel p-6">
               <EmptyHelp
-                title="Provider approval"
-                text="Review provider capabilities, approve or reject them, and activate or deactivate business access without editing security internals."
+                title={tx('اعتماد المزودين', 'Provider approval')}
+                text={tx(
+                  'راجع قدرات المزودين واعتمدهم أو ارفضهم، وفعّل أو عطّل وصولهم للأعمال دون تعديل الجوانب الأمنية الداخلية.',
+                  'Review provider capabilities, approve or reject them, and activate or deactivate business access without editing security internals.',
+                )}
               />
-              <DataTable columns={providerColumns} emptyDescription="Provider accounts appear here once created." emptyTitle="No providers found" rows={providers} />
+              <DataTable
+                columns={providerColumns}
+                emptyDescription={tx('تظهر حسابات المزودين هنا بعد إنشائها.', 'Provider accounts appear here once created.')}
+                emptyTitle={tx('لا يوجد مزودون', 'No providers found')}
+                rows={providers}
+              />
               <SectionMessage message={feedback.providers} />
           </div>
         </section>
@@ -1016,11 +1121,22 @@ function AdminRuleManagementPage() {
       {activeTab === 'workflow' ? (
         <section className="glass-panel p-6">
           <EmptyHelp
-            title="Workflow rules review"
-            text="This screen explains the active workflow in simple language. Dangerous transitions cannot be edited directly from the admin UI."
-            warning="If workflow change approval is introduced later, change requests should point there instead of direct editing."
+            title={tx('مراجعة قواعد سير العمل', 'Workflow rules review')}
+            text={tx(
+              'تشرح هذه الشاشة سير العمل النشط بلغة بسيطة. لا يمكن تعديل الانتقالات الخطرة مباشرة من واجهة الإدارة.',
+              'This screen explains the active workflow in simple language. Dangerous transitions cannot be edited directly from the admin UI.',
+            )}
+            warning={tx(
+              'إذا تمت إضافة اعتماد لتغيير سير العمل لاحقاً، فيجب أن تتجه طلبات التغيير إليه بدلاً من التعديل المباشر.',
+              'If workflow change approval is introduced later, change requests should point there instead of direct editing.',
+            )}
           />
-          <DataTable columns={workflowColumns} emptyDescription="Workflow rules will appear here once loaded." emptyTitle="No workflow rules found" rows={workflowRules.map((rule, index) => ({ id: index + 1, ...rule }))} />
+          <DataTable
+            columns={workflowColumns}
+            emptyDescription={tx('ستظهر قواعد سير العمل هنا بعد تحميلها.', 'Workflow rules will appear here once loaded.')}
+            emptyTitle={tx('لا توجد قواعد سير عمل', 'No workflow rules found')}
+            rows={workflowRules.map((rule, index) => ({ id: index + 1, ...rule }))}
+          />
         </section>
       ) : null}
 
@@ -1028,15 +1144,23 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title="Notification templates"
-              text="Only safe text templates can be edited here. HTML and unsafe placeholders are blocked."
-              warning="Preview the message before saving any change."
+              title={tx('قوالب الإشعارات', 'Notification templates')}
+              text={tx(
+                'لا يمكن تعديل سوى القوالب النصية الآمنة هنا. يتم حظر HTML والعناصر النائبة غير الآمنة.',
+                'Only safe text templates can be edited here. HTML and unsafe placeholders are blocked.',
+              )}
+              warning={tx('عاين الرسالة قبل حفظ أي تغيير.', 'Preview the message before saving any change.')}
             />
             <button className="btn-primary" onClick={() => openTemplateEditor()} type="button">
-              New template
+              {tx('قالب جديد', 'New template')}
             </button>
           </div>
-          <DataTable columns={templateColumns} emptyDescription="Create the first notification template for staff-approved messages." emptyTitle="No notification templates found" rows={notificationTemplates} />
+          <DataTable
+            columns={templateColumns}
+            emptyDescription={tx('أنشئ أول قالب إشعار للرسائل المعتمدة من الموظفين.', 'Create the first notification template for staff-approved messages.')}
+            emptyTitle={tx('لا توجد قوالب إشعارات', 'No notification templates found')}
+            rows={notificationTemplates}
+          />
           <SectionMessage message={feedback.notifications} />
         </section>
       ) : null}
@@ -1044,10 +1168,18 @@ function AdminRuleManagementPage() {
       {activeTab === 'payments' ? (
         <section className="glass-panel p-6">
             <EmptyHelp
-              title="Payment status management"
-              text="View payment status and update it only through the safe status action. Raw transaction records are not editable here."
+              title={tx('إدارة حالات الدفع', 'Payment status management')}
+              text={tx(
+                'اعرض حالة الدفع وحدّثها فقط من خلال إجراء الحالة الآمن. لا يمكن تعديل سجلات العمليات الخام هنا.',
+                'View payment status and update it only through the safe status action. Raw transaction records are not editable here.',
+              )}
             />
-            <DataTable columns={paymentColumns} emptyDescription="Payments linked to orders will appear here." emptyTitle="No payments found" rows={payments} />
+            <DataTable
+              columns={paymentColumns}
+              emptyDescription={tx('ستظهر المدفوعات المرتبطة بالطلبات هنا.', 'Payments linked to orders will appear here.')}
+              emptyTitle={tx('لا توجد مدفوعات', 'No payments found')}
+              rows={payments}
+            />
           <SectionMessage message={feedback.payments} />
         </section>
       ) : null}
@@ -1056,15 +1188,23 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title="User and role management"
-              text="Manage normal business users and roles only. Super admin accounts and permission internals stay protected."
-              warning="Normal admins cannot create or modify admin-level users."
+              title={tx('إدارة المستخدمين والأدوار', 'User and role management')}
+              text={tx(
+                'أدر مستخدمي الأعمال العاديين وأدوارهم فقط. تبقى حسابات المشرف الأعلى وتفاصيل الصلاحيات الداخلية محمية.',
+                'Manage normal business users and roles only. Super admin accounts and permission internals stay protected.',
+              )}
+              warning={tx('لا يمكن للمشرفين العاديين إنشاء أو تعديل مستخدمين بمستوى إداري.', 'Normal admins cannot create or modify admin-level users.')}
             />
             <button className="btn-primary" onClick={() => openUserEditor()} type="button">
-              New user
+              {tx('مستخدم جديد', 'New user')}
             </button>
           </div>
-          <DataTable columns={userColumns} emptyDescription="Business users will appear here once created." emptyTitle="No users found" rows={users} />
+          <DataTable
+            columns={userColumns}
+            emptyDescription={tx('سيظهر مستخدمو الأعمال هنا بعد إنشائهم.', 'Business users will appear here once created.')}
+            emptyTitle={tx('لا يوجد مستخدمون', 'No users found')}
+            rows={users}
+          />
           <SectionMessage message={feedback.users} />
         </section>
       ) : null}
@@ -1072,42 +1212,50 @@ function AdminRuleManagementPage() {
       {activeTab === 'audit' ? (
         <section className="glass-panel space-y-6 p-6">
           <EmptyHelp
-            title="Audit log viewer"
-            text="Filter by user, module, action, result, or date. Audit logs are view-only and cannot be edited or deleted from this screen."
+            title={tx('عارض سجل التدقيق', 'Audit log viewer')}
+            text={tx(
+              'قم بالتصفية حسب المستخدم أو الوحدة أو الإجراء أو النتيجة أو التاريخ. سجلات التدقيق للعرض فقط ولا يمكن تعديلها أو حذفها من هذه الشاشة.',
+              'Filter by user, module, action, result, or date. Audit logs are view-only and cannot be edited or deleted from this screen.',
+            )}
           />
           <div className="grid gap-4 md:grid-cols-3">
-            <Field label="User" help="Filter by user name or ID if needed.">
+            <Field label={tx('المستخدم', 'User')} help={tx('صفِّ حسب اسم المستخدم أو المعرف عند الحاجة.', 'Filter by user name or ID if needed.')}>
               <input className="field" value={auditFilters.user} onChange={(event) => setAuditFilters({ ...auditFilters, user: event.target.value })} />
             </Field>
-            <Field label="Module" help="Examples: Service, Payment, Notification.">
+            <Field label={tx('الوحدة', 'Module')} help={tx('أمثلة: خدمة، دفع، إشعار.', 'Examples: Service, Payment, Notification.')}>
               <input className="field" value={auditFilters.module} onChange={(event) => setAuditFilters({ ...auditFilters, module: event.target.value })} />
             </Field>
-            <Field label="Action" help="Examples: update_service, payment_status_update.">
+            <Field label={tx('الإجراء', 'Action')} help={tx('أمثلة: update_service، payment_status_update.', 'Examples: update_service, payment_status_update.')}>
               <input className="field" value={auditFilters.action} onChange={(event) => setAuditFilters({ ...auditFilters, action: event.target.value })} />
             </Field>
-            <Field label="From date" help="Show events on or after this date.">
+            <Field label={tx('من تاريخ', 'From date')} help={tx('اعرض الأحداث في هذا التاريخ أو بعده.', 'Show events on or after this date.')}>
               <input className="field" type="date" value={auditFilters.date_from} onChange={(event) => setAuditFilters({ ...auditFilters, date_from: event.target.value })} />
             </Field>
-            <Field label="To date" help="Show events on or before this date.">
+            <Field label={tx('إلى تاريخ', 'To date')} help={tx('اعرض الأحداث في هذا التاريخ أو قبله.', 'Show events on or before this date.')}>
               <input className="field" type="date" value={auditFilters.date_to} onChange={(event) => setAuditFilters({ ...auditFilters, date_to: event.target.value })} />
             </Field>
-            <Field label="Result" help="Filter by success or failed actions.">
+            <Field label={tx('النتيجة', 'Result')} help={tx('صفِّ حسب الإجراءات الناجحة أو الفاشلة.', 'Filter by success or failed actions.')}>
               <select className="field" value={auditFilters.status} onChange={(event) => setAuditFilters({ ...auditFilters, status: event.target.value })}>
-                <option value="">All results</option>
-                <option value="success">Success</option>
-                <option value="failed">Failed</option>
+                <option value="">{tx('كل النتائج', 'All results')}</option>
+                <option value="success">{tx('ناجح', 'Success')}</option>
+                <option value="failed">{tx('فشل', 'Failed')}</option>
               </select>
             </Field>
           </div>
           <div className="flex gap-3">
             <button className="btn-primary" onClick={() => reloadAudit()} type="button">
-              Refresh logs
+              {tx('تحديث السجلات', 'Refresh logs')}
             </button>
             <button className="btn-secondary" onClick={() => setAuditFilters(DEFAULT_AUDIT_FILTERS)} type="button">
-              Clear filters
+              {tx('مسح الفلاتر', 'Clear filters')}
             </button>
           </div>
-          <DataTable columns={auditColumns} emptyDescription="Sensitive changes will appear here once they occur." emptyTitle="No audit logs found" rows={auditLogs} />
+          <DataTable
+            columns={auditColumns}
+            emptyDescription={tx('ستظهر التغييرات الحساسة هنا عند حدوثها.', 'Sensitive changes will appear here once they occur.')}
+            emptyTitle={tx('لا توجد سجلات تدقيق', 'No audit logs found')}
+            rows={auditLogs}
+          />
         </section>
       ) : null}
 
@@ -1115,15 +1263,23 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title="System settings"
-              text="Only whitelisted business-safe settings appear here. Raw JSON and security internals are blocked."
-              warning="Sensitive settings should stay under super admin or code control."
+              title={tx('إعدادات النظام', 'System settings')}
+              text={tx(
+                'تظهر هنا فقط الإعدادات التجارية الآمنة المسموح بها. يتم حظر JSON الخام وتفاصيل الأمان الداخلية.',
+                'Only whitelisted business-safe settings appear here. Raw JSON and security internals are blocked.',
+              )}
+              warning={tx('يجب أن تبقى الإعدادات الحساسة تحت تحكم المشرف الأعلى أو الكود.', 'Sensitive settings should stay under super admin or code control.')}
             />
             <button className="btn-primary" onClick={() => openSettingEditor()} type="button">
-              New setting
+              {tx('إعداد جديد', 'New setting')}
             </button>
           </div>
-          <DataTable columns={settingColumns} emptyDescription="Create a safe setting when the business needs a controlled option." emptyTitle="No safe settings found" rows={systemSettings} />
+          <DataTable
+            columns={settingColumns}
+            emptyDescription={tx('أنشئ إعداداً آمناً عندما تحتاج الأعمال إلى خيار مضبوط.', 'Create a safe setting when the business needs a controlled option.')}
+            emptyTitle={tx('لا توجد إعدادات آمنة', 'No safe settings found')}
+            rows={systemSettings}
+          />
           <SectionMessage message={feedback.settings} />
         </section>
       ) : null}
@@ -1132,71 +1288,77 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'service'}
         onClose={closeServiceEditor}
         size="xl"
-        title={selectedService ? 'Edit service' : 'New service'}
-        description="Manage business-facing service details in one focused popup without compressing the table view."
+        title={selectedService ? tx('تعديل الخدمة', 'Edit service') : tx('خدمة جديدة', 'New service')}
+        description={tx(
+          'أدر تفاصيل الخدمة الظاهرة للأعمال داخل نافذة مركزة واحدة دون ضغط عرض الجدول.',
+          'Manage business-facing service details in one focused popup without compressing the table view.',
+        )}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeServiceEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleServiceSave} type="button">
-              Save service
+              {tx('حفظ الخدمة', 'Save service')}
             </button>
           </div>
         }
       >
         <EmptyHelp
-          title="Price rules"
-          text="Base price, extra fees, review requirement, and provider requirement are audited. This form does not allow direct workflow bypass."
-          warning="Price changes are visible to staff immediately and are recorded in the audit log."
+          title={tx('قواعد التسعير', 'Price rules')}
+          text={tx(
+            'يتم تدقيق السعر الأساسي والرسوم الإضافية ومتطلبات المراجعة ومتطلبات المزود. لا يسمح هذا النموذج بتجاوز سير العمل مباشرة.',
+            'Base price, extra fees, review requirement, and provider requirement are audited. This form does not allow direct workflow bypass.',
+          )}
+          warning={tx('تظهر تغييرات الأسعار للموظفين فوراً ويتم تسجيلها في سجل التدقيق.', 'Price changes are visible to staff immediately and are recorded in the audit log.')}
         />
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Category" help="Choose the business category shown to admins and clients.">
+          <Field label={tx('التصنيف', 'Category')} help={tx('اختر التصنيف التجاري الظاهر للمشرفين والعملاء.', 'Choose the business category shown to admins and clients.')}>
             <select className="field" value={serviceForm.category_id} onChange={(event) => setServiceForm({ ...serviceForm, category_id: event.target.value })}>
-              <option value="">Choose category</option>
+              <option value="">{tx('اختر التصنيف', 'Choose category')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name_ar}
+                  {getLocalizedName(category)}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Arabic name" help="Main service name visible in Arabic screens.">
+          <Field label={tx('الاسم العربي', 'Arabic name')} help={tx('اسم الخدمة الرئيسي الظاهر في الشاشات العربية.', 'Main service name visible in Arabic screens.')}>
             <input className="field" value={serviceForm.name_ar} onChange={(event) => setServiceForm({ ...serviceForm, name_ar: event.target.value })} />
           </Field>
-          <Field label="English name" help="Used in bilingual screens and reports.">
+          <Field label={tx('الاسم الإنجليزي', 'English name')} help={tx('يستخدم في الشاشات الثنائية اللغة والتقارير.', 'Used in bilingual screens and reports.')}>
             <input className="field" value={serviceForm.name_en} onChange={(event) => setServiceForm({ ...serviceForm, name_en: event.target.value })} />
           </Field>
-          <Field label="Base price" help="Main service amount before other fees.">
+          <Field label={tx('السعر الأساسي', 'Base price')} help={tx('المبلغ الرئيسي للخدمة قبل الرسوم الأخرى.', 'Main service amount before other fees.')}>
             <input className="field" type="number" value={serviceForm.base_price} onChange={(event) => setServiceForm({ ...serviceForm, base_price: event.target.value })} />
           </Field>
-          <Field label="Government fee" help="Optional government amount if this service needs it.">
+          <Field label={tx('الرسوم الحكومية', 'Government fee')} help={tx('مبلغ حكومي اختياري إذا كانت الخدمة تتطلبه.', 'Optional government amount if this service needs it.')}>
             <input className="field" type="number" value={serviceForm.government_fee} onChange={(event) => setServiceForm({ ...serviceForm, government_fee: event.target.value })} />
           </Field>
-          <Field label="Extra service fee" help="Any extra internal fee allowed by the business model.">
+          <Field label={tx('رسوم خدمة إضافية', 'Extra service fee')} help={tx('أي رسوم داخلية إضافية يسمح بها نموذج العمل.', 'Any extra internal fee allowed by the business model.')}>
             <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
           </Field>
-          <Field label="Estimated duration" help="Use a simple number for non-technical admins.">
+          <Field label={tx('المدة التقديرية', 'Estimated duration')} help={tx('استخدم رقماً بسيطاً للمشرفين غير التقنيين.', 'Use a simple number for non-technical admins.')}>
             <input className="field" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
           </Field>
-          <Field label="Duration unit" help="Choose the clearest unit for operations.">
+          <Field label={tx('وحدة المدة', 'Duration unit')} help={tx('اختر أوضح وحدة للعمليات.', 'Choose the clearest unit for operations.')}>
             <select className="field" value={serviceForm.estimated_duration_unit} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_unit: event.target.value })}>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
+              <option value="hours">{durationUnitLabels.hours}</option>
+              <option value="days">{durationUnitLabels.days}</option>
+              <option value="weeks">{durationUnitLabels.weeks}</option>
             </select>
           </Field>
-          <Field label="Arabic description" help="Explain the service in simple language.">
+          <Field label={tx('الوصف العربي', 'Arabic description')} help={tx('اشرح الخدمة بلغة بسيطة.', 'Explain the service in simple language.')}>
             <textarea className="field min-h-28" value={serviceForm.description_ar} onChange={(event) => setServiceForm({ ...serviceForm, description_ar: event.target.value })} />
           </Field>
-          <Field label="English description" help="Optional bilingual description.">
+          <Field label={tx('الوصف الإنجليزي', 'English description')} help={tx('وصف ثنائي اللغة اختياري.', 'Optional bilingual description.')}>
             <textarea className="field min-h-28" value={serviceForm.description_en} onChange={(event) => setServiceForm({ ...serviceForm, description_en: event.target.value })} />
           </Field>
         </div>
         <div className="mt-4 grid gap-3">
-          <ToggleField checked={serviceForm.provider_required} help="Turn this off only for services completed fully inside the office." label="Provider is required" onChange={(value) => setServiceForm({ ...serviceForm, provider_required: value })} />
-          <ToggleField checked={serviceForm.requires_manual_review} help="Keep this on when an employee must review each order before execution." label="Employee review is required" onChange={(value) => setServiceForm({ ...serviceForm, requires_manual_review: value })} />
-          <ToggleField checked={serviceForm.is_active} help="Inactive services stay in history but stop accepting new orders." label="Service is active" onChange={(value) => setServiceForm({ ...serviceForm, is_active: value })} />
+          <ToggleField checked={serviceForm.provider_required} help={tx('أوقف هذا فقط للخدمات التي تُنجز بالكامل داخل المكتب.', 'Turn this off only for services completed fully inside the office.')} label={tx('المزود مطلوب', 'Provider is required')} onChange={(value) => setServiceForm({ ...serviceForm, provider_required: value })} />
+          <ToggleField checked={serviceForm.requires_manual_review} help={tx('أبقِ هذا مفعلاً عندما يجب أن يراجع موظف كل طلب قبل التنفيذ.', 'Keep this on when an employee must review each order before execution.')} label={tx('مراجعة الموظف مطلوبة', 'Employee review is required')} onChange={(value) => setServiceForm({ ...serviceForm, requires_manual_review: value })} />
+          <ToggleField checked={serviceForm.is_active} help={tx('تبقى الخدمات غير النشطة في السجل لكنها تتوقف عن استقبال طلبات جديدة.', 'Inactive services stay in history but stop accepting new orders.')} label={tx('الخدمة نشطة', 'Service is active')} onChange={(value) => setServiceForm({ ...serviceForm, is_active: value })} />
         </div>
         <div className="mt-4">
           <SectionMessage message={feedback.services} />
@@ -1207,34 +1369,34 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'document'}
         onClose={closeDocumentEditor}
         size="lg"
-        title={selectedDocument ? 'Edit document rule' : 'New document rule'}
-        description="Define required files in a focused popup so the rules list stays readable."
+        title={selectedDocument ? tx('تعديل قاعدة المستند', 'Edit document rule') : tx('قاعدة مستند جديدة', 'New document rule')}
+        description={tx('حدّد الملفات المطلوبة في نافذة مركزة حتى تبقى قائمة القواعد واضحة.', 'Define required files in a focused popup so the rules list stays readable.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeDocumentEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleDocumentSave} type="button">
-              Save document rule
+              {tx('حفظ قاعدة المستند', 'Save document rule')}
             </button>
           </div>
         }
       >
         <div className="space-y-4">
-          <Field label="Service" help="Choose which service needs this document.">
+          <Field label={tx('الخدمة', 'Service')} help={tx('اختر الخدمة التي تحتاج هذا المستند.', 'Choose which service needs this document.')}>
             <select className="field" value={documentForm.service_id} onChange={(event) => setDocumentForm({ ...documentForm, service_id: event.target.value })}>
-              <option value="">Choose service</option>
+              <option value="">{tx('اختر الخدمة', 'Choose service')}</option>
               {services.map((service) => (
                 <option key={service.id} value={service.id}>
-                  {service.name_ar}
+                  {getLocalizedName(service)}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Arabic document name" help="Visible label shown to staff and clients.">
+          <Field label={tx('اسم المستند بالعربية', 'Arabic document name')} help={tx('الاسم الظاهر للموظفين والعملاء.', 'Visible label shown to staff and clients.')}>
             <input className="field" value={documentForm.name_ar} onChange={(event) => setDocumentForm({ ...documentForm, name_ar: event.target.value })} />
           </Field>
-          <Field label="English document name" help="Optional bilingual label.">
+          <Field label={tx('اسم المستند بالإنجليزية', 'English document name')} help={tx('اسم ثنائي اللغة اختياري.', 'Optional bilingual label.')}>
             <input className="field" value={documentForm.name_en} onChange={(event) => setDocumentForm({ ...documentForm, name_en: event.target.value })} />
           </Field>
           <div className="grid gap-3 md:grid-cols-2">
@@ -1256,14 +1418,14 @@ function AdminRuleManagementPage() {
               </label>
             ))}
           </div>
-          <Field label="Maximum size in bytes" help="Keep this simple. The system also applies a global safety limit.">
+          <Field label={tx('الحد الأقصى للحجم بالبايت', 'Maximum size in bytes')} help={tx('اجعلها بسيطة. يطبق النظام أيضاً حداً عاماً للسلامة.', 'Keep this simple. The system also applies a global safety limit.')}>
             <input className="field" type="number" value={documentForm.max_file_size} onChange={(event) => setDocumentForm({ ...documentForm, max_file_size: event.target.value })} />
           </Field>
           <div className="grid gap-3">
-            <ToggleField checked={documentForm.is_required} help="Required documents block order progress until uploaded and approved." label="Required document" onChange={(value) => setDocumentForm({ ...documentForm, is_required: value })} />
-            <ToggleField checked={documentForm.requires_verification} help="Use this when staff must verify the file before the order can move forward." label="Requires verification" onChange={(value) => setDocumentForm({ ...documentForm, requires_verification: value })} />
-            <ToggleField checked={documentForm.client_can_replace_file} help="Turn off when the client should not replace a previously uploaded file without staff action." label="Client can replace the file" onChange={(value) => setDocumentForm({ ...documentForm, client_can_replace_file: value })} />
-            <ToggleField checked={documentForm.provider_can_view_file} help="Only enable if the provider truly needs access to this file." label="Provider can view the file" onChange={(value) => setDocumentForm({ ...documentForm, provider_can_view_file: value })} />
+            <ToggleField checked={documentForm.is_required} help={tx('المستندات المطلوبة تمنع تقدم الطلب حتى يتم رفعها واعتمادها.', 'Required documents block order progress until uploaded and approved.')} label={tx('مستند مطلوب', 'Required document')} onChange={(value) => setDocumentForm({ ...documentForm, is_required: value })} />
+            <ToggleField checked={documentForm.requires_verification} help={tx('استخدم هذا عندما يجب على الموظفين التحقق من الملف قبل متابعة الطلب.', 'Use this when staff must verify the file before the order can move forward.')} label={tx('يتطلب تحققاً', 'Requires verification')} onChange={(value) => setDocumentForm({ ...documentForm, requires_verification: value })} />
+            <ToggleField checked={documentForm.client_can_replace_file} help={tx('أوقف هذا عندما لا يجب على العميل استبدال ملف مرفوع سابقاً دون إجراء من الموظف.', 'Turn off when the client should not replace a previously uploaded file without staff action.')} label={tx('يمكن للعميل استبدال الملف', 'Client can replace the file')} onChange={(value) => setDocumentForm({ ...documentForm, client_can_replace_file: value })} />
+            <ToggleField checked={documentForm.provider_can_view_file} help={tx('فعّل هذا فقط إذا كان المزود يحتاج فعلاً إلى الوصول لهذا الملف.', 'Only enable if the provider truly needs access to this file.')} label={tx('يمكن للمزود عرض الملف', 'Provider can view the file')} onChange={(value) => setDocumentForm({ ...documentForm, provider_can_view_file: value })} />
           </div>
           <SectionMessage message={feedback.documents} />
         </div>
@@ -1273,33 +1435,33 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'assignment'}
         onClose={closeAssignmentEditor}
         size="md"
-        title={selectedAssignment ? 'Edit assignment rule' : 'New assignment rule'}
-        description="Link approved providers to services without compressing the rule tables."
+        title={selectedAssignment ? tx('تعديل قاعدة الإسناد', 'Edit assignment rule') : tx('قاعدة إسناد جديدة', 'New assignment rule')}
+        description={tx('اربط المزودين المعتمدين بالخدمات دون ضغط جداول القواعد.', 'Link approved providers to services without compressing the rule tables.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeAssignmentEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleAssignmentSave} type="button">
-              Save assignment rule
+              {tx('حفظ قاعدة الإسناد', 'Save assignment rule')}
             </button>
           </div>
         }
       >
         <div className="space-y-4">
-          <Field label="Service" help="Choose the service that this provider can execute.">
+          <Field label={tx('الخدمة', 'Service')} help={tx('اختر الخدمة التي يستطيع هذا المزود تنفيذها.', 'Choose the service that this provider can execute.')}>
             <select className="field" value={assignmentForm.service_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, service_id: event.target.value })}>
-              <option value="">Choose service</option>
+              <option value="">{tx('اختر الخدمة', 'Choose service')}</option>
               {services.filter((service) => service.provider_required).map((service) => (
                 <option key={service.id} value={service.id}>
-                  {service.name_ar}
+                  {getLocalizedName(service)}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Provider" help="Only approved, business-active providers should be linked.">
+          <Field label={tx('مزود الخدمة', 'Provider')} help={tx('يجب ربط المزودين المعتمدين والنشطين فقط.', 'Only approved, business-active providers should be linked.')}>
             <select className="field" value={assignmentForm.provider_id} onChange={(event) => setAssignmentForm({ ...assignmentForm, provider_id: event.target.value })}>
-              <option value="">Choose provider</option>
+              <option value="">{tx('اختر المزود', 'Choose provider')}</option>
               {providers.map((provider) => (
                 <option key={provider.id} value={provider.id}>
                   {provider.full_name}
@@ -1307,7 +1469,7 @@ function AdminRuleManagementPage() {
               ))}
             </select>
           </Field>
-          <ToggleField checked={assignmentForm.is_active} help="Inactive links stay in audit history but stop future matching." label="Assignment rule is active" onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })} />
+          <ToggleField checked={assignmentForm.is_active} help={tx('تبقى الروابط غير النشطة في سجل التدقيق لكنها توقف المطابقة المستقبلية.', 'Inactive links stay in audit history but stop future matching.')} label={tx('قاعدة الإسناد نشطة', 'Assignment rule is active')} onChange={(value) => setAssignmentForm({ ...assignmentForm, is_active: value })} />
           <SectionMessage message={feedback.assignments} />
         </div>
       </FormModal>
@@ -1316,12 +1478,12 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'provider'}
         onClose={closeProviderEditor}
         size="lg"
-        title={selectedProvider ? `Manage ${selectedProvider.full_name}` : 'Manage provider'}
-        description="Review provider approval and business access in a focused popup."
+        title={selectedProvider ? tx(`إدارة ${selectedProvider.full_name}`, `Manage ${selectedProvider.full_name}`) : tx('إدارة المزود', 'Manage provider')}
+        description={tx('راجع اعتماد المزود ووصوله للأعمال داخل نافذة مركزة.', 'Review provider approval and business access in a focused popup.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeProviderEditor} type="button">
-              Close
+              {tx('إغلاق', 'Close')}
             </button>
           </div>
         }
@@ -1330,27 +1492,27 @@ function AdminRuleManagementPage() {
           <div className="space-y-4">
             <EmptyHelp
               title={selectedProvider.full_name}
-              text={`Capabilities: ${selectedProvider.capability_summary}.`}
-              warning="Approval and activation changes are audited."
+              text={tx(`القدرات: ${selectedProvider.capability_summary}.`, `Capabilities: ${selectedProvider.capability_summary}.`)}
+              warning={tx('يتم تدقيق تغييرات الاعتماد والتفعيل.', 'Approval and activation changes are audited.')}
             />
-            <Field label="Approval decision" help="Rejecting a provider requires a reason for the audit trail.">
+            <Field label={tx('قرار الاعتماد', 'Approval decision')} help={tx('رفض المزود يتطلب سبباً لأثر التدقيق.', 'Rejecting a provider requires a reason for the audit trail.')}>
               <select className="field" value={providerActionForm.decision} onChange={(event) => setProviderActionForm({ ...providerActionForm, decision: event.target.value })}>
-                <option value="approve">Approve provider</option>
-                <option value="reject">Reject provider</option>
+                <option value="approve">{tx('اعتماد المزود', 'Approve provider')}</option>
+                <option value="reject">{tx('رفض المزود', 'Reject provider')}</option>
               </select>
             </Field>
-            <Field label="Approval reason" help="Required only when rejecting a provider.">
+            <Field label={tx('سبب الاعتماد أو الرفض', 'Approval reason')} help={tx('مطلوب فقط عند رفض المزود.', 'Required only when rejecting a provider.')}>
               <textarea className="field min-h-24" value={providerActionForm.approval_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, approval_reason: event.target.value })} />
             </Field>
             <button className="btn-primary" onClick={handleProviderApproval} type="button">
-              Save approval decision
+              {tx('حفظ قرار الاعتماد', 'Save approval decision')}
             </button>
-            <ToggleField checked={providerActionForm.is_active} help="Turn off access safely without deleting the provider profile." label="Provider account is active" onChange={(value) => setProviderActionForm({ ...providerActionForm, is_active: value })} />
-            <Field label="Activation reason" help="Required only when deactivating a provider.">
+            <ToggleField checked={providerActionForm.is_active} help={tx('أوقف الوصول بأمان دون حذف ملف المزود.', 'Turn off access safely without deleting the provider profile.')} label={tx('حساب المزود نشط', 'Provider account is active')} onChange={(value) => setProviderActionForm({ ...providerActionForm, is_active: value })} />
+            <Field label={tx('سبب التفعيل أو التعطيل', 'Activation reason')} help={tx('مطلوب فقط عند تعطيل المزود.', 'Required only when deactivating a provider.')}>
               <textarea className="field min-h-24" value={providerActionForm.activation_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, activation_reason: event.target.value })} />
             </Field>
             <button className="btn-secondary" onClick={handleProviderActivation} type="button">
-              Save activation
+              {tx('حفظ التفعيل', 'Save activation')}
             </button>
             <SectionMessage message={feedback.providers} />
           </div>
@@ -1361,52 +1523,52 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'template'}
         onClose={closeTemplateEditor}
         size="lg"
-        title={selectedTemplate ? 'Edit notification template' : 'New notification template'}
-        description="Edit safe message templates in a popup and preview them before saving."
+        title={selectedTemplate ? tx('تعديل قالب الإشعار', 'Edit notification template') : tx('قالب إشعار جديد', 'New notification template')}
+        description={tx('عدّل قوالب الرسائل الآمنة داخل نافذة منبثقة وعاينها قبل الحفظ.', 'Edit safe message templates in a popup and preview them before saving.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeTemplateEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-secondary" onClick={handleTemplatePreview} type="button">
-              Preview
+              {tx('معاينة', 'Preview')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleTemplateSave} type="button">
-              Save template
+              {tx('حفظ القالب', 'Save template')}
             </button>
           </div>
         }
       >
         <div className="space-y-4">
-          <Field label="Template key" help="Internal key used by staff. Keep it short and stable.">
+          <Field label={tx('مفتاح القالب', 'Template key')} help={tx('مفتاح داخلي يستخدمه الموظفون. اجعله قصيراً وثابتاً.', 'Internal key used by staff. Keep it short and stable.')}>
             <input className="field" value={templateForm.key} onChange={(event) => setTemplateForm({ ...templateForm, key: event.target.value })} />
           </Field>
-          <Field label="Channel" help="Only safe channels already supported by the system should be used.">
+          <Field label={tx('القناة', 'Channel')} help={tx('استخدم فقط القنوات الآمنة المدعومة بالفعل في النظام.', 'Only safe channels already supported by the system should be used.')}>
             <select className="field" value={templateForm.channel} onChange={(event) => setTemplateForm({ ...templateForm, channel: event.target.value })}>
-              <option value="system">System</option>
-              <option value="email">Email</option>
-              <option value="sms">SMS</option>
-              <option value="whatsapp">WhatsApp</option>
+              <option value="system">{channelLabels.system}</option>
+              <option value="email">{channelLabels.email}</option>
+              <option value="sms">{channelLabels.sms}</option>
+              <option value="whatsapp">{channelLabels.whatsapp}</option>
             </select>
           </Field>
-          <Field label="Arabic title" help="Visible notification title.">
+          <Field label={tx('العنوان العربي', 'Arabic title')} help={tx('عنوان الإشعار الظاهر.', 'Visible notification title.')}>
             <input className="field" value={templateForm.title_ar} onChange={(event) => setTemplateForm({ ...templateForm, title_ar: event.target.value })} />
           </Field>
-          <Field label="Arabic message" help="Allowed placeholders: {{order_number}}, {{service_name}}, {{customer_name}}, {{status_label}}.">
+          <Field label={tx('الرسالة العربية', 'Arabic message')} help={tx('العناصر النائبة المسموح بها: {{order_number}} و{{service_name}} و{{customer_name}} و{{status_label}}.', 'Allowed placeholders: {{order_number}}, {{service_name}}, {{customer_name}}, {{status_label}}.')}>
             <textarea className="field min-h-24" value={templateForm.message_ar} onChange={(event) => setTemplateForm({ ...templateForm, message_ar: event.target.value })} />
           </Field>
-          <Field label="English title" help="Optional bilingual title.">
+          <Field label={tx('العنوان الإنجليزي', 'English title')} help={tx('عنوان ثنائي اللغة اختياري.', 'Optional bilingual title.')}>
             <input className="field" value={templateForm.title_en} onChange={(event) => setTemplateForm({ ...templateForm, title_en: event.target.value })} />
           </Field>
-          <Field label="English message" help="Optional bilingual message.">
+          <Field label={tx('الرسالة الإنجليزية', 'English message')} help={tx('رسالة ثنائية اللغة اختيارية.', 'Optional bilingual message.')}>
             <textarea className="field min-h-24" value={templateForm.message_en} onChange={(event) => setTemplateForm({ ...templateForm, message_en: event.target.value })} />
           </Field>
-          <ToggleField checked={templateForm.is_active} help="Inactive templates stay in history and stop being used." label="Template is active" onChange={(value) => setTemplateForm({ ...templateForm, is_active: value })} />
+          <ToggleField checked={templateForm.is_active} help={tx('تبقى القوالب غير النشطة في السجل وتتوقف عن الاستخدام.', 'Inactive templates stay in history and stop being used.')} label={tx('القالب نشط', 'Template is active')} onChange={(value) => setTemplateForm({ ...templateForm, is_active: value })} />
           {templatePreview ? (
             <div className="rounded-3xl border border-brand-100 bg-brand-50/50 p-4">
-              <p className="text-sm font-bold text-ink">Preview</p>
-              <p className="mt-3 text-sm font-semibold text-ink">{templatePreview.title_ar || templatePreview.title_en || 'No title'}</p>
-              <p className="mt-2 text-sm leading-7 text-slate-600">{templatePreview.message_ar || templatePreview.message_en || 'No message'}</p>
+              <p className="text-sm font-bold text-ink">{tx('المعاينة', 'Preview')}</p>
+              <p className="mt-3 text-sm font-semibold text-ink">{templatePreview.title_ar || templatePreview.title_en || tx('بدون عنوان', 'No title')}</p>
+              <p className="mt-2 text-sm leading-7 text-slate-600">{templatePreview.message_ar || templatePreview.message_en || tx('بدون رسالة', 'No message')}</p>
             </div>
           ) : null}
           <SectionMessage message={feedback.notifications} />
@@ -1417,38 +1579,38 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'payment'}
         onClose={closePaymentEditor}
         size="md"
-        title={selectedPayment ? `Update ${selectedPayment.payment_number}` : 'Update payment'}
-        description="Change payment status in a popup while keeping the payment history list visible in the background."
+        title={selectedPayment ? tx(`تحديث ${selectedPayment.payment_number}`, `Update ${selectedPayment.payment_number}`) : tx('تحديث الدفعة', 'Update payment')}
+        description={tx('غيّر حالة الدفع داخل نافذة منبثقة مع إبقاء قائمة سجل المدفوعات ظاهرة في الخلفية.', 'Change payment status in a popup while keeping the payment history list visible in the background.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closePaymentEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handlePaymentSave} type="button">
-              Update payment status
+              {tx('تحديث حالة الدفع', 'Update payment status')}
             </button>
           </div>
         }
       >
         {selectedPayment ? (
           <div className="space-y-4">
-            <EmptyHelp title={selectedPayment.payment_number} text={`Order ${selectedPayment.order_number} for ${selectedPayment.customer_name}.`} warning="Status changes are audited." />
-            <Field label="Payment status" help="Choose the correct business status for this payment.">
+            <EmptyHelp title={selectedPayment.payment_number} text={tx(`الطلب ${selectedPayment.order_number} للعميل ${selectedPayment.customer_name}.`, `Order ${selectedPayment.order_number} for ${selectedPayment.customer_name}.`)} warning={tx('يتم تدقيق تغييرات الحالة.', 'Status changes are audited.')} />
+            <Field label={tx('حالة الدفع', 'Payment status')} help={tx('اختر حالة الأعمال الصحيحة لهذه الدفعة.', 'Choose the correct business status for this payment.')}>
               <select className="field" value={paymentForm.status} onChange={(event) => setPaymentForm({ ...paymentForm, status: event.target.value })}>
                 {PAYMENT_STATUS_OPTIONS.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {paymentStatusLabels[option] || option}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Reference number" help="Add a bank, gateway, or manual receipt reference when available.">
+            <Field label={tx('رقم المرجع', 'Reference number')} help={tx('أضف مرجع البنك أو البوابة أو الإيصال اليدوي عند توفره.', 'Add a bank, gateway, or manual receipt reference when available.')}>
               <input className="field" value={paymentForm.reference_number} onChange={(event) => setPaymentForm({ ...paymentForm, reference_number: event.target.value })} />
             </Field>
-            <Field label="Reason or notes" help="Explain why this payment status changed.">
+            <Field label={tx('السبب أو الملاحظات', 'Reason or notes')} help={tx('اشرح سبب تغير حالة هذه الدفعة.', 'Explain why this payment status changed.')}>
               <textarea className="field min-h-24" value={paymentForm.notes} onChange={(event) => setPaymentForm({ ...paymentForm, notes: event.target.value })} />
             </Field>
-            <Field label="Failure reason" help="Use this only when the payment failed.">
+            <Field label={tx('سبب الفشل', 'Failure reason')} help={tx('استخدم هذا فقط عندما تفشل الدفعة.', 'Use this only when the payment failed.')}>
               <textarea className="field min-h-24" value={paymentForm.failure_reason} onChange={(event) => setPaymentForm({ ...paymentForm, failure_reason: event.target.value })} />
             </Field>
             <SectionMessage message={feedback.payments} />
@@ -1460,47 +1622,47 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'user'}
         onClose={closeUserEditor}
         size="lg"
-        title={selectedUser ? 'Edit user' : 'New user'}
-        description="Manage standard business users in a popup without shrinking the list."
+        title={selectedUser ? tx('تعديل المستخدم', 'Edit user') : tx('مستخدم جديد', 'New user')}
+        description={tx('أدر مستخدمي الأعمال القياسيين داخل نافذة منبثقة دون تصغير القائمة.', 'Manage standard business users in a popup without shrinking the list.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeUserEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleUserSave} type="button">
-              Save user
+              {tx('حفظ المستخدم', 'Save user')}
             </button>
           </div>
         }
       >
         <div className="space-y-4">
-          <Field label="Full name" help="Use the business-facing display name.">
+          <Field label={tx('الاسم الكامل', 'Full name')} help={tx('استخدم الاسم الظاهر للأعمال.', 'Use the business-facing display name.')}>
             <input className="field" value={userForm.full_name} onChange={(event) => setUserForm({ ...userForm, full_name: event.target.value })} />
           </Field>
-          <Field label="Email" help="Used for login and notifications.">
+          <Field label={tx('البريد الإلكتروني', 'Email')} help={tx('يستخدم لتسجيل الدخول والإشعارات.', 'Used for login and notifications.')}>
             <input className="field" type="email" value={userForm.email} onChange={(event) => setUserForm({ ...userForm, email: event.target.value })} />
           </Field>
-          <Field label="Phone" help="Primary contact number.">
+          <Field label={tx('الهاتف', 'Phone')} help={tx('رقم التواصل الأساسي.', 'Primary contact number.')}>
             <input className="field" value={userForm.phone} onChange={(event) => setUserForm({ ...userForm, phone: event.target.value })} />
           </Field>
-          <Field label="Password" help="Leave blank when editing if no password reset is needed.">
+          <Field label={tx('كلمة المرور', 'Password')} help={tx('اتركها فارغة عند التعديل إذا لم تكن هناك حاجة لإعادة التعيين.', 'Leave blank when editing if no password reset is needed.')}>
             <input className="field" type="password" value={userForm.password} onChange={(event) => setUserForm({ ...userForm, password: event.target.value })} />
           </Field>
-          <Field label="Role" help="Only normal business roles are available here.">
+          <Field label={tx('الدور', 'Role')} help={tx('تتوفر هنا فقط الأدوار التجارية العادية.', 'Only normal business roles are available here.')}>
             <select className="field" value={userForm.role} onChange={(event) => setUserForm({ ...userForm, role: event.target.value })}>
               {(selectedUser?.role_options || ['customer', 'employee', 'support', 'provider']).map((option) => (
                 <option key={option} value={option}>
-                  {option}
+                  {roleLabels[option] || option}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="National ID" help="Optional identity reference when the business uses it.">
+          <Field label={tx('الرقم الوطني', 'National ID')} help={tx('مرجع هوية اختياري عندما تستخدمه الأعمال.', 'Optional identity reference when the business uses it.')}>
             <input className="field" value={userForm.national_id} onChange={(event) => setUserForm({ ...userForm, national_id: event.target.value })} />
           </Field>
           <div className="grid gap-3">
-            <ToggleField checked={userForm.is_active} help="Turn off access without deleting the account." label="User is active" onChange={(value) => setUserForm({ ...userForm, is_active: value })} />
-            <ToggleField checked={userForm.is_verified} help="Use only when the business verification process is complete." label="User is verified" onChange={(value) => setUserForm({ ...userForm, is_verified: value })} />
+            <ToggleField checked={userForm.is_active} help={tx('أوقف الوصول دون حذف الحساب.', 'Turn off access without deleting the account.')} label={tx('المستخدم نشط', 'User is active')} onChange={(value) => setUserForm({ ...userForm, is_active: value })} />
+            <ToggleField checked={userForm.is_verified} help={tx('استخدم هذا فقط عند اكتمال عملية التحقق التجارية.', 'Use only when the business verification process is complete.')} label={tx('المستخدم موثّق', 'User is verified')} onChange={(value) => setUserForm({ ...userForm, is_verified: value })} />
           </div>
           <SectionMessage message={feedback.users} />
         </div>
@@ -1510,25 +1672,25 @@ function AdminRuleManagementPage() {
         open={activeEditor === 'setting'}
         onClose={closeSettingEditor}
         size="lg"
-        title={selectedSetting ? 'Edit setting' : 'New setting'}
-        description="Only whitelisted business-safe settings can be edited here."
+        title={selectedSetting ? tx('تعديل الإعداد', 'Edit setting') : tx('إعداد جديد', 'New setting')}
+        description={tx('لا يمكن تعديل سوى الإعدادات التجارية الآمنة المسموح بها هنا.', 'Only whitelisted business-safe settings can be edited here.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeSettingEditor} type="button">
-              Cancel
+              {tx('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" onClick={handleSettingSave} type="button">
-              Save setting
+              {tx('حفظ الإعداد', 'Save setting')}
             </button>
           </div>
         }
       >
         <div className="space-y-4">
-          <Field label="Setting" help="Choose one of the allowed business-safe settings.">
+          <Field label={tx('الإعداد', 'Setting')} help={tx('اختر واحداً من الإعدادات التجارية الآمنة المسموح بها.', 'Choose one of the allowed business-safe settings.')}>
             <select className="field" value={settingForm.key} onChange={(event) => setSettingForm({ key: event.target.value, description: '', values: {} })}>
               {SYSTEM_SETTING_KEYS.map((key) => (
                 <option key={key} value={key}>
-                  {key}
+                  {localizeSettingValue(SETTING_DEFINITIONS[key]?.label) || key}
                 </option>
               ))}
             </select>
@@ -1562,7 +1724,7 @@ function AdminRuleManagementPage() {
               )}
             </Field>
           ))}
-          <Field label="Admin note" help="Optional note explaining why this setting changed.">
+          <Field label={tx('ملاحظة إدارية', 'Admin note')} help={tx('ملاحظة اختيارية توضح سبب تغيير هذا الإعداد.', 'Optional note explaining why this setting changed.')}>
             <textarea className="field min-h-24" value={settingForm.description} onChange={(event) => setSettingForm({ ...settingForm, description: event.target.value })} />
           </Field>
           <SectionMessage message={feedback.settings} />
