@@ -8,6 +8,7 @@ import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { hasPermission } from '../../utils/authz'
@@ -49,6 +50,7 @@ function CheckboxField({ label, registration }) {
 
 function ServiceCategoryManagementPage() {
   const { user } = useAuth()
+  const { isArabic } = useLanguage()
   const { toast } = useToast()
   const form = useForm({ defaultValues })
   const [filters, setFilters] = useState({
@@ -232,10 +234,10 @@ function ServiceCategoryManagementPage() {
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        title="Service Category Management"
-        eyebrow="Service Catalog"
+        title={isArabic ? 'إدارة تصنيفات الخدمات' : 'Service Category Management'}
+        eyebrow={isArabic ? 'كتالوج الخدمات' : 'Service Catalog'}
         icon={FolderTree}
-        description="Manage hierarchical categories that control the public catalog, client ordering flow, support lookup, and category-based reporting."
+        description={isArabic ? 'إدارة التصنيفات الهرمية التي تتحكم في الكتالوج العام ومسار الطلب والبحث الداخلي.' : 'Manage the hierarchical categories that drive the public catalog, ordering flow, and support lookup.'}
         actions={
           canManage ? (
             <button className="btn-primary" onClick={openCreateForm} type="button">

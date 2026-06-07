@@ -7,18 +7,10 @@ import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { getHelpScreenLabel } from '../../help/screenRegistry'
 import { useAsyncData } from '../../hooks/useAsyncData'
-
-const TABS = [
-  { id: 'screens', label: 'Screen Guides', icon: BookOpenText },
-  { id: 'screenshots', label: 'Screenshots', icon: ImagePlus },
-  { id: 'fields', label: 'Field Guides', icon: FormInput },
-  { id: 'actions', label: 'Action Guides', icon: Boxes },
-  { id: 'services', label: 'Service Guides', icon: FileCog },
-  { id: 'workflows', label: 'Workflow Guides', icon: GitBranch },
-]
 
 const DEFAULT_VALUES = {
   screens: {
@@ -190,7 +182,16 @@ function flattenPermissionOptions(permissionGroups) {
 }
 
 function HelpGuideManagementPage() {
+  const { isArabic } = useLanguage()
   const { toast } = useToast()
+  const TABS = [
+    { id: 'screens', label: isArabic ? 'أدلة الشاشات' : 'Screen Guides', icon: BookOpenText },
+    { id: 'screenshots', label: isArabic ? 'الصور' : 'Screenshots', icon: ImagePlus },
+    { id: 'fields', label: isArabic ? 'أدلة الحقول' : 'Field Guides', icon: FormInput },
+    { id: 'actions', label: isArabic ? 'أدلة الإجراءات' : 'Action Guides', icon: Boxes },
+    { id: 'services', label: isArabic ? 'أدلة الخدمات' : 'Service Guides', icon: FileCog },
+    { id: 'workflows', label: isArabic ? 'أدلة المسار' : 'Workflow Guides', icon: GitBranch },
+  ]
   const [activeTab, setActiveTab] = useState('screens')
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
@@ -596,7 +597,7 @@ function HelpGuideManagementPage() {
         description="Manage contextual help content for screens, fields, buttons, services, and workflow steps. All user-facing help still stays filtered by backend role and permission checks."
         eyebrow="In-App Help"
         icon={BookOpenText}
-        title="Help Guide Management"
+        title={isArabic ? 'إدارة دليل المستخدم' : 'Help Guide Management'}
         actions={
           <button className="btn-primary" onClick={openCreate} type="button">
             + New {currentConfig.title}

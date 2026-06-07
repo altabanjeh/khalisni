@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { LANGUAGE_STORAGE_KEY, normalizeLanguage } from '../utils/i18n'
 
 export const ACCESS_TOKEN_KEY = 'khalisni_access'
 export const REFRESH_TOKEN_KEY = 'khalisni_refresh'
@@ -48,6 +49,11 @@ function getStoredRefreshToken() {
   }
 
   return null
+}
+
+function getStoredLanguage() {
+  if (typeof window === 'undefined') return 'ar'
+  return normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY))
 }
 
 function flattenErrorMessages(value) {
@@ -224,6 +230,10 @@ apiClient.interceptors.request.use((config) => {
 
   if (access && !headers.Authorization) {
     headers.Authorization = `Bearer ${access}`
+  }
+
+  if (!headers['Accept-Language']) {
+    headers['Accept-Language'] = getStoredLanguage()
   }
 
   if (isFormData(nextConfig.data)) {

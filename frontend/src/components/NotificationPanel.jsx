@@ -1,12 +1,14 @@
 import { Bell, BellRing } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/services'
+import { useLanguage } from '../context/LanguageContext'
 import { useAsyncData } from '../hooks/useAsyncData'
 import { hasPermission } from '../utils/authz'
 import { formatDateTime } from '../utils/format'
 import EmptyState from './EmptyState'
 
 function NotificationPanel({ user, onNavigate }) {
+  const { t } = useLanguage()
   const { data: notifications = [] } = useAsyncData(() => api.getNotificationCenter(), [], [])
   const unreadCount = notifications.filter((item) => !item.is_read).length
   const notificationPath = hasPermission(user, 'accounts.manage_user_roles') ? '/admin/notifications' : null
@@ -15,8 +17,8 @@ function NotificationPanel({ user, onNavigate }) {
     return (
       <div className="w-full sm:max-w-sm">
         <EmptyState
-          title="لا توجد إشعارات حالياً"
-          description="ستظهر هنا التنبيهات المرتبطة بالطلبات والوثائق."
+          title={t('notifications.emptyTitle', 'لا توجد إشعارات حالياً')}
+          description={t('notifications.emptyDescription', 'ستظهر هنا التنبيهات المرتبطة بالطلبات والوثائق.')}
           icon={Bell}
         />
       </div>
@@ -27,8 +29,8 @@ function NotificationPanel({ user, onNavigate }) {
     <div className="w-full rounded-3xl border border-border bg-white p-4 shadow-panel sm:max-w-sm">
       <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <p className="text-sm font-bold text-ink">مركز الإشعارات</p>
-          <p className="text-xs text-slate-500">غير المقروءة: {unreadCount}</p>
+          <p className="text-sm font-bold text-ink">{t('notifications.center', 'مركز الإشعارات')}</p>
+          <p className="text-xs text-slate-500">{t('notifications.unreadCount', 'غير المقروءة: {count}', { count: unreadCount })}</p>
         </div>
         <span className="icon-chip h-10 w-10 rounded-xl">
           <BellRing className="h-4 w-4" />
@@ -57,7 +59,7 @@ function NotificationPanel({ user, onNavigate }) {
 
       {notificationPath ? (
         <Link className="btn-secondary mt-4 w-full" onClick={onNavigate} to={notificationPath}>
-          عرض جميع الإشعارات
+          {t('notifications.viewAll', 'عرض جميع الإشعارات')}
         </Link>
       ) : null}
     </div>

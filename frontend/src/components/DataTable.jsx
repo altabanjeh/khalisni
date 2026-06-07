@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLanguage } from '../context/LanguageContext'
 import EmptyState from './EmptyState'
 import Pagination from './Pagination'
 
@@ -26,6 +27,7 @@ function DataTable({
   loading = false,
   pagination,
 }) {
+  const { t } = useLanguage()
   const [isTableLayout, setIsTableLayout] = useState(() =>
     typeof window === 'undefined' || !window.matchMedia
       ? true
@@ -67,7 +69,9 @@ function DataTable({
       {toolbar ? (
         <div className="glass-panel flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="text-sm text-slate-500">
-            {loading ? 'جارٍ تحميل البيانات...' : `عدد العناصر الظاهرة: ${visibleRows}`}
+            {loading
+              ? t('common.loadingData', 'جارٍ تحميل البيانات...')
+              : t('common.visibleItems', 'عدد العناصر الظاهرة: {count}', { count: visibleRows })}
           </div>
           <div className="min-w-0 flex-1">{toolbar}</div>
         </div>

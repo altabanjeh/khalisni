@@ -3,10 +3,12 @@ import { X } from 'lucide-react'
 import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import { normalizeRole } from '../utils/format'
 
 function Sidebar({ title, links, isOpen, onClose }) {
   const { user } = useAuth()
+  const { t } = useLanguage()
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -46,16 +48,16 @@ function Sidebar({ title, links, isOpen, onClose }) {
       >
         <div className="flex items-start justify-between gap-4 xl:block">
           <div>
-            <p className="text-sm font-semibold text-brand-600">بوابة العمل</p>
+            <p className="text-sm font-semibold text-brand-600">{t('sidebar.workPortal', 'بوابة العمل')}</p>
             <p className="mt-1 text-2xl font-extrabold text-ink">{title}</p>
           </div>
-          <button aria-label="إغلاق القائمة" className="btn-ghost p-2 xl:hidden" onClick={onClose} type="button">
+          <button aria-label={t('sidebar.closeMenu', 'إغلاق القائمة')} className="btn-ghost p-2 xl:hidden" onClick={onClose} type="button">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="mt-5 rounded-3xl border border-brand-100 bg-brand-50/70 px-4 py-3 text-sm text-slate-600">
-          تنقل سريع بين أهم الشاشات المرتبطة بدورك الحالي.
+          {t('sidebar.quickNav', 'تنقل سريع بين أهم الشاشات المرتبطة بدورك الحالي.')}
         </div>
 
         <nav className="mt-6 space-y-2">

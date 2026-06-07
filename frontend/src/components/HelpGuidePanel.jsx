@@ -5,6 +5,8 @@ import { api } from '../api/services'
 import { getDisplayError } from '../api/client'
 import { useHelpGuideContext } from '../context/HelpGuideContext'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
+import { getManualScreenshots } from '../help/manualAssets'
 import { getHelpScreenLabel, matchHelpScreen } from '../help/screenRegistry'
 
 function splitLines(value) {
@@ -12,6 +14,19 @@ function splitLines(value) {
     .split(/\r?\n/)
     .map((item) => item.trim())
     .filter(Boolean)
+}
+
+function hasRealScreenshot(screenshot) {
+  return Boolean(screenshot?.image_url)
+}
+
+function getGuideScreenshots(guide, language) {
+  const existing = Array.isArray(guide?.screenshots) ? guide.screenshots : []
+  const fallback = getManualScreenshots(guide?.screen_key, language)
+
+  if (!existing.length) return fallback
+  if (existing.some(hasRealScreenshot)) return existing
+  return fallback.length ? fallback : existing
 }
 
 function SectionBlock({ title, children, tone = 'default' }) {
@@ -87,12 +102,12 @@ function GuideTable({ columns, rows, emptyLabel }) {
   )
 }
 
-function ScreenshotGallery({ screenshots = [] }) {
+function ScreenshotGallery({ screenshots = [], t }) {
   if (!screenshots.length) return null
 
   return (
     <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-      <h4 className="text-sm font-bold text-ink">Screenshots</h4>
+      <h4 className="text-sm font-bold text-ink">{t('manual.screenshots', 'الصور التوضيحية')}</h4>
       <div className="grid gap-4 md:grid-cols-2">
         {screenshots.map((shot) => (
           <figure key={shot.id || `${shot.caption}-${shot.display_order}`} className="space-y-3 rounded-3xl border border-border bg-slate-50/70 p-4">
@@ -100,12 +115,12 @@ function ScreenshotGallery({ screenshots = [] }) {
               <img alt={shot.alt_text || shot.caption} className="w-full rounded-2xl border border-border bg-white object-cover" src={shot.image_url} />
             ) : (
               <div className="flex min-h-48 items-center justify-center rounded-2xl border border-dashed border-amber-300 bg-amber-50 px-6 text-center text-sm font-semibold text-amber-900">
-                {shot.placeholder_label || `Screenshot required: ${shot.caption}`}
+                {shot.placeholder_label || t('manual.screenshotRequired', 'الصورة مطلوبة: {caption}', { caption: shot.caption })}
               </div>
             )}
             <figcaption className="space-y-1 text-sm text-slate-700">
               <p className="font-semibold text-ink">{shot.caption}</p>
-              {shot.step_reference ? <p className="text-xs uppercase tracking-wide text-slate-500">Step: {shot.step_reference}</p> : null}
+              {shot.step_reference ? <p className="text-xs uppercase tracking-wide text-slate-500">{t('manual.stepLabel', 'الخطوة: {step}', { step: shot.step_reference })}</p> : null}
             </figcaption>
           </figure>
         ))}
@@ -114,7 +129,7 @@ function ScreenshotGallery({ screenshots = [] }) {
   )
 }
 
-function RelatedGuides({ guide, onSelectGuide }) {
+function RelatedGuides({ guide, onSelectGuide, t }) {
   const relatedPages = guide?.related_pages || []
   const relatedScreenLabel = guide?.related_screen_label
 
@@ -122,7 +137,7 @@ function RelatedGuides({ guide, onSelectGuide }) {
 
   return (
     <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-      <h4 className="text-sm font-bold text-ink">Related Pages</h4>
+      <h4 className="text-sm font-bold text-ink">{t('manual.relatedPages', 'صفحات مرتبطة')}</h4>
       <div className="flex flex-wrap gap-2">
         {relatedPages.map((item) => (
           <button
@@ -142,11 +157,11 @@ function RelatedGuides({ guide, onSelectGuide }) {
   )
 }
 
-function GuideDetail({ guide, onSelectGuide, extraSections = null }) {
+function GuideDetail({ guide, onSelectGuide, extraSections = null, t, language }) {
   if (!guide) {
     return (
       <div className="rounded-[32px] border border-dashed border-border bg-white/70 p-6 text-center text-sm text-slate-500">
-        Select a guide to read the full manual page.
+        {t('manual.noGuideSelected', 'اختر دليلاً لقراءة الصفحة الكاملة.')}
       </div>
     )
   }
@@ -156,31 +171,32 @@ function GuideDetail({ guide, onSelectGuide, extraSections = null }) {
   const expectedResult = guide.expected_result_items?.length ? guide.expected_result_items : splitLines(guide.expected_result)
   const commonMistakes = guide.common_error_items?.length ? guide.common_error_items : splitLines(guide.common_errors)
   const troubleshooting = guide.troubleshooting_items?.length ? guide.troubleshooting_items : splitLines(guide.troubleshooting)
+  const screenshots = getGuideScreenshots(guide, language)
 
   return (
     <div className="space-y-5">
-      <SectionBlock title="Title">
+      <SectionBlock title={t('manual.title', 'العنوان')}>
         <div className="space-y-2">
           <p className="text-lg font-bold text-ink">{guide.title}</p>
           {guide.short_description ? <p>{guide.short_description}</p> : null}
         </div>
       </SectionBlock>
 
-      <SectionBlock title="Who Can Use This">
-        <p>{guide.role_label || guide.role || 'All users'}</p>
+      <SectionBlock title={t('manual.whoCanUse', 'من يستخدم هذه الصفحة')}>
+        <p>{guide.role_label || guide.role || t('common.allUsers', 'جميع المستخدمين')}</p>
       </SectionBlock>
 
-      <SectionBlock title="Purpose">
-        <p>{guide.purpose || guide.when_to_use || 'No purpose statement is available yet.'}</p>
+      <SectionBlock title={t('manual.purpose', 'الغرض')}>
+        <p>{guide.purpose || guide.when_to_use || t('common.notAvailable', 'غير متاح')}</p>
       </SectionBlock>
 
-      <ListBlock items={beforeYouStart} title="Before You Start" />
-      <ListBlock items={steps} ordered title="Steps" />
-      <ListBlock items={expectedResult} title="Expected Result" />
-      <ListBlock items={commonMistakes} title="Common Mistakes" tone="warning" />
-      <ListBlock items={troubleshooting} title="Troubleshooting" tone="warning" />
-      <ScreenshotGallery screenshots={guide.screenshots || []} />
-      <RelatedGuides guide={guide} onSelectGuide={onSelectGuide} />
+      <ListBlock items={beforeYouStart} title={t('manual.beforeYouStart', 'قبل أن تبدأ')} />
+      <ListBlock items={steps} ordered title={t('manual.steps', 'الخطوات')} />
+      <ListBlock items={expectedResult} title={t('manual.expectedResult', 'النتيجة المتوقعة')} />
+      <ListBlock items={commonMistakes} title={t('manual.commonMistakes', 'الأخطاء الشائعة')} tone="warning" />
+      <ListBlock items={troubleshooting} title={t('manual.troubleshooting', 'استكشاف الأخطاء')} tone="warning" />
+      <ScreenshotGallery screenshots={screenshots} t={t} />
+      <RelatedGuides guide={guide} onSelectGuide={onSelectGuide} t={t} />
       {extraSections}
     </div>
   )
@@ -203,12 +219,12 @@ function SearchSection({ title, rows, renderItem }) {
   )
 }
 
-function SearchResults({ results }) {
+function SearchResults({ results, t }) {
   return (
     <div className="space-y-5">
       <SearchSection
         rows={results.screens || []}
-        title="Screen Guides"
+        title={t('manual.searchResults.screens', 'أدلة الشاشات')}
         renderItem={(item) => (
           <>
             <p className="font-semibold text-ink">{item.title}</p>
@@ -219,7 +235,7 @@ function SearchResults({ results }) {
       />
       <SearchSection
         rows={results.actions || []}
-        title="Buttons and Actions"
+        title={t('manual.searchResults.actions', 'الأزرار والإجراءات')}
         renderItem={(item) => (
           <>
             <p className="font-semibold text-ink">{item.button_label}</p>
@@ -230,7 +246,7 @@ function SearchResults({ results }) {
       />
       <SearchSection
         rows={results.fields || []}
-        title="Fields"
+        title={t('manual.searchResults.fields', 'الحقول')}
         renderItem={(item) => (
           <>
             <p className="font-semibold text-ink">{item.field_label}</p>
@@ -241,7 +257,7 @@ function SearchResults({ results }) {
       />
       <SearchSection
         rows={results.services || []}
-        title="Services"
+        title={t('manual.searchResults.services', 'الخدمات')}
         renderItem={(item) => (
           <>
             <p className="font-semibold text-ink">{item.service_name}</p>
@@ -252,7 +268,7 @@ function SearchResults({ results }) {
       />
       <SearchSection
         rows={results.workflows || []}
-        title="Workflow Actions"
+        title={t('manual.searchResults.workflows', 'إجراءات المسار')}
         renderItem={(item) => (
           <>
             <p className="font-semibold text-ink">{item.action_label || item.workflow_key}</p>
@@ -270,6 +286,7 @@ function SearchResults({ results }) {
 function HelpGuidePanel({ onClose, open }) {
   const location = useLocation()
   const { user } = useAuth()
+  const { t, language } = useLanguage()
   const { currentHelp, currentHelpError, currentHelpLoading, pageHelp } = useHelpGuideContext()
   const [panelView, setPanelView] = useState('current')
   const [query, setQuery] = useState('')
@@ -283,7 +300,7 @@ function HelpGuidePanel({ onClose, open }) {
   const [roleFilter, setRoleFilter] = useState('')
   const [selectedGuideSlug, setSelectedGuideSlug] = useState('')
 
-  const activeScreen = useMemo(() => matchHelpScreen(location.pathname), [location.pathname])
+  const activeScreen = useMemo(() => matchHelpScreen(location.pathname), [location.pathname, language])
   const activeScreenKey = activeScreen?.screen_key || ''
   const activeScreenLabel = activeScreen?.label || getHelpScreenLabel(activeScreenKey)
   const screenGuides = currentHelp.screen_guides || currentHelp.results || []
@@ -292,7 +309,11 @@ function HelpGuidePanel({ onClose, open }) {
   const fieldRows = currentHelp.fields || []
   const workflowRows = currentHelp.workflows || []
   const serviceGuide = currentHelp.service || null
-  const selectedLibraryGuide = libraryData.guides.find((item) => item.slug === selectedGuideSlug) || libraryData.quick_links.find((item) => item.slug === selectedGuideSlug) || libraryData.guides[0] || null
+  const selectedLibraryGuide =
+    libraryData.guides.find((item) => item.slug === selectedGuideSlug) ||
+    libraryData.quick_links.find((item) => item.slug === selectedGuideSlug) ||
+    libraryData.guides[0] ||
+    null
 
   useEffect(() => {
     if (!open) return undefined
@@ -382,79 +403,79 @@ function HelpGuidePanel({ onClose, open }) {
   const contextualExtraSections = (
     <>
       <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-        <h4 className="text-sm font-bold text-ink">Buttons and Actions</h4>
+        <h4 className="text-sm font-bold text-ink">{t('manual.buttonsAndActions', 'الأزرار والإجراءات')}</h4>
         <GuideTable
           columns={[
-            { key: 'button_label', label: 'Button' },
-            { key: 'purpose', label: 'Purpose' },
-            { key: 'when_to_use', label: 'When to Use' },
-            { key: 'action_result', label: 'Result' },
-            { key: 'warning_message', label: 'Warning' },
+            { key: 'button_label', label: t('manual.table.button', 'الزر') },
+            { key: 'purpose', label: t('manual.table.purpose', 'الغرض') },
+            { key: 'when_to_use', label: t('manual.table.whenToUse', 'متى يُستخدم') },
+            { key: 'action_result', label: t('manual.table.result', 'النتيجة') },
+            { key: 'warning_message', label: t('manual.table.warning', 'تنبيه') },
           ]}
-          emptyLabel="No contextual button help is available for this screen yet."
+          emptyLabel={t('manual.table.emptyActions', 'لا توجد مساعدة مرتبطة بالأزرار لهذه الشاشة بعد.')}
           rows={actionRows}
         />
       </section>
 
       <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-        <h4 className="text-sm font-bold text-ink">Fields and Data Entry</h4>
+        <h4 className="text-sm font-bold text-ink">{t('manual.fieldsAndDataEntry', 'الحقول وإدخال البيانات')}</h4>
         <GuideTable
           columns={[
-            { key: 'field_label', label: 'Field' },
-            { key: 'required', label: 'Required', render: (row) => (row.required ? 'Yes' : 'Optional') },
-            { key: 'purpose', label: 'What to Enter' },
-            { key: 'valid_example', label: 'Example' },
-            { key: 'error_explanation', label: 'Common Error' },
+            { key: 'field_label', label: t('manual.table.field', 'الحقل') },
+            { key: 'required', label: t('manual.table.required', 'الإلزام'), render: (row) => (row.required ? t('common.required', 'إلزامي') : t('common.optional', 'اختياري')) },
+            { key: 'purpose', label: t('manual.table.whatToEnter', 'ماذا تُدخل') },
+            { key: 'valid_example', label: t('manual.table.example', 'مثال') },
+            { key: 'error_explanation', label: t('manual.table.commonError', 'خطأ شائع') },
           ]}
-          emptyLabel="No field-level help is available for this screen yet."
+          emptyLabel={t('manual.table.emptyFields', 'لا توجد مساعدة على مستوى الحقول لهذه الشاشة بعد.')}
           rows={fieldRows}
         />
       </section>
 
       {serviceGuide ? (
         <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-          <h4 className="text-sm font-bold text-ink">Service Guide</h4>
+          <h4 className="text-sm font-bold text-ink">{t('manual.serviceGuide', 'دليل الخدمة')}</h4>
           <div className="space-y-3 text-sm leading-7 text-slate-700">
             <p>{serviceGuide.description}</p>
             <p>
-              <span className="font-semibold text-ink">Who can use it:</span> {serviceGuide.who_can_use}
+              <span className="font-semibold text-ink">{t('manual.serviceWhoCanUse', 'من يستخدمها')}:</span> {serviceGuide.who_can_use}
             </p>
             <p>
-              <span className="font-semibold text-ink">Estimated time:</span> {serviceGuide.estimated_processing_time}
+              <span className="font-semibold text-ink">{t('manual.serviceEstimatedTime', 'المدة التقديرية')}:</span> {serviceGuide.estimated_processing_time}
             </p>
             <p>
-              <span className="font-semibold text-ink">Price rule:</span> {serviceGuide.price_rule}
+              <span className="font-semibold text-ink">{t('manual.servicePriceRule', 'قاعدة التسعير')}:</span> {serviceGuide.price_rule}
             </p>
           </div>
-          <ListBlock items={serviceGuide.required_documents || []} title="Required Documents" />
-          <ListBlock items={serviceGuide.required_data || []} title="Required Data" />
-          <ListBlock items={serviceGuide.workflow_summary || []} title="Workflow Steps" />
+          <ListBlock items={serviceGuide.required_documents || []} title={t('manual.requiredDocuments', 'الوثائق المطلوبة')} />
+          <ListBlock items={serviceGuide.required_data || []} title={t('manual.requiredData', 'البيانات المطلوبة')} />
+          <ListBlock items={serviceGuide.workflow_summary || []} title={t('manual.workflowSteps', 'خطوات المسار')} />
         </section>
       ) : null}
 
       {workflowRows.length ? (
         <section className="space-y-3 rounded-3xl border border-border bg-white p-4">
-          <h4 className="text-sm font-bold text-ink">Workflow / Status Guide</h4>
+          <h4 className="text-sm font-bold text-ink">{t('manual.workflowGuide', 'دليل الحالات والمسار')}</h4>
           <GuideTable
             columns={[
-              { key: 'current_status_label', label: 'Current Status' },
-              { key: 'action_label', label: 'User Action' },
-              { key: 'next_status_label', label: 'Next Status' },
-              { key: 'role_label', label: 'Who Can Do It' },
+              { key: 'current_status_label', label: t('manual.table.currentStatus', 'الحالة الحالية') },
+              { key: 'action_label', label: t('manual.table.userAction', 'إجراء المستخدم') },
+              { key: 'next_status_label', label: t('manual.table.nextStatus', 'الحالة التالية') },
+              { key: 'role_label', label: t('manual.table.whoCanDoIt', 'من يستطيع التنفيذ') },
             ]}
-            emptyLabel="No workflow guidance is available for this status."
+            emptyLabel={t('manual.table.emptyWorkflow', 'لا توجد إرشادات حالة لهذه المرحلة حالياً.')}
             rows={workflowRows}
           />
         </section>
       ) : null}
 
-      <ListBlock items={commonProblems} title="Common Problems" tone="warning" />
+      <ListBlock items={commonProblems} title={t('manual.commonProblems', 'المشكلات الشائعة')} tone="warning" />
     </>
   )
 
   return (
     <div className="fixed inset-0 z-50">
-      <button aria-label="Close help panel" className="absolute inset-0 bg-slate-900/45" onClick={onClose} type="button" />
+      <button aria-label={t('common.close', 'إغلاق')} className="absolute inset-0 bg-slate-900/45" onClick={onClose} type="button" />
 
       <aside className="absolute inset-y-0 left-0 flex w-full max-w-full justify-end">
         <div className="flex h-full w-full max-w-[1080px] flex-col border-r border-border bg-[#f7f5ef] shadow-2xl">
@@ -463,16 +484,16 @@ function HelpGuidePanel({ onClose, open }) {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-brand-700">
                   <CircleHelp className="h-5 w-5" />
-                  <span className="text-sm font-semibold">In-App Manual</span>
+                  <span className="text-sm font-semibold">{t('manual.inAppManual', 'الدليل داخل النظام')}</span>
                 </div>
-                <h2 className="text-2xl font-extrabold text-ink">{panelView === 'current' ? activeScreenLabel : 'Manual Library'}</h2>
+                <h2 className="text-2xl font-extrabold text-ink">{panelView === 'current' ? activeScreenLabel : t('manual.library', 'مكتبة الدليل')}</h2>
                 <p className="text-sm leading-7 text-slate-600">
                   {panelView === 'current'
-                    ? 'Read the current page guide, review related actions and fields, or search across the help system.'
-                    : 'Browse role-based guides, quick links, categories, and screenshot-supported workflow instructions.'}
+                    ? t('manual.currentDescription', 'اقرأ دليل الصفحة الحالية، وراجع الأزرار والحقول المرتبطة بها، أو ابحث داخل نظام المساعدة.')
+                    : t('manual.libraryDescription', 'تصفح الأدلة حسب الدور والتصنيف والتعليمات المدعومة بالصور.')}
                 </p>
               </div>
-              <button aria-label="Close" className="btn-ghost p-2" onClick={onClose} type="button">
+              <button aria-label={t('common.close', 'إغلاق')} className="btn-ghost p-2" onClick={onClose} type="button">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -483,14 +504,14 @@ function HelpGuidePanel({ onClose, open }) {
                 onClick={() => setPanelView('current')}
                 type="button"
               >
-                Current Page
+                {t('manual.currentPage', 'الصفحة الحالية')}
               </button>
               <button
                 className={`rounded-2xl border px-4 py-2 text-sm font-semibold ${panelView === 'library' ? 'border-brand-600 bg-brand-600 text-white' : 'border-border bg-white text-slate-600'}`}
                 onClick={() => setPanelView('library')}
                 type="button"
               >
-                Manual Library
+                {t('manual.library', 'مكتبة الدليل')}
               </button>
             </div>
 
@@ -500,13 +521,13 @@ function HelpGuidePanel({ onClose, open }) {
                 <input
                   className="field pr-9"
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder={panelView === 'current' ? 'Search screens, buttons, fields, and workflows' : 'Search guide titles and workflow pages'}
+                  placeholder={panelView === 'current' ? t('manual.searchCurrent', 'ابحث في الشاشات والأزرار والحقول ومسارات العمل') : t('manual.searchLibrary', 'ابحث في عناوين الأدلة وصفحات العمل')}
                   value={query}
                 />
               </div>
               {panelView === 'library' ? (
                 <select className="field" onChange={(event) => setCategoryFilter(event.target.value)} value={categoryFilter}>
-                  <option value="">All categories</option>
+                  <option value="">{t('manual.allCategories', 'كل التصنيفات')}</option>
                   {(libraryData.categories || []).map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
@@ -515,7 +536,7 @@ function HelpGuidePanel({ onClose, open }) {
                 </select>
               ) : (
                 <div className="rounded-2xl border border-border bg-white px-4 py-3 text-sm text-slate-600">
-                  Role: <span className="font-semibold text-ink">{user.role}</span>
+                  {t('manual.role', 'الدور')}: <span className="font-semibold text-ink">{user.role}</span>
                 </div>
               )}
               {panelView === 'library' ? (
@@ -525,7 +546,7 @@ function HelpGuidePanel({ onClose, open }) {
                   onChange={(event) => setRoleFilter(event.target.value)}
                   value={roleFilter}
                 >
-                  <option value="">{libraryData.can_manage_help_guides ? 'Current role visibility' : 'Role preview requires help-guide admin access'}</option>
+                  <option value="">{libraryData.can_manage_help_guides ? t('manual.currentRoleVisibility', 'عرض أدلة الدور الحالي') : t('manual.rolePreviewRestricted', 'معاينة الأدوار تتطلب صلاحية إدارة الدليل')}</option>
                   {(libraryData.roles || []).map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
@@ -534,11 +555,11 @@ function HelpGuidePanel({ onClose, open }) {
                 </select>
               ) : pageHelp.workflowStatus ? (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                  Workflow status: <span className="font-semibold">{pageHelp.workflowStatus}</span>
+                  {t('manual.workflowStatus', 'حالة المسار')}: <span className="font-semibold">{pageHelp.workflowStatus}</span>
                 </div>
               ) : (
                 <div className="rounded-2xl border border-border bg-white px-4 py-3 text-sm text-slate-600">
-                  Screen key: <span className="font-semibold text-ink">{activeScreenKey || 'General'}</span>
+                  {t('manual.screenKey', 'مفتاح الشاشة')}: <span className="font-semibold text-ink">{activeScreenKey || t('manual.general', 'دليل عام')}</span>
                 </div>
               )}
             </div>
@@ -560,17 +581,19 @@ function HelpGuidePanel({ onClose, open }) {
                   </div>
                 ) : null}
 
-                {!currentHelpLoading && !searchLoading && isCurrentSearch && searchResults ? <SearchResults results={searchResults} /> : null}
+                {!currentHelpLoading && !searchLoading && isCurrentSearch && searchResults ? <SearchResults results={searchResults} t={t} /> : null}
 
                 {!isCurrentSearch && !currentHelpLoading ? (
                   <div className="space-y-5">
                     <GuideDetail
                       guide={primaryGuide}
                       extraSections={contextualExtraSections}
+                      language={language}
                       onSelectGuide={(slug) => {
                         if (slug) setSelectedGuideSlug(slug)
                         setPanelView('library')
                       }}
+                      t={t}
                     />
 
                     {!screenGuides.length && !actionRows.length && !fieldRows.length && !workflowRows.length && !serviceGuide ? (
@@ -579,15 +602,15 @@ function HelpGuidePanel({ onClose, open }) {
                           <BookOpenText className="h-6 w-6" />
                         </div>
                         <div className="space-y-2">
-                          <h3 className="text-lg font-bold text-ink">No contextual help is available yet</h3>
+                          <h3 className="text-lg font-bold text-ink">{t('manual.noContextHelpTitle', 'لا توجد مساعدة سياقية لهذه الصفحة بعد')}</h3>
                           <p className="text-sm leading-7 text-slate-600">
-                            Add screen, field, action, service, workflow, and screenshot guidance from Help Guide Management to make this page self-explanatory.
+                            {t('manual.noContextHelpDescription', 'أضف محتوى الشاشة والحقول والأزرار والحالات والصور من شاشة إدارة الدليل لجعل هذه الصفحة أوضح للمستخدم.')}
                           </p>
                         </div>
                         <div className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                           <div className="flex items-start gap-3">
                             <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0" />
-                            <p>The system still applies backend role and permission filtering even when generic guidance exists elsewhere in the library.</p>
+                            <p>{t('manual.permissionFilterNote', 'يواصل النظام تطبيق تصفية الأدوار والصلاحيات من الخلفية حتى عند توفر إرشادات عامة في المكتبة.')}</p>
                           </div>
                         </div>
                       </div>
@@ -606,7 +629,7 @@ function HelpGuidePanel({ onClose, open }) {
                 ) : (
                   <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
                     <aside className="space-y-5">
-                      <SectionBlock title="Quick Links" tone="muted">
+                      <SectionBlock title={t('manual.quickLinks', 'روابط سريعة')} tone="muted">
                         <div className="flex flex-wrap gap-2">
                           {(libraryData.quick_links || []).map((guide) => (
                             <button
@@ -621,7 +644,7 @@ function HelpGuidePanel({ onClose, open }) {
                         </div>
                       </SectionBlock>
 
-                      <SectionBlock title="Guide Pages" tone="muted">
+                      <SectionBlock title={t('manual.guidePages', 'صفحات الدليل')} tone="muted">
                         <div className="space-y-2">
                           {(libraryData.guides || []).map((guide) => (
                             <button
@@ -637,13 +660,13 @@ function HelpGuidePanel({ onClose, open }) {
                             </button>
                           ))}
                           {!libraryData.guides?.length ? (
-                            <p className="rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-slate-500">No guides match the current search and filters.</p>
+                            <p className="rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-slate-500">{t('manual.noGuidesMatch', 'لا توجد أدلة مطابقة للبحث أو الفلاتر الحالية.')}</p>
                           ) : null}
                         </div>
                       </SectionBlock>
                     </aside>
 
-                    <GuideDetail guide={selectedLibraryGuide} onSelectGuide={setSelectedGuideSlug} />
+                    <GuideDetail guide={selectedLibraryGuide} language={language} onSelectGuide={setSelectedGuideSlug} t={t} />
                   </div>
                 )}
               </>

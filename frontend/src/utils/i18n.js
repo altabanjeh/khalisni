@@ -1,6 +1,13 @@
+import arMessages from '../locales/ar.json'
+import enMessages from '../locales/en.json'
+
 export const DEFAULT_LANGUAGE = 'ar'
 export const SUPPORTED_LANGUAGES = ['ar', 'en']
 export const LANGUAGE_STORAGE_KEY = 'khalisni-language'
+export const MESSAGES = {
+  ar: arMessages,
+  en: enMessages,
+}
 
 export function normalizeLanguage(value) {
   return value === 'en' ? 'en' : DEFAULT_LANGUAGE
@@ -50,4 +57,23 @@ export function getLocalizedField(record, fields, language, fallback = '') {
   }
 
   return fallback
+}
+
+export function interpolateMessage(template, values = {}) {
+  return String(template || '').replace(/\{(\w+)\}/g, (_match, key) => {
+    const value = values[key]
+    return value == null ? '' : String(value)
+  })
+}
+
+export function translateMessage(language, key, fallback = '', values = {}) {
+  const normalizedLanguage = normalizeLanguage(language)
+  const dictionary = MESSAGES[normalizedLanguage] || MESSAGES[DEFAULT_LANGUAGE]
+  const message = dictionary?.[key]
+
+  if (typeof message === 'string') {
+    return interpolateMessage(message, values)
+  }
+
+  return interpolateMessage(fallback || key, values)
 }

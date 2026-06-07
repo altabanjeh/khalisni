@@ -27,17 +27,17 @@ function PublicLink({ className, label, to }) {
 }
 
 function PublicLayoutContent() {
-  const { language, direction, isArabic } = useLanguage()
+  const { language, direction, t } = useLanguage()
   const { content, importantAlert, theme } = usePublicSite()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const links = [
-    { to: '/', label: isArabic ? 'الرئيسية' : 'Home' },
-    { to: '/services', label: isArabic ? 'الخدمات' : 'Services' },
-    { to: '/track-order', label: isArabic ? 'تتبع الطلب' : 'Track order' },
-    { to: '/about', label: isArabic ? 'من نحن' : 'About' },
-    { to: '/contact', label: isArabic ? 'تواصل معنا' : 'Contact' },
-    { to: '/faq', label: isArabic ? 'الأسئلة الشائعة' : 'FAQ' },
+    { to: '/', label: t('public.home', 'الرئيسية') },
+    { to: '/services', label: t('public.services', 'الخدمات') },
+    { to: '/track-order', label: t('public.trackOrder', 'تتبع الطلب') },
+    { to: '/about', label: t('public.about', 'من نحن') },
+    { to: '/contact', label: t('public.contact', 'تواصل معنا') },
+    { to: '/faq', label: t('public.faq', 'الأسئلة الشائعة') },
   ]
   const heroTitle = getLocalizedField(content, { ar: 'hero_title_ar', en: 'hero_title_en' }, language)
   const importantAlertTitle = getLocalizedField(importantAlert, { ar: 'title_ar', en: 'title_en' }, language)
@@ -102,7 +102,7 @@ function PublicLayoutContent() {
 
             <button
               aria-expanded={mobileMenuOpen}
-              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-label={mobileMenuOpen ? t('public.closeNav', 'إغلاق قائمة التنقل') : t('public.openNav', 'فتح قائمة التنقل')}
               className="btn-ghost p-2 lg:hidden"
               onClick={() => setMobileMenuOpen((current) => !current)}
               type="button"
@@ -115,7 +115,7 @@ function PublicLayoutContent() {
             className={clsx(
               'mt-4 flex-col gap-3 border-t border-border pt-4 lg:mt-0 lg:flex lg:border-t-0 lg:pt-0',
               mobileMenuOpen ? 'flex' : 'hidden',
-              isArabic ? 'lg:items-end' : 'lg:items-start',
+              direction === 'rtl' ? 'lg:items-end' : 'lg:items-start',
             )}
           >
             <nav className="flex flex-col gap-2 text-sm font-semibold sm:flex-row sm:flex-wrap sm:items-center">
@@ -137,7 +137,7 @@ function PublicLayoutContent() {
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <LanguageSwitcher light />
               <Link className="btn-secondary w-full px-4 py-2 text-xs sm:w-auto" to="/login">
-                {isArabic ? 'تسجيل الدخول' : 'Sign in'}
+                {t('public.signIn', 'تسجيل الدخول')}
               </Link>
               <PublicLink
                 className="public-primary-button w-full px-4 py-2 text-xs sm:w-auto"
@@ -166,10 +166,10 @@ function PublicLayoutContent() {
           </div>
           <div className="flex flex-wrap gap-4">
             <Link className="text-white/90 hover:text-white" to="/privacy">
-              {isArabic ? 'سياسة الخصوصية' : 'Privacy policy'}
+              {t('public.privacy', 'سياسة الخصوصية')}
             </Link>
             <Link className="text-white/90 hover:text-white" to="/faq">
-              {isArabic ? 'الأسئلة الشائعة' : 'FAQ'}
+              {t('public.faq', 'الأسئلة الشائعة')}
             </Link>
           </div>
         </div>

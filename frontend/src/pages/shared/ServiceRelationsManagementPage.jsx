@@ -7,6 +7,7 @@ import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
@@ -69,6 +70,7 @@ function CheckboxField({ label, registration, hint }) {
 }
 
 function ServiceRelationsManagementPage() {
+  const { isArabic } = useLanguage()
   const { toast } = useToast()
   const form = useForm({ defaultValues })
   const [selectedRelationId, setSelectedRelationId] = useState(null)
@@ -219,10 +221,10 @@ function ServiceRelationsManagementPage() {
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        title="Service Relations Management"
-        eyebrow="Service Rules"
+        title={isArabic ? 'إدارة علاقات الخدمات' : 'Service Relations Management'}
+        eyebrow={isArabic ? 'قواعد الخدمات' : 'Service Rules'}
         icon={GitBranchPlus}
-        description="Define prerequisites, follow-up recommendations, optional bundles, and alternatives without code changes."
+        description={isArabic ? 'عرّف الشروط المسبقة والتوصيات اللاحقة والحزم الاختيارية والبدائل بدون تعديل برمجي.' : 'Define prerequisites, recommendations, optional bundles, and alternatives without code changes.'}
         actions={
           <button className="btn-primary" onClick={openCreateForm} type="button">
             + New Relation

@@ -6,6 +6,7 @@ import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { broadcastPublicSiteUpdate } from '../../utils/publicSiteSync'
 import {
@@ -61,6 +62,7 @@ function applyServerErrors(error, setError, setFeedback) {
 }
 
 function AdvertisementManagerPage() {
+  const { isArabic } = useLanguage()
   const { data: advertisements = [], loading, reload } = useAsyncData(() => api.getAdminPublicSiteAdvertisements(), [], [])
   const [selectedId, setSelectedId] = useState(null)
   const [feedback, setFeedback] = useState(null)
@@ -207,9 +209,9 @@ function AdvertisementManagerPage() {
           </button>
         }
         description="أنشئ الحملات العامة والتنبيهات المهمة من نافذة منظمة وواضحة بدون ضغط الجدول أو تشتيت الصفحة."
-        eyebrow="PUBLIC SITE"
+        eyebrow={isArabic ? 'الموقع العام' : 'PUBLIC SITE'}
         icon={Megaphone}
-        title="Advertisement Manager"
+        title={isArabic ? 'إدارة الإعلانات' : 'Advertisement Manager'}
       />
 
       <section className="glass-panel p-6">

@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { useLanguage } from '../context/LanguageContext'
 
 function LanguageSwitcher({ className = '', light = false }) {
-  const { language, setLanguage } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
 
   return (
     <div
@@ -13,8 +13,8 @@ function LanguageSwitcher({ className = '', light = false }) {
       )}
     >
       {[
-        { value: 'ar', label: 'العربية' },
-        { value: 'en', label: 'English' },
+        { value: 'ar', label: t('language.ar', 'العربية') },
+        { value: 'en', label: t('language.en', 'English') },
       ].map((option) => {
         const active = language === option.value
 

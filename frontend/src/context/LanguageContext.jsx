@@ -7,6 +7,7 @@ import {
   isRtlLanguage,
   LANGUAGE_STORAGE_KEY,
   normalizeLanguage,
+  translateMessage,
 } from '../utils/i18n'
 
 const defaultLanguageContext = {
@@ -15,6 +16,7 @@ const defaultLanguageContext = {
   direction: 'rtl',
   isArabic: true,
   setLanguage: () => {},
+  t: (_key, fallback = '') => fallback,
 }
 
 const LanguageContext = createContext(defaultLanguageContext)
@@ -41,6 +43,7 @@ export function LanguageProvider({ children }) {
         direction: getDirectionForLanguage(language),
         isArabic: isRtlLanguage(language),
         setLanguage,
+        t: (key, fallback = '', values = {}) => translateMessage(language, key, fallback, values),
       }}
     >
       {children}

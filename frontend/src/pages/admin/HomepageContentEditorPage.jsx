@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { fallbackPublicContent } from '../../utils/publicSiteDefaults'
 import { broadcastPublicSiteUpdate } from '../../utils/publicSiteSync'
@@ -18,6 +19,7 @@ function applyServerErrors(error, setError, setFeedback) {
 }
 
 function HomepageContentEditorPage() {
+  const { isArabic } = useLanguage()
   const { data, loading, reload } = useAsyncData(() => api.getAdminPublicSiteContent(), [], null)
   const [feedback, setFeedback] = useState(null)
   const form = useForm({ defaultValues: fallbackPublicContent })
@@ -76,14 +78,14 @@ function HomepageContentEditorPage() {
     <div className="page-section">
       <PageHeader
         icon={FileText}
-        title="Homepage Content Editor"
-        eyebrow="PUBLIC SITE"
+        title={isArabic ? 'محرر محتوى الصفحة الرئيسية' : 'Homepage Content Editor'}
+        eyebrow={isArabic ? 'الموقع العام' : 'PUBLIC SITE'}
         description="حرر النصوص والصور وروابط الأزرار وبيانات التواصل التي تظهر على الصفحة الرئيسية العامة."
       />
 
       <form className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]" onSubmit={form.handleSubmit(onSubmit)}>
         <section className="glass-panel space-y-5 p-6">
-          <h2 className="text-xl font-extrabold text-ink">Hero Section</h2>
+          <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'قسم البطل' : 'Hero Section'}</h2>
           <FieldGroup error={form.formState.errors.version_name} hint="اسم داخلي فقط" label="Version name / اسم النسخة">
             <input className="field" {...form.register('version_name', { required: 'اسم النسخة مطلوب' })} />
           </FieldGroup>
@@ -133,7 +135,7 @@ function HomepageContentEditorPage() {
 
         <section className="space-y-6">
           <div className="glass-panel space-y-5 p-6">
-            <h2 className="text-xl font-extrabold text-ink">How It Works</h2>
+            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'كيف تعمل المنصة' : 'How It Works'}</h2>
             <FieldGroup error={form.formState.errors.how_it_works_text} label="How it works AR / نص كيف تعمل المنصة">
               <textarea className="field min-h-32" {...form.register('how_it_works_text', { required: 'هذا النص مطلوب' })} />
             </FieldGroup>
@@ -143,7 +145,7 @@ function HomepageContentEditorPage() {
           </div>
 
           <div className="glass-panel space-y-5 p-6">
-            <h2 className="text-xl font-extrabold text-ink">Contact And Footer</h2>
+            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'التواصل والتذييل' : 'Contact and Footer'}</h2>
             <FieldGroup error={form.formState.errors.contact_phone} label="Phone / رقم الهاتف">
               <input className="field" {...form.register('contact_phone', { required: 'رقم الهاتف مطلوب' })} />
             </FieldGroup>

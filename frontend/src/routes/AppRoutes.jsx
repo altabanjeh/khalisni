@@ -27,8 +27,10 @@ import {
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RouteErrorBoundary from '../components/RouteErrorBoundary'
+import { useLanguage } from '../context/LanguageContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 import PublicLayout from '../layouts/PublicLayout'
+import ManualLaunchPage from '../pages/shared/ManualLaunchPage'
 import ProtectedRoute from './ProtectedRoute'
 
 import HomePage from '../pages/public/HomePage'
@@ -86,52 +88,6 @@ const ProviderDashboardHome = lazy(() => import('../pages/provider/ProviderDashb
 const AssignedOrdersPage = lazy(() => import('../pages/provider/AssignedOrdersPage'))
 const ProviderOrderDetailsPage = lazy(() => import('../pages/provider/ProviderOrderDetailsPage'))
 
-const customerLinks = [
-  { to: '/customer', label: 'الرئيسية', icon: Home },
-  { to: '/customer/orders/new', label: 'طلب جديد', icon: FilePlus2 },
-  { to: '/customer/orders', label: 'طلباتي', icon: ClipboardList },
-  { to: '/customer/profile', label: 'الملف الشخصي', icon: UserCog },
-]
-
-const employeeLinks = [
-  { to: '/employee', label: 'الرئيسية', icon: LayoutDashboard },
-  { to: '/employee/orders', label: 'قائمة المراجعة', icon: FileSearch },
-  { to: '/employee/missing-service-requests', label: 'طلبات خدمات جديدة', icon: MessageSquareMore },
-  { to: '/employee/service-categories', label: 'تصنيفات الخدمات', icon: FolderTree, roles: ['support'] },
-  { to: '/employee/service-relations', label: 'علاقات الخدمات', icon: GitBranchPlus, roles: ['support'] },
-  { to: '/employee/documents/verify', label: 'التحقق من الوثائق', icon: ShieldCheck },
-  { to: '/employee/reports', label: 'تقارير الموظف', icon: LineChart },
-]
-
-const adminLinks = [
-  { to: '/admin', label: 'لوحة الإدارة', icon: LayoutDashboard },
-  { to: '/admin/orders', label: 'إدارة الطلبات', icon: FolderKanban },
-  { to: '/admin/rules', label: 'قواعد التشغيل', icon: Settings },
-  { to: '/admin/cms', label: 'إعدادات النظام', icon: Database },
-  { to: '/admin/service-categories', label: 'تصنيفات الخدمات', icon: FolderTree },
-  { to: '/admin/services', label: 'الخدمات', icon: Settings },
-  { to: '/admin/service-relations', label: 'علاقات الخدمات', icon: GitBranchPlus },
-  { to: '/admin/public-site', label: 'الموقع العام', icon: Monitor },
-  { to: '/admin/public-site/content', label: 'محتوى الرئيسية', icon: FileText },
-  { to: '/admin/public-site/advertisements', label: 'الإعلانات', icon: ImagePlus },
-  { to: '/admin/public-site/theme', label: 'المظهر العام', icon: Palette },
-  { to: '/admin/public-site/preview', label: 'معاينة الواجهة', icon: Eye },
-  { to: '/admin/missing-service-requests', label: 'طلبات الخدمات الجديدة', icon: MessageSquareMore },
-  { to: '/admin/users', label: 'المستخدمون والأدوار', icon: UsersRound },
-  { to: '/admin/providers', label: 'المزودون', icon: BriefcaseBusiness },
-  { to: '/admin/provider-services', label: 'خدمات المزودين', icon: ClipboardList },
-  { to: '/admin/payments', label: 'المدفوعات', icon: CreditCard },
-  { to: '/admin/reports', label: 'التقارير', icon: LineChart },
-  { to: '/admin/notifications', label: 'الإشعارات', icon: Bell },
-  { to: '/admin/audit', label: 'سجل التدقيق', icon: ShieldCheck },
-  { to: '/admin/help-guides', label: 'Help Guides', icon: BookOpenText },
-]
-
-const providerLinks = [
-  { to: '/provider', label: 'الرئيسية', icon: Home },
-  { to: '/provider/orders', label: 'الطلبات المعينة', icon: ClipboardList },
-]
-
 function PageLoader() {
   return (
     <div className="flex min-h-[40vh] items-center justify-center">
@@ -141,6 +97,58 @@ function PageLoader() {
 }
 
 function AppRoutes() {
+  const { t } = useLanguage()
+
+  const customerLinks = [
+    { to: '/customer', label: t('public.home', 'الرئيسية'), icon: Home },
+    { to: '/customer/orders/new', label: t('customer.newOrder', 'طلب جديد'), icon: FilePlus2 },
+    { to: '/customer/orders', label: t('customer.myOrders', 'طلباتي'), icon: ClipboardList },
+    { to: '/customer/profile', label: t('customer.profile', 'الملف الشخصي'), icon: UserCog },
+    { to: '/customer/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+  ]
+
+  const employeeLinks = [
+    { to: '/employee', label: t('employee.dashboard', 'الرئيسية'), icon: LayoutDashboard },
+    { to: '/employee/orders', label: t('employee.reviewQueue', 'قائمة المراجعة'), icon: FileSearch },
+    { to: '/employee/missing-service-requests', label: t('employee.missingServices', 'طلبات خدمات جديدة'), icon: MessageSquareMore },
+    { to: '/employee/service-categories', label: t('employee.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree, roles: ['support'] },
+    { to: '/employee/service-relations', label: t('employee.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus, roles: ['support'] },
+    { to: '/employee/documents/verify', label: t('employee.verifyDocuments', 'التحقق من الوثائق'), icon: ShieldCheck },
+    { to: '/employee/reports', label: t('employee.reports', 'تقارير الموظف'), icon: LineChart },
+    { to: '/employee/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+  ]
+
+  const adminLinks = [
+    { to: '/admin', label: t('routes.adminPortal', 'لوحة الإدارة'), icon: LayoutDashboard },
+    { to: '/admin/orders', label: t('admin.orders', 'إدارة الطلبات'), icon: FolderKanban },
+    { to: '/admin/rules', label: t('admin.rules', 'قواعد التشغيل'), icon: Settings },
+    { to: '/admin/cms', label: t('admin.settings', 'إعدادات النظام'), icon: Database },
+    { to: '/admin/service-categories', label: t('admin.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree },
+    { to: '/admin/services', label: t('admin.services', 'الخدمات'), icon: Settings },
+    { to: '/admin/service-relations', label: t('admin.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus },
+    { to: '/admin/public-site', label: t('admin.publicSite', 'الموقع العام'), icon: Monitor },
+    { to: '/admin/public-site/content', label: t('admin.homepageContent', 'محتوى الرئيسية'), icon: FileText },
+    { to: '/admin/public-site/advertisements', label: t('admin.advertisements', 'الإعلانات'), icon: ImagePlus },
+    { to: '/admin/public-site/theme', label: t('admin.theme', 'المظهر العام'), icon: Palette },
+    { to: '/admin/public-site/preview', label: t('admin.preview', 'معاينة الواجهة'), icon: Eye },
+    { to: '/admin/missing-service-requests', label: t('admin.missingServices', 'طلبات الخدمات الجديدة'), icon: MessageSquareMore },
+    { to: '/admin/users', label: t('admin.usersRoles', 'المستخدمون والأدوار'), icon: UsersRound },
+    { to: '/admin/providers', label: t('admin.providers', 'المزوّدون'), icon: BriefcaseBusiness },
+    { to: '/admin/provider-services', label: t('admin.providerServices', 'خدمات المزوّدين'), icon: ClipboardList },
+    { to: '/admin/payments', label: t('admin.payments', 'المدفوعات'), icon: CreditCard },
+    { to: '/admin/reports', label: t('admin.reports', 'التقارير'), icon: LineChart },
+    { to: '/admin/notifications', label: t('admin.notifications', 'الإشعارات'), icon: Bell },
+    { to: '/admin/audit', label: t('admin.audit', 'سجل التدقيق'), icon: ShieldCheck },
+    { to: '/admin/help-guides', label: t('admin.helpGuides', 'إدارة الدليل'), icon: BookOpenText },
+    { to: '/admin/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+  ]
+
+  const providerLinks = [
+    { to: '/provider', label: t('provider.dashboard', 'الرئيسية'), icon: Home },
+    { to: '/provider/orders', label: t('provider.orders', 'الطلبات المعيّنة'), icon: ClipboardList },
+    { to: '/provider/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+  ]
+
   return (
     <RouteErrorBoundary>
       <Suspense fallback={<PageLoader />}>
@@ -162,36 +170,38 @@ function AppRoutes() {
           </Route>
 
           <Route element={<ProtectedRoute roles={['customer']} />}>
-            <Route element={<DashboardLayout links={customerLinks} title="بوابة العميل" />}>
+            <Route element={<DashboardLayout links={customerLinks} title={t('routes.customerPortal', 'بوابة العميل')} />}>
               <Route path="/customer" element={<CustomerDashboardHome />} />
               <Route path="/customer/orders/new" element={<CustomerCreateOrderPage />} />
               <Route path="/customer/orders" element={<MyOrdersPage />} />
               <Route path="/customer/orders/:id" element={<CustomerOrderDetailsPage />} />
               <Route path="/customer/orders/:id/missing-docs" element={<MissingDocumentsResponsePage />} />
               <Route path="/customer/profile" element={<ProfilePage />} />
+              <Route path="/customer/manual" element={<ManualLaunchPage />} />
             </Route>
           </Route>
 
           <Route element={<ProtectedRoute roles={['employee', 'support']} />}>
-            <Route element={<DashboardLayout links={employeeLinks} title="بوابة الموظف" />}>
+            <Route element={<DashboardLayout links={employeeLinks} title={t('routes.employeePortal', 'بوابة الموظف')} />}>
               <Route path="/employee" element={<EmployeeDashboardHome />} />
               <Route path="/employee/orders" element={<EmployeeReviewQueuePage />} />
               <Route path="/employee/missing-service-requests" element={<MissingServiceRequestsPage />} />
               <Route path="/employee/orders/:id" element={<EmployeeOrderReviewPage />} />
               <Route path="/employee/documents/verify" element={<EmployeeVerifyDocumentsPage />} />
               <Route path="/employee/reports" element={<EmployeeReportsPage />} />
+              <Route path="/employee/manual" element={<ManualLaunchPage />} />
             </Route>
           </Route>
 
           <Route element={<ProtectedRoute roles={['support']} />}>
-            <Route element={<DashboardLayout links={employeeLinks} title="بوابة الموظف" />}>
+            <Route element={<DashboardLayout links={employeeLinks} title={t('routes.employeePortal', 'بوابة الموظف')} />}>
               <Route path="/employee/service-categories" element={<ServiceCategoryManagementPage />} />
               <Route path="/employee/service-relations" element={<ServiceRelationsManagementPage />} />
             </Route>
           </Route>
 
           <Route element={<ProtectedRoute roles={['admin']} />}>
-            <Route element={<DashboardLayout links={adminLinks} title="لوحة الإدارة" />}>
+            <Route element={<DashboardLayout links={adminLinks} title={t('routes.adminPortal', 'لوحة الإدارة')} />}>
               <Route path="/admin" element={<AdminOverviewPage />} />
               <Route path="/admin/orders" element={<OrdersManagementPage />} />
               <Route path="/admin/orders/:id" element={<AdminOrderDetailsPage />} />
@@ -214,14 +224,16 @@ function AppRoutes() {
               <Route path="/admin/payments" element={<PaymentsManagementPage />} />
               <Route path="/admin/audit" element={<AuditLogPage />} />
               <Route path="/admin/help-guides" element={<HelpGuideManagementPage />} />
+              <Route path="/admin/manual" element={<ManualLaunchPage />} />
             </Route>
           </Route>
 
           <Route element={<ProtectedRoute roles={['provider']} />}>
-            <Route element={<DashboardLayout links={providerLinks} title="بوابة المزود" />}>
+            <Route element={<DashboardLayout links={providerLinks} title={t('routes.providerPortal', 'بوابة المزود')} />}>
               <Route path="/provider" element={<ProviderDashboardHome />} />
               <Route path="/provider/orders" element={<AssignedOrdersPage />} />
               <Route path="/provider/orders/:id" element={<ProviderOrderDetailsPage />} />
+              <Route path="/provider/manual" element={<ManualLaunchPage />} />
             </Route>
           </Route>
 
