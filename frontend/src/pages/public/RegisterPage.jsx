@@ -71,32 +71,33 @@ function RegisterPage() {
 
       <form className="mt-8 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
         <div className="md:col-span-2">
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
-          <input className="field" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
+          <label htmlFor="reg-full-name" className="mb-2 block text-sm font-semibold">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
+          <input id="reg-full-name" className="field" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
           {errors.full_name ? <p className="mt-2 text-sm text-danger">{errors.full_name.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
-          <input className="field" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
+          <label htmlFor="reg-phone" className="mb-2 block text-sm font-semibold">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
+          <input id="reg-phone" className="field" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
           {errors.phone ? <p className="mt-2 text-sm text-danger">{errors.phone.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
-          <input className="field" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
+          <label htmlFor="reg-email" className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
+          <input id="reg-email" className="field" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
           {errors.email ? <p className="mt-2 text-sm text-danger">{errors.email.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
-          <input className="field" {...register('national_id')} />
+          <label htmlFor="reg-national-id" className="mb-2 block text-sm font-semibold">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
+          <input id="reg-national-id" className="field" {...register('national_id')} />
           {errors.national_id ? <p className="mt-2 text-sm text-danger">{errors.national_id.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
+          <label htmlFor="reg-password" className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
           <input
+            id="reg-password"
             className="field"
             type="password"
             {...register('password', {

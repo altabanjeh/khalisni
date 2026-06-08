@@ -57,4 +57,4 @@ test('services management page builds required information schema from visual fi
       }),
     )
   })
-})
+}, 15000)

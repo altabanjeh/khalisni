@@ -31,13 +31,13 @@ function TrackOrderPage() {
         <h1 className="mt-2 text-3xl font-extrabold text-ink">{isArabic ? 'أدخل رقم الطلب ورقم الهاتف' : 'Enter the order number and phone number'}</h1>
         <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label className="mb-2 block text-sm font-semibold text-ink">{isArabic ? 'رقم الطلب' : 'Order number'}</label>
-            <input className="field" {...register('order_number', { required: isArabic ? 'رقم الطلب مطلوب' : 'Order number is required' })} />
+            <label htmlFor="track-order-number" className="mb-2 block text-sm font-semibold text-ink">{isArabic ? 'رقم الطلب' : 'Order number'}</label>
+            <input id="track-order-number" className="field" {...register('order_number', { required: isArabic ? 'رقم الطلب مطلوب' : 'Order number is required' })} />
             {errors.order_number ? <p className="mt-2 text-sm text-danger">{errors.order_number.message}</p> : null}
           </div>
           <div>
-            <label className="mb-2 block text-sm font-semibold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
-            <input className="field" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
+            <label htmlFor="track-phone" className="mb-2 block text-sm font-semibold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
+            <input id="track-phone" className="field" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
             {errors.phone ? <p className="mt-2 text-sm text-danger">{errors.phone.message}</p> : null}
           </div>
           <button className="btn-primary w-full" disabled={isSubmitting} type="submit">

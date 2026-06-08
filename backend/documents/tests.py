@@ -228,3 +228,83 @@ class DocumentAdminCrudTests(APITestCase):
         document_id = response.data["document_id"]
         delete_response = self.client.delete(f"/api/admin/documents/{document_id}/")
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class DocumentDownloadTokenTests(APITestCase):
+    """Tests for the signed download-token endpoint added in the May 2026 enhancement."""
+
+    def setUp(self):
+        self.client = APIClient()
+        category = ServiceCategory.objects.create(name_ar="تصنيف", name_en="Category", slug="category-token-dl")
+        service = Service.objects.create(
+            category=category,
+            name_ar="خدمة",
+            name_en="Service",
+            slug="service-token-dl",
+            description_ar="تفاصيل",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=3,
+            service_fee=4,
+        )
+        self.customer = CustomUser.objects.create_user(
+            email="customer-token@example.com",
+            password="Password@123",
+            full_name="Token Customer",
+            phone="0799900010",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.other_customer = CustomUser.objects.create_user(
+            email="other-token@example.com",
+            password="Password@123",
+            full_name="Other Token Customer",
+            phone="0799900011",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.order = Order.objects.create(customer=self.customer, service=service, city="Amman")
+        self.document = Document.objects.create(
+            order=self.order,
+            uploaded_by=self.customer,
+            document_type="national_id",
+            file=SimpleUploadedFile("id.pdf", b"%PDF-1.4 test", content_type="application/pdf"),
+            original_filename="id.pdf",
+            file_size=13,
+            mime_type="application/pdf",
+        )
+
+    def test_authenticated_owner_can_get_download_token(self):
+        self.client.force_authenticate(self.customer)
+        response = self.client.get(f"/api/documents/{self.document.id}/download-token/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("token", response.data)
+        self.assertIn("expires_in", response.data)
+        self.assertEqual(response.data["expires_in"], 1800)
+
+    def test_unauthenticated_user_cannot_get_download_token(self):
+        response = self.client.get(f"/api/documents/{self.document.id}/download-token/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_other_customer_cannot_get_token_for_foreign_document(self):
+        self.client.force_authenticate(self.other_customer)
+        response = self.client.get(f"/api/documents/{self.document.id}/download-token/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_token_based_download_works_for_anonymous_user(self):
+        self.client.force_authenticate(self.customer)
+        token_response = self.client.get(f"/api/documents/{self.document.id}/download-token/")
+        self.assertEqual(token_response.status_code, status.HTTP_200_OK)
+        token = token_response.data["token"]
+
+        self.client.force_authenticate(None)
+        download_response = self.client.get(
+            f"/api/documents/{self.document.id}/download/",
+            {"token": token},
+        )
+        self.assertEqual(download_response.status_code, status.HTTP_200_OK)
+
+    def test_tampered_token_returns_404(self):
+        download_response = self.client.get(
+            f"/api/documents/{self.document.id}/download/",
+            {"token": "this.is.a.bad.token"},
+        )
+        self.assertEqual(download_response.status_code, status.HTTP_404_NOT_FOUND)

@@ -8,3 +8,5 @@ pillow
 python-dotenv
 gunicorn
 whitenoise[brotli]
+django-storages[s3]
+boto3

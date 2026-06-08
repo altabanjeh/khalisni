@@ -5,7 +5,7 @@ from rest_framework.test import APIClient, APITestCase
 from accounts.models import CustomUser
 from audit.models import AuditLog
 from notifications.models import Notification
-from orders.models import Order
+from orders.models import MissingDocumentRequest, Order
 from providers.models import ProviderProfile
 from services.order_completion import create_related_service_notifications
 from services.models import Service, ServiceCategory, ServiceRelation, ServiceRequiredDocument
@@ -1059,3 +1059,42 @@ class OrderAPITests(APITestCase):
         self.assertEqual(existing_order.final_price, existing_total)
         self.assertEqual(new_order.final_price, self.service.total_fee)
         self.assertNotEqual(new_order.final_price, existing_total)
+
+    def test_missing_document_request_model_is_created_and_resolved(self):
+        """MissingDocumentRequest row created on request-documents and resolved when customer uploads all types."""
+        order = Order.objects.create(
+            customer=self.customer,
+            service=self.service,
+            city="Amman",
+            status=Order.Status.UNDER_REVIEW,
+            assigned_employee=self.employee_user,
+        )
+        self.client.force_authenticate(self.employee_user)
+        request_response = self.client.post(
+            f"/api/admin/orders/{order.id}/request-documents/",
+            {
+                "note": "Please send your ID",
+                "document_types": ["national_id"],
+            },
+            format="json",
+        )
+        self.assertEqual(request_response.status_code, status.HTTP_200_OK)
+
+        mdr = MissingDocumentRequest.objects.get(order=order)
+        self.assertFalse(mdr.is_resolved)
+        self.assertEqual(mdr.document_types, ["national_id"])
+
+        self.client.force_authenticate(self.customer)
+        upload_response = self.client.post(
+            f"/api/customer/orders/{order.id}/documents/",
+            {
+                "document_type": "national_id",
+                "file": self._pdf_upload("national-id.pdf"),
+            },
+            format="multipart",
+        )
+        self.assertEqual(upload_response.status_code, status.HTTP_201_CREATED)
+
+        mdr.refresh_from_db()
+        self.assertTrue(mdr.is_resolved)
+        self.assertIsNotNone(mdr.responded_at)

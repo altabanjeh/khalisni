@@ -63,12 +63,12 @@ function LoginPage() {
       ) : null}
       <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
-          <input autoComplete="email" className="field" {...register('email')} />
+          <label htmlFor="login-email" className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
+          <input id="login-email" autoComplete="email" className="field" {...register('email')} />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
-          <input autoComplete="current-password" className="field" type="password" {...register('password')} />
+          <label htmlFor="login-password" className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
+          <input id="login-password" autoComplete="current-password" className="field" type="password" {...register('password')} />
         </div>
         <div className="text-right">
           <Link
