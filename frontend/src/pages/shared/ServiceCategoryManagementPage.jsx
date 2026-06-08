@@ -137,10 +137,10 @@ function ServiceCategoryManagementPage() {
 
       if (selectedCategory) {
         await api.updateAdminCategory(selectedCategory.id, payload)
-        toast('Service category updated.', 'success')
+        toast(isArabic ? 'تم تحديث التصنيف.' : 'Service category updated.', 'success')
       } else {
         await api.createAdminCategory(payload)
-        toast('Service category created.', 'success')
+        toast(isArabic ? 'تم إنشاء التصنيف.' : 'Service category created.', 'success')
       }
 
       reload()
@@ -159,7 +159,7 @@ function ServiceCategoryManagementPage() {
 
     try {
       await api.deleteAdminCategory(categoryId)
-      toast('Service category deactivated.', 'success')
+      toast(isArabic ? 'تم إيقاف التصنيف.' : 'Service category deactivated.', 'success')
       reload()
     } catch (error) {
       toast(getDisplayError(error), 'error')
@@ -187,27 +187,41 @@ function ServiceCategoryManagementPage() {
   }
 
   const columns = [
-    { key: 'name_ar', label: 'Category' },
-    { key: 'parent_name', label: 'Parent', render: (row) => row.parent_name || 'Root' },
-    { key: 'sort_order', label: 'Order' },
-    { key: 'show_on_public_site', label: 'Public', render: (row) => (row.show_on_public_site ? 'Visible' : 'Internal') },
-    { key: 'is_active', label: 'Status', render: (row) => (row.is_active ? 'Active' : 'Inactive') },
-    { key: 'active_services_count', label: 'Services' },
+    { key: 'name_ar', label: isArabic ? 'التصنيف' : 'Category' },
+    {
+      key: 'parent_name',
+      label: isArabic ? 'التصنيف الأصلي' : 'Parent',
+      render: (row) => row.parent_name || (isArabic ? 'رئيسي' : 'Root'),
+    },
+    { key: 'sort_order', label: isArabic ? 'الترتيب' : 'Order' },
+    {
+      key: 'show_on_public_site',
+      label: isArabic ? 'الظهور' : 'Public',
+      render: (row) => (row.show_on_public_site ? (isArabic ? 'ظاهر' : 'Visible') : (isArabic ? 'داخلي' : 'Internal')),
+    },
+    {
+      key: 'is_active',
+      label: isArabic ? 'الحالة' : 'Status',
+      render: (row) => (row.is_active ? (isArabic ? 'مفعّل' : 'Active') : (isArabic ? 'موقف' : 'Inactive')),
+    },
+    { key: 'active_services_count', label: isArabic ? 'الخدمات' : 'Services' },
     {
       key: 'services_preview',
-      label: 'Service Preview',
+      label: isArabic ? 'معاينة الخدمات' : 'Service Preview',
       render: (row) =>
-        row.services_preview?.length ? row.services_preview.map((service) => service.name_ar).join(', ') : 'No active services',
+        row.services_preview?.length
+          ? row.services_preview.map((service) => service.name_ar).join(', ')
+          : (isArabic ? 'لا توجد خدمات فعّالة' : 'No active services'),
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: isArabic ? 'الإجراءات' : 'Actions',
       render: (row) => (
         <div className="flex flex-wrap gap-2">
           {canManage ? (
             <>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
-                Edit
+                {isArabic ? 'تعديل' : 'Edit'}
               </button>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, -1)} type="button">
                 <ArrowUp className="h-3.5 w-3.5" />
@@ -220,11 +234,11 @@ function ServiceCategoryManagementPage() {
                 onClick={() => setPendingDeactivate(row)}
                 type="button"
               >
-                Deactivate
+                {isArabic ? 'إيقاف' : 'Deactivate'}
               </button>
             </>
           ) : (
-            <span className="text-xs text-slate-500">View only</span>
+            <span className="text-xs text-slate-500">{isArabic ? 'عرض فقط' : 'View only'}</span>
           )}
         </div>
       ),
@@ -241,7 +255,7 @@ function ServiceCategoryManagementPage() {
         actions={
           canManage ? (
             <button className="btn-primary" onClick={openCreateForm} type="button">
-              + New Category
+              {isArabic ? '+ تصنيف جديد' : '+ New Category'}
             </button>
           ) : null
         }
@@ -251,8 +265,8 @@ function ServiceCategoryManagementPage() {
         columns={columns}
         rows={categories}
         loading={loading}
-        emptyTitle="No categories found"
-        emptyDescription="Create the first service category to organize the catalog."
+        emptyTitle={isArabic ? 'لا توجد تصنيفات' : 'No categories found'}
+        emptyDescription={isArabic ? 'أنشئ أول تصنيف لتنظيم الكتالوج.' : 'Create the first service category to organize the catalog.'}
         toolbar={
           <div className="grid gap-3 md:grid-cols-3">
             <select
@@ -260,26 +274,26 @@ function ServiceCategoryManagementPage() {
               value={filters.is_active}
               onChange={(event) => setFilters((current) => ({ ...current, is_active: event.target.value }))}
             >
-              <option value="">All statuses</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
+              <option value="">{isArabic ? 'جميع الحالات' : 'All statuses'}</option>
+              <option value="true">{isArabic ? 'مفعّل' : 'Active'}</option>
+              <option value="false">{isArabic ? 'موقف' : 'Inactive'}</option>
             </select>
             <select
               className="field"
               value={filters.show_on_public_site}
               onChange={(event) => setFilters((current) => ({ ...current, show_on_public_site: event.target.value }))}
             >
-              <option value="">All visibility</option>
-              <option value="true">Public</option>
-              <option value="false">Internal only</option>
+              <option value="">{isArabic ? 'جميع مستويات الظهور' : 'All visibility'}</option>
+              <option value="true">{isArabic ? 'عام' : 'Public'}</option>
+              <option value="false">{isArabic ? 'داخلي فقط' : 'Internal only'}</option>
             </select>
             <select
               className="field"
               value={filters.parent}
               onChange={(event) => setFilters((current) => ({ ...current, parent: event.target.value }))}
             >
-              <option value="">All parents</option>
-              <option value="root">Root categories</option>
+              <option value="">{isArabic ? 'جميع الأصول' : 'All parents'}</option>
+              <option value="root">{isArabic ? 'التصنيفات الرئيسية' : 'Root categories'}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.full_path_name || category.name_ar}
@@ -294,36 +308,36 @@ function ServiceCategoryManagementPage() {
         open={isFormOpen}
         onClose={closeForm}
         size="lg"
-        title={selectedCategory ? 'Edit Service Category' : 'New Service Category'}
-        description="Use parent categories for hierarchy and keep internal-only categories hidden from the public catalog."
+        title={selectedCategory ? (isArabic ? 'تعديل التصنيف' : 'Edit Service Category') : (isArabic ? 'تصنيف جديد' : 'New Service Category')}
+        description={isArabic ? 'استخدم التصنيفات الأصلية للتسلسل الهرمي، واحتفظ بالتصنيفات الداخلية مخفية عن الكتالوج العام.' : 'Use parent categories for hierarchy and keep internal-only categories hidden from the public catalog.'}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeForm} type="button">
-              Cancel
+              {isArabic ? 'إلغاء' : 'Cancel'}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="service-category-management-form" type="submit">
               {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
-              {selectedCategory ? 'Save Changes' : 'Create Category'}
+              {selectedCategory ? (isArabic ? 'حفظ التعديلات' : 'Save Changes') : (isArabic ? 'إنشاء التصنيف' : 'Create Category')}
             </button>
           </div>
         }
       >
         <form className="space-y-4" id="service-category-management-form" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Arabic name">
+            <Field label={isArabic ? 'الاسم بالعربية' : 'Arabic name'}>
               <input className="field" {...form.register('name_ar', { required: true })} />
             </Field>
-            <Field label="English name">
+            <Field label={isArabic ? 'الاسم بالإنجليزية' : 'English name'}>
               <input className="field" {...form.register('name_en')} />
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Slug" hint="Leave blank to generate it from the name.">
+            <Field label={isArabic ? 'المعرّف (Slug)' : 'Slug'} hint={isArabic ? 'اتركه فارغاً لتوليده تلقائياً من الاسم.' : 'Leave blank to generate it from the name.'}>
               <input className="field" {...form.register('slug')} />
             </Field>
-            <Field label="Parent category">
+            <Field label={isArabic ? 'التصنيف الأصلي' : 'Parent category'}>
               <select className="field" {...form.register('parent_id')}>
-                <option value="">Root category</option>
+                <option value="">{isArabic ? 'بدون تصنيف أصلي' : 'Root category'}</option>
                 {parentOptions.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.full_path_name || category.name_ar}
@@ -333,22 +347,22 @@ function ServiceCategoryManagementPage() {
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Icon">
+            <Field label={isArabic ? 'الأيقونة' : 'Icon'}>
               <input className="field" {...form.register('icon')} />
             </Field>
-            <Field label="Color" hint="Example: #0f766e">
+            <Field label={isArabic ? 'اللون' : 'Color'} hint={isArabic ? 'مثال: #0f766e' : 'Example: #0f766e'}>
               <input className="field" {...form.register('color')} />
             </Field>
           </div>
-          <Field label="Description">
+          <Field label={isArabic ? 'الوصف' : 'Description'}>
             <textarea className="field min-h-24" {...form.register('description_ar')} />
           </Field>
-          <Field label="Sort order">
+          <Field label={isArabic ? 'ترتيب العرض' : 'Sort order'}>
             <input className="field" type="number" {...form.register('sort_order')} />
           </Field>
           <div className="grid gap-3 md:grid-cols-2">
-            <CheckboxField label="Category is active" registration={form.register('is_active')} />
-            <CheckboxField label="Show on public site" registration={form.register('show_on_public_site')} />
+            <CheckboxField label={isArabic ? 'التصنيف مفعّل' : 'Category is active'} registration={form.register('is_active')} />
+            <CheckboxField label={isArabic ? 'ظاهر في الموقع العام' : 'Show on public site'} registration={form.register('show_on_public_site')} />
           </div>
         </form>
       </FormModal>
@@ -357,9 +371,9 @@ function ServiceCategoryManagementPage() {
         open={!!pendingDeactivate}
         onClose={() => setPendingDeactivate(null)}
         onConfirm={handleDeactivateConfirm}
-        title="Deactivate Service Category"
-        description="The category will stop appearing on public and client ordering screens. Active services must be moved or deactivated first."
-        confirmLabel="Deactivate"
+        title={isArabic ? 'إيقاف التصنيف' : 'Deactivate Service Category'}
+        description={isArabic ? 'سيتوقف التصنيف عن الظهور في شاشات الطلب العامة وشاشات العملاء. يجب نقل الخدمات الفعّالة أو إيقافها أولاً.' : 'The category will stop appearing on public and client ordering screens. Active services must be moved or deactivated first.'}
+        confirmLabel={isArabic ? 'إيقاف' : 'Deactivate'}
         variant="danger"
       />
     </div>
