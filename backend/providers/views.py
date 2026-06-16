@@ -11,9 +11,10 @@ from rest_framework.views import APIView
 from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
 from documents.serializers import DocumentUploadSerializer
-from organizations.selectors import enforce_organization_scope
+from organizations.selectors import active_memberships_for_user, enforce_organization_scope, has_scoped_memberships
 from orders.models import Order
 from orders.serializers import ProviderOrderDetailSerializer, ProviderOrderListSerializer
+from orders.selectors import get_reviewable_orders_for_user
 from orders.services import complete_provider_work, provider_add_internal_note, provider_update_status
 from providers.models import ProviderProfile
 from providers.serializers import (
@@ -23,15 +24,28 @@ from providers.serializers import (
     ProviderApprovalDecisionSerializer,
     ProviderProfileSerializer,
 )
+from services.models import Service
+
+
+def _scope_provider_admin_queryset(queryset, user):
+    if not user or not getattr(user, "is_authenticated", False):
+        return queryset.none()
+    if has_scoped_memberships(user):
+        org_ids = active_memberships_for_user(user).values_list("organization_id", flat=True)
+        return queryset.filter(
+            Q(organization_id__in=org_ids)
+            | Q(service_assignments__service__organization_id__in=org_ids)
+            | Q(service_categories__services__organization_id__in=org_ids)
+        ).distinct()
+    return queryset
 
 
 class ProviderAdminViewSet(viewsets.ModelViewSet):
     queryset = ProviderProfile.objects.select_related("user").prefetch_related("service_categories")
     search_fields = ["user__full_name", "user__email", "city", "provider_type"]
-    pagination_class = None
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        base_queryset = super().get_queryset()
         params = self.request.query_params
         order_id = params.get("order")
         service_id = params.get("service")
@@ -39,7 +53,11 @@ class ProviderAdminViewSet(viewsets.ModelViewSet):
         active = params.get("is_active")
 
         if order_id:
-            order = generics.get_object_or_404(Order.objects.select_related("service"), pk=order_id)
+            queryset = base_queryset
+            order = generics.get_object_or_404(
+                get_reviewable_orders_for_user(self.request.user).select_related("service"),
+                pk=order_id,
+            )
             queryset = queryset.filter(
                 is_available=True,
                 is_approved=True,
@@ -48,13 +66,22 @@ class ProviderAdminViewSet(viewsets.ModelViewSet):
                 | Q(service_categories=order.service.category)
             ).distinct()
         elif service_id:
+            queryset = base_queryset
+            scoped_services = enforce_organization_scope(
+                Service.objects.select_related("category"),
+                user=self.request.user,
+                organization_field="organization",
+            ).distinct()
+            service = generics.get_object_or_404(scoped_services, pk=service_id)
             queryset = queryset.filter(
                 is_available=True,
                 is_approved=True,
             ).filter(
-                Q(service_assignments__service_id=service_id, service_assignments__is_active=True)
-                | Q(service_categories__services__service_id=service_id)
+                Q(service_assignments__service=service, service_assignments__is_active=True)
+                | Q(service_categories=service.category)
             ).distinct()
+        else:
+            queryset = _scope_provider_admin_queryset(base_queryset, self.request.user)
 
         if approved is not None:
             queryset = queryset.filter(is_approved=str(approved).strip().lower() in {"1", "true", "yes", "on"})
@@ -245,7 +272,6 @@ class ProviderDashboardAPIView(APIView):
 class ProviderOrderListAPIView(generics.ListAPIView):
     serializer_class = ProviderOrderListSerializer
     permission_classes = [permissions.IsAuthenticated, IsProviderRole]
-    pagination_class = None
 
     def get_queryset(self):
         return provider_orders_queryset(self.request.user)

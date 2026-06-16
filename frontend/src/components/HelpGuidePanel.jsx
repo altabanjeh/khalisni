@@ -300,7 +300,7 @@ function HelpGuidePanel({ onClose, open }) {
   const [roleFilter, setRoleFilter] = useState('')
   const [selectedGuideSlug, setSelectedGuideSlug] = useState('')
 
-  const activeScreen = useMemo(() => matchHelpScreen(location.pathname), [location.pathname, language])
+  const activeScreen = useMemo(() => matchHelpScreen(location.pathname), [location.pathname])
   const activeScreenKey = activeScreen?.screen_key || ''
   const activeScreenLabel = activeScreen?.label || getHelpScreenLabel(activeScreenKey)
   const screenGuides = currentHelp.screen_guides || currentHelp.results || []

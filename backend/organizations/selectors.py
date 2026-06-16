@@ -39,6 +39,21 @@ def membership_roles_for_user(user):
     return set(active_memberships_for_user(user).values_list("role", flat=True))
 
 
+def has_scoped_memberships(user):
+    """
+    Return True when the user has active non-platform memberships and should be
+    treated as tenant-scoped for queryset filtering.
+    """
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "is_superuser", False):
+        return False
+    memberships = active_memberships_for_user(user)
+    if not memberships.exists():
+        return False
+    return not memberships.filter(role__in=PLATFORM_STAFF_ROLES).exists()
+
+
 def is_platform_super_admin(user):
     if not user or not getattr(user, "is_authenticated", False):
         return False

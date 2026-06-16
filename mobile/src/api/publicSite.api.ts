@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, unwrapListData } from './client';
 import type { PublicAdvertisement, PublicHomepagePayload, PublicSiteTheme } from '../types/publicSite';
 
 export const publicSiteApi = {
@@ -9,6 +9,6 @@ export const publicSiteApi = {
     return apiClient.get<PublicSiteTheme>('/public-site/theme/').then((res) => res.data);
   },
   getAdvertisements() {
-    return apiClient.get<PublicAdvertisement[]>('/public-site/advertisements/').then((res) => res.data);
+    return apiClient.get<PublicAdvertisement[]>('/public-site/advertisements/').then((res) => unwrapListData(res.data));
   },
 };

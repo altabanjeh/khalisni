@@ -60,6 +60,7 @@ export interface Order extends BaseEntity {
   final_price?: number | null;
   customer_notes?: string;
   internal_notes?: string;
+  provider_instructions?: string | null;
   missing_document_types?: string[];
   rejection_reason?: string;
   is_archived?: boolean;

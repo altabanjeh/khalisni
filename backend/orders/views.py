@@ -82,6 +82,7 @@ class CreateOrderAPIView(generics.CreateAPIView):
 
 class TrackOrderAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "order_tracking"
 
     def get(self, request):
         order_number = request.query_params.get("order_number")
@@ -99,7 +100,6 @@ class TrackOrderAPIView(APIView):
 class CustomerOrderListAPIView(generics.ListAPIView):
     serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
-    pagination_class = None
 
     def get_queryset(self):
         return get_orders_for_user(self.request.user)
@@ -183,7 +183,6 @@ class CustomerOrderCancelAPIView(APIView):
 class AdminDashboardOrderListAPIView(generics.ListAPIView):
     serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAuthenticated, CanReviewOrders]
-    pagination_class = None
 
     def get_queryset(self):
         queryset = get_reviewable_orders_for_user(self.request.user)
@@ -246,7 +245,6 @@ class AdminOrderRecordViewSet(viewsets.ModelViewSet):
     )
     search_fields = ["order_number", "customer__full_name", "service__name_ar", "city"]
     ordering_fields = ["created_at", "updated_at", "expected_delivery_date", "status", "priority"]
-    pagination_class = None
 
     def get_serializer_class(self):
         if self.action in {"list", "retrieve"}:
@@ -321,7 +319,6 @@ class AdminOrderNoteViewSet(viewsets.ModelViewSet):
     serializer_class = OrderNoteAdminSerializer
     queryset = OrderNote.objects.select_related("order", "user").all()
     search_fields = ["order__order_number", "user__full_name", "note", "visibility"]
-    pagination_class = None
 
 
 class AdminOrderIssueViewSet(viewsets.ModelViewSet):
@@ -329,7 +326,6 @@ class AdminOrderIssueViewSet(viewsets.ModelViewSet):
     serializer_class = OrderIssueAdminSerializer
     queryset = OrderIssue.objects.select_related("order", "created_by", "resolved_by").all()
     search_fields = ["order__order_number", "title", "description"]
-    pagination_class = None
 
 
 class AdminRatingViewSet(viewsets.ModelViewSet):
@@ -337,7 +333,6 @@ class AdminRatingViewSet(viewsets.ModelViewSet):
     serializer_class = RatingAdminSerializer
     queryset = Rating.objects.select_related("order", "customer").all()
     search_fields = ["order__order_number", "customer__full_name", "comment"]
-    pagination_class = None
 
 
 class AdminOrderDetailAPIView(generics.RetrieveAPIView):

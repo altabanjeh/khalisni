@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -26,7 +27,7 @@ from accounts.serializers import (
 )
 from audit.utils import create_audit_log
 from config.permissions import CanManageUserRoles, IsCustomerRole
-from organizations.selectors import active_memberships_for_user, is_platform_super_admin
+from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
 
 # Apps whose permissions are surfaced in the admin permission-assignment UI.
 _PERMISSION_APPS = {"orders", "documents", "services", "payment", "accounts", "notifications", "providers", "audit", "organizations"}
@@ -100,6 +101,7 @@ class MeAPIView(APIView):
 
 class ForgotPasswordAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "auth_password_reset"
 
     def post(self, request):
         serializer = ForgotPasswordRequestSerializer(data=request.data)
@@ -110,6 +112,7 @@ class ForgotPasswordAPIView(APIView):
 
 class ResetPasswordAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "auth_password_reset"
 
     def post(self, request, token):
         try:
@@ -161,7 +164,6 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().order_by("full_name")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
     search_fields = ["full_name", "email", "phone", "role"]
-    pagination_class = None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -318,9 +320,20 @@ class SystemSettingViewSet(viewsets.ModelViewSet):
 
 class CustomerProfileAdminViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerProfileAdminSerializer
-    queryset = CustomerProfile.objects.select_related("user").all()
+    queryset = CustomerProfile.objects.select_related("user").order_by("pk")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
-    pagination_class = None
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if is_platform_super_admin(self.request.user):
+            return queryset
+        if has_scoped_memberships(self.request.user):
+            org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
+            return queryset.filter(
+                Q(organization_id__in=org_ids)
+                | Q(user__organization_memberships__organization_id__in=org_ids)
+            ).distinct()
+        return queryset
 
 
 class AvailablePermissionsAPIView(APIView):

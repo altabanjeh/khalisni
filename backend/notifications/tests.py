@@ -11,6 +11,10 @@ from services.models import Service, ServiceCategory
 
 
 class NotificationCenterTests(APITestCase):
+    @staticmethod
+    def _rows(response):
+        return response.data if isinstance(response.data, list) else response.data["results"]
+
     def setUp(self):
         self.client = APIClient()
         category = ServiceCategory.objects.create(name_ar="تصنيف", name_en="Category", slug="notif-category")
@@ -69,8 +73,9 @@ class NotificationCenterTests(APITestCase):
         self.client.force_authenticate(self.customer)
         response = self.client.get("/api/notifications/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Own")
+        records = self._rows(response)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["title"], "Own")
 
     def test_admin_can_crud_notifications_and_templates(self):
         admin = CustomUser.objects.create_user(

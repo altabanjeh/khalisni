@@ -1,6 +1,10 @@
+from django.conf import settings
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
+from rest_framework.throttling import ScopedRateThrottle
 
 from accounts.models import CustomUser
 from audit.models import AuditLog
@@ -12,6 +16,10 @@ from services.models import Service, ServiceCategory, ServiceRelation, ServiceRe
 
 
 class OrderAPITests(APITestCase):
+    @staticmethod
+    def _rows(response):
+        return response.data if isinstance(response.data, list) else response.data["results"]
+
     def setUp(self):
         self.client = APIClient()
         self.category = ServiceCategory.objects.create(
@@ -306,7 +314,7 @@ class OrderAPITests(APITestCase):
         self.client.force_authenticate(self.employee_user)
         response = self.client.get("/api/admin/orders/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(self._rows(response)), 1)
 
     def test_employee_review_queue_supports_safe_filters(self):
         matching_order = Order.objects.create(
@@ -332,8 +340,9 @@ class OrderAPITests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["id"], matching_order.id)
+        records = self._rows(response)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["id"], matching_order.id)
 
     def test_employee_can_start_review_via_status_endpoint(self):
         order = Order.objects.create(customer=self.customer, service=self.service, city="Amman")
@@ -1098,3 +1107,101 @@ class OrderAPITests(APITestCase):
         mdr.refresh_from_db()
         self.assertTrue(mdr.is_resolved)
         self.assertIsNotNone(mdr.responded_at)
+
+
+class CustomerOrderPaginationTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        category = ServiceCategory.objects.create(
+            name_ar="Customer Orders",
+            name_en="Customer Orders",
+            slug="customer-orders",
+        )
+        service = Service.objects.create(
+            category=category,
+            name_ar="Customer Order Service",
+            name_en="Customer Order Service",
+            slug="customer-order-service",
+            description_ar="Customer order details",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=5,
+            service_fee=5,
+        )
+        self.customer = CustomUser.objects.create_user(
+            email="pagination-customer@example.com",
+            password="Password@123",
+            full_name="Pagination Customer",
+            phone="0793111111",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        Order.objects.create(customer=self.customer, service=service, city="Amman")
+        Order.objects.create(customer=self.customer, service=service, city="Zarqa")
+        self.client.force_authenticate(self.customer)
+
+    def test_customer_order_list_returns_paginated_response(self):
+        response = self.client.get("/api/customer/orders/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("count", response.data)
+        self.assertIn("results", response.data)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 2)
+
+
+@override_settings(
+    REST_FRAMEWORK={
+        **settings.REST_FRAMEWORK,
+        "DEFAULT_THROTTLE_RATES": {
+            **settings.REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}),
+            "order_tracking": "1/minute",
+        },
+    }
+)
+class PublicOrderTrackingThrottleTests(APITestCase):
+    def setUp(self):
+        cache.clear()
+        self._original_throttle_rates = dict(ScopedRateThrottle.THROTTLE_RATES)
+        ScopedRateThrottle.THROTTLE_RATES = {
+            **ScopedRateThrottle.THROTTLE_RATES,
+            "order_tracking": "1/minute",
+        }
+        self.client = APIClient()
+        category = ServiceCategory.objects.create(
+            name_ar="Tracking Services",
+            name_en="Tracking Services",
+            slug="tracking-services",
+        )
+        service = Service.objects.create(
+            category=category,
+            name_ar="Tracking Service",
+            name_en="Tracking Service",
+            slug="tracking-service",
+            description_ar="Tracking details",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=5,
+            service_fee=5,
+        )
+        customer = CustomUser.objects.create_user(
+            email="tracking-customer@example.com",
+            password="Password@123",
+            full_name="Tracking Customer",
+            phone="0793010101",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.order = Order.objects.create(customer=customer, service=service, city="Amman")
+
+    def tearDown(self):
+        ScopedRateThrottle.THROTTLE_RATES = self._original_throttle_rates
+        cache.clear()
+        super().tearDown()
+
+    def test_public_order_tracking_is_rate_limited(self):
+        params = f"?order_number={self.order.order_number}&phone={self.order.customer.phone}"
+
+        first_response = self.client.get(f"/api/orders/track/{params}")
+        second_response = self.client.get(f"/api/orders/track/{params}")
+
+        self.assertEqual(first_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)

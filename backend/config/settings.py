@@ -34,6 +34,13 @@ def _get_list_env(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in raw_value.split(",") if item.strip()]
 
 
+def _get_str_env(name: str, default: str) -> str:
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    return value.strip()
+
+
 def _host_from_origin(origin: str) -> str | None:
     parsed = urlparse(origin)
     return parsed.hostname
@@ -250,6 +257,18 @@ if HAS_DRF:
         "DEFAULT_FILTER_BACKENDS": tuple(filter_backends),
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 20,
+        "DEFAULT_THROTTLE_CLASSES": (
+            "rest_framework.throttling.AnonRateThrottle",
+            "rest_framework.throttling.UserRateThrottle",
+            "rest_framework.throttling.ScopedRateThrottle",
+        ),
+        "DEFAULT_THROTTLE_RATES": {
+            "anon": _get_str_env("API_THROTTLE_ANON_RATE", "120/minute"),
+            "user": _get_str_env("API_THROTTLE_USER_RATE", "600/minute"),
+            "order_tracking": _get_str_env("API_THROTTLE_ORDER_TRACKING_RATE", "10/minute"),
+            "missing_service_request": _get_str_env("API_THROTTLE_MISSING_SERVICE_REQUEST_RATE", "5/hour"),
+            "auth_password_reset": _get_str_env("API_THROTTLE_AUTH_PASSWORD_RESET_RATE", "5/hour"),
+        },
     }
 
 SIMPLE_JWT = {

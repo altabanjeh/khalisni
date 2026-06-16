@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { clearStoredAuth, getStoredRefreshToken, storeAuthTokens } from '../api/client'
 import { api } from '../api/services'
 
 const AuthContext = createContext(null)
@@ -41,23 +42,18 @@ export function AuthProvider({ children }) {
       user,
       loading,
       async login(payload) {
-        const result = await api.login(payload)
-        localStorage.setItem('khalisni_access', result.access)
-        localStorage.setItem('khalisni_refresh', result.refresh)
-        sessionStorage.setItem('khalisni_access', result.access)
-        sessionStorage.setItem('khalisni_refresh', result.refresh)
+        const { remember = false, ...credentials } = payload || {}
+        const result = await api.login(credentials)
+        storeAuthTokens({ access: result.access, refresh: result.refresh }, { persistent: remember })
         setUser(result.user)
         return result.user
       },
       async logout() {
-        const refresh = localStorage.getItem('khalisni_refresh') || sessionStorage.getItem('khalisni_refresh')
+        const refresh = getStoredRefreshToken()
         if (refresh) {
           await api.logout(refresh).catch(() => null)
         }
-        localStorage.removeItem('khalisni_access')
-        localStorage.removeItem('khalisni_refresh')
-        sessionStorage.removeItem('khalisni_access')
-        sessionStorage.removeItem('khalisni_refresh')
+        clearStoredAuth({ notify: false })
         setUser(null)
       },
       setUser,

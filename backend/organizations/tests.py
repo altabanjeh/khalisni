@@ -9,6 +9,10 @@ from services.models import Service, ServiceCategory
 
 
 class B2B2COrganizationTests(APITestCase):
+    @staticmethod
+    def _rows(response):
+        return response.data if isinstance(response.data, list) else response.data["results"]
+
     def setUp(self):
         self.client = APIClient()
         self.category = ServiceCategory.objects.create(
@@ -251,7 +255,7 @@ class B2B2COrganizationTests(APITestCase):
         self.assertEqual(organizations_response.status_code, status.HTTP_200_OK)
         self.assertEqual({row["slug"] for row in organizations_response.data}, {"partner-one"})
         self.assertEqual(orders_response.status_code, status.HTTP_200_OK)
-        returned_ids = {row["id"] for row in orders_response.data}
+        returned_ids = {row["id"] for row in self._rows(orders_response)}
         self.assertIn(self.order_partner_one_branch_one.id, returned_ids)
         self.assertIn(self.order_partner_one_branch_two.id, returned_ids)
         self.assertNotIn(self.order_partner_two.id, returned_ids)
@@ -269,7 +273,7 @@ class B2B2COrganizationTests(APITestCase):
         response = self.client.get("/api/provider/orders/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual([row["id"] for row in response.data], [self.order_provider_assigned.id])
+        self.assertEqual([row["id"] for row in self._rows(response)], [self.order_provider_assigned.id])
 
     def test_partner_service_configuration_controls_customer_visibility(self):
         response_partner_one = self.client.get(f"/api/services/?organization={self.partner_one.slug}")
@@ -319,7 +323,7 @@ class B2B2COrganizationTests(APITestCase):
         response = self.client.get("/api/admin/orders/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        returned_ids = {row["id"] for row in response.data}
+        returned_ids = {row["id"] for row in self._rows(response)}
         self.assertIn(self.order_partner_one_branch_one.id, returned_ids)
         self.assertNotIn(self.order_partner_one_branch_two.id, returned_ids)
         self.assertNotIn(self.order_partner_two.id, returned_ids)

@@ -27,6 +27,7 @@ function LoginPage() {
     defaultValues: {
       email: searchParams.get('email') || '',
       password: '',
+      remember: false,
     },
   })
 
@@ -78,6 +79,10 @@ function LoginPage() {
             {isArabic ? 'نسيت كلمة المرور؟' : 'Forgot your password?'}
           </Link>
         </div>
+        <label className="flex items-center gap-3 text-sm font-medium text-slate-700" htmlFor="login-remember">
+          <input id="login-remember" className="h-4 w-4 rounded border-slate-300" type="checkbox" {...register('remember')} />
+          <span>{isArabic ? 'Ø§Ù„Ø¥Ø¨Ù‚Ø§Ø¡ Ø¹Ù„Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' : 'Remember me on this device'}</span>
+        </label>
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         <button className="btn-primary w-full" disabled={isSubmitting}>
           {isSubmitting ? (isArabic ? 'جارٍ تسجيل الدخول...' : 'Signing in...') : isArabic ? 'دخول' : 'Sign in'}

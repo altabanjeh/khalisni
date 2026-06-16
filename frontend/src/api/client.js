@@ -3,6 +3,9 @@ import { LANGUAGE_STORAGE_KEY, normalizeLanguage } from '../utils/i18n'
 
 export const ACCESS_TOKEN_KEY = 'khalisni_access'
 export const REFRESH_TOKEN_KEY = 'khalisni_refresh'
+export const AUTH_STORAGE_MODE_KEY = 'khalisni_auth_storage'
+export const AUTH_STORAGE_MODE_LOCAL = 'local'
+export const AUTH_STORAGE_MODE_SESSION = 'session'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
 export const API_BASE_URL = String(
@@ -15,40 +18,92 @@ function isFormData(value) {
   return typeof FormData !== 'undefined' && value instanceof FormData
 }
 
-function clearStoredAuth() {
+function getStorageModeValue(storage) {
+  const value = storage.getItem(AUTH_STORAGE_MODE_KEY)
+  return value === AUTH_STORAGE_MODE_LOCAL || value === AUTH_STORAGE_MODE_SESSION ? value : null
+}
+
+function hasStoredAuth(storage) {
+  return Boolean(storage.getItem(REFRESH_TOKEN_KEY) || storage.getItem(ACCESS_TOKEN_KEY))
+}
+
+function getStorageForMode(mode) {
+  return mode === AUTH_STORAGE_MODE_LOCAL ? localStorage : sessionStorage
+}
+
+function removeStoredAuth() {
   localStorage.removeItem(ACCESS_TOKEN_KEY)
   localStorage.removeItem(REFRESH_TOKEN_KEY)
+  localStorage.removeItem(AUTH_STORAGE_MODE_KEY)
   sessionStorage.removeItem(ACCESS_TOKEN_KEY)
   sessionStorage.removeItem(REFRESH_TOKEN_KEY)
+  sessionStorage.removeItem(AUTH_STORAGE_MODE_KEY)
+}
+
+export function clearStoredAuth({ notify = true } = {}) {
+  removeStoredAuth()
   if (typeof window !== 'undefined') {
+    if (!notify) return
     window.dispatchEvent(new Event('khalisni:auth-expired'))
   }
 }
 
-function getStoredAccessToken() {
-  const localAccess = localStorage.getItem(ACCESS_TOKEN_KEY)
-  if (localAccess) return localAccess
-
-  const sessionAccess = sessionStorage.getItem(ACCESS_TOKEN_KEY)
-  if (sessionAccess) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, sessionAccess)
-    return sessionAccess
+export function getStoredAuthMode() {
+  if (hasStoredAuth(localStorage) || getStorageModeValue(localStorage) === AUTH_STORAGE_MODE_LOCAL) {
+    return AUTH_STORAGE_MODE_LOCAL
   }
 
-  return null
+  if (hasStoredAuth(sessionStorage) || getStorageModeValue(sessionStorage) === AUTH_STORAGE_MODE_SESSION) {
+    return AUTH_STORAGE_MODE_SESSION
+  }
+
+  return AUTH_STORAGE_MODE_SESSION
 }
 
-function getStoredRefreshToken() {
-  const localRefresh = localStorage.getItem(REFRESH_TOKEN_KEY)
-  if (localRefresh) return localRefresh
+function getActiveAuthStorage() {
+  return getStorageForMode(getStoredAuthMode())
+}
 
-  const sessionRefresh = sessionStorage.getItem(REFRESH_TOKEN_KEY)
-  if (sessionRefresh) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, sessionRefresh)
-    return sessionRefresh
+export function storeAuthTokens(tokens, { persistent = false } = {}) {
+  removeStoredAuth()
+
+  const mode = persistent ? AUTH_STORAGE_MODE_LOCAL : AUTH_STORAGE_MODE_SESSION
+  const storage = getStorageForMode(mode)
+  storage.setItem(AUTH_STORAGE_MODE_KEY, mode)
+
+  if (tokens?.access) {
+    storage.setItem(ACCESS_TOKEN_KEY, tokens.access)
   }
 
-  return null
+  if (tokens?.refresh) {
+    storage.setItem(REFRESH_TOKEN_KEY, tokens.refresh)
+  }
+}
+
+export function updateStoredAccessToken(access) {
+  const mode = getStoredAuthMode()
+  const storage = getStorageForMode(mode)
+  const inactiveStorage = getStorageForMode(
+    mode === AUTH_STORAGE_MODE_LOCAL ? AUTH_STORAGE_MODE_SESSION : AUTH_STORAGE_MODE_LOCAL,
+  )
+
+  inactiveStorage.removeItem(ACCESS_TOKEN_KEY)
+  storage.setItem(AUTH_STORAGE_MODE_KEY, mode)
+
+  if (access) {
+    storage.setItem(ACCESS_TOKEN_KEY, access)
+    return
+  }
+
+  storage.removeItem(ACCESS_TOKEN_KEY)
+}
+
+export function getStoredAccessToken() {
+  return getActiveAuthStorage().getItem(ACCESS_TOKEN_KEY)
+}
+
+export function getStoredRefreshToken() {
+  return getActiveAuthStorage().getItem(REFRESH_TOKEN_KEY)
 }
 
 function getStoredLanguage() {
@@ -295,8 +350,7 @@ apiClient.interceptors.response.use(
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, { refresh })
       const newAccess = response.data.access
-      localStorage.setItem(ACCESS_TOKEN_KEY, newAccess)
-      sessionStorage.setItem(ACCESS_TOKEN_KEY, newAccess)
+      updateStoredAccessToken(newAccess)
       _processRefreshQueue(null, newAccess)
       const retryConfig = { ...error.config }
       retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccess}` }

@@ -28,11 +28,11 @@ Primary implementation sources reviewed:
 | Authentication and identity | JWT login, refresh, logout, `/auth/me/`, customer profile update | Mobile should reuse JWT flow with secure storage instead of web `sessionStorage`. |
 | User and role management | Admin user CRUD, direct permission assignment, customer profiles, system settings | Admin role management is implemented through users + direct Django permissions, not a separate RBAC product UI. |
 | Service catalog | Public service list, categories, service details, dynamic required-information schema, service pricing, service required documents | Mobile client flow should reuse service metadata and dynamic form behavior. |
-| Order intake | Public order creation, customer order list/detail, track order | Public unauthenticated order creation already exists and creates/reuses guest customer accounts. |
+| Order intake | Authenticated customer order creation, customer order list/detail, track order | Order creation currently requires authenticated customer access; public order tracking remains available. |
 | Internal order workflow | Employee/admin review, request missing documents, assign provider, update status, reject, cancel, complete, archive/reopen | Workflow is backend-driven and enforced through transition rules. |
 | Provider operations | Provider dashboard, assigned orders, provider notes, provider status updates, final document upload | Provider cannot invent statuses; only backend-approved transitions are allowed. |
 | Document management | Upload, verify, reject, final document upload, secure download token, public final-document download fallback | File rules are backend-enforced; mobile must validate before upload for UX only. |
-| Notifications | Notification center, notification templates, manual employee notification sending | In-app list exists, but read-state mutation endpoints are missing. |
+| Notifications | Notification center, notification templates, manual employee notification sending | In-app list exists and notification read mutation exists; unread-count and mark-all-read endpoints are still missing. |
 | Payments | Customer payment records, admin payment management, status changes/refund-related updates | Payment flows are record-based; there is no fully integrated mobile gateway flow yet. |
 | Reports and dashboards | Admin dashboard, daily/weekly reports, employee dashboard, scoped operational summary | Customer dashboard currently derives from orders + notifications on the frontend rather than a dedicated backend endpoint. |
 | Public-site content | Public homepage payload, theme, advertisements, admin public content/theme/ads management | Admin mobile can reuse these endpoints for content operations. |
@@ -262,21 +262,17 @@ This is the minimum mobile set needed to preserve current behavior:
 
 High-priority gaps for a production mobile app:
 
-1. Forgot-password and reset-password endpoints are not present.
-2. Notification read-state mutation is not present.
-3. Notification unread-count endpoint is not present.
-4. Push notification device registration/send pipeline is not present.
-5. No self-service profile endpoints for employee/provider/admin beyond `auth/me`; only customer profile update exists.
-6. No explicit customer dashboard summary endpoint; current web dashboard composes from orders + notifications.
-7. No dedicated mark-all-notifications-read endpoint.
+1. Notification unread-count endpoint is not present.
+2. Push notification device registration/send pipeline is not present.
+3. No self-service profile endpoints for employee/provider/admin beyond `auth/me`; only customer profile update exists.
+4. No explicit customer dashboard summary endpoint; current web dashboard composes from orders + notifications.
+5. No dedicated mark-all-notifications-read endpoint.
 
 Detailed breakdown is in `docs/mobile/api_gap_report.md`.
 
 ## 8. Backend Changes Required for Mobile Support
 
 ### Required before full production parity
-- Add forgot/reset password flow.
-- Add notification read endpoints.
 - Add unread count endpoint.
 - Add device token registration and push dispatch support.
 - Add role-appropriate self-profile update endpoints, or formally scope mobile profile editing to customer only.

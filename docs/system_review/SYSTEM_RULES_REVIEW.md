@@ -107,8 +107,8 @@ The canonical transition map is defined in `backend/workflow/rules.py:4-50` and 
 
 ### Client / Customer
 
-- Public users can create orders without authentication through `/api/orders/`.
-  Source: `backend/orders/views.py:61-77`, `backend/orders/serializers.py:147-267`, explicit.
+- Authenticated customers can create orders through `/api/orders/`.
+  Source: `backend/orders/views.py:56-72`, `backend/orders/serializers.py:147-267`, explicit.
 - Public order creation only accepts active services and blocks non-online services.
   Source: `backend/orders/serializers.py:148`, `188-191`, explicit.
 - Public order creation enforces required service documents, per-document allowed extensions, and per-document max file size.

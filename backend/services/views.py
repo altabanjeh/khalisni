@@ -1,13 +1,14 @@
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.decorators import action
 from django.db.models import Count, Q
+from django.db import transaction
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
-from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_platform_super_admin
+from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
 from services.models import Address, Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
 from services.service_categories import category_snapshot
 from services.service_relations import relation_snapshot
@@ -143,7 +144,6 @@ class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     search_fields = ["name_ar", "name_en", "slug"]
     ordering_fields = ["created_at", "service_fee", "government_fee"]
     serializer_class = AdminServiceRuleSerializer
-    pagination_class = None
     audit_entity_type = "Service"
     audit_fields = (
         "organization_id",
@@ -238,29 +238,54 @@ class CategoryAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     def reorder(self, request):
-        if not request.user.role == request.user.Role.ADMIN and not request.user.has_perm("services.manage_service_prices"):
+        if (
+            not is_platform_super_admin(request.user)
+            and not is_partner_admin(request.user)
+            and not request.user.has_perm("services.manage_service_prices")
+        ):
             raise PermissionDenied("You do not have permission to reorder service categories.")
 
         items = request.data.get("items", [])
         if not isinstance(items, list):
             return Response({"items": "Items must be a list."}, status=status.HTTP_400_BAD_REQUEST)
 
+        scoped_categories = self.get_queryset()
+        requested_ids = []
+        parsed_items = []
         for item in items:
-            category = ServiceCategory.objects.filter(pk=item.get("id")).first()
-            if not category:
-                continue
-            sort_order = int(item.get("sort_order", category.sort_order))
-            category.sort_order = sort_order
-            category.display_order = sort_order
-            category.save(update_fields=["sort_order", "display_order", "updated_at"])
-            create_audit_log(
-                request=request,
-                user=request.user,
-                action="reorder_service_category",
-                entity_type="ServiceCategory",
-                entity_id=category.pk,
-                new_value=category_snapshot(category),
+            try:
+                category_id = int(item.get("id"))
+            except (TypeError, ValueError):
+                return Response({"items": "Each item must include a valid category id."}, status=status.HTTP_400_BAD_REQUEST)
+            requested_ids.append(category_id)
+            parsed_items.append((category_id, item))
+
+        visible_categories = {category.pk: category for category in scoped_categories.filter(pk__in=requested_ids)}
+        missing_ids = [category_id for category_id in requested_ids if category_id not in visible_categories]
+        if missing_ids:
+            return Response(
+                {"items": f"Categories are invalid or outside your scope: {missing_ids}"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+        with transaction.atomic():
+            for category_id, item in parsed_items:
+                category = visible_categories[category_id]
+                try:
+                    sort_order = int(item.get("sort_order", category.sort_order))
+                except (TypeError, ValueError):
+                    raise ValidationError({"items": f"Invalid sort_order for category {category_id}."})
+                category.sort_order = sort_order
+                category.display_order = sort_order
+                category.save(update_fields=["sort_order", "display_order", "updated_at"])
+                create_audit_log(
+                    request=request,
+                    user=request.user,
+                    action="reorder_service_category",
+                    entity_type="ServiceCategory",
+                    entity_id=category.pk,
+                    new_value=category_snapshot(category),
+                )
         return Response({"detail": "Categories reordered."})
 
 
@@ -269,7 +294,6 @@ class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
     queryset = ServiceRequiredDocument.objects.select_related("service").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["service__name_ar", "document_type", "name_ar", "name_en"]
-    pagination_class = None
     audit_entity_type = "ServiceRequiredDocument"
     audit_fields = (
         "service_id",
@@ -317,7 +341,6 @@ class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
         "target_service__name_en",
         "message_to_customer",
     ]
-    pagination_class = None
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -413,7 +436,6 @@ class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewS
     queryset = ServiceProviderAssignment.objects.select_related("service", "provider", "provider__user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["service__name_ar", "provider__user__full_name"]
-    pagination_class = None
     audit_entity_type = "ServiceProviderAssignment"
     audit_fields = ("service_id", "provider_id", "is_active")
 
@@ -444,4 +466,3 @@ class AddressAdminViewSet(viewsets.ModelViewSet):
     queryset = Address.objects.select_related("user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["user__full_name", "city", "area", "street"]
-    pagination_class = None

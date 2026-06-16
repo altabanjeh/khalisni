@@ -14,15 +14,15 @@
 | Refresh token | Ready | `POST /api/auth/token/refresh/` | Access lifetime 8h, refresh lifetime 7d. |
 | Current user | Ready | `GET /api/auth/me/` | Includes `permissions`. |
 | Customer profile update | Ready | `PATCH /api/customer/profile/` | Customer only. |
-| Forgot password | Missing | None | Required for mobile if product expects recovery. |
-| Reset password | Missing | None | Required for mobile if product expects recovery. |
+| Forgot password | Ready | `POST /api/auth/forgot-password/` | Public endpoint; now rate-limited. |
+| Reset password | Ready | `POST /api/auth/reset-password/{token}/` | Public endpoint; now rate-limited. |
 | Provider/employee/admin self-profile update | Missing | None | Only admin user management exists, not self-service profile editing. |
 
 ## Customer Module
 
 | Capability | Status | Existing endpoints | Notes |
 | --- | --- | --- | --- |
-| Public order creation | Ready | `POST /api/orders/` | Supports multipart + dynamic docs. |
+| Customer order creation | Ready | `POST /api/orders/` | Requires authenticated customer access. |
 | Track order | Ready | `GET /api/orders/track/` | Uses `order_number` + `phone`. |
 | Customer order list | Ready | `GET /api/customer/orders/` | Mobile should support paginated or array response. |
 | Customer order detail | Ready | `GET /api/customer/orders/{id}/` | Includes allowed actions, notes, docs, logs. |
@@ -97,7 +97,7 @@
 | Notification center list | Ready | `GET /api/notifications/` | All authenticated roles. |
 | Employee notification templates | Ready | `GET /api/employee/notification-templates/` | For manual in-app notifications. |
 | Send manual order notification | Ready | `POST /api/orders/{id}/manual-notification/` | Employee/internal use. |
-| Mark notification as read | Missing | None | Mobile needs this. |
+| Mark notification as read | Ready | `PATCH /api/notifications/{id}/read/` | Available for authenticated users within their scoped notification set. |
 | Mark all as read | Missing | None | Recommended for mobile UX. |
 | Unread count | Missing | None | Needed for badge without downloading full list every time. |
 | Push device registration | Missing | None | Needed for Expo/FCM/APNs integration. |
@@ -126,13 +126,10 @@
 
 ## Required Backend Additions Before Full Mobile Production
 
-1. `POST /api/auth/forgot-password/`
-2. `POST /api/auth/reset-password/`
-3. `POST /api/notifications/{id}/read/` or `PATCH /api/notifications/{id}/`
-4. `POST /api/notifications/read-all/`
-5. `GET /api/notifications/unread-count/`
-6. `POST /api/mobile/devices/` for Expo/FCM token registration
-7. Optional self-profile endpoints for provider/employee/admin
+1. `POST /api/notifications/read-all/`
+2. `GET /api/notifications/unread-count/`
+3. `POST /api/mobile/devices/` for Expo/FCM token registration
+4. Optional self-profile endpoints for provider/employee/admin
 
 ## Backend Support Not Required Immediately
 

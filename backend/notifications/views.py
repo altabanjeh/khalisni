@@ -21,7 +21,6 @@ from orders.selectors import get_reviewable_orders_for_user
 class AdminNotificationListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = Notification.objects.select_related("recipient", "actor", "order", "template")
-    pagination_class = None
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -42,7 +41,6 @@ class AdminNotificationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class NotificationCenterAPIView(generics.ListAPIView):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None
 
     def get_queryset(self):
         return get_notifications_for_user(self.request.user)
@@ -96,7 +94,6 @@ class NotificationTemplateAdminViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationTemplateSerializer
     queryset = NotificationTemplate.objects.all()
     search_fields = ["key", "channel", "title_ar", "title_en"]
-    pagination_class = None
 
     def get_queryset(self):
         queryset = super().get_queryset()

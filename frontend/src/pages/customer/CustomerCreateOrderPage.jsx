@@ -12,6 +12,12 @@ import { useAuth } from '../../context/AuthContext'
 import { useRegisterPageHelp } from '../../context/HelpGuideContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import {
+  buildBaseDraftValues,
+  draftStorageKey,
+  parseStoredDraft,
+  serializeDraft,
+} from './orderDrafts'
 import { formatCurrency } from '../../utils/format'
 import {
   applyServerFieldErrors,
@@ -25,8 +31,6 @@ import {
   validateMultipleFiles,
   validateSingleFileList,
 } from '../../utils/serviceForms'
-
-const draftStorageKey = 'khalisni-client-order-draft'
 
 function CustomerCreateOrderPage() {
   const { user } = useAuth()
@@ -72,30 +76,33 @@ function CustomerCreateOrderPage() {
 
   useEffect(() => {
     const storedDraft = localStorage.getItem(draftStorageKey)
-    const baseValues = {
-      category_slug: '',
-      service: requestedServiceId,
-      full_name: user?.full_name || '',
-      phone: user?.phone || '',
-      national_id: user?.national_id || '',
-      city: '',
-      notes: '',
-      consent: true,
-    }
+    const baseValues = buildBaseDraftValues({ requestedServiceId, user })
 
     if (storedDraft) {
-      const parsedDraft = JSON.parse(storedDraft)
-      reset({
-        ...baseValues,
-        ...parsedDraft,
-        service: requestedServiceId || parsedDraft.service || '',
-        consent: true,
-      })
-      return
+      try {
+        const { values: parsedDraft, message } = parseStoredDraft(storedDraft)
+        if (message) {
+          localStorage.removeItem(draftStorageKey)
+          toast(message, 'info')
+        }
+
+        if (parsedDraft) {
+          reset({
+            ...baseValues,
+            ...parsedDraft,
+            service: requestedServiceId || parsedDraft.service || '',
+            consent: true,
+          })
+          return
+        }
+      } catch {
+        localStorage.removeItem(draftStorageKey)
+        toast('تعذر استعادة المسودة المحفوظة وتمت إزالتها. يمكنك المتابعة ببيانات جديدة.', 'info')
+      }
     }
 
     reset(baseValues)
-  }, [requestedServiceId, reset, user])
+  }, [requestedServiceId, reset, toast, user])
 
   useEffect(() => {
     if (!requestedServiceId || !selectedService?.category?.slug) return
@@ -179,7 +186,7 @@ function CustomerCreateOrderPage() {
         delete values[key]
       }
     })
-    localStorage.setItem(draftStorageKey, JSON.stringify(values))
+    localStorage.setItem(draftStorageKey, serializeDraft(values))
     toast('تم حفظ المسودة محلياً على هذا الجهاز.', 'info')
   }
 

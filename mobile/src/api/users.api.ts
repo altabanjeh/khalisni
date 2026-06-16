@@ -1,10 +1,10 @@
-import { apiClient, buildQuery } from './client';
+import { apiClient, buildQuery, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { AdminUser, User } from '../types/user';
 
 export const usersApi = {
   getUsers(params: ApiListParams = {}) {
-    return apiClient.get<AdminUser[]>('/admin/users/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<AdminUser[]>('/admin/users/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   createUser(payload: Partial<AdminUser> & { password: string }) {
     return apiClient.post<AdminUser>('/admin/users/', payload).then((res) => res.data);

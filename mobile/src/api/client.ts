@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios'
 import { env } from '../config/env';
 import { clearSessionStorage, readSession, saveSession } from '../auth/authStorage';
 import { useAuthStore } from '../state/authStore';
-import type { ApiError } from '../types/common';
+import type { ApiError, PaginatedResponse } from '../types/common';
 
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
@@ -133,6 +133,12 @@ export function buildQuery(params: Record<string, string | number | boolean | un
   return Object.fromEntries(
     Object.entries(params).filter(([, value]) => value !== undefined && value !== ''),
   );
+}
+
+export function unwrapListData<T>(data: T[] | PaginatedResponse<T> | null | undefined) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  return [];
 }
 
 export function applyAccessToken(token?: string | null) {

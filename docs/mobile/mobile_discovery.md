@@ -8,6 +8,8 @@
   - `POST /api/auth/logout/`
   - `POST /api/auth/token/refresh/`
   - `GET /api/auth/me/`
+  - `POST /api/auth/forgot-password/`
+  - `POST /api/auth/reset-password/{token}/`
 - Existing business modules already exposed by the backend:
   - accounts / user roles
   - services / categories
@@ -37,6 +39,7 @@
   - `GET /api/customer/orders/`
   - `GET /api/customer/orders/{id}/`
   - `POST /api/customer/orders/{id}/documents/`
+  - `PATCH /api/notifications/{id}/read/`
 - Employee/Admin workflow:
   - `GET /api/admin/orders/`
   - `GET /api/admin/orders/{id}/`
@@ -56,8 +59,6 @@
 
 ## APIs Missing Or Incomplete For Mobile
 
-- Forgot password / reset password flow
-- Notification mark-as-read endpoint
 - Notification unread-count endpoint
 - Push registration / push delivery endpoints
 - Non-customer self-profile update endpoints
@@ -66,6 +67,6 @@
 
 - Mobile uses the same backend status lifecycle and relies on backend enforcement for real security.
 - Frontend role `client` is a presentation alias for backend role `customer`.
-- Notification read state remains view-only until backend supports a mutation endpoint.
+- Notification read state can be updated per item, but there is still no mark-all or unread-count endpoint.
 - Public-content and theme editing use existing admin endpoints with JSON payload editing where field-specific contracts are not fully documented.
 - Document download uses the secure document URL already returned by backend serializers and shares the file locally after download.

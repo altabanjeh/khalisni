@@ -4,6 +4,7 @@ from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser
 from audit.models import AuditLog
+from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
 from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
 
@@ -640,3 +641,89 @@ class ServiceCategoryFeatureTests(APITestCase):
 
         self.assertEqual(list_response.status_code, status.HTTP_200_OK)
         self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ServiceCategoryReorderScopeTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.partner_org_a = Organization.objects.create(
+            name="Partner Scope A",
+            slug="partner-scope-a",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.partner_org_b = Organization.objects.create(
+            name="Partner Scope B",
+            slug="partner-scope-b",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.partner_admin = CustomUser.objects.create_user(
+            email="category-scope-admin@example.com",
+            password="Password@123",
+            full_name="Category Scope Admin",
+            phone="0794020004",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        OrganizationMembership.objects.create(
+            user=self.partner_admin,
+            organization=self.partner_org_a,
+            role=OrganizationMembership.MembershipRole.PARTNER_ADMIN,
+        )
+        self.category_a = ServiceCategory.objects.create(name_ar="فئة أ", name_en="Cat A", slug="scope-cat-a", sort_order=1)
+        self.category_b = ServiceCategory.objects.create(name_ar="فئة ب", name_en="Cat B", slug="scope-cat-b", sort_order=2)
+        self.service_a = Service.objects.create(
+            category=self.category_a,
+            organization=self.partner_org_a,
+            scope=Service.Scope.PARTNER_PRIVATE,
+            name_ar="خدمة أ",
+            name_en="Service A",
+            slug="scope-cat-service-a",
+            description_ar="تفاصيل",
+            estimated_duration=1,
+            base_price=1,
+            government_fee=1,
+            service_fee=1,
+        )
+        self.service_b = Service.objects.create(
+            category=self.category_b,
+            organization=self.partner_org_b,
+            scope=Service.Scope.PARTNER_PRIVATE,
+            name_ar="خدمة ب",
+            name_en="Service B",
+            slug="scope-cat-service-b",
+            description_ar="تفاصيل",
+            estimated_duration=1,
+            base_price=1,
+            government_fee=1,
+            service_fee=1,
+        )
+        self.client.force_authenticate(self.partner_admin)
+
+    def test_reorder_rejects_out_of_scope_categories_without_partial_update(self):
+        response = self.client.post(
+            "/api/admin/categories/reorder/",
+            {
+                "items": [
+                    {"id": self.category_a.id, "sort_order": 10},
+                    {"id": self.category_b.id, "sort_order": 20},
+                ]
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.category_a.refresh_from_db()
+        self.category_b.refresh_from_db()
+        self.assertEqual(self.category_a.sort_order, 1)
+        self.assertEqual(self.category_b.sort_order, 2)
+
+    def test_reorder_updates_only_visible_categories(self):
+        response = self.client.post(
+            "/api/admin/categories/reorder/",
+            {"items": [{"id": self.category_a.id, "sort_order": 7}]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.category_a.refresh_from_db()
+        self.assertEqual(self.category_a.sort_order, 7)
+        self.assertEqual(self.category_a.display_order, 7)

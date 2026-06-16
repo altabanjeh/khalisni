@@ -6,15 +6,18 @@ from django.core.management import call_command
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth.models import Permission
+from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.throttling import ScopedRateThrottle
 
 from accounts.models import CustomUser, PasswordResetToken
 from accounts.password_reset import FORGOT_PASSWORD_RESPONSE_MESSAGE, PASSWORD_RESET_SUCCESS_MESSAGE
 from audit.models import AuditLog
+from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
 from public_site.models import Advertisement, PublicPageContent, SiteTheme
 from services.models import Service, ServiceCategory
@@ -370,6 +373,101 @@ class UserPermissionManagementTests(TestCase):
         self.assertIn("orders.review_order", response.data["current_permissions"])
 
 
+class CustomerProfileAdminScopeTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.partner_org_a = Organization.objects.create(
+            name="Customer Org A",
+            slug="customer-org-a",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.partner_org_b = Organization.objects.create(
+            name="Customer Org B",
+            slug="customer-org-b",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.partner_admin = CustomUser.objects.create_user(
+            email="customer-profile-admin@example.com",
+            password="Password@123",
+            full_name="Customer Profile Admin",
+            phone="0792000004",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        OrganizationMembership.objects.create(
+            user=self.partner_admin,
+            organization=self.partner_org_a,
+            role=OrganizationMembership.MembershipRole.PARTNER_ADMIN,
+        )
+        self.customer_a = CustomUser.objects.create_user(
+            email="customer-a@example.com",
+            password="Password@123",
+            full_name="Customer A",
+            phone="0792000005",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.customer_b = CustomUser.objects.create_user(
+            email="customer-b@example.com",
+            password="Password@123",
+            full_name="Customer B",
+            phone="0792000006",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        from accounts.models import CustomerProfile
+
+        self.profile_a = CustomerProfile.objects.create(user=self.customer_a, organization=self.partner_org_a)
+        self.profile_b = CustomerProfile.objects.create(user=self.customer_b, organization=self.partner_org_b)
+        self.client.force_authenticate(self.partner_admin)
+
+    def test_partner_admin_only_lists_customer_profiles_in_scope(self):
+        response = self.client.get("/api/admin/customer-profiles/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual([record["id"] for record in records], [self.profile_a.pk])
+
+    def test_partner_admin_cannot_retrieve_foreign_customer_profile(self):
+        response = self.client.get(f"/api/admin/customer-profiles/{self.profile_b.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class AdminUserPaginationTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = CustomUser.objects.create_user(
+            email="pagination-admin@example.com",
+            password="Password@123",
+            full_name="Pagination Admin",
+            phone="0792000100",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        CustomUser.objects.create_user(
+            email="pagination-employee-1@example.com",
+            password="Password@123",
+            full_name="Pagination Employee One",
+            phone="0792000101",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        CustomUser.objects.create_user(
+            email="pagination-employee-2@example.com",
+            password="Password@123",
+            full_name="Pagination Employee Two",
+            phone="0792000102",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        self.client.force_authenticate(self.admin)
+
+    def test_admin_user_list_returns_paginated_response(self):
+        response = self.client.get("/api/admin/users/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("count", response.data)
+        self.assertIn("results", response.data)
+        self.assertGreaterEqual(response.data["count"], 3)
+        self.assertEqual(len(response.data["results"]), response.data["count"])
+
+
 class PublicAuthTests(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -617,3 +715,50 @@ class PasswordResetTests(TestCase):
         self.assertIn("invalid or has expired", response.data["detail"])
         self.customer.refresh_from_db()
         self.assertTrue(self.customer.check_password("Password@123"))
+
+
+@override_settings(
+    REST_FRAMEWORK={
+        **settings.REST_FRAMEWORK,
+        "DEFAULT_THROTTLE_RATES": {
+            **settings.REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}),
+            "auth_password_reset": "1/minute",
+        },
+    }
+)
+class ForgotPasswordThrottleTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self._original_throttle_rates = dict(ScopedRateThrottle.THROTTLE_RATES)
+        ScopedRateThrottle.THROTTLE_RATES = {
+            **ScopedRateThrottle.THROTTLE_RATES,
+            "auth_password_reset": "1/minute",
+        }
+        self.client = APIClient()
+        self.customer = CustomUser.objects.create_user(
+            email="throttle-reset@example.com",
+            password="Password@123",
+            full_name="Throttle Reset Customer",
+            phone="0794000101",
+            role=CustomUser.Role.CUSTOMER,
+        )
+
+    def tearDown(self):
+        ScopedRateThrottle.THROTTLE_RATES = self._original_throttle_rates
+        cache.clear()
+        super().tearDown()
+
+    def test_forgot_password_endpoint_is_rate_limited(self):
+        first_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.customer.email},
+            format="json",
+        )
+        second_response = self.client.post(
+            "/api/auth/forgot-password/",
+            {"email": self.customer.email},
+            format="json",
+        )
+
+        self.assertEqual(first_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)

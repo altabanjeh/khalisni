@@ -91,6 +91,7 @@ class PublicAdvertisementListAPIView(generics.ListAPIView):
 class PublicMissingServiceRequestCreateAPIView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = MissingServiceRequestPublicSerializer
+    throttle_scope = "missing_service_request"
 
     def perform_create(self, serializer):
         user = self.request.user if getattr(self.request.user, "is_authenticated", False) else None

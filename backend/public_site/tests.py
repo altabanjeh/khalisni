@@ -1,9 +1,12 @@
+from django.conf import settings
+from django.core.cache import cache
 from datetime import timedelta
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.throttling import ScopedRateThrottle
 
 from accounts.models import CustomUser
 from notifications.models import Notification
@@ -260,3 +263,43 @@ class PublicSiteAPITests(TestCase):
         response = self.client.get("/api/admin/public-site/missing-service-requests/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+@override_settings(
+    REST_FRAMEWORK={
+        **settings.REST_FRAMEWORK,
+        "DEFAULT_THROTTLE_RATES": {
+            **settings.REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}),
+            "missing_service_request": "1/minute",
+        },
+    }
+)
+class PublicMissingServiceRequestThrottleTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self._original_throttle_rates = dict(ScopedRateThrottle.THROTTLE_RATES)
+        ScopedRateThrottle.THROTTLE_RATES = {
+            **ScopedRateThrottle.THROTTLE_RATES,
+            "missing_service_request": "1/minute",
+        }
+        self.client = APIClient()
+        self.payload = {
+            "service_name": "معاملة جديدة",
+            "request_message": "أحتاج خدمة غير موجودة.",
+            "requester_name": "عميل تجريبي",
+            "requester_phone": "0795550000",
+            "preferred_contact_channel": "whatsapp",
+            "source": "homepage_chat",
+        }
+
+    def tearDown(self):
+        ScopedRateThrottle.THROTTLE_RATES = self._original_throttle_rates
+        cache.clear()
+        super().tearDown()
+
+    def test_public_missing_service_request_submission_is_rate_limited(self):
+        first_response = self.client.post("/api/public-site/missing-service-requests/", self.payload, format="json")
+        second_response = self.client.post("/api/public-site/missing-service-requests/", self.payload, format="json")
+
+        self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(second_response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)

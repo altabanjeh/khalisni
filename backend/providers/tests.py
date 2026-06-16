@@ -4,6 +4,7 @@ from rest_framework.test import APIClient, APITestCase
 from accounts.models import CustomUser
 from audit.models import AuditLog
 from documents.models import Document
+from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
 from providers.models import ProviderProfile
 from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRequiredDocument
@@ -165,6 +166,9 @@ class ProviderPermissionsTests(APITestCase):
 
     def test_employee_order_filtered_provider_list_returns_only_eligible_providers(self):
         service = self.visible_order.service
+        self.visible_order.status = Order.Status.UNDER_REVIEW
+        self.visible_order.assigned_employee = self.employee_user
+        self.visible_order.save(update_fields=["status", "assigned_employee", "updated_at"])
         ServiceProviderAssignment.objects.create(service=service, provider=self.provider, is_active=True)
         self.other_provider.is_available = False
         self.other_provider.save(update_fields=["is_available"])
@@ -228,3 +232,158 @@ class ProviderPermissionsTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ProviderOrganizationScopeTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.category = ServiceCategory.objects.create(name_ar="تصنيف", name_en="Category", slug="provider-scope-category")
+        self.partner_org_a = Organization.objects.create(
+            name="Partner A",
+            slug="partner-a",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.partner_org_b = Organization.objects.create(
+            name="Partner B",
+            slug="partner-b",
+            organization_type=Organization.OrganizationType.PARTNER,
+        )
+        self.provider_org_a = Organization.objects.create(
+            name="Provider Org A",
+            slug="provider-org-a",
+            organization_type=Organization.OrganizationType.PROVIDER,
+        )
+        self.provider_org_b = Organization.objects.create(
+            name="Provider Org B",
+            slug="provider-org-b",
+            organization_type=Organization.OrganizationType.PROVIDER,
+        )
+        self.customer = CustomUser.objects.create_user(
+            email="scope-customer@example.com",
+            password="Password@123",
+            full_name="Scoped Customer",
+            phone="0799000001",
+            role=CustomUser.Role.CUSTOMER,
+        )
+        self.partner_admin = CustomUser.objects.create_user(
+            email="partner-admin@example.com",
+            password="Password@123",
+            full_name="Partner Admin",
+            phone="0799000002",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        OrganizationMembership.objects.create(
+            user=self.partner_admin,
+            organization=self.partner_org_a,
+            role=OrganizationMembership.MembershipRole.PARTNER_ADMIN,
+        )
+        self.service_a = Service.objects.create(
+            category=self.category,
+            organization=self.partner_org_a,
+            scope=Service.Scope.PARTNER_PRIVATE,
+            name_ar="خدمة أ",
+            name_en="Service A",
+            slug="provider-scope-service-a",
+            description_ar="تفاصيل",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=3,
+            service_fee=4,
+        )
+        self.service_b = Service.objects.create(
+            category=self.category,
+            organization=self.partner_org_b,
+            scope=Service.Scope.PARTNER_PRIVATE,
+            name_ar="خدمة ب",
+            name_en="Service B",
+            slug="provider-scope-service-b",
+            description_ar="تفاصيل",
+            estimated_duration=2,
+            base_price=10,
+            government_fee=3,
+            service_fee=4,
+        )
+        provider_user_a = CustomUser.objects.create_user(
+            email="provider-scope-a@example.com",
+            password="Password@123",
+            full_name="Provider Scope A",
+            phone="0799000003",
+            role=CustomUser.Role.PROVIDER,
+        )
+        provider_user_b = CustomUser.objects.create_user(
+            email="provider-scope-b@example.com",
+            password="Password@123",
+            full_name="Provider Scope B",
+            phone="0799000004",
+            role=CustomUser.Role.PROVIDER,
+        )
+        self.provider_a = ProviderProfile.objects.create(
+            organization=self.provider_org_a,
+            user=provider_user_a,
+            provider_type="Agent",
+            city="Amman",
+            is_available=True,
+            is_approved=True,
+        )
+        self.provider_b = ProviderProfile.objects.create(
+            organization=self.provider_org_b,
+            user=provider_user_b,
+            provider_type="Agent",
+            city="Irbid",
+            is_available=True,
+            is_approved=True,
+        )
+        ServiceProviderAssignment.objects.create(service=self.service_a, provider=self.provider_a, is_active=True)
+        ServiceProviderAssignment.objects.create(service=self.service_b, provider=self.provider_b, is_active=True)
+        self.order_a = Order.objects.create(
+            customer=self.customer,
+            organization=self.partner_org_a,
+            service=self.service_a,
+            city="Amman",
+            status=Order.Status.UNDER_REVIEW,
+        )
+        self.order_b = Order.objects.create(
+            customer=self.customer,
+            organization=self.partner_org_b,
+            service=self.service_b,
+            city="Irbid",
+            status=Order.Status.UNDER_REVIEW,
+        )
+
+    def test_partner_admin_only_sees_providers_for_in_scope_services(self):
+        self.client.force_authenticate(self.partner_admin)
+
+        response = self.client.get("/api/admin/providers/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual([record["id"] for record in records], [self.provider_a.id])
+
+    def test_partner_admin_cannot_retrieve_or_update_out_of_scope_provider(self):
+        self.client.force_authenticate(self.partner_admin)
+
+        detail_response = self.client.get(f"/api/admin/providers/{self.provider_b.id}/")
+        activation_response = self.client.post(
+            f"/api/admin/providers/{self.provider_b.id}/activation/",
+            {"is_active": False, "reason": "Scoped test"},
+            format="json",
+        )
+
+        self.assertEqual(detail_response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(activation_response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_partner_admin_cannot_lookup_provider_candidates_for_foreign_order(self):
+        self.client.force_authenticate(self.partner_admin)
+
+        response = self.client.get(f"/api/admin/providers/?order={self.order_b.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_partner_admin_can_lookup_provider_candidates_for_visible_order(self):
+        self.client.force_authenticate(self.partner_admin)
+
+        response = self.client.get(f"/api/admin/providers/?order={self.order_a.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data if isinstance(response.data, list) else response.data["results"]
+        self.assertEqual([record["id"] for record in records], [self.provider_a.id])

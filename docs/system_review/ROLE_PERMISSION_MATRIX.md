@@ -9,7 +9,7 @@ Notes:
 |---|---|---|---|---|---|---|---|---|---|---|
 | Auth | `/api/auth/register/` | Register account | Yes | No | No | No | No | Yes | Yes | Public registration always creates `role="customer"`. Ref: `backend/accounts/views.py:33-47`, `backend/accounts/serializers.py:43-51` |
 | Services | `/api/services/`, `/api/services/<slug>/` | View active service catalog | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Public endpoints return only `is_active=True`. Ref: `backend/services/views.py:16-43` |
-| Orders | `/api/orders/` | Create service order | Yes | No | No | No | No | Yes | Yes | Public endpoint; requires online service and required docs when configured. Ref: `backend/orders/views.py:61-77`, `backend/orders/serializers.py:147-267` |
+| Orders | `/api/orders/` | Create service order | Limited | No | No | No | No | Yes | Yes | Authenticated customer-only endpoint; still requires online service and required docs when configured. Ref: `backend/orders/views.py:56-72`, `backend/orders/serializers.py:147-267` |
 | Orders | `/api/orders/track/` | Track order and view final docs | Limited | Limited | Limited | Limited | Limited | Limited | Yes | Public by `order_number + phone`; not role-based. Ref: `backend/orders/views.py:80-93`, `backend/documents/views.py:36-42` |
 | Orders | `/api/customer/orders/` | List own orders | Yes | No | No | No | No | Yes | Yes | Customer-only route. Ref: `backend/orders/views.py:96-101` |
 | Orders | `/api/customer/orders/<id>/` | View own order detail | Yes | No | No | No | No | Yes | Yes | Customer sees only customer-visible notes. Ref: `backend/orders/views.py:104-109`, `backend/orders/serializers.py:136-144` |

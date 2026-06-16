@@ -1,4 +1,4 @@
-import { apiClient, buildQuery } from './client';
+import { apiClient, buildQuery, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { DocumentVerificationPayload, OrderDocument } from '../types/document';
 
@@ -19,7 +19,7 @@ export const documentsApi = {
     }).then((res) => res.data);
   },
   getStaffDocuments(params: ApiListParams = {}) {
-    return apiClient.get<OrderDocument[]>('/staff/documents/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<OrderDocument[]>('/staff/documents/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   verifyStaffDocument(documentId: number | string, payload: DocumentVerificationPayload) {
     return apiClient.post(`/staff/documents/${documentId}/verify/`, payload).then((res) => res.data);

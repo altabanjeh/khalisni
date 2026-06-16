@@ -45,6 +45,11 @@ test('successful customer login redirects to customer dashboard', async () => {
   await waitFor(() => {
     expect(screen.getByTestId('location-probe')).toHaveTextContent('/customer')
   })
+
+  expect(sessionStorage.getItem('khalisni_access')).toBe('fake-access-token')
+  expect(sessionStorage.getItem('khalisni_refresh')).toBe('fake-refresh-token')
+  expect(localStorage.getItem('khalisni_access')).toBeNull()
+  expect(localStorage.getItem('khalisni_refresh')).toBeNull()
 })
 
 test('successful admin login redirects to admin portal', async () => {
@@ -83,6 +88,31 @@ test('login respects ?next= redirect parameter', async () => {
   await waitFor(() => {
     expect(screen.getByTestId('location-probe')).toHaveTextContent('/customer/orders/new?service=5')
   })
+})
+
+test('remember me stores tokens in localStorage only', async () => {
+  vi.spyOn(api, 'me').mockResolvedValueOnce(null)
+  vi.spyOn(api, 'login').mockResolvedValueOnce({
+    access: 'remember-access-token',
+    refresh: 'remember-refresh-token',
+    user: { id: 2, full_name: 'Ø£Ø­Ù…Ø¯ Ø®Ø§Ù„Ø¯', role: 'customer', email: 'customer@khalisni.local' },
+  })
+
+  renderLoginPage('/login')
+
+  await userEvent.type(await screen.findByLabelText(/email|البريد/i), 'customer@khalisni.local')
+  await userEvent.type(screen.getByLabelText(/password|كلمة/i), 'Password@123')
+  await userEvent.click(screen.getByRole('checkbox', { name: /remember me|Ø§Ù„Ø¥Ø¨Ù‚Ø§Ø¡/i }))
+  await userEvent.click(screen.getByRole('button', { name: /sign in|دخول/i }))
+
+  await waitFor(() => {
+    expect(screen.getByTestId('location-probe')).toHaveTextContent('/customer')
+  })
+
+  expect(localStorage.getItem('khalisni_access')).toBe('remember-access-token')
+  expect(localStorage.getItem('khalisni_refresh')).toBe('remember-refresh-token')
+  expect(sessionStorage.getItem('khalisni_access')).toBeNull()
+  expect(sessionStorage.getItem('khalisni_refresh')).toBeNull()
 })
 
 test('wrong credentials show error message', async () => {

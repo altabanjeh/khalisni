@@ -14,7 +14,7 @@ What does not exist yet:
 - push provider integration
 - delivery routing to Expo/APNs/FCM
 - unread badge endpoint
-- notification read mutation endpoint
+- mark-all-read endpoint
 
 Push notifications should therefore be treated as a planned extension, not assumed to exist.
 
@@ -64,7 +64,9 @@ Recommended later:
 ### 5. Read-state APIs
 Needed for accurate badge behavior:
 
-- `POST /api/notifications/{id}/read/`
+- Existing:
+  - `PATCH /api/notifications/{id}/read/`
+- Still needed:
 - `POST /api/notifications/read-all/`
 - `GET /api/notifications/unread-count/`
 

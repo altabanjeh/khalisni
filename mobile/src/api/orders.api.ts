@@ -1,4 +1,4 @@
-import { apiClient, buildQuery } from './client';
+import { apiClient, buildQuery, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { Order } from '../types/order';
 
@@ -12,7 +12,7 @@ export const ordersApi = {
     return apiClient.post<Order>('/orders/track/', payload).then((res) => res.data);
   },
   getCustomerOrders(params: ApiListParams = {}) {
-    return apiClient.get<Order[]>('/customer/orders/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<Order[]>('/customer/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   getCustomerOrder(orderId: number | string) {
     return apiClient.get<Order>(`/customer/orders/${orderId}/`).then((res) => res.data);
@@ -24,7 +24,7 @@ export const ordersApi = {
     return apiClient.post(`/customer/orders/${orderId}/rating/`, payload).then((res) => res.data);
   },
   getEmployeeOrders(params: ApiListParams = {}) {
-    return apiClient.get<Order[]>('/admin/orders/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<Order[]>('/admin/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   getEmployeeOrder(orderId: number | string) {
     return apiClient.get<Order>(`/admin/orders/${orderId}/`).then((res) => res.data);
@@ -51,7 +51,7 @@ export const ordersApi = {
     return apiClient.post(`/admin/orders/${orderId}/reject/`, payload).then((res) => res.data);
   },
   getAdminOrders(params: ApiListParams = {}) {
-    return apiClient.get<Order[]>('/admin/orders/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<Order[]>('/admin/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   getAdminOrder(orderId: number | string) {
     return apiClient.get<Order>(`/admin/orders/${orderId}/`).then((res) => res.data);
@@ -75,7 +75,7 @@ export const ordersApi = {
     return apiClient.post(`/admin/orders/${orderId}/reject/`, payload).then((res) => res.data);
   },
   getProviderOrders(params: ApiListParams = {}) {
-    return apiClient.get<Order[]>('/provider/orders/', { params: buildQuery(params) }).then((res) => res.data);
+    return apiClient.get<Order[]>('/provider/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },
   getProviderDashboard() {
     return apiClient.get('/provider/dashboard/').then((res) => res.data);

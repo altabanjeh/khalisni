@@ -93,7 +93,6 @@ class DocumentDownloadAPIView(RetrieveAPIView):
 class StaffDocumentListAPIView(generics.ListAPIView):
     serializer_class = StaffDocumentSerializer
     permission_classes = [permissions.IsAuthenticated, CanVerifyDocuments]
-    pagination_class = None
 
     def get_queryset(self):
         queryset = Document.objects.select_related("order", "order__service", "uploaded_by", "verified_by").filter(
@@ -146,4 +145,3 @@ class AdminDocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.select_related("order", "uploaded_by", "verified_by").all()
     serializer_class = DocumentAdminSerializer
     search_fields = ["order__order_number", "document_type", "original_filename", "mime_type"]
-    pagination_class = None
