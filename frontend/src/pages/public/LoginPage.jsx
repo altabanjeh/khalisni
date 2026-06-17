@@ -81,7 +81,7 @@ function LoginPage() {
         </div>
         <label className="flex items-center gap-3 text-sm font-medium text-slate-700" htmlFor="login-remember">
           <input id="login-remember" className="h-4 w-4 rounded border-slate-300" type="checkbox" {...register('remember')} />
-          <span>{isArabic ? 'Ø§Ù„Ø¥Ø¨Ù‚Ø§Ø¡ Ø¹Ù„Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' : 'Remember me on this device'}</span>
+          <span>{isArabic ? '\u0627\u0644\u0625\u0628\u0642\u0627\u0621 \u0639\u0644\u0649 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' : 'Remember me on this device'}</span>
         </label>
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         <button className="btn-primary w-full" disabled={isSubmitting}>

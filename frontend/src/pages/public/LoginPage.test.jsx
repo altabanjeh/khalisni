@@ -102,7 +102,7 @@ test('remember me stores tokens in localStorage only', async () => {
 
   await userEvent.type(await screen.findByLabelText(/email|البريد/i), 'customer@khalisni.local')
   await userEvent.type(screen.getByLabelText(/password|كلمة/i), 'Password@123')
-  await userEvent.click(screen.getByRole('checkbox', { name: /remember me|Ø§Ù„Ø¥Ø¨Ù‚Ø§Ø¡/i }))
+  await userEvent.click(screen.getByRole('checkbox', { name: /remember me|\u0627\u0644\u0625\u0628\u0642\u0627\u0621/i }))
   await userEvent.click(screen.getByRole('button', { name: /sign in|دخول/i }))
 
   await waitFor(() => {
