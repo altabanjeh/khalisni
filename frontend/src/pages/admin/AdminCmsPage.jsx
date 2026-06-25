@@ -18,6 +18,11 @@ const defaultValues = {
   email: '',
 }
 
+const defaultDeleteGuardForm = {
+  delete_password: '',
+  confirm_delete_password: '',
+}
+
 const safeSettingDefinitions = [
   { key: 'site.homepage', label: 'محتوى الصفحة الرئيسية', description: 'العنوان الرئيسي والنص التعريفي المختصر.' },
   { key: 'site.contact', label: 'بيانات التواصل', description: 'الهاتف والبريد الظاهرين للعملاء.' },
@@ -86,9 +91,11 @@ function SettingFields({ settingKey, form, selectedSetting }) {
 function AdminCmsPage() {
   const { toast } = useToast()
   const { data: settings = [], loading, reload } = useAsyncData(() => api.getSystemSettings(), [], [])
+  const { data: deleteGuard = null, reload: reloadDeleteGuard } = useAsyncData(() => api.getDeleteGuardConfig(), [], null)
   const [selectedSettingId, setSelectedSettingId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [deleteGuardForm, setDeleteGuardForm] = useState(defaultDeleteGuardForm)
   const form = useForm({ defaultValues })
 
   const selectedSetting = useMemo(
@@ -186,6 +193,17 @@ function AdminCmsPage() {
     }
   }
 
+  async function handleDeleteGuardSave() {
+    try {
+      await api.updateDeleteGuardConfig(deleteGuardForm)
+      reloadDeleteGuard()
+      setDeleteGuardForm(defaultDeleteGuardForm)
+      toast('تم حفظ كلمة مرور الحذف.', 'success')
+    } catch (error) {
+      toast(getDisplayError(error), 'error')
+    }
+  }
+
   const columns = [
     { key: 'label', label: 'الإعداد', render: (row) => row.label || row.key },
     { key: 'description', label: 'الوصف', render: (row) => row.description || 'بدون وصف' },
@@ -249,6 +267,51 @@ function AdminCmsPage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="glass-panel p-5">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold text-ink">حماية الحذف</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              لا يمكن حذف أو تعطيل أي سجل من داخل النظام إلا من خلال حساب المشرف وباستخدام كلمة مرور الحذف الإضافية.
+            </p>
+            <p className="mt-2 text-xs font-semibold text-slate-500">
+              {deleteGuard?.is_configured ? 'كلمة مرور الحذف مفعلة.' : 'لم يتم ضبط كلمة مرور الحذف بعد.'}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-slate-50 px-4 py-3 text-xs text-slate-500">
+            كلمة المرور هذه ستُطلب قبل أي عملية حذف أو إيقاف من شاشات الإدارة.
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="كلمة مرور الحذف" hint="استخدم كلمة قوية يعرفها المشرف فقط.">
+            <input
+              className="field"
+              type="password"
+              value={deleteGuardForm.delete_password}
+              onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, delete_password: event.target.value })}
+            />
+          </Field>
+          <Field label="تأكيد كلمة المرور" hint="يجب أن تتطابق القيمتان قبل الحفظ.">
+            <input
+              className="field"
+              type="password"
+              value={deleteGuardForm.confirm_delete_password}
+              onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, confirm_delete_password: event.target.value })}
+            />
+          </Field>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
+            حفظ كلمة مرور الحذف
+          </button>
+          <button className="btn-secondary" onClick={() => setDeleteGuardForm(defaultDeleteGuardForm)} type="button">
+            مسح الحقول
+          </button>
         </div>
       </section>
 
