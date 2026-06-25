@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanSendManualNotifications, IsAdminRole
+from core.delete_guard import AdminDeleteGuardMixin
 from notifications.models import Notification, NotificationTemplate
 from notifications.selectors import get_notifications_for_user
 from notifications.serializers import (
@@ -28,7 +29,7 @@ class AdminNotificationListAPIView(generics.ListCreateAPIView):
         return NotificationAdminSerializer
 
 
-class AdminNotificationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+class AdminNotificationDetailAPIView(AdminDeleteGuardMixin, generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = Notification.objects.select_related("recipient", "actor", "order", "template")
 
@@ -89,7 +90,7 @@ class EmployeeNotificationTemplateListAPIView(generics.ListAPIView):
         ).order_by("key")
 
 
-class NotificationTemplateAdminViewSet(viewsets.ModelViewSet):
+class NotificationTemplateAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = NotificationTemplateSerializer
     queryset = NotificationTemplate.objects.all()
@@ -131,6 +132,7 @@ class NotificationTemplateAdminViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         template = self.get_object()
         template.is_active = False
         template.save(update_fields=["is_active", "updated_at"])

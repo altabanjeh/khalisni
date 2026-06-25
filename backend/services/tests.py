@@ -1,8 +1,9 @@
 from django.contrib.auth.models import Permission
+from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, SystemSetting
 from audit.models import AuditLog
 from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
@@ -161,8 +162,17 @@ class ServiceManagementPermissionTests(APITestCase):
         )
         Order.objects.create(customer=customer, service=service, city="Amman")
         self.client.force_authenticate(self.admin)
+        SystemSetting.objects.create(
+            key="security.delete_guard",
+            value={"password_hash": make_password("DeleteGuard@123")},
+            description="Delete guard",
+        )
 
-        response = self.client.delete(f"/api/admin/services/{service.id}/")
+        response = self.client.delete(
+            f"/api/admin/services/{service.id}/",
+            {"delete_password": "DeleteGuard@123"},
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         service.refresh_from_db()
@@ -200,6 +210,55 @@ class ServiceManagementPermissionTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(ServiceProviderAssignment.objects.filter(service=service, provider=provider).exists())
+
+    def test_category_and_service_generate_safe_defaults_when_slug_or_icon_missing(self):
+        self.client.force_authenticate(self.admin)
+
+        category_response = self.client.post(
+            "/api/admin/categories/",
+            {
+                "name_ar": "خدمات الوثائق",
+                "name_en": "Document Services",
+                "slug": "",
+                "icon": "",
+                "is_active": True,
+            },
+            format="json",
+        )
+        self.assertEqual(category_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(category_response.data["slug"], "document-services")
+        self.assertEqual(category_response.data["icon"], "file-text")
+
+        service_response = self.client.post(
+            "/api/admin/services/",
+            {
+                "category_id": category_response.data["id"],
+                "name_ar": "خدمة جواز السفر",
+                "name_en": "Passport Service",
+                "slug": "",
+                "description_ar": "تفاصيل",
+                "description_en": "",
+                "required_information_schema": [],
+                "terms_ar": "",
+                "terms_en": "",
+                "base_price": "1.00",
+                "government_fee": "1.00",
+                "service_fee": "1.00",
+                "estimated_duration": 1,
+                "estimated_duration_unit": "days",
+                "price_type": "fixed",
+                "is_online": True,
+                "provider_required": True,
+                "requires_manual_review": True,
+                "requires_appointment": False,
+                "is_featured": False,
+                "is_active": True,
+                "display_order": 0,
+            },
+            format="json",
+        )
+        self.assertEqual(service_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(service_response.data["slug"], "passport-service")
 
 
 class ServiceRelationManagementTests(APITestCase):
@@ -398,9 +457,14 @@ class ServiceRelationManagementTests(APITestCase):
         self.client.force_authenticate(self.support)
 
         allowed_delete = self.client.delete(f"/api/admin/service-relations/{relation_id}/")
-        self.assertEqual(allowed_delete.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(allowed_delete.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_authenticate(self.admin)
+        SystemSetting.objects.create(
+            key="security.delete_guard",
+            value={"password_hash": make_password("DeleteGuard@123")},
+            description="Delete guard",
+        )
         hard_delete_relation = ServiceRelation.objects.create(
             source_service=self.source_service,
             target_service=self.third_service,
@@ -409,7 +473,9 @@ class ServiceRelationManagementTests(APITestCase):
             created_by=self.admin,
         )
         hard_delete_response = self.client.delete(
-            f"/api/admin/service-relations/{hard_delete_relation.id}/hard-delete/"
+            f"/api/admin/service-relations/{hard_delete_relation.id}/hard-delete/",
+            {"delete_password": "DeleteGuard@123"},
+            format="json",
         )
         self.assertEqual(hard_delete_response.status_code, status.HTTP_204_NO_CONTENT)
 

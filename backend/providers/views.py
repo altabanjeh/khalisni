@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
+from core.delete_guard import AdminDeleteGuardMixin
 from documents.serializers import DocumentUploadSerializer
 from organizations.selectors import active_memberships_for_user, enforce_organization_scope, has_scoped_memberships
 from orders.models import Order
@@ -40,7 +41,7 @@ def _scope_provider_admin_queryset(queryset, user):
     return queryset
 
 
-class ProviderAdminViewSet(viewsets.ModelViewSet):
+class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     queryset = ProviderProfile.objects.select_related("user").prefetch_related("service_categories")
     search_fields = ["user__full_name", "user__email", "city", "provider_type"]
 
@@ -143,6 +144,7 @@ class ProviderAdminViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         provider = self.get_object()
         provider.user.is_active = False
         provider.user.save(update_fields=["is_active", "updated_at"])

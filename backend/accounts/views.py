@@ -19,6 +19,7 @@ from accounts.serializers import (
     CustomTokenObtainPairSerializer,
     CustomerProfileAdminSerializer,
     CustomerProfileSerializer,
+    DeleteGuardSettingSerializer,
     ForgotPasswordRequestSerializer,
     RegisterSerializer,
     ResetPasswordSerializer,
@@ -26,7 +27,8 @@ from accounts.serializers import (
     UserSerializer,
 )
 from audit.utils import create_audit_log
-from config.permissions import CanManageUserRoles, IsCustomerRole
+from core.delete_guard import AdminDeleteGuardMixin, get_delete_guard_setting
+from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole
 from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
 
 # Apps whose permissions are surfaced in the admin permission-assignment UI.
@@ -159,7 +161,7 @@ class CustomerProfileAPIView(generics.UpdateAPIView):
         )
 
 
-class AdminUserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = AdminUserSerializer
     queryset = CustomUser.objects.all().order_by("full_name")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
@@ -203,6 +205,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         user = self.get_object()
         old_value = {"role": user.role, "is_active": user.is_active}
         user.is_active = False
@@ -318,7 +321,7 @@ class SystemSettingViewSet(viewsets.ModelViewSet):
         return response.Response({"detail": "System settings cannot be deleted from this screen."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class CustomerProfileAdminViewSet(viewsets.ModelViewSet):
+class CustomerProfileAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = CustomerProfileAdminSerializer
     queryset = CustomerProfile.objects.select_related("user").order_by("pk")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
@@ -361,3 +364,28 @@ class AvailablePermissionsAPIView(APIView):
                 }
             )
         return response.Response(groups)
+
+
+class DeleteGuardSettingAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsAdminRole]
+
+    def get(self, request):
+        serializer = DeleteGuardSettingSerializer(instance=get_delete_guard_setting(), context={"request": request})
+        return response.Response(serializer.data)
+
+    def put(self, request):
+        setting = get_delete_guard_setting()
+        serializer = DeleteGuardSettingSerializer(instance=setting, data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        old_value = {"is_configured": bool(setting and isinstance(setting.value, dict) and setting.value.get("password_hash"))}
+        setting = serializer.save()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="update_delete_guard_setting",
+            entity_type="SystemSetting",
+            entity_id=setting.pk,
+            old_value=old_value,
+            new_value={"is_configured": True},
+        )
+        return response.Response(DeleteGuardSettingSerializer(instance=setting, context={"request": request}).data)

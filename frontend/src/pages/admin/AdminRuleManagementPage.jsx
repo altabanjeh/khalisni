@@ -121,6 +121,11 @@ const DEFAULT_AUDIT_FILTERS = {
   status: '',
 }
 
+const DEFAULT_DELETE_GUARD_FORM = {
+  delete_password: '',
+  confirm_delete_password: '',
+}
+
 const SAFE_FILE_TYPES = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx']
 const PAYMENT_STATUS_OPTIONS = ['pending', 'processing', 'paid', 'failed', 'cancelled', 'refunded', 'partially_refunded']
 const SYSTEM_SETTING_KEYS = ['site.homepage', 'site.contact']
@@ -314,6 +319,7 @@ function AdminRuleManagementPage() {
   const [userForm, setUserForm] = useState(DEFAULT_USER_FORM)
   const [settingForm, setSettingForm] = useState({ key: SYSTEM_SETTING_KEYS[0], description: '', values: {} })
   const [auditFilters, setAuditFilters] = useState(DEFAULT_AUDIT_FILTERS)
+  const [deleteGuardForm, setDeleteGuardForm] = useState(DEFAULT_DELETE_GUARD_FORM)
 
   const { data: categories = [], loading: categoriesLoading } = useAsyncData(() => api.getAdminCategories(), [], [])
   const { data: services = [], loading: servicesLoading, reload: reloadServices } = useAsyncData(() => api.getAdminServices(), [], [])
@@ -329,6 +335,7 @@ function AdminRuleManagementPage() {
   const { data: payments = [], loading: paymentsLoading, reload: reloadPayments } = useAsyncData(() => api.getAdminPayments(), [], [])
   const { data: users = [], loading: usersLoading, reload: reloadUsers } = useAsyncData(() => api.getAdminUsers(), [], [])
   const { data: systemSettings = [], loading: settingsLoading, reload: reloadSettings } = useAsyncData(() => api.getSystemSettings(), [], [])
+  const { data: deleteGuard = null, loading: deleteGuardLoading, reload: reloadDeleteGuard } = useAsyncData(() => api.getDeleteGuardConfig(), [], null)
   const { data: auditLogs = [], loading: auditLoading, reload: reloadAudit } = useAsyncData(() => api.getAuditLogs(auditFilters), [auditFilters], [])
 
   const selectedService = services.find((item) => String(item.id) === String(selectedServiceId)) || null
@@ -351,6 +358,7 @@ function AdminRuleManagementPage() {
     paymentsLoading ||
     usersLoading ||
     settingsLoading ||
+    deleteGuardLoading ||
     auditLoading
 
   useEffect(() => {
@@ -760,6 +768,17 @@ function AdminRuleManagementPage() {
     }
   }
 
+  async function handleDeleteGuardSave() {
+    try {
+      await api.updateDeleteGuardConfig(deleteGuardForm)
+      reloadDeleteGuard()
+      setDeleteGuardForm(DEFAULT_DELETE_GUARD_FORM)
+      setSectionFeedback('settings', 'success', tx('تم حفظ كلمة مرور الحذف.', 'Delete password saved.'))
+    } catch (error) {
+      setSectionFeedback('settings', 'error', getDisplayError(error))
+    }
+  }
+
   if (busy) return <LoadingSpinner />
 
   const serviceColumns = [
@@ -1039,6 +1058,53 @@ function AdminRuleManagementPage() {
             <button className="btn-primary" onClick={() => openServiceEditor()} type="button">
               {tx('خدمة جديدة', 'New service')}
             </button>
+          </div>
+          <div className="mb-6 rounded-3xl border border-border bg-slate-50/70 p-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h3 className="text-base font-bold text-ink">{tx('حماية الحذف', 'Delete protection')}</h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  {tx(
+                    'لا يمكن حذف أو تعطيل أي سجل من واجهات الإدارة إلا بحساب المشرف الأعلى وكلمة المرور الإضافية هذه.',
+                    'No admin delete or deactivate action can run without the super admin account and this extra password.',
+                  )}
+                </p>
+                <p className="mt-2 text-xs font-semibold text-slate-500">
+                  {deleteGuard?.is_configured
+                    ? tx('كلمة المرور مفعلة.', 'Delete password is configured.')
+                    : tx('لم يتم ضبط كلمة مرور الحذف بعد.', 'Delete password is not configured yet.')}
+                </p>
+              </div>
+              <div className="text-xs text-slate-500">
+                {tx('آخر تحديث', 'Last update')}: {formatDateTime(deleteGuard?.updated_at, locale, tx('غير متوفر', 'Not available'))}
+              </div>
+            </div>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <Field label={tx('كلمة مرور الحذف', 'Delete password')} help={tx('استخدم كلمة قوية لا يعرفها إلا المشرف الأعلى.', 'Use a strong password known only to the super admin.')}>
+                <input
+                  className="field"
+                  type="password"
+                  value={deleteGuardForm.delete_password}
+                  onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, delete_password: event.target.value })}
+                />
+              </Field>
+              <Field label={tx('تأكيد كلمة المرور', 'Confirm password')} help={tx('يجب أن تتطابق القيمتان قبل الحفظ.', 'Both values must match before saving.')}>
+                <input
+                  className="field"
+                  type="password"
+                  value={deleteGuardForm.confirm_delete_password}
+                  onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, confirm_delete_password: event.target.value })}
+                />
+              </Field>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
+                {tx('حفظ كلمة المرور', 'Save delete password')}
+              </button>
+              <button className="btn-secondary" onClick={() => setDeleteGuardForm(DEFAULT_DELETE_GUARD_FORM)} type="button">
+                {tx('مسح الحقول', 'Clear')}
+              </button>
+            </div>
           </div>
           <DataTable
             columns={serviceColumns}

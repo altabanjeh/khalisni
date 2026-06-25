@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import IsAdminRole, IsInternalStaffRole
+from core.delete_guard import AdminDeleteGuardMixin
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT, DEFAULT_SITE_THEME
 from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
 from public_site.services import notify_missing_service_request_assigned, notify_missing_service_request_created
@@ -212,7 +213,7 @@ class AdminPublicPageContentAPIView(AdminSingletonMixin, APIView):
         return Response(serializer.data)
 
 
-class AdvertisementAdminViewSet(viewsets.ModelViewSet):
+class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = AdvertisementAdminSerializer
     queryset = Advertisement.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
@@ -292,6 +293,7 @@ class AdvertisementAdminViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(
             instance,

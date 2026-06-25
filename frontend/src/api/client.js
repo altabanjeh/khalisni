@@ -251,6 +251,30 @@ export function getDisplayError(error) {
   return error.message || 'تعذر إتمام الطلب.'
 }
 
+function createClientActionError(message) {
+  const error = new Error(message)
+  error.displayMessage = message
+  return error
+}
+
+function promptDeletePassword() {
+  if (typeof window === 'undefined' || typeof window.prompt !== 'function') {
+    throw createClientActionError('Delete password prompt is unavailable in this environment.')
+  }
+
+  const password = window.prompt('Enter the admin delete password / أدخل كلمة مرور الحذف')
+  if (password == null) {
+    throw createClientActionError('Delete action was cancelled.')
+  }
+
+  const normalized = String(password).trim()
+  if (!normalized) {
+    throw createClientActionError('Delete password is required.')
+  }
+
+  return normalized
+}
+
 export function unwrapList(data) {
   if (Array.isArray(data)) return data
   if (Array.isArray(data?.results)) return data.results
@@ -386,6 +410,16 @@ export const http = {
   delete(url, config = {}) {
     return request({ ...config, method: 'delete', url })
   },
+}
+
+export function secureAdminDelete(url, config = {}) {
+  const deletePassword = config.deletePassword || config.data?.delete_password || promptDeletePassword()
+  const data = {
+    ...(config.data || {}),
+    delete_password: deletePassword,
+  }
+  const { deletePassword: _deletePassword, ...rest } = config
+  return request({ ...rest, method: 'delete', url, data })
 }
 
 export function buildQuery(params = {}) {

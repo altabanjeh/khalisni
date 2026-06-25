@@ -1,4 +1,4 @@
-import { buildQuery, http, unwrapList, withId } from './client'
+import { buildQuery, http, secureAdminDelete, unwrapList, withId } from './client'
 
 function normalizeScreen(record) {
   return withId(record, 'help_guide_id')
@@ -54,7 +54,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpScreen(id) {
-    return http.delete(`/help/admin/screens/${id}/`)
+    return secureAdminDelete(`/help/admin/screens/${id}/`)
   },
 
   async getAdminHelpFields(params = {}) {
@@ -70,7 +70,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpField(id) {
-    return http.delete(`/help/admin/fields/${id}/`)
+    return secureAdminDelete(`/help/admin/fields/${id}/`)
   },
 
   async getAdminHelpActions(params = {}) {
@@ -86,7 +86,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpAction(id) {
-    return http.delete(`/help/admin/actions/${id}/`)
+    return secureAdminDelete(`/help/admin/actions/${id}/`)
   },
 
   async getAdminHelpServices(params = {}) {
@@ -102,7 +102,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpService(id) {
-    return http.delete(`/help/admin/services/${id}/`)
+    return secureAdminDelete(`/help/admin/services/${id}/`)
   },
 
   async getAdminHelpWorkflows(params = {}) {
@@ -118,7 +118,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpWorkflow(id) {
-    return http.delete(`/help/admin/workflows/${id}/`)
+    return secureAdminDelete(`/help/admin/workflows/${id}/`)
   },
 
   async getAdminHelpScreenshots(params = {}) {
@@ -134,7 +134,7 @@ export const helpGuidesApi = {
   },
 
   deleteAdminHelpScreenshot(id) {
-    return http.delete(`/help/admin/screenshots/${id}/`)
+    return secureAdminDelete(`/help/admin/screenshots/${id}/`)
   },
 
   getHelpGuideMetadata() {

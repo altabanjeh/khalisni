@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth.models import Permission
+from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
@@ -14,7 +15,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.throttling import ScopedRateThrottle
 
-from accounts.models import CustomUser, PasswordResetToken
+from accounts.models import CustomUser, PasswordResetToken, SystemSetting
 from accounts.password_reset import FORGOT_PASSWORD_RESPONSE_MESSAGE, PASSWORD_RESET_SUCCESS_MESSAGE
 from audit.models import AuditLog
 from organizations.models import Organization, OrganizationMembership
@@ -371,6 +372,71 @@ class UserPermissionManagementTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("current_permissions", response.data)
         self.assertIn("orders.review_order", response.data["current_permissions"])
+
+
+class AdminDeleteGuardTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = CustomUser.objects.create_user(
+            email="delete-guard-admin@example.com",
+            password="Password@123",
+            full_name="Delete Guard Admin",
+            phone="0792000991",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        self.target = CustomUser.objects.create_user(
+            email="delete-guard-target@example.com",
+            password="Password@123",
+            full_name="Delete Guard Target",
+            phone="0792000992",
+            role=CustomUser.Role.EMPLOYEE,
+        )
+        self.client.force_authenticate(self.admin)
+
+    def test_admin_can_configure_delete_guard(self):
+        response = self.client.put(
+            "/api/admin/delete-guard/",
+            {
+                "delete_password": "DeleteGuard@123",
+                "confirm_delete_password": "DeleteGuard@123",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        setting = SystemSetting.objects.get(key="security.delete_guard")
+        self.assertTrue(setting.value.get("password_hash"))
+        self.assertNotEqual(setting.value.get("password_hash"), "DeleteGuard@123")
+        self.assertTrue(response.data["is_configured"])
+
+    def test_delete_requires_matching_admin_delete_password(self):
+        SystemSetting.objects.create(
+            key="security.delete_guard",
+            value={"password_hash": make_password("DeleteGuard@123")},
+            description="Delete guard",
+        )
+
+        missing_password_response = self.client.delete(f"/api/admin/users/{self.target.pk}/", format="json")
+        self.assertEqual(missing_password_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("delete_password", missing_password_response.data)
+
+        wrong_password_response = self.client.delete(
+            f"/api/admin/users/{self.target.pk}/",
+            {"delete_password": "WrongPassword@123"},
+            format="json",
+        )
+        self.assertEqual(wrong_password_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("delete_password", wrong_password_response.data)
+
+        success_response = self.client.delete(
+            f"/api/admin/users/{self.target.pk}/",
+            {"delete_password": "DeleteGuard@123"},
+            format="json",
+        )
+        self.assertEqual(success_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.target.refresh_from_db()
+        self.assertFalse(self.target.is_active)
 
 
 class CustomerProfileAdminScopeTests(TestCase):

@@ -17,6 +17,7 @@ from config.permissions import (
     IsAdminRole,
     IsCustomerRole,
 )
+from core.delete_guard import AdminDeleteGuardMixin
 from workflow.rules import WORKFLOW_TRANSITIONS
 from documents.serializers import DocumentUploadSerializer
 from orders.models import Order, OrderIssue, OrderNote, Rating
@@ -228,7 +229,7 @@ class AdminDashboardOrderListAPIView(generics.ListAPIView):
         return queryset
 
 
-class AdminOrderRecordViewSet(viewsets.ModelViewSet):
+class AdminOrderRecordViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = (
         Order.objects.select_related(
@@ -293,6 +294,7 @@ class AdminOrderRecordViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         order = self.get_object()
         if not request.user.is_superuser:
             create_audit_log(
@@ -314,21 +316,21 @@ class AdminOrderRecordViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class AdminOrderNoteViewSet(viewsets.ModelViewSet):
+class AdminOrderNoteViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = OrderNoteAdminSerializer
     queryset = OrderNote.objects.select_related("order", "user").all()
     search_fields = ["order__order_number", "user__full_name", "note", "visibility"]
 
 
-class AdminOrderIssueViewSet(viewsets.ModelViewSet):
+class AdminOrderIssueViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = OrderIssueAdminSerializer
     queryset = OrderIssue.objects.select_related("order", "created_by", "resolved_by").all()
     search_fields = ["order__order_number", "title", "description"]
 
 
-class AdminRatingViewSet(viewsets.ModelViewSet):
+class AdminRatingViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = RatingAdminSerializer
     queryset = Rating.objects.select_related("order", "customer").all()

@@ -1,4 +1,4 @@
-import { buildQuery, http, unwrapList } from './client'
+import { buildQuery, http, secureAdminDelete, unwrapList } from './client'
 
 function withTemplateId(record) {
   if (!record) return record
@@ -38,7 +38,7 @@ export const notificationsApi = {
   },
 
   deleteAdminNotificationTemplate(id) {
-    return http.delete(`/admin/notification-templates/${id}/`)
+    return secureAdminDelete(`/admin/notification-templates/${id}/`)
   },
 
   previewNotificationTemplate(payload) {

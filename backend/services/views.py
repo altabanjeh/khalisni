@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
+from core.delete_guard import AdminDeleteGuardMixin
 from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
 from services.models import Address, Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
 from services.service_categories import category_snapshot
@@ -138,7 +139,7 @@ class ServiceDetailAPIView(generics.RetrieveAPIView):
         )
 
 
-class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
+class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     queryset = Service.objects.all().select_related("category")
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["name_ar", "name_en", "slug"]
@@ -180,6 +181,7 @@ class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return AdminServiceRuleSerializer
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
         instance.is_active = False
@@ -194,7 +196,7 @@ class ServiceAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CategoryAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
+class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminCategoryRuleSerializer
     queryset = ServiceCategory.objects.all().select_related("parent").prefetch_related("services")
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -224,6 +226,7 @@ class CategoryAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
         instance.is_active = False
@@ -289,7 +292,7 @@ class CategoryAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return Response({"detail": "Categories reordered."})
 
 
-class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
+class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminRequiredDocumentRuleSerializer
     queryset = ServiceRequiredDocument.objects.select_related("service").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -318,6 +321,7 @@ class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return queryset
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
         instance.is_active = False
@@ -326,7 +330,7 @@ class RequiredDocumentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
+class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = ServiceRelationAdminSerializer
     queryset = ServiceRelation.objects.select_related(
         "source_service",
@@ -393,6 +397,7 @@ class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         relation = self.get_object()
         if request.user.role == request.user.Role.SUPPORT and not request.user.has_perm("services.manage_service_prices"):
             raise PermissionDenied("You do not have permission to deactivate service relations.")
@@ -413,6 +418,7 @@ class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["delete"], url_path="hard-delete")
     def hard_delete(self, request, pk=None):
+        self.enforce_delete_guard(request)
         if request.user.role != request.user.Role.ADMIN:
             raise PermissionDenied("Only admin users can permanently delete service relations.")
 
@@ -431,7 +437,7 @@ class ServiceRelationAdminViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewSet):
+class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminServiceProviderAssignmentSerializer
     queryset = ServiceProviderAssignment.objects.select_related("service", "provider", "provider__user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -453,6 +459,7 @@ class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewS
         return queryset
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
         instance.is_active = False
@@ -461,7 +468,7 @@ class ServiceProviderAssignmentAdminViewSet(AdminAuditMixin, viewsets.ModelViewS
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class AddressAdminViewSet(viewsets.ModelViewSet):
+class AddressAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = AddressAdminSerializer
     queryset = Address.objects.select_related("user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]

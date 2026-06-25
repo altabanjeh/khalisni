@@ -1,4 +1,4 @@
-import { buildQuery, http, unwrapList } from './client'
+import { buildQuery, http, secureAdminDelete, unwrapList } from './client'
 
 export const providersApi = {
   async getProviders(params = {}) {
@@ -14,7 +14,7 @@ export const providersApi = {
   },
 
   deleteProvider(id) {
-    return http.delete(`/admin/providers/${id}/`)
+    return secureAdminDelete(`/admin/providers/${id}/`)
   },
 
   updateProviderApproval(id, payload) {

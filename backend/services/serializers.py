@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.utils.text import slugify
 from rest_framework import serializers
 
 from core.serializer_mixins import PkAsIdMixin
@@ -13,6 +12,7 @@ from services.models import (
     ServiceRelation,
     ServiceRequiredDocument,
 )
+from services.catalog_defaults import fallback_slug, suggest_category_icon
 from services.order_validation import get_completed_service_ids_for_customer
 from services.service_relations import RELATION_TYPE_HELP_TEXT
 from services.selectors import resolve_service_organization_from_request, visible_services_queryset
@@ -21,14 +21,6 @@ from services.selectors import resolve_service_organization_from_request, visibl
 def _matched_partner_config(service):
     configs = getattr(service, "_matched_partner_configs", None) or []
     return configs[0] if configs else None
-
-
-def _fallback_slug(*parts):
-    for part in parts:
-        value = slugify(part or "")
-        if value:
-            return value
-    return ""
 
 
 def _normalize_extension(value):
@@ -137,9 +129,15 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if "sort_order" in validated_data and "display_order" not in validated_data:
             validated_data["display_order"] = validated_data["sort_order"]
-        validated_data["slug"] = validated_data.get("slug") or _fallback_slug(
+        validated_data["slug"] = validated_data.get("slug") or fallback_slug(
             validated_data.get("name_en"),
             validated_data.get("name_ar"),
+            default_prefix="category",
+        )
+        validated_data["icon"] = validated_data.get("icon") or suggest_category_icon(
+            validated_data.get("name_en"),
+            validated_data.get("name_ar"),
+            validated_data.get("slug"),
         )
         return super().create(validated_data)
 
@@ -147,15 +145,29 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
         if "sort_order" in validated_data and "display_order" not in validated_data:
             validated_data["display_order"] = validated_data["sort_order"]
         if "slug" in validated_data:
-            instance.slug = validated_data["slug"] or _fallback_slug(
+            instance.slug = validated_data["slug"] or fallback_slug(
                 validated_data.get("name_en", instance.name_en),
                 validated_data.get("name_ar", instance.name_ar),
+                default_prefix="category",
             )
             validated_data.pop("slug", None)
         elif "name_ar" in validated_data or "name_en" in validated_data:
-            instance.slug = _fallback_slug(
+            instance.slug = fallback_slug(
                 validated_data.get("name_en", instance.name_en),
                 validated_data.get("name_ar", instance.name_ar),
+                default_prefix="category",
+            )
+        if "icon" in validated_data:
+            validated_data["icon"] = validated_data["icon"] or suggest_category_icon(
+                validated_data.get("name_en", instance.name_en),
+                validated_data.get("name_ar", instance.name_ar),
+                instance.slug,
+            )
+        elif "name_ar" in validated_data or "name_en" in validated_data:
+            validated_data["icon"] = instance.icon or suggest_category_icon(
+                validated_data.get("name_en", instance.name_en),
+                validated_data.get("name_ar", instance.name_ar),
+                instance.slug,
             )
         return super().update(instance, validated_data)
 
@@ -372,23 +384,26 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
         return f"{obj.estimated_duration} {obj.get_estimated_duration_unit_display().lower()}"
 
     def create(self, validated_data):
-        validated_data["slug"] = validated_data.get("slug") or _fallback_slug(
+        validated_data["slug"] = validated_data.get("slug") or fallback_slug(
             validated_data.get("name_en"),
             validated_data.get("name_ar"),
+            default_prefix="service",
         )
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         if "slug" in validated_data:
-            instance.slug = validated_data["slug"] or _fallback_slug(
+            instance.slug = validated_data["slug"] or fallback_slug(
                 validated_data.get("name_en", instance.name_en),
                 validated_data.get("name_ar", instance.name_ar),
+                default_prefix="service",
             )
             validated_data.pop("slug", None)
         elif "name_ar" in validated_data or "name_en" in validated_data:
-            instance.slug = _fallback_slug(
+            instance.slug = fallback_slug(
                 validated_data.get("name_en", instance.name_en),
                 validated_data.get("name_ar", instance.name_ar),
+                default_prefix="service",
             )
         return super().update(instance, validated_data)
 

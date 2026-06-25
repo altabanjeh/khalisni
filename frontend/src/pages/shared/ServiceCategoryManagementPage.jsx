@@ -12,6 +12,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { hasPermission } from '../../utils/authz'
+import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
 
 const defaultValues = {
   name_ar: '',
@@ -62,6 +63,8 @@ function ServiceCategoryManagementPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pendingDeactivate, setPendingDeactivate] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [slugEdited, setSlugEdited] = useState(false)
+  const [iconEdited, setIconEdited] = useState(false)
 
   const canManage =
     user?.role === 'admin' || hasPermission(user, 'services.manage_service_prices')
@@ -76,6 +79,8 @@ function ServiceCategoryManagementPage() {
     () => categories.find((item) => String(item.id) === String(selectedCategoryId)) || null,
     [categories, selectedCategoryId],
   )
+  const categoryNameAr = form.watch('name_ar')
+  const categoryNameEn = form.watch('name_en')
   const parentOptions = useMemo(
     () => categories.filter((item) => String(item.id) !== String(selectedCategoryId)),
     [categories, selectedCategoryId],
@@ -99,22 +104,40 @@ function ServiceCategoryManagementPage() {
           }
         : defaultValues,
     )
+    setSlugEdited(Boolean(selectedCategory))
+    setIconEdited(Boolean(selectedCategory))
   }, [form, selectedCategory])
+
+  useEffect(() => {
+    if (selectedCategory || slugEdited) return
+    form.setValue('slug', generateCatalogSlug([categoryNameEn, categoryNameAr], 'category'), { shouldDirty: false })
+  }, [categoryNameAr, categoryNameEn, form, selectedCategory, slugEdited])
+
+  useEffect(() => {
+    if (selectedCategory || iconEdited) return
+    form.setValue('icon', suggestCategoryIcon(categoryNameEn, categoryNameAr), { shouldDirty: false })
+  }, [categoryNameAr, categoryNameEn, form, iconEdited, selectedCategory])
 
   function openCreateForm() {
     setSelectedCategoryId(null)
     form.reset(defaultValues)
+    setSlugEdited(false)
+    setIconEdited(false)
     setIsFormOpen(true)
   }
 
   function openEditForm(id) {
     setSelectedCategoryId(id)
+    setSlugEdited(true)
+    setIconEdited(true)
     setIsFormOpen(true)
   }
 
   function closeForm() {
     setSelectedCategoryId(null)
     form.reset(defaultValues)
+    setSlugEdited(false)
+    setIconEdited(false)
     setIsFormOpen(false)
   }
 
@@ -124,11 +147,11 @@ function ServiceCategoryManagementPage() {
       const payload = {
         name_ar: values.name_ar.trim(),
         name_en: values.name_en.trim(),
-        slug: values.slug.trim(),
+        slug: (values.slug || '').trim(),
         parent_id: values.parent_id ? Number(values.parent_id) : null,
         description_ar: values.description_ar.trim(),
         description_en: values.description_en.trim(),
-        icon: values.icon.trim(),
+        icon: (values.icon || '').trim(),
         color: values.color.trim(),
         sort_order: Number(values.sort_order || 0),
         is_active: Boolean(values.is_active),
@@ -333,7 +356,12 @@ function ServiceCategoryManagementPage() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label={isArabic ? 'المعرّف (Slug)' : 'Slug'} hint={isArabic ? 'اتركه فارغاً لتوليده تلقائياً من الاسم.' : 'Leave blank to generate it from the name.'}>
-              <input className="field" {...form.register('slug')} />
+              <input
+                className="field"
+                {...form.register('slug', {
+                  onChange: () => setSlugEdited(true),
+                })}
+              />
             </Field>
             <Field label={isArabic ? 'التصنيف الأصلي' : 'Parent category'}>
               <select className="field" {...form.register('parent_id')}>
@@ -348,7 +376,12 @@ function ServiceCategoryManagementPage() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label={isArabic ? 'الأيقونة' : 'Icon'}>
-              <input className="field" {...form.register('icon')} />
+              <input
+                className="field"
+                {...form.register('icon', {
+                  onChange: () => setIconEdited(true),
+                })}
+              />
             </Field>
             <Field label={isArabic ? 'اللون' : 'Color'} hint={isArabic ? 'مثال: #0f766e' : 'Example: #0f766e'}>
               <input className="field" {...form.register('color')} />

@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageHelpGuides
+from core.delete_guard import AdminDeleteGuardMixin
 from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
 from help_guides.selectors import (
     build_contextual_help_payload,
@@ -236,7 +237,7 @@ class HelpGuideMetadataAPIView(APIView):
         return response.Response(serializer.data)
 
 
-class BaseAdminGuideViewSet(viewsets.ModelViewSet):
+class BaseAdminGuideViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanManageHelpGuides]
     pagination_class = None
 
@@ -266,6 +267,7 @@ class BaseAdminGuideViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
+        self.enforce_delete_guard(request)
         instance = self.get_object()
         instance.is_active = False
         instance.updated_by = request.user

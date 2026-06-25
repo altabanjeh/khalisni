@@ -8,6 +8,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 
 from config.permissions import CanVerifyDocuments, IsAdminRole
+from core.delete_guard import AdminDeleteGuardMixin
 from documents.models import Document
 from documents.selectors import get_documents_for_user
 from documents.serializers import (
@@ -140,7 +141,7 @@ class StaffDocumentVerifyAPIView(APIView):
         return response.Response(StaffDocumentSerializer(document, context={"request": request}).data, status=status.HTTP_200_OK)
 
 
-class AdminDocumentViewSet(viewsets.ModelViewSet):
+class AdminDocumentViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = Document.objects.select_related("order", "uploaded_by", "verified_by").all()
     serializer_class = DocumentAdminSerializer

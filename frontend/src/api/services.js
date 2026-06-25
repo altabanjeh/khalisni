@@ -160,6 +160,13 @@ const mockNotificationTemplates = [
   { template_id: 1, key: 'missing_documents_followup', channel: 'system', title_ar: 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø·Ù„Ø¨', message_ar: 'ÙŠØ±Ø¬Ù‰ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ« Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ.' },
   { template_id: 2, key: 'review_started', channel: 'system', title_ar: 'Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', message_ar: 'ØªÙ… Ø¨Ø¯Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø·Ù„Ø¨Ùƒ.' },
 ]
+const mockDeleteGuard = {
+  key: 'security.delete_guard',
+  label: 'Delete protection',
+  description: 'Extra password required before any admin delete or deactivate action.',
+  is_configured: false,
+  updated_at: null,
+}
 let mockHelpGuides = [
   {
     id: 1,
@@ -452,7 +459,7 @@ export const api = {
   completeOrder: ordersApi.completeOrder,
   rejectOrder: ordersApi.rejectOrder,
 
-  getAdminServices: async () => withTestValue(() => servicesApi.getAdminServices(), mockServices),
+  getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), mockServices),
   getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), mockCategories),
   reorderAdminCategories: servicesApi.reorderAdminCategories,
   getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), []),
@@ -481,6 +488,16 @@ export const api = {
   createSystemSetting: servicesApi.createSystemSetting,
   updateSystemSetting: servicesApi.updateSystemSetting,
   deleteSystemSetting: servicesApi.deleteSystemSetting,
+  getDeleteGuardConfig: async () => withTestValue(() => servicesApi.getDeleteGuardConfig(), mockDeleteGuard),
+  updateDeleteGuardConfig: async (payload) =>
+    withTestValue(
+      () => servicesApi.updateDeleteGuardConfig(payload),
+      {
+        ...mockDeleteGuard,
+        is_configured: true,
+        updated_at: new Date().toISOString(),
+      },
+    ),
   getAdminPublicSiteContent: async () =>
     withTestValue(() => publicSiteApi.getAdminPublicSiteContent(), mockPublicHomepage.content),
   updateAdminPublicSiteContent: publicSiteApi.updateAdminPublicSiteContent,

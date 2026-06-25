@@ -1,4 +1,4 @@
-import { http, unwrapList, withId } from './client'
+import { http, secureAdminDelete, unwrapList, withId } from './client'
 
 function normalizeTheme(record) {
   return withId(record, 'theme_id')
@@ -90,7 +90,7 @@ export const publicSiteApi = {
   },
 
   deleteAdminPublicSiteAdvertisement(id) {
-    return http.delete(`/admin/public-site/advertisements/${id}/`)
+    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`)
   },
 
   async getMissingServiceRequests(params = {}) {

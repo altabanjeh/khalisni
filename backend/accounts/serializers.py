@@ -3,6 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
+from core.delete_guard import get_delete_guard_setting, update_delete_guard_password
 from core.serializer_mixins import PkAsIdMixin
 from organizations.models import Branch, Organization, OrganizationMembership
 from organizations.serializers import MembershipSummarySerializer
@@ -370,3 +371,65 @@ class SafeSystemSettingSerializer(serializers.ModelSerializer):
         validated_data.pop("key", None)
         validated_data["value"] = self._build_value(validated_data)
         return super().update(instance, validated_data)
+
+
+class DeleteGuardSettingSerializer(serializers.Serializer):
+    key = serializers.CharField(read_only=True, default="security.delete_guard")
+    label = serializers.CharField(read_only=True, default="Delete protection")
+    description = serializers.CharField(read_only=True, default="Extra password required before any admin delete or deactivate action.")
+    is_configured = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
+    delete_password = serializers.CharField(write_only=True, required=False, allow_blank=False, trim_whitespace=False)
+    confirm_delete_password = serializers.CharField(write_only=True, required=False, allow_blank=False, trim_whitespace=False)
+
+    def get_is_configured(self, _obj):
+        setting = self._get_setting()
+        return bool(setting and isinstance(setting.value, dict) and setting.value.get("password_hash"))
+
+    def get_updated_at(self, _obj):
+        setting = self._get_setting()
+        return getattr(setting, "updated_at", None)
+
+    def _get_setting(self):
+        return self.instance or get_delete_guard_setting()
+
+    def validate(self, attrs):
+        delete_password = attrs.get("delete_password", "")
+        confirm_delete_password = attrs.get("confirm_delete_password", "")
+
+        if not delete_password:
+            raise serializers.ValidationError({"delete_password": "Delete password is required."})
+        if delete_password != confirm_delete_password:
+            raise serializers.ValidationError({"confirm_delete_password": "Delete passwords do not match."})
+
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        try:
+            validate_password(delete_password, user=user)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"delete_password": list(exc.messages)}) from exc
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        return update_delete_guard_password(
+            raw_password=validated_data["delete_password"],
+            actor=getattr(request, "user", None),
+        )
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        return update_delete_guard_password(
+            raw_password=validated_data["delete_password"],
+            actor=getattr(request, "user", None),
+        )
+
+    def to_representation(self, instance):
+        setting = instance or self._get_setting()
+        return {
+            "key": "security.delete_guard",
+            "label": "Delete protection",
+            "description": "Extra password required before any admin delete or deactivate action.",
+            "is_configured": bool(setting and isinstance(setting.value, dict) and setting.value.get("password_hash")),
+            "updated_at": getattr(setting, "updated_at", None),
+        }

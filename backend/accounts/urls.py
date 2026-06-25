@@ -8,6 +8,7 @@ from accounts.views import (
     AvailablePermissionsAPIView,
     CustomerProfileAdminViewSet,
     CustomerProfileAPIView,
+    DeleteGuardSettingAPIView,
     ForgotPasswordAPIView,
     LoginAPIView,
     LogoutAPIView,
@@ -33,4 +34,5 @@ urlpatterns = [
     path("auth/me/", MeAPIView.as_view()),
     path("customer/profile/", CustomerProfileAPIView.as_view()),
     path("admin/available-permissions/", AvailablePermissionsAPIView.as_view(), name="admin-available-permissions"),
+    path("admin/delete-guard/", DeleteGuardSettingAPIView.as_view(), name="admin-delete-guard"),
 ]

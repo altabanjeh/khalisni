@@ -1,4 +1,4 @@
-import { buildQuery, http, unwrapList, withId } from './client'
+import { buildQuery, http, secureAdminDelete, unwrapList, withId } from './client'
 
 function normalizeCategory(record) {
   return withId(record, 'category_id')
@@ -29,8 +29,8 @@ export const servicesApi = {
     return http.get(`/services/${slug}/`)
   },
 
-  async getAdminServices() {
-    return unwrapList(await http.get('/admin/services/')).map(normalizeService)
+  async getAdminServices(params = {}) {
+    return unwrapList(await http.get(`/admin/services/${buildQuery(params)}`)).map(normalizeService)
   },
 
   async getAdminCategories(params = {}) {
@@ -58,7 +58,7 @@ export const servicesApi = {
   },
 
   deleteAdminServiceRelation(id) {
-    return http.delete(`/admin/service-relations/${id}/`)
+    return secureAdminDelete(`/admin/service-relations/${id}/`)
   },
 
   createAdminServiceDocument(payload) {
@@ -70,7 +70,7 @@ export const servicesApi = {
   },
 
   deleteAdminServiceDocument(id) {
-    return http.delete(`/admin/service-documents/${id}/`)
+    return secureAdminDelete(`/admin/service-documents/${id}/`)
   },
 
   async getAdminServiceAssignments(params = {}) {
@@ -86,7 +86,7 @@ export const servicesApi = {
   },
 
   deleteAdminServiceAssignment(id) {
-    return http.delete(`/admin/service-provider-assignments/${id}/`)
+    return secureAdminDelete(`/admin/service-provider-assignments/${id}/`)
   },
 
   async createAdminCategory(payload) {
@@ -98,7 +98,7 @@ export const servicesApi = {
   },
 
   deleteAdminCategory(id) {
-    return http.delete(`/admin/categories/${id}/`)
+    return secureAdminDelete(`/admin/categories/${id}/`)
   },
 
   async createAdminService(payload) {
@@ -110,7 +110,7 @@ export const servicesApi = {
   },
 
   deleteAdminService(id) {
-    return http.delete(`/admin/services/${id}/`)
+    return secureAdminDelete(`/admin/services/${id}/`)
   },
 
   async getAdminUsers() {
@@ -126,7 +126,7 @@ export const servicesApi = {
   },
 
   deleteAdminUser(id) {
-    return http.delete(`/admin/users/${id}/`)
+    return secureAdminDelete(`/admin/users/${id}/`)
   },
 
   async getSystemSettings() {
@@ -142,7 +142,15 @@ export const servicesApi = {
   },
 
   deleteSystemSetting(id) {
-    return http.delete(`/admin/system-settings/${id}/`)
+    return secureAdminDelete(`/admin/system-settings/${id}/`)
+  },
+
+  getDeleteGuardConfig() {
+    return http.get('/admin/delete-guard/')
+  },
+
+  updateDeleteGuardConfig(payload) {
+    return http.put('/admin/delete-guard/', payload)
   },
 
   getDailyReport() {

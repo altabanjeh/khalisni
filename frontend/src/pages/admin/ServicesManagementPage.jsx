@@ -9,6 +9,7 @@ import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
 
 const defaultCategoryValues = {
   name_ar: '',
@@ -394,10 +395,17 @@ function ServicesManagementPage() {
   const [submitting, setSubmitting] = useState(false)
   const [serviceSchemaFields, setServiceSchemaFields] = useState([])
   const [serviceSchemaErrors, setServiceSchemaErrors] = useState([])
+  const [categorySlugEdited, setCategorySlugEdited] = useState(false)
+  const [categoryIconEdited, setCategoryIconEdited] = useState(false)
+  const [serviceSlugEdited, setServiceSlugEdited] = useState(false)
 
   const categoryForm = useForm({ defaultValues: defaultCategoryValues })
   const serviceForm = useForm({ defaultValues: defaultServiceValues })
   const documentForm = useForm({ defaultValues: defaultDocumentValues })
+  const categoryNameAr = categoryForm.watch('name_ar')
+  const categoryNameEn = categoryForm.watch('name_en')
+  const serviceNameAr = serviceForm.watch('name_ar')
+  const serviceNameEn = serviceForm.watch('name_en')
 
   const selectedCategory = useMemo(
     () => categories.find((item) => String(item.id) === String(selectedCategoryId)) || null,
@@ -428,6 +436,8 @@ function ServicesManagementPage() {
           }
         : defaultCategoryValues,
     )
+    setCategorySlugEdited(Boolean(selectedCategory))
+    setCategoryIconEdited(Boolean(selectedCategory))
   }, [categoryForm, selectedCategory])
 
   useEffect(() => {
@@ -461,6 +471,7 @@ function ServicesManagementPage() {
           }
         : defaultServiceValues,
     )
+    setServiceSlugEdited(Boolean(selectedService))
     setServiceSchemaFields(
       Array.isArray(selectedService?.required_information_schema)
         ? selectedService.required_information_schema.map((field) => createSchemaFieldRow(field))
@@ -468,6 +479,21 @@ function ServicesManagementPage() {
     )
     setServiceSchemaErrors([])
   }, [selectedService, serviceForm])
+
+  useEffect(() => {
+    if (selectedCategory || categorySlugEdited) return
+    categoryForm.setValue('slug', generateCatalogSlug([categoryNameEn, categoryNameAr], 'category'), { shouldDirty: false })
+  }, [categoryForm, categoryNameAr, categoryNameEn, categorySlugEdited, selectedCategory])
+
+  useEffect(() => {
+    if (selectedCategory || categoryIconEdited) return
+    categoryForm.setValue('icon', suggestCategoryIcon(categoryNameEn, categoryNameAr), { shouldDirty: false })
+  }, [categoryForm, categoryIconEdited, categoryNameAr, categoryNameEn, selectedCategory])
+
+  useEffect(() => {
+    if (selectedService || serviceSlugEdited) return
+    serviceForm.setValue('slug', generateCatalogSlug([serviceNameEn, serviceNameAr], 'service'), { shouldDirty: false })
+  }, [selectedService, serviceForm, serviceNameAr, serviceNameEn, serviceSlugEdited])
 
   useEffect(() => {
     documentForm.reset(
@@ -507,15 +533,21 @@ function ServicesManagementPage() {
     categoryForm.reset(defaultCategoryValues)
     serviceForm.reset(defaultServiceValues)
     documentForm.reset(defaultDocumentValues)
+    setCategorySlugEdited(false)
+    setCategoryIconEdited(false)
+    setServiceSlugEdited(false)
   }
 
   function openCategoryForm(id = null) {
     setSelectedCategoryId(id)
+    setCategorySlugEdited(Boolean(id))
+    setCategoryIconEdited(Boolean(id))
     setActiveModal('category')
   }
 
   function openServiceForm(id = null) {
     setSelectedServiceId(id)
+    setServiceSlugEdited(Boolean(id))
     setActiveModal('service')
   }
 
@@ -529,6 +561,8 @@ function ServicesManagementPage() {
     try {
       const payload = {
         ...values,
+        slug: (values.slug || '').trim(),
+        icon: (values.icon || '').trim(),
         display_order: Number(values.display_order || 0),
       }
 
@@ -585,7 +619,7 @@ function ServicesManagementPage() {
         category_id: Number(values.category_id),
         name_ar: values.name_ar.trim(),
         name_en: values.name_en.trim(),
-        slug: values.slug.trim(),
+        slug: (values.slug || '').trim(),
         short_description_ar: values.short_description_ar.trim(),
         short_description_en: values.short_description_en.trim(),
         description_ar: values.description_ar.trim(),
@@ -933,10 +967,20 @@ function ServicesManagementPage() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Field hint="إذا تركته فارغا سيُولد من الاسم." label="المعرف">
-              <input className="field" {...categoryForm.register('slug')} />
+              <input
+                className="field"
+                {...categoryForm.register('slug', {
+                  onChange: () => setCategorySlugEdited(true),
+                })}
+              />
             </Field>
             <Field label="الأيقونة">
-              <input className="field" {...categoryForm.register('icon')} />
+              <input
+                className="field"
+                {...categoryForm.register('icon', {
+                  onChange: () => setCategoryIconEdited(true),
+                })}
+              />
             </Field>
           </div>
           <Field label="الوصف بالعربية">
@@ -993,7 +1037,12 @@ function ServicesManagementPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <Field hint="إذا تركته فارغا سيُولد من الاسم." label="المعرف">
-              <input className="field" {...serviceForm.register('slug')} />
+              <input
+                className="field"
+                {...serviceForm.register('slug', {
+                  onChange: () => setServiceSlugEdited(true),
+                })}
+              />
             </Field>
             <Field label="ترتيب العرض">
               <input className="field" type="number" {...serviceForm.register('display_order')} />
