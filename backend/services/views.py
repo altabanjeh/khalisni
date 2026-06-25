@@ -181,18 +181,19 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
         return AdminServiceRuleSerializer
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
-        instance.is_active = False
-        instance.save(update_fields=["is_active", "updated_at"])
-        self._log_change(
-            request,
-            "disable_service",
-            instance,
-            old_value=old_value,
-            new_value=_snapshot(instance, self.audit_fields),
-        )
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.is_active = False
+            instance.save(update_fields=["is_active", "updated_at"])
+            self._log_change(
+                request,
+                "disable_service",
+                instance,
+                old_value=old_value,
+                new_value=_snapshot(instance, self.audit_fields),
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -226,17 +227,18 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
-        instance.is_active = False
-        try:
-            instance.save(update_fields=["is_active", "updated_at"])
-        except DjangoValidationError as exc:
-            if hasattr(exc, "message_dict"):
-                raise ValidationError(exc.message_dict)
-            raise ValidationError(exc.messages)
-        self._log_change(request, "disable_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.is_active = False
+            try:
+                instance.save(update_fields=["is_active", "updated_at"])
+            except DjangoValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    raise ValidationError(exc.message_dict)
+                raise ValidationError(exc.messages)
+            self._log_change(request, "disable_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["post"])
@@ -321,12 +323,13 @@ class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, views
         return queryset
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
-        instance.is_active = False
-        instance.save(update_fields=["is_active"])
-        self._log_change(request, "disable_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.is_active = False
+            instance.save(update_fields=["is_active", "updated_at"])
+            self._log_change(request, "disable_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -397,43 +400,42 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         relation = self.get_object()
+        old_value = relation_snapshot(relation)
+        self.enforce_delete_guard(request, instance=relation, old_value=old_value)
         if request.user.role == request.user.Role.SUPPORT and not request.user.has_perm("services.manage_service_prices"):
             raise PermissionDenied("You do not have permission to deactivate service relations.")
 
-        old_value = relation_snapshot(relation)
-        relation.is_active = False
-        relation.save(update_fields=["is_active", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="deactivate_service_relation",
-            entity_type="ServiceRelation",
-            entity_id=relation.pk,
-            old_value=old_value,
-            new_value=relation_snapshot(relation),
-        )
+        with transaction.atomic():
+            relation.is_active = False
+            relation.save(update_fields=["is_active", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_service_relation",
+                entity_type="ServiceRelation",
+                entity_id=relation.pk,
+                old_value=old_value,
+                new_value=relation_snapshot(relation),
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["delete"], url_path="hard-delete")
     def hard_delete(self, request, pk=None):
-        self.enforce_delete_guard(request)
-        if request.user.role != request.user.Role.ADMIN:
-            raise PermissionDenied("Only admin users can permanently delete service relations.")
-
         relation = self.get_object()
         old_value = relation_snapshot(relation)
+        self.enforce_delete_guard(request, instance=relation, old_value=old_value)
         relation_id = relation.pk
-        relation.delete()
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="delete_service_relation",
-            entity_type="ServiceRelation",
-            entity_id=relation_id,
-            old_value=old_value,
-        )
+        with transaction.atomic():
+            relation.delete()
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="delete_service_relation",
+                entity_type="ServiceRelation",
+                entity_id=relation_id,
+                old_value=old_value,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -459,12 +461,13 @@ class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMix
         return queryset
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
-        instance.is_active = False
-        instance.save(update_fields=["is_active"])
-        self._log_change(request, "disable_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.is_active = False
+            instance.save(update_fields=["is_active", "updated_at"])
+            self._log_change(request, "disable_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

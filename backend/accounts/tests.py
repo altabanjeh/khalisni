@@ -6,7 +6,6 @@ from django.core.management import call_command
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth.models import Permission
-from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
@@ -411,12 +410,6 @@ class AdminDeleteGuardTests(TestCase):
         self.assertTrue(response.data["is_configured"])
 
     def test_delete_requires_matching_admin_delete_password(self):
-        SystemSetting.objects.create(
-            key="security.delete_guard",
-            value={"password_hash": make_password("DeleteGuard@123")},
-            description="Delete guard",
-        )
-
         missing_password_response = self.client.delete(f"/api/admin/users/{self.target.pk}/", format="json")
         self.assertEqual(missing_password_response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("delete_password", missing_password_response.data)
@@ -431,7 +424,7 @@ class AdminDeleteGuardTests(TestCase):
 
         success_response = self.client.delete(
             f"/api/admin/users/{self.target.pk}/",
-            {"delete_password": "DeleteGuard@123"},
+            {"delete_password": "Password@123"},
             format="json",
         )
         self.assertEqual(success_response.status_code, status.HTTP_204_NO_CONTENT)

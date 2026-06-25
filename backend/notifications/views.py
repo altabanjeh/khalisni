@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, response, status, viewsets
+from django.db import transaction
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 
@@ -37,6 +38,29 @@ class AdminNotificationDetailAPIView(AdminDeleteGuardMixin, generics.RetrieveUpd
         if self.request.method == "GET":
             return NotificationSerializer
         return NotificationAdminSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        notification = self.get_object()
+        old_value = {
+            "recipient_id": notification.recipient_id,
+            "order_id": notification.order_id,
+            "template_id": notification.template_id,
+            "status": notification.status,
+            "channel": notification.channel,
+        }
+        self.enforce_delete_guard(request, instance=notification, old_value=old_value)
+        with transaction.atomic():
+            notification.delete()
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="delete_notification",
+                entity_type="Notification",
+                entity_id=notification.pk,
+                entity_name=notification.title,
+                old_value=old_value,
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class NotificationCenterAPIView(generics.ListAPIView):
@@ -132,19 +156,22 @@ class NotificationTemplateAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelView
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         template = self.get_object()
-        template.is_active = False
-        template.save(update_fields=["is_active", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="disable_notification_template",
-            entity_type="NotificationTemplate",
-            entity_id=template.pk,
-            old_value={"is_active": True},
-            new_value={"is_active": False},
-        )
+        old_value = {"is_active": template.is_active}
+        self.enforce_delete_guard(request, instance=template, old_value=old_value)
+        with transaction.atomic():
+            template.is_active = False
+            template.save(update_fields=["is_active", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="disable_notification_template",
+                entity_type="NotificationTemplate",
+                entity_id=template.pk,
+                entity_name=template.key,
+                old_value=old_value,
+                new_value={"is_active": False},
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["post"])

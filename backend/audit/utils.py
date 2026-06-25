@@ -34,7 +34,20 @@ def _resolved_source(*, request=None, actor=None):
     return AuditLog.Source.SYSTEM
 
 
-def create_audit_log(*, request=None, user=None, action, entity_type, entity_id, old_value=None, new_value=None):
+def create_audit_log(
+    *,
+    request=None,
+    user=None,
+    action,
+    entity_type,
+    entity_id,
+    old_value=None,
+    new_value=None,
+    status=AuditLog.LogStatus.SUCCESS,
+    message="",
+    error_message="",
+    entity_name="",
+):
     actor = user or getattr(request, "user", None)
     ip_address = None
     user_agent = ""
@@ -48,11 +61,15 @@ def create_audit_log(*, request=None, user=None, action, entity_type, entity_id,
         user_role=_resolved_actor_role(actor),
         action=action,
         source=_resolved_source(request=request, actor=actor),
+        status=status,
         entity_type=entity_type,
         entity_id=str(entity_id),
+        entity_name=str(entity_name or ""),
         old_values=_as_json_safe(old_value),
         new_values=_as_json_safe(new_value),
         changed_fields=sorted(set((old_value or {}).keys()) | set((new_value or {}).keys())),
+        message=str(message or ""),
+        error_message=str(error_message or ""),
         request_id=request_id,
         ip_address=ip_address,
         user_agent=user_agent,

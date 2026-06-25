@@ -143,7 +143,11 @@ class HelpGuideApiTests(APITestCase):
         )
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
 
-        delete_response = self.client.delete(f"/api/help/{guide_id}/")
+        delete_response = self.client.delete(
+            f"/api/help/{guide_id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
         guide = HelpGuide.objects.get(pk=guide_id)

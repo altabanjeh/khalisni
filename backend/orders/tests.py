@@ -561,7 +561,7 @@ class OrderAPITests(APITestCase):
         self.assertEqual(blocked_response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("status", blocked_response.data)
 
-    def test_admin_order_record_endpoint_blocks_raw_create_and_delete_for_normal_admin(self):
+    def test_admin_order_record_endpoint_blocks_raw_create_but_allows_password_confirmed_delete_for_admin(self):
         order = Order.objects.create(customer=self.customer, service=self.service, city="Amman")
         self.client.force_authenticate(self.admin_user)
 
@@ -575,9 +575,13 @@ class OrderAPITests(APITestCase):
         )
         self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
 
-        delete_response = self.client.delete(f"/api/admin/order-records/{order.id}/")
-        self.assertEqual(delete_response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertTrue(Order.objects.filter(pk=order.pk).exists())
+        delete_response = self.client.delete(
+            f"/api/admin/order-records/{order.id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Order.objects.filter(pk=order.pk).exists())
 
     def test_finalized_order_cannot_be_edited_normally(self):
         order = Order.objects.create(

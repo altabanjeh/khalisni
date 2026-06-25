@@ -1,9 +1,8 @@
 from django.contrib.auth.models import Permission
-from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from accounts.models import CustomUser, SystemSetting
+from accounts.models import CustomUser
 from audit.models import AuditLog
 from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
@@ -162,15 +161,9 @@ class ServiceManagementPermissionTests(APITestCase):
         )
         Order.objects.create(customer=customer, service=service, city="Amman")
         self.client.force_authenticate(self.admin)
-        SystemSetting.objects.create(
-            key="security.delete_guard",
-            value={"password_hash": make_password("DeleteGuard@123")},
-            description="Delete guard",
-        )
-
         response = self.client.delete(
             f"/api/admin/services/{service.id}/",
-            {"delete_password": "DeleteGuard@123"},
+            {"delete_password": "Password@123"},
             format="json",
         )
 
@@ -460,11 +453,6 @@ class ServiceRelationManagementTests(APITestCase):
         self.assertEqual(allowed_delete.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_authenticate(self.admin)
-        SystemSetting.objects.create(
-            key="security.delete_guard",
-            value={"password_hash": make_password("DeleteGuard@123")},
-            description="Delete guard",
-        )
         hard_delete_relation = ServiceRelation.objects.create(
             source_service=self.source_service,
             target_service=self.third_service,
@@ -474,7 +462,7 @@ class ServiceRelationManagementTests(APITestCase):
         )
         hard_delete_response = self.client.delete(
             f"/api/admin/service-relations/{hard_delete_relation.id}/hard-delete/",
-            {"delete_password": "DeleteGuard@123"},
+            {"delete_password": "Password@123"},
             format="json",
         )
         self.assertEqual(hard_delete_response.status_code, status.HTTP_204_NO_CONTENT)

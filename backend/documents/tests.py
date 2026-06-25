@@ -226,7 +226,11 @@ class DocumentAdminCrudTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         document_id = response.data["document_id"]
-        delete_response = self.client.delete(f"/api/admin/documents/{document_id}/")
+        delete_response = self.client.delete(
+            f"/api/admin/documents/{document_id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
 

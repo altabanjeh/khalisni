@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db import transaction
 from rest_framework import permissions, response, status, viewsets
 from rest_framework.views import APIView
 
@@ -267,19 +268,23 @@ class BaseAdminGuideViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
-        instance.is_active = False
-        instance.updated_by = request.user
-        instance.save(update_fields=["is_active", "updated_by", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action=f"deactivate_{instance.__class__.__name__.lower()}",
-            entity_type=instance.__class__.__name__,
-            entity_id=instance.pk,
-            new_value={"is_active": False},
-        )
+        old_value = {"is_active": instance.is_active}
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.is_active = False
+            instance.updated_by = request.user
+            instance.save(update_fields=["is_active", "updated_by", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action=f"deactivate_{instance.__class__.__name__.lower()}",
+                entity_type=instance.__class__.__name__,
+                entity_id=instance.pk,
+                entity_name=getattr(instance, "title", "") or getattr(instance, "caption", ""),
+                old_value=old_value,
+                new_value={"is_active": False},
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 

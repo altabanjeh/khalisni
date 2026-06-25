@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, status, viewsets
+from django.db import transaction
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -293,7 +294,6 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         instance = self.get_object()
         old_value = _snapshot(
             instance,
@@ -306,17 +306,20 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                 "is_active",
             ),
         )
-        response = super().destroy(request, *args, **kwargs)
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="delete_public_site_advertisement",
-            entity_type="PublicSiteAdvertisement",
-            entity_id=instance.pk,
-            old_value=old_value,
-            new_value=None,
-        )
-        return response
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.delete()
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="delete_public_site_advertisement",
+                entity_type="PublicSiteAdvertisement",
+                entity_id=instance.pk,
+                entity_name=instance.title_ar or instance.title_en,
+                old_value=old_value,
+                new_value=None,
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MissingServiceRequestViewSet(viewsets.ModelViewSet):

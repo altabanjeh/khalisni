@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.decorators import action
@@ -205,20 +206,22 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         user = self.get_object()
         old_value = {"role": user.role, "is_active": user.is_active}
-        user.is_active = False
-        user.save(update_fields=["is_active", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="deactivate_admin_user",
-            entity_type="CustomUser",
-            entity_id=user.pk,
-            old_value=old_value,
-            new_value={"is_active": user.is_active},
-        )
+        self.enforce_delete_guard(request, instance=user, old_value=old_value)
+        with transaction.atomic():
+            user.is_active = False
+            user.save(update_fields=["is_active", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_admin_user",
+                entity_type="CustomUser",
+                entity_id=user.pk,
+                entity_name=user.full_name,
+                old_value=old_value,
+                new_value={"is_active": user.is_active},
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["get", "patch"], url_path="permissions")

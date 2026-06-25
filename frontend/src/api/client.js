@@ -259,17 +259,17 @@ function createClientActionError(message) {
 
 function promptDeletePassword() {
   if (typeof window === 'undefined' || typeof window.prompt !== 'function') {
-    throw createClientActionError('Delete password prompt is unavailable in this environment.')
+    throw createClientActionError('Current admin password prompt is unavailable in this environment.')
   }
 
-  const password = window.prompt('Enter the admin delete password / أدخل كلمة مرور الحذف')
+  const password = window.prompt('Enter your current admin password / أدخل كلمة مرور حسابك الإدارية الحالية')
   if (password == null) {
     throw createClientActionError('Delete action was cancelled.')
   }
 
   const normalized = String(password).trim()
   if (!normalized) {
-    throw createClientActionError('Delete password is required.')
+    throw createClientActionError('Current admin password is required.')
   }
 
   return normalized

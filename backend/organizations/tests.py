@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser, CustomerProfile
+from audit.models import AuditLog
 from organizations.models import Branch, Organization, OrganizationMembership, PartnerServiceConfig
 from orders.models import Order
 from providers.models import ProviderProfile
@@ -327,3 +328,36 @@ class B2B2COrganizationTests(APITestCase):
         self.assertIn(self.order_partner_one_branch_one.id, returned_ids)
         self.assertNotIn(self.order_partner_one_branch_two.id, returned_ids)
         self.assertNotIn(self.order_partner_two.id, returned_ids)
+
+    def test_platform_admin_can_delete_branch_after_password_confirmation(self):
+        self.client.force_authenticate(self.platform_admin)
+
+        response = self.client.delete(
+            f"/api/branches/{self.branch_two.id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.branch_two.refresh_from_db()
+        self.assertFalse(self.branch_two.is_active)
+        self.assertTrue(
+            AuditLog.objects.filter(
+                action="deactivate_branch",
+                entity_type="Branch",
+                entity_id=str(self.branch_two.id),
+            ).exists()
+        )
+
+    def test_partner_admin_cannot_delete_branch_even_with_password(self):
+        self.client.force_authenticate(self.partner_admin)
+
+        response = self.client.delete(
+            f"/api/branches/{self.branch_two.id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.branch_two.refresh_from_db()
+        self.assertTrue(self.branch_two.is_active)

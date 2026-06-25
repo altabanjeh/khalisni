@@ -144,3 +144,22 @@ export function unwrapListData<T>(data: T[] | PaginatedResponse<T> | null | unde
 export function applyAccessToken(token?: string | null) {
   setAuthorizationHeader(token);
 }
+
+export function secureAdminDelete<T = unknown>(
+  url: string,
+  deletePassword: string,
+  config: AxiosRequestConfig = {},
+) {
+  const normalizedPassword = String(deletePassword || '').trim();
+  if (!normalizedPassword) {
+    throw new Error('Current admin password is required.');
+  }
+
+  return apiClient.delete<T>(url, {
+    ...config,
+    data: {
+      ...(config.data as Record<string, unknown> | undefined),
+      delete_password: normalizedPassword,
+    },
+  }).then((res) => res.data);
+}

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, permissions, response, status, viewsets
@@ -144,21 +145,27 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         provider = self.get_object()
-        provider.user.is_active = False
-        provider.user.save(update_fields=["is_active", "updated_at"])
-        provider.is_available = False
-        provider.save(update_fields=["is_available", "updated_at"])
-        create_audit_log(
-            request=request,
-            user=request.user,
-            action="deactivate_provider_profile",
-            entity_type="ProviderProfile",
-            entity_id=provider.pk,
-            old_value={"is_available": True, "user_is_active": True},
-            new_value={"is_available": provider.is_available, "user_is_active": provider.user.is_active},
-        )
+        old_value = {
+            "is_available": provider.is_available,
+            "user_is_active": provider.user.is_active,
+        }
+        self.enforce_delete_guard(request, instance=provider, old_value=old_value)
+        with transaction.atomic():
+            provider.user.is_active = False
+            provider.user.save(update_fields=["is_active", "updated_at"])
+            provider.is_available = False
+            provider.save(update_fields=["is_available", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_provider_profile",
+                entity_type="ProviderProfile",
+                entity_id=provider.pk,
+                entity_name=provider.user.full_name,
+                old_value=old_value,
+                new_value={"is_available": provider.is_available, "user_is_active": provider.user.is_active},
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])

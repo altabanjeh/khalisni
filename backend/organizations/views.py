@@ -1,9 +1,11 @@
+from django.db import transaction
 from rest_framework import permissions, response, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanManageOrganizations, CanManagePartnerCatalog, CanManagePlatformOrganizations, CanViewScopedOrganizations
+from core.delete_guard import AdminDeleteGuardMixin
 from organizations.models import Branch, Organization, OrganizationBranding, OrganizationMembership, PartnerServiceConfig
 from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_platform_super_admin
 from organizations.serializers import (
@@ -17,7 +19,7 @@ from organizations.serializers import (
 from organizations.services import onboard_partner_organization
 
 
-class OrganizationViewSet(viewsets.ModelViewSet):
+class OrganizationViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     permission_classes = [permissions.IsAuthenticated, CanViewScopedOrganizations]
     queryset = Organization.objects.all()
@@ -60,8 +62,27 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             new_value={"name": organization.name, "is_active": organization.is_active},
         )
 
+    def destroy(self, request, *args, **kwargs):
+        organization = self.get_object()
+        old_value = {"name": organization.name, "is_active": organization.is_active}
+        self.enforce_delete_guard(request, instance=organization, old_value=old_value)
+        with transaction.atomic():
+            organization.is_active = False
+            organization.save(update_fields=["is_active", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_organization",
+                entity_type="Organization",
+                entity_id=organization.pk,
+                entity_name=organization.name,
+                old_value=old_value,
+                new_value={"name": organization.name, "is_active": organization.is_active},
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
-class BranchViewSet(viewsets.ModelViewSet):
+
+class BranchViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = BranchSerializer
     permission_classes = [permissions.IsAuthenticated, CanViewScopedOrganizations]
     queryset = Branch.objects.select_related("organization").all()
@@ -100,8 +121,27 @@ class BranchViewSet(viewsets.ModelViewSet):
             new_value={"name": branch.name, "is_active": branch.is_active},
         )
 
+    def destroy(self, request, *args, **kwargs):
+        branch = self.get_object()
+        old_value = {"name": branch.name, "is_active": branch.is_active}
+        self.enforce_delete_guard(request, instance=branch, old_value=old_value)
+        with transaction.atomic():
+            branch.is_active = False
+            branch.save(update_fields=["is_active", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_branch",
+                entity_type="Branch",
+                entity_id=branch.pk,
+                entity_name=branch.name,
+                old_value=old_value,
+                new_value={"name": branch.name, "is_active": branch.is_active},
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
-class OrganizationMembershipViewSet(viewsets.ModelViewSet):
+
+class OrganizationMembershipViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = OrganizationMembershipSerializer
     permission_classes = [permissions.IsAuthenticated, CanManageOrganizations]
     queryset = OrganizationMembership.objects.select_related("user", "organization", "branch").all()
@@ -138,8 +178,27 @@ class OrganizationMembershipViewSet(viewsets.ModelViewSet):
             new_value={"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active},
         )
 
+    def destroy(self, request, *args, **kwargs):
+        membership = self.get_object()
+        old_value = {"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active}
+        self.enforce_delete_guard(request, instance=membership, old_value=old_value)
+        with transaction.atomic():
+            membership.is_active = False
+            membership.save(update_fields=["is_active"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="deactivate_membership",
+                entity_type="OrganizationMembership",
+                entity_id=membership.pk,
+                entity_name=str(membership),
+                old_value=old_value,
+                new_value={"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active},
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
-class OrganizationBrandingViewSet(viewsets.ModelViewSet):
+
+class OrganizationBrandingViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = OrganizationBrandingSerializer
     permission_classes = [permissions.IsAuthenticated, CanViewScopedOrganizations]
     queryset = OrganizationBranding.objects.select_related("organization").all()
@@ -168,7 +227,7 @@ class OrganizationBrandingViewSet(viewsets.ModelViewSet):
         )
 
 
-class PartnerServiceConfigViewSet(viewsets.ModelViewSet):
+class PartnerServiceConfigViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     serializer_class = PartnerServiceConfigSerializer
     permission_classes = [permissions.IsAuthenticated, CanManagePartnerCatalog]
     queryset = PartnerServiceConfig.objects.select_related("organization", "service", "service__category").all()
@@ -201,6 +260,34 @@ class PartnerServiceConfigViewSet(viewsets.ModelViewSet):
             old_value=old_value,
             new_value={"is_enabled": config.is_enabled, "visible_to_customers": config.visible_to_customers, "custom_price": str(config.custom_price) if config.custom_price is not None else None},
         )
+
+    def destroy(self, request, *args, **kwargs):
+        config = self.get_object()
+        old_value = {
+            "is_enabled": config.is_enabled,
+            "visible_to_customers": config.visible_to_customers,
+            "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+        }
+        self.enforce_delete_guard(request, instance=config, old_value=old_value)
+        with transaction.atomic():
+            config.is_enabled = False
+            config.visible_to_customers = False
+            config.save(update_fields=["is_enabled", "visible_to_customers", "updated_at"])
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="disable_partner_service_config",
+                entity_type="PartnerServiceConfig",
+                entity_id=config.pk,
+                entity_name=str(config),
+                old_value=old_value,
+                new_value={
+                    "is_enabled": config.is_enabled,
+                    "visible_to_customers": config.visible_to_customers,
+                    "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+                },
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PartnerOnboardingAPIView(APIView):

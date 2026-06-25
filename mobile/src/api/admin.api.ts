@@ -1,4 +1,4 @@
-import { apiClient, buildQuery, unwrapListData } from './client';
+import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { Service } from '../types/service';
 import type { ProviderProfileBrief } from '../types/order';
@@ -52,8 +52,8 @@ export const adminApi = {
   updateAdminAdvertisement(id: number | string, payload: Record<string, unknown>) {
     return apiClient.patch(`/admin/public-site/advertisements/${id}/`, payload).then((res) => res.data);
   },
-  deleteAdminAdvertisement(id: number | string) {
-    return apiClient.delete(`/admin/public-site/advertisements/${id}/`).then((res) => res.data);
+  deleteAdminAdvertisement(id: number | string, deletePassword: string) {
+    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`, deletePassword);
   },
   getAdminPublicContent() {
     return apiClient.get('/admin/public-site/content/').then((res) => res.data);

@@ -128,7 +128,11 @@ class NotificationCenterTests(APITestCase):
         )
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
 
-        delete_response = self.client.delete(f"/api/admin/notifications/{notification_id}/")
+        delete_response = self.client.delete(
+            f"/api/admin/notifications/{notification_id}/",
+            {"delete_password": "Password@123"},
+            format="json",
+        )
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_employee_can_send_manual_template_notification_for_reviewable_order(self):

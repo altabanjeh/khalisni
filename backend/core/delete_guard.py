@@ -1,7 +1,12 @@
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import make_password
+from django.db import transaction
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.response import Response
 
 from accounts.models import SystemSetting
+from audit.models import AuditLog
+from audit.utils import create_audit_log
 from organizations.selectors import is_platform_super_admin
 
 DELETE_GUARD_SETTING_KEY = "security.delete_guard"
@@ -42,31 +47,218 @@ def _extract_delete_password(request):
     return str(raw_password or "").strip()
 
 
-def enforce_admin_delete_guard(request):
+def is_admin_delete_user(user):
+    return bool(user and getattr(user, "is_authenticated", False) and is_platform_super_admin(user))
+
+
+def infer_delete_entity_name(instance):
+    if instance is None:
+        return ""
+
+    for attr_name in (
+        "order_number",
+        "request_number",
+        "title",
+        "name",
+        "name_ar",
+        "full_name",
+        "button_label",
+        "field_label",
+        "workflow_key",
+        "caption",
+        "key",
+        "slug",
+        "original_filename",
+    ):
+        value = getattr(instance, attr_name, "")
+        if value:
+            return str(value)
+
+    return str(getattr(instance, "pk", "") or "")
+
+
+def snapshot_instance(instance, *, fields=None):
+    if instance is None:
+        return None
+
+    if fields:
+        snapshot = {}
+        for field_name in fields:
+            value = getattr(instance, field_name, None)
+            if hasattr(value, "pk"):
+                snapshot[field_name] = value.pk
+            elif hasattr(value, "name") and not isinstance(value, str):
+                snapshot[field_name] = getattr(value, "name", "")
+            else:
+                snapshot[field_name] = value
+        return snapshot
+
+    snapshot = {}
+    for field in getattr(instance._meta, "concrete_fields", ()):
+        if getattr(field, "is_relation", False):
+            snapshot[field.attname] = getattr(instance, field.attname, None)
+            continue
+
+        value = getattr(instance, field.name, None)
+        if hasattr(value, "name") and not isinstance(value, str):
+            snapshot[field.name] = getattr(value, "name", "")
+        else:
+            snapshot[field.name] = value
+    return snapshot
+
+
+def log_delete_failure(*, request, action, entity_type, entity_id, reason, entity_name="", old_value=None):
+    create_audit_log(
+        request=request,
+        user=getattr(request, "user", None),
+        action=action,
+        entity_type=entity_type or "Record",
+        entity_id=entity_id or "",
+        entity_name=entity_name,
+        old_value=old_value,
+        new_value=None,
+        status=AuditLog.LogStatus.FAILED,
+        error_message=reason,
+    )
+
+
+def enforce_admin_delete_guard(request, *, entity_type="Record", entity_id="", entity_name="", old_value=None):
     user = getattr(request, "user", None)
-    if not user or not getattr(user, "is_authenticated", False) or not is_platform_super_admin(user):
-        raise PermissionDenied("Only admin users can delete or deactivate records.")
-
-    setting = get_delete_guard_setting()
-    password_hash = ""
-    if setting and isinstance(setting.value, dict):
-        password_hash = str(setting.value.get("password_hash", "") or "")
-
-    if not password_hash:
-        raise PermissionDenied("Delete password is not configured. Set it first from admin settings.")
+    if not is_admin_delete_user(user):
+        reason = "Only admin users can delete or deactivate records."
+        if getattr(user, "is_authenticated", False):
+            log_delete_failure(
+                request=request,
+                action="blocked_delete",
+                entity_type=entity_type,
+                entity_id=entity_id,
+                entity_name=entity_name,
+                old_value=old_value,
+                reason=reason,
+            )
+        raise PermissionDenied(reason)
 
     raw_password = _extract_delete_password(request)
     if not raw_password:
-        raise ValidationError({"delete_password": "Delete password is required."})
+        reason = "Current admin password is required."
+        log_delete_failure(
+            request=request,
+            action="blocked_delete",
+            entity_type=entity_type,
+            entity_id=entity_id,
+            entity_name=entity_name,
+            old_value=old_value,
+            reason=reason,
+        )
+        raise ValidationError({"delete_password": reason})
 
-    if not check_password(raw_password, password_hash):
-        raise ValidationError({"delete_password": "Delete password is incorrect."})
+    if not user.check_password(raw_password):
+        reason = "Current admin password is incorrect."
+        log_delete_failure(
+            request=request,
+            action="blocked_delete",
+            entity_type=entity_type,
+            entity_id=entity_id,
+            entity_name=entity_name,
+            old_value=old_value,
+            reason=reason,
+        )
+        raise ValidationError({"delete_password": reason})
+
+    return user
 
 
 class AdminDeleteGuardMixin:
-    def enforce_delete_guard(self, request):
-        enforce_admin_delete_guard(request)
+    delete_audit_action = "delete_record"
+    delete_blocked_audit_action = "blocked_delete"
+    delete_audit_fields = None
+
+    def get_delete_instance(self):
+        return self.get_object()
+
+    def get_delete_entity_type(self, instance=None):
+        if getattr(self, "audit_entity_type", ""):
+            return self.audit_entity_type
+        queryset = getattr(self, "queryset", None)
+        model = getattr(queryset, "model", None)
+        if model is not None:
+            return model.__name__
+        if instance is not None:
+            return instance.__class__.__name__
+        return "Record"
+
+    def get_delete_entity_id(self, instance=None):
+        if instance is not None:
+            return getattr(instance, "pk", "") or ""
+        lookup_field = getattr(self, "lookup_field", "pk")
+        return self.kwargs.get(lookup_field, self.kwargs.get("pk", ""))
+
+    def get_delete_entity_name(self, instance=None):
+        return infer_delete_entity_name(instance)
+
+    def get_delete_old_value(self, instance):
+        return snapshot_instance(instance, fields=self.delete_audit_fields)
+
+    def enforce_delete_guard(self, request, *, instance=None, old_value=None):
+        enforce_admin_delete_guard(
+            request,
+            entity_type=self.get_delete_entity_type(instance),
+            entity_id=self.get_delete_entity_id(instance),
+            entity_name=self.get_delete_entity_name(instance),
+            old_value=old_value,
+        )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        if request.method != "DELETE":
+            return
+
+        if is_admin_delete_user(getattr(request, "user", None)):
+            return
+
+        entity_type = self.get_delete_entity_type()
+        entity_id = self.get_delete_entity_id()
+        log_delete_failure(
+            request=request,
+            action=self.delete_blocked_audit_action,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            reason="Only admin users can delete or deactivate records.",
+        )
+        raise PermissionDenied("Only admin users can delete or deactivate records.")
+
+    def perform_delete_action(self, instance):
+        self.perform_destroy(instance)
+
+    def log_delete_success(self, request, instance, *, old_value=None, new_value=None):
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action=self.delete_audit_action,
+            entity_type=self.get_delete_entity_type(instance),
+            entity_id=self.get_delete_entity_id(instance),
+            entity_name=self.get_delete_entity_name(instance),
+            old_value=old_value,
+            new_value=new_value,
+        )
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
-        return super().destroy(request, *args, **kwargs)
+        instance = self.get_delete_instance()
+        old_value = self.get_delete_old_value(instance)
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        try:
+            with transaction.atomic():
+                self.perform_delete_action(instance)
+                self.log_delete_success(request, instance, old_value=old_value, new_value=None)
+        except Exception as exc:
+            log_delete_failure(
+                request=request,
+                action=self.delete_blocked_audit_action,
+                entity_type=self.get_delete_entity_type(instance),
+                entity_id=self.get_delete_entity_id(instance),
+                entity_name=self.get_delete_entity_name(instance),
+                old_value=old_value,
+                reason=str(exc),
+            )
+            raise
+        return Response(status=status.HTTP_204_NO_CONTENT)

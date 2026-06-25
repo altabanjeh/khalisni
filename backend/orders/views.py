@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
@@ -294,29 +295,24 @@ class AdminOrderRecordViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        self.enforce_delete_guard(request)
         order = self.get_object()
-        if not request.user.is_superuser:
+        old_value = {"status": order.status, "order_number": order.order_number}
+        self.enforce_delete_guard(request, instance=order, old_value=old_value)
+        with transaction.atomic():
             create_audit_log(
                 request=request,
-                action="blocked_admin_order_delete",
+                action="delete_order_record",
                 entity_type="Order",
                 entity_id=order.pk,
-                old_value={"status": order.status, "order_number": order.order_number},
-                new_value={"reason": "Super admin required for raw order deletion."},
+                entity_name=order.order_number,
+                old_value=old_value,
             )
-            raise PermissionDenied("Only super admin can delete orders from this endpoint.")
-        create_audit_log(
-            request=request,
-            action="delete_order_record",
-            entity_type="Order",
-            entity_id=order.pk,
-            old_value={"status": order.status, "order_number": order.order_number},
-        )
-        return super().destroy(request, *args, **kwargs)
+            order.delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AdminOrderNoteViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
+    delete_audit_action = "delete_order_note"
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = OrderNoteAdminSerializer
     queryset = OrderNote.objects.select_related("order", "user").all()
@@ -324,6 +320,7 @@ class AdminOrderNoteViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
 
 class AdminOrderIssueViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
+    delete_audit_action = "delete_order_issue"
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = OrderIssueAdminSerializer
     queryset = OrderIssue.objects.select_related("order", "created_by", "resolved_by").all()
@@ -331,6 +328,7 @@ class AdminOrderIssueViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
 
 class AdminRatingViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
+    delete_audit_action = "delete_rating"
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     serializer_class = RatingAdminSerializer
     queryset = Rating.objects.select_related("order", "customer").all()

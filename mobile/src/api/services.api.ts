@@ -1,4 +1,4 @@
-import { apiClient, buildQuery, unwrapListData } from './client';
+import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { Service, ServiceCategory } from '../types/service';
 
@@ -21,8 +21,8 @@ export const servicesApi = {
   updateAdminService(serviceId: number | string, payload: Partial<Service>) {
     return apiClient.patch<Service>(`/admin/services/${serviceId}/`, payload).then((res) => res.data);
   },
-  deleteAdminService(serviceId: number | string) {
-    return apiClient.delete(`/admin/services/${serviceId}/`).then((res) => res.data);
+  deleteAdminService(serviceId: number | string, deletePassword: string) {
+    return secureAdminDelete(`/admin/services/${serviceId}/`, deletePassword);
   },
   getAdminCategories(params: ApiListParams = {}) {
     return apiClient.get<ServiceCategory[]>('/admin/categories/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));

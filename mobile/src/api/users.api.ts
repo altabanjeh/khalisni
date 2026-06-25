@@ -1,4 +1,4 @@
-import { apiClient, buildQuery, unwrapListData } from './client';
+import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { AdminUser, User } from '../types/user';
 
@@ -12,8 +12,8 @@ export const usersApi = {
   updateUser(userId: number | string, payload: Partial<AdminUser>) {
     return apiClient.patch<AdminUser>(`/admin/users/${userId}/`, payload).then((res) => res.data);
   },
-  deleteUser(userId: number | string) {
-    return apiClient.delete(`/admin/users/${userId}/`).then((res) => res.data);
+  deleteUser(userId: number | string, deletePassword: string) {
+    return secureAdminDelete(`/admin/users/${userId}/`, deletePassword);
   },
   getAvailablePermissions() {
     return apiClient.get<Record<string, string[]>>('/admin/available-permissions/').then((res) => res.data);

@@ -1,12 +1,14 @@
 from django.core import signing
 from django.http import FileResponse, Http404
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 
+from audit.utils import create_audit_log
 from config.permissions import CanVerifyDocuments, IsAdminRole
 from core.delete_guard import AdminDeleteGuardMixin
 from documents.models import Document
@@ -146,3 +148,32 @@ class AdminDocumentViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     queryset = Document.objects.select_related("order", "uploaded_by", "verified_by").all()
     serializer_class = DocumentAdminSerializer
     search_fields = ["order__order_number", "document_type", "original_filename", "mime_type"]
+    delete_audit_fields = (
+        "order_id",
+        "uploaded_by_id",
+        "verified_by_id",
+        "document_type",
+        "original_filename",
+        "status",
+        "is_final_document",
+        "is_verified",
+        "is_deleted",
+    )
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        old_value = self.get_delete_old_value(instance)
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        with transaction.atomic():
+            instance.soft_delete(user=request.user)
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="delete_document",
+                entity_type="Document",
+                entity_id=instance.pk,
+                entity_name=instance.original_filename,
+                old_value=old_value,
+                new_value=self.get_delete_old_value(instance),
+            )
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
