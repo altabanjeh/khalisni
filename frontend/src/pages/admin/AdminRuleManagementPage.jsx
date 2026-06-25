@@ -781,6 +781,56 @@ function AdminRuleManagementPage() {
 
   if (busy) return <LoadingSpinner />
 
+  const deleteProtectionCard = (
+    <div className="mb-6 rounded-3xl border border-border bg-slate-50/70 p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h3 className="text-base font-bold text-ink">{tx('حماية الحذف', 'Delete protection')}</h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            {tx(
+              'لا يمكن حذف أو تعطيل أي سجل من واجهات الإدارة إلا بحساب المشرف الأعلى وكلمة المرور الإضافية هذه.',
+              'No admin delete or deactivate action can run without the super admin account and this extra password.',
+            )}
+          </p>
+          <p className="mt-2 text-xs font-semibold text-slate-500">
+            {deleteGuard?.is_configured
+              ? tx('كلمة المرور مفعلة.', 'Delete password is configured.')
+              : tx('لم يتم ضبط كلمة مرور الحذف بعد.', 'Delete password is not configured yet.')}
+          </p>
+        </div>
+        <div className="text-xs text-slate-500">
+          {tx('آخر تحديث', 'Last update')}: {formatDateTime(deleteGuard?.updated_at, locale, tx('غير متوفر', 'Not available'))}
+        </div>
+      </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <Field label={tx('كلمة مرور الحذف', 'Delete password')} help={tx('استخدم كلمة قوية لا يعرفها إلا المشرف الأعلى.', 'Use a strong password known only to the super admin.')}>
+          <input
+            className="field"
+            type="password"
+            value={deleteGuardForm.delete_password}
+            onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, delete_password: event.target.value })}
+          />
+        </Field>
+        <Field label={tx('تأكيد كلمة المرور', 'Confirm password')} help={tx('يجب أن تتطابق القيمتان قبل الحفظ.', 'Both values must match before saving.')}>
+          <input
+            className="field"
+            type="password"
+            value={deleteGuardForm.confirm_delete_password}
+            onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, confirm_delete_password: event.target.value })}
+          />
+        </Field>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
+          {tx('حفظ كلمة المرور', 'Save delete password')}
+        </button>
+        <button className="btn-secondary" onClick={() => setDeleteGuardForm(DEFAULT_DELETE_GUARD_FORM)} type="button">
+          {tx('مسح الحقول', 'Clear')}
+        </button>
+      </div>
+    </div>
+  )
+
   const serviceColumns = [
     { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
     { key: 'category_name', label: tx('التصنيف', 'Category') },
@@ -1059,53 +1109,6 @@ function AdminRuleManagementPage() {
               {tx('خدمة جديدة', 'New service')}
             </button>
           </div>
-          <div className="mb-6 rounded-3xl border border-border bg-slate-50/70 p-5">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h3 className="text-base font-bold text-ink">{tx('حماية الحذف', 'Delete protection')}</h3>
-                <p className="mt-2 text-sm leading-7 text-slate-600">
-                  {tx(
-                    'لا يمكن حذف أو تعطيل أي سجل من واجهات الإدارة إلا بحساب المشرف الأعلى وكلمة المرور الإضافية هذه.',
-                    'No admin delete or deactivate action can run without the super admin account and this extra password.',
-                  )}
-                </p>
-                <p className="mt-2 text-xs font-semibold text-slate-500">
-                  {deleteGuard?.is_configured
-                    ? tx('كلمة المرور مفعلة.', 'Delete password is configured.')
-                    : tx('لم يتم ضبط كلمة مرور الحذف بعد.', 'Delete password is not configured yet.')}
-                </p>
-              </div>
-              <div className="text-xs text-slate-500">
-                {tx('آخر تحديث', 'Last update')}: {formatDateTime(deleteGuard?.updated_at, locale, tx('غير متوفر', 'Not available'))}
-              </div>
-            </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <Field label={tx('كلمة مرور الحذف', 'Delete password')} help={tx('استخدم كلمة قوية لا يعرفها إلا المشرف الأعلى.', 'Use a strong password known only to the super admin.')}>
-                <input
-                  className="field"
-                  type="password"
-                  value={deleteGuardForm.delete_password}
-                  onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, delete_password: event.target.value })}
-                />
-              </Field>
-              <Field label={tx('تأكيد كلمة المرور', 'Confirm password')} help={tx('يجب أن تتطابق القيمتان قبل الحفظ.', 'Both values must match before saving.')}>
-                <input
-                  className="field"
-                  type="password"
-                  value={deleteGuardForm.confirm_delete_password}
-                  onChange={(event) => setDeleteGuardForm({ ...deleteGuardForm, confirm_delete_password: event.target.value })}
-                />
-              </Field>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
-                {tx('حفظ كلمة المرور', 'Save delete password')}
-              </button>
-              <button className="btn-secondary" onClick={() => setDeleteGuardForm(DEFAULT_DELETE_GUARD_FORM)} type="button">
-                {tx('مسح الحقول', 'Clear')}
-              </button>
-            </div>
-          </div>
           <DataTable
             columns={serviceColumns}
             emptyDescription={tx('أنشئ أول خدمة لبدء استقبال الطلبات.', 'Create the first service to start taking orders.')}
@@ -1340,6 +1343,7 @@ function AdminRuleManagementPage() {
               {tx('إعداد جديد', 'New setting')}
             </button>
           </div>
+          {deleteProtectionCard}
           <DataTable
             columns={settingColumns}
             emptyDescription={tx('أنشئ إعداداً آمناً عندما تحتاج الأعمال إلى خيار مضبوط.', 'Create a safe setting when the business needs a controlled option.')}

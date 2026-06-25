@@ -63,8 +63,6 @@ function ServiceCategoryManagementPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pendingDeactivate, setPendingDeactivate] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [slugEdited, setSlugEdited] = useState(false)
-  const [iconEdited, setIconEdited] = useState(false)
 
   const canManage =
     user?.role === 'admin' || hasPermission(user, 'services.manage_service_prices')
@@ -81,6 +79,8 @@ function ServiceCategoryManagementPage() {
   )
   const categoryNameAr = form.watch('name_ar')
   const categoryNameEn = form.watch('name_en')
+  const generatedSlug = selectedCategory?.slug || form.watch('slug') || generateCatalogSlug([categoryNameEn, categoryNameAr], 'category')
+  const generatedIcon = selectedCategory?.icon || form.watch('icon') || suggestCategoryIcon(categoryNameEn, categoryNameAr)
   const parentOptions = useMemo(
     () => categories.filter((item) => String(item.id) !== String(selectedCategoryId)),
     [categories, selectedCategoryId],
@@ -104,40 +104,32 @@ function ServiceCategoryManagementPage() {
           }
         : defaultValues,
     )
-    setSlugEdited(Boolean(selectedCategory))
-    setIconEdited(Boolean(selectedCategory))
   }, [form, selectedCategory])
 
   useEffect(() => {
-    if (selectedCategory || slugEdited) return
+    if (selectedCategory) return
     form.setValue('slug', generateCatalogSlug([categoryNameEn, categoryNameAr], 'category'), { shouldDirty: false })
-  }, [categoryNameAr, categoryNameEn, form, selectedCategory, slugEdited])
+  }, [categoryNameAr, categoryNameEn, form, selectedCategory])
 
   useEffect(() => {
-    if (selectedCategory || iconEdited) return
+    if (selectedCategory) return
     form.setValue('icon', suggestCategoryIcon(categoryNameEn, categoryNameAr), { shouldDirty: false })
-  }, [categoryNameAr, categoryNameEn, form, iconEdited, selectedCategory])
+  }, [categoryNameAr, categoryNameEn, form, selectedCategory])
 
   function openCreateForm() {
     setSelectedCategoryId(null)
     form.reset(defaultValues)
-    setSlugEdited(false)
-    setIconEdited(false)
     setIsFormOpen(true)
   }
 
   function openEditForm(id) {
     setSelectedCategoryId(id)
-    setSlugEdited(true)
-    setIconEdited(true)
     setIsFormOpen(true)
   }
 
   function closeForm() {
     setSelectedCategoryId(null)
     form.reset(defaultValues)
-    setSlugEdited(false)
-    setIconEdited(false)
     setIsFormOpen(false)
   }
 
@@ -147,11 +139,11 @@ function ServiceCategoryManagementPage() {
       const payload = {
         name_ar: values.name_ar.trim(),
         name_en: values.name_en.trim(),
-        slug: (values.slug || '').trim(),
+        slug: (values.slug || generatedSlug || '').trim(),
         parent_id: values.parent_id ? Number(values.parent_id) : null,
         description_ar: values.description_ar.trim(),
         description_en: values.description_en.trim(),
-        icon: (values.icon || '').trim(),
+        icon: (values.icon || generatedIcon || '').trim(),
         color: values.color.trim(),
         sort_order: Number(values.sort_order || 0),
         is_active: Boolean(values.is_active),
@@ -327,6 +319,14 @@ function ServiceCategoryManagementPage() {
         }
       />
 
+      {canManage ? (
+        <p className="text-sm text-slate-500">
+          {isArabic
+            ? 'لإيقاف أي تصنيف افتح التعديل ثم استخدم زر الإيقاف الأحمر، أو استخدم زر الإيقاف من عمود الإجراءات.'
+            : 'To deactivate a category, open its edit form and use the red deactivate button, or use the deactivate action in the table.'}
+        </p>
+      ) : null}
+
       <FormModal
         open={isFormOpen}
         onClose={closeForm}
@@ -334,7 +334,19 @@ function ServiceCategoryManagementPage() {
         title={selectedCategory ? (isArabic ? 'تعديل التصنيف' : 'Edit Service Category') : (isArabic ? 'تصنيف جديد' : 'New Service Category')}
         description={isArabic ? 'استخدم التصنيفات الأصلية للتسلسل الهرمي، واحتفظ بالتصنيفات الداخلية مخفية عن الكتالوج العام.' : 'Use parent categories for hierarchy and keep internal-only categories hidden from the public catalog.'}
         footer={
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+            {selectedCategory && canManage ? (
+              <button
+                className="btn-danger"
+                onClick={() => {
+                  setPendingDeactivate(selectedCategory)
+                  closeForm()
+                }}
+                type="button"
+              >
+                {isArabic ? 'إيقاف التصنيف' : 'Deactivate category'}
+              </button>
+            ) : null}
             <button className="btn-secondary" onClick={closeForm} type="button">
               {isArabic ? 'إلغاء' : 'Cancel'}
             </button>
@@ -346,6 +358,8 @@ function ServiceCategoryManagementPage() {
         }
       >
         <form className="space-y-4" id="service-category-management-form" onSubmit={form.handleSubmit(handleSubmit)}>
+          <input type="hidden" {...form.register('slug')} />
+          <input type="hidden" {...form.register('icon')} />
           <div className="grid gap-4 md:grid-cols-2">
             <Field label={isArabic ? 'الاسم بالعربية' : 'Arabic name'}>
               <input className="field" {...form.register('name_ar', { required: true })} />
@@ -355,13 +369,11 @@ function ServiceCategoryManagementPage() {
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label={isArabic ? 'المعرّف (Slug)' : 'Slug'} hint={isArabic ? 'اتركه فارغاً لتوليده تلقائياً من الاسم.' : 'Leave blank to generate it from the name.'}>
-              <input
-                className="field"
-                {...form.register('slug', {
-                  onChange: () => setSlugEdited(true),
-                })}
-              />
+            <Field
+              label={isArabic ? 'المعرّف (Slug)' : 'Slug'}
+              hint={isArabic ? 'يتم توليده تلقائياً من اسم التصنيف.' : 'Generated automatically from the category name.'}
+            >
+              <input className="field cursor-not-allowed bg-slate-50 font-mono text-slate-600" readOnly value={generatedSlug} />
             </Field>
             <Field label={isArabic ? 'التصنيف الأصلي' : 'Parent category'}>
               <select className="field" {...form.register('parent_id')}>
@@ -375,13 +387,11 @@ function ServiceCategoryManagementPage() {
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label={isArabic ? 'الأيقونة' : 'Icon'}>
-              <input
-                className="field"
-                {...form.register('icon', {
-                  onChange: () => setIconEdited(true),
-                })}
-              />
+            <Field
+              label={isArabic ? 'الأيقونة' : 'Icon'}
+              hint={isArabic ? 'يتم اختيارها تلقائياً حسب اسم التصنيف.' : 'Selected automatically from the category name.'}
+            >
+              <input className="field cursor-not-allowed bg-slate-50 text-slate-600" readOnly value={generatedIcon} />
             </Field>
             <Field label={isArabic ? 'اللون' : 'Color'} hint={isArabic ? 'مثال: #0f766e' : 'Example: #0f766e'}>
               <input className="field" {...form.register('color')} />
