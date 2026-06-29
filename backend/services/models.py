@@ -4,9 +4,27 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
+
+from core.models import SoftDeleteModel
 
 
-class ServiceCategory(models.Model):
+def _normalize_code(value):
+    return str(value or "").strip().lower().replace(" ", "_")
+
+
+def _normalize_extension_list(values):
+    return sorted(
+        {
+            (str(value).strip().lower() if str(value).strip().startswith(".") else f".{str(value).strip().lower()}")
+            for value in (values or [])
+            if str(value).strip()
+        }
+    )
+
+
+class ServiceCategory(SoftDeleteModel):
     category_id = models.BigAutoField(primary_key=True)
 
     name_ar = models.CharField(max_length=255)
@@ -39,7 +57,6 @@ class ServiceCategory(models.Model):
 
     is_active = models.BooleanField(default=True)
     show_on_public_site = models.BooleanField(default=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,6 +71,7 @@ class ServiceCategory(models.Model):
             models.Index(fields=["sort_order"]),
             models.Index(fields=["parent", "is_active"]),
             models.Index(fields=["show_on_public_site"]),
+            models.Index(fields=["is_deleted", "is_active"]),
         ]
 
     def __str__(self):
@@ -109,24 +127,27 @@ class ServiceCategory(models.Model):
         duplicate_qs = type(self).objects.exclude(pk=self.pk).filter(
             parent_id=self.parent_id,
             name_ar__iexact=(self.name_ar or "").strip(),
+            is_deleted=False,
         )
         if self.name_ar and duplicate_qs.exists():
             errors["name_ar"] = "Category name must be unique under the same parent category."
 
-        if self.pk and not self.is_active and self.services.filter(is_active=True).exists():
+        if self.pk and not self.is_active and not self.is_deleted and self.services.filter(is_active=True, is_deleted=False).exists():
             errors["is_active"] = "Deactivate or reassign active services before deactivating this category."
 
         if errors:
             raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_active = False
         if not self.sort_order and self.display_order:
             self.sort_order = self.display_order
         self.full_clean()
         super().save(*args, **kwargs)
 
 
-class Service(models.Model):
+class Service(SoftDeleteModel):
     class Scope(models.TextChoices):
         GLOBAL = "global", "Global"
         PARTNER_PRIVATE = "partner_private", "Partner private"
@@ -142,6 +163,10 @@ class Service(models.Model):
         HOURS = "hours", "Hours"
         DAYS = "days", "Days"
         WEEKS = "weeks", "Weeks"
+
+    class DeliveryTimeMode(models.TextChoices):
+        DURATION = "duration", "Expected duration"
+        DATE_RANGE = "date_range", "Date range"
 
     service_id = models.BigAutoField(primary_key=True)
 
@@ -223,6 +248,12 @@ class Service(models.Model):
         validators=[MinValueValidator(Decimal("0.00"))]
     )
 
+    show_total_price_public = models.BooleanField(default=True)
+    show_government_fee_public = models.BooleanField(default=False)
+    show_company_fee_public = models.BooleanField(default=False)
+    public_price_note_ar = models.TextField(blank=True)
+    public_price_note_en = models.TextField(blank=True)
+
     estimated_duration = models.PositiveIntegerField(
         default=1,
         validators=[MinValueValidator(1)]
@@ -233,6 +264,16 @@ class Service(models.Model):
         choices=DurationUnit.choices,
         default=DurationUnit.DAYS
     )
+
+    delivery_time_mode = models.CharField(
+        max_length=20,
+        choices=DeliveryTimeMode.choices,
+        default=DeliveryTimeMode.DURATION,
+    )
+    delivery_start_date = models.DateField(null=True, blank=True)
+    delivery_end_date = models.DateField(null=True, blank=True)
+    delivery_note_ar = models.TextField(blank=True)
+    delivery_note_en = models.TextField(blank=True)
 
     terms_ar = models.TextField(blank=True)
     terms_en = models.TextField(blank=True)
@@ -256,6 +297,7 @@ class Service(models.Model):
 
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    show_on_public_site = models.BooleanField(default=True)
 
     display_order = models.PositiveIntegerField(default=0)
 
@@ -278,6 +320,8 @@ class Service(models.Model):
             models.Index(fields=["display_order"]),
             models.Index(fields=["category", "is_active"]),
             models.Index(fields=["organization", "scope", "is_active"]),
+            models.Index(fields=["show_on_public_site", "is_active"]),
+            models.Index(fields=["is_deleted", "is_active"]),
         ]
         constraints = [
             models.CheckConstraint(
@@ -302,6 +346,42 @@ class Service(models.Model):
     def total_fee(self):
         return self.base_price + self.government_fee + self.service_fee
 
+    def delivery_time_payload(self):
+        if self.delivery_time_mode == self.DeliveryTimeMode.DATE_RANGE:
+            start_date = self.delivery_start_date.isoformat() if self.delivery_start_date else None
+            end_date = self.delivery_end_date.isoformat() if self.delivery_end_date else None
+            label_en = f"From {start_date} to {end_date}" if start_date and end_date else "Date range"
+            label_ar = f"من {start_date} إلى {end_date}" if start_date and end_date else "فترة زمنية"
+            return {
+                "mode": self.delivery_time_mode,
+                "label": label_en,
+                "label_ar": label_ar,
+                "label_en": label_en,
+                "start_date": start_date,
+                "end_date": end_date,
+                "expected_duration": None,
+                "expected_duration_unit": None,
+                "note_ar": self.delivery_note_ar,
+                "note_en": self.delivery_note_en,
+            }
+
+        unit_label_en = self.get_estimated_duration_unit_display().lower()
+        unit_label_ar = "يوم" if self.estimated_duration_unit == self.DurationUnit.DAYS else "ساعة" if self.estimated_duration_unit == self.DurationUnit.HOURS else "أسبوع"
+        label_en = f"Expected completion: {self.estimated_duration} {unit_label_en}"
+        label_ar = f"المدة المتوقعة: {self.estimated_duration} {unit_label_ar}"
+        return {
+            "mode": self.delivery_time_mode,
+            "label": label_en,
+            "label_ar": label_ar,
+            "label_en": label_en,
+            "start_date": None,
+            "end_date": None,
+            "expected_duration": self.estimated_duration,
+            "expected_duration_unit": self.estimated_duration_unit,
+            "note_ar": self.delivery_note_ar,
+            "note_en": self.delivery_note_en,
+        }
+
     def clean(self):
         errors = {}
 
@@ -311,6 +391,18 @@ class Service(models.Model):
             errors["organization"] = "Partner-scoped services must belong to an organization."
         if self.organization_id and not self.organization.is_active:
             errors["organization"] = "Services can only belong to active organizations."
+        if self.is_active and self.category_id and self.category.is_deleted:
+            errors["category"] = "Active services cannot belong to deleted categories."
+        if self.delivery_time_mode == self.DeliveryTimeMode.DATE_RANGE:
+            if not self.delivery_start_date:
+                errors["delivery_start_date"] = "Start date is required for date-range delivery."
+            if not self.delivery_end_date:
+                errors["delivery_end_date"] = "End date is required for date-range delivery."
+            if self.delivery_start_date and self.delivery_end_date and self.delivery_end_date < self.delivery_start_date:
+                errors["delivery_end_date"] = "End date must be on or after the start date."
+        else:
+            if not self.estimated_duration:
+                errors["estimated_duration"] = "Expected duration is required for duration mode."
 
         if errors:
             raise ValidationError(errors)
@@ -326,6 +418,8 @@ class Service(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        if self.is_deleted:
+            self.is_active = False
         exclude = ["service_number"] if not self.service_number else None
         self.full_clean(exclude=exclude)
 
@@ -335,8 +429,84 @@ class Service(models.Model):
             self.service_number = f"SRV-{self.service_id:06d}"
             super().save(update_fields=["service_number"])
 
+class RequiredDocumentDefinition(SoftDeleteModel):
+    definition_id = models.BigAutoField(primary_key=True)
+    code = models.SlugField(max_length=120, unique=False)
+    name_ar = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255, blank=True)
+    description_ar = models.TextField(blank=True)
+    description_en = models.TextField(blank=True)
+    allowed_extensions = models.JSONField(default=list, blank=True)
+    allowed_mime_types = models.JSONField(default=list, blank=True)
+    max_file_size = models.PositiveBigIntegerField(default=10 * 1024 * 1024)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
-class ServiceRelation(models.Model):
+    class Meta:
+        ordering = ["sort_order", "name_ar"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["code"],
+                condition=Q(is_deleted=False, is_active=True),
+                name="unique_active_required_document_definition_code",
+            ),
+            models.UniqueConstraint(
+                fields=["name_ar"],
+                condition=Q(is_deleted=False, is_active=True),
+                name="unique_active_required_document_definition_name_ar",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["code", "is_active"]),
+            models.Index(fields=["is_deleted", "is_active"]),
+        ]
+
+    def __str__(self):
+        return self.name_ar
+
+    @property
+    def id(self):
+        return self.pk
+
+    def clean(self):
+        self.code = _normalize_code(self.code or self.name_en or self.name_ar)
+        self.allowed_extensions = _normalize_extension_list(self.allowed_extensions)
+        self.allowed_mime_types = sorted(
+            {
+                str(value).strip().lower()
+                for value in (self.allowed_mime_types or [])
+                if str(value).strip()
+            }
+        )
+
+        errors = {}
+        if (
+            self.code
+            and type(self).objects.exclude(pk=self.pk).filter(code=self.code, is_deleted=False, is_active=True).exists()
+        ):
+            errors["code"] = "Document code must be unique among active definitions."
+        if (
+            self.name_ar
+            and type(self).objects.exclude(pk=self.pk).filter(
+                name_ar__iexact=(self.name_ar or "").strip(),
+                is_deleted=False,
+                is_active=True,
+            ).exists()
+        ):
+            errors["name_ar"] = "Arabic document name must be unique among active definitions."
+        if self.max_file_size <= 0:
+            errors["max_file_size"] = "Maximum file size must be greater than zero."
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_active = False
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class ServiceRelation(SoftDeleteModel):
     class RelationType(models.TextChoices):
         PREREQUISITE = "prerequisite", "Required first"
         RECOMMENDED_AFTER = "recommended_after", "Recommended after completion"
@@ -382,6 +552,7 @@ class ServiceRelation(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["source_service", "target_service", "relation_type"],
+                condition=Q(is_deleted=False),
                 name="unique_service_relation_per_type"
             )
         ]
@@ -389,6 +560,7 @@ class ServiceRelation(models.Model):
             models.Index(fields=["source_service", "relation_type", "is_active"]),
             models.Index(fields=["target_service", "relation_type", "is_active"]),
             models.Index(fields=["is_active", "relation_type"]),
+            models.Index(fields=["is_deleted", "is_active"]),
         ]
 
     def __str__(self):
@@ -441,10 +613,13 @@ class ServiceRelation(models.Model):
             raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_active = False
         self.full_clean()
         super().save(*args, **kwargs)
 
-class ServiceProviderAssignment(models.Model):
+
+class ServiceProviderAssignment(SoftDeleteModel):
     assignment_id = models.BigAutoField(primary_key=True)
 
     service = models.ForeignKey(
@@ -467,6 +642,7 @@ class ServiceProviderAssignment(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["service", "provider"],
+                condition=Q(is_deleted=False),
                 name="unique_service_provider_assignment"
             )
         ]
@@ -481,6 +657,8 @@ class ServiceProviderAssignment(models.Model):
             raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_active = False
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -488,7 +666,7 @@ class ServiceProviderAssignment(models.Model):
     def id(self):
         return self.pk
 
-class Address(models.Model):
+class Address(SoftDeleteModel):
     address_id = models.BigAutoField(primary_key=True)
 
     user = models.ForeignKey(
@@ -515,6 +693,7 @@ class Address(models.Model):
         indexes = [
             models.Index(fields=["user", "is_default"]),
             models.Index(fields=["city"]),
+            models.Index(fields=["is_deleted"]),
         ]
         constraints = [
             models.UniqueConstraint(
@@ -529,6 +708,8 @@ class Address(models.Model):
             raise ValidationError({"user": "Addresses can only be linked to customer users."})
 
     def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_default = False
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -536,7 +717,7 @@ class Address(models.Model):
     def id(self):
         return self.pk
 
-class ServiceRequiredDocument(models.Model):
+class ServiceRequiredDocument(SoftDeleteModel):
     requirement_id = models.BigAutoField(primary_key=True)
 
     service = models.ForeignKey(
@@ -545,9 +726,19 @@ class ServiceRequiredDocument(models.Model):
         related_name="document_requirements"
     )
 
+    document_definition = models.ForeignKey(
+        "services.RequiredDocumentDefinition",
+        on_delete=models.PROTECT,
+        related_name="service_links",
+        null=True,
+        blank=True,
+    )
+
     document_type = models.CharField(max_length=120)
     name_ar = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, blank=True)
+    instructions_ar = models.TextField(blank=True)
+    instructions_en = models.TextField(blank=True)
 
     is_required = models.BooleanField(default=True)
     allowed_extensions = models.JSONField(default=list, blank=True)
@@ -565,17 +756,36 @@ class ServiceRequiredDocument(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["service", "document_type"],
+                condition=Q(is_deleted=False),
                 name="unique_service_required_document_type"
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["service", "document_definition"],
+                condition=Q(is_deleted=False),
+                name="unique_service_required_document_definition"
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["service", "is_active"]),
+            models.Index(fields=["service", "is_deleted"]),
+            models.Index(fields=["document_definition", "is_active"]),
         ]
 
     def clean(self):
-        self.document_type = (self.document_type or "").strip().lower()
-        self.allowed_extensions = sorted(
-            {extension.lower() for extension in (self.allowed_extensions or []) if extension}
-        )
+        if self.document_definition_id:
+            self.document_type = self.document_definition.code
+            self.name_ar = self.document_definition.name_ar
+            self.name_en = self.document_definition.name_en
+            if not self.allowed_extensions:
+                self.allowed_extensions = list(self.document_definition.allowed_extensions or [])
+            if not self.max_file_size:
+                self.max_file_size = self.document_definition.max_file_size
+        self.document_type = _normalize_code(self.document_type)
+        self.allowed_extensions = _normalize_extension_list(self.allowed_extensions)
 
     def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.is_active = False
         self.full_clean()
         super().save(*args, **kwargs)
 

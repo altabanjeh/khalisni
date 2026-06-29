@@ -29,7 +29,7 @@ def get_orders_for_user(user):
         "notes__user",
         Prefetch(
             "service__document_requirements",
-            queryset=ServiceRequiredDocument.objects.filter(is_active=True, is_required=True).only("document_type"),
+            queryset=ServiceRequiredDocument.objects.filter(is_active=True, is_deleted=False, is_required=True).only("document_type"),
             to_attr="_active_required_docs",
         ),
     )

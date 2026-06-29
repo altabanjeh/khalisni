@@ -85,7 +85,7 @@ class Command(BaseCommand):
         )
         for order in orders:
             required_document_types = list(
-                order.service.document_requirements.filter(is_active=True, is_required=True).values_list("document_type", flat=True)
+                order.service.document_requirements.filter(is_active=True, is_deleted=False, is_required=True).values_list("document_type", flat=True)
             )
             if not required_document_types:
                 continue

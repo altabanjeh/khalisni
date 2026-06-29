@@ -65,7 +65,7 @@ def _sync_customer_organization(customer, organization):
 
 def _required_document_types(order):
     return list(
-        order.service.document_requirements.filter(is_active=True, is_required=True).values_list("document_type", flat=True)
+        order.service.document_requirements.filter(is_active=True, is_deleted=False, is_required=True).values_list("document_type", flat=True)
     )
 
 
@@ -289,6 +289,7 @@ def upload_customer_document(*, order, actor, validated_data, request=None):
     requirement = order.service.document_requirements.filter(
         document_type=validated_data["document_type"],
         is_active=True,
+        is_deleted=False,
     ).first()
     if (
         getattr(actor, "role", "") == CustomUser.Role.CUSTOMER

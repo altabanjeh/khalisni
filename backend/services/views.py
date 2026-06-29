@@ -10,7 +10,15 @@ from audit.utils import create_audit_log
 from config.permissions import CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
 from core.delete_guard import AdminDeleteGuardMixin
 from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
-from services.models import Address, Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
+from services.models import (
+    Address,
+    RequiredDocumentDefinition,
+    Service,
+    ServiceCategory,
+    ServiceProviderAssignment,
+    ServiceRelation,
+    ServiceRequiredDocument,
+)
 from services.service_categories import category_snapshot
 from services.service_relations import relation_snapshot
 from services.selectors import (
@@ -21,9 +29,11 @@ from services.selectors import (
 from services.serializers import (
     AddressAdminSerializer,
     AdminCategoryRuleSerializer,
+    AdminRequiredDocumentDefinitionSerializer,
     AdminRequiredDocumentRuleSerializer,
     AdminServiceProviderAssignmentSerializer,
     AdminServiceRuleSerializer,
+    RequiredDocumentDefinitionSerializer,
     ServiceRelationAdminSerializer,
     ServiceCategorySerializer,
     ServiceDetailSerializer,
@@ -35,6 +45,14 @@ def _as_bool(value):
     if value is None:
         return None
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _include_deleted(request):
+    return _as_bool(request.query_params.get("include_deleted")) is True
+
+
+def _delete_reason(request):
+    return str(request.data.get("delete_reason", "") or "").strip()
 
 
 def _snapshot(instance, fields):
@@ -116,13 +134,33 @@ class ServiceCategoryListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         organization = resolve_service_organization_from_request(self.request)
-        queryset = visible_service_categories_queryset(organization=organization)
+        queryset = visible_service_categories_queryset(organization=organization).annotate(
+            service_count=Count(
+                "services",
+                filter=Q(
+                    services__is_active=True,
+                    services__is_deleted=False,
+                    services__show_on_public_site=True,
+                ),
+                distinct=True,
+            )
+        )
         parent_id = self.request.query_params.get("parent")
         if parent_id == "root":
             queryset = queryset.filter(parent__isnull=True)
         elif parent_id:
             queryset = queryset.filter(parent_id=parent_id)
         return queryset.order_by("sort_order", "display_order", "name_ar")
+
+
+class PublicServiceCategoryServicesAPIView(generics.ListAPIView):
+    serializer_class = ServiceListSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        organization = resolve_service_organization_from_request(self.request)
+        return visible_services_queryset(organization=organization).filter(category__slug=self.kwargs["slug"])
 
 
 class ServiceDetailAPIView(generics.RetrieveAPIView):
@@ -133,7 +171,7 @@ class ServiceDetailAPIView(generics.RetrieveAPIView):
     def get_queryset(self):
         organization = resolve_service_organization_from_request(self.request)
         return visible_services_queryset(organization=organization).prefetch_related(
-            "document_requirements",
+            "document_requirements__document_definition",
             "incoming_relations__source_service",
             "outgoing_relations__target_service",
         )
@@ -165,6 +203,8 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
         queryset = super().get_queryset()
         organization_id = self.request.query_params.get("organization")
         queryset = enforce_organization_scope(queryset, user=self.request.user, organization_field="organization")
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
         if organization_id:
             queryset = queryset.filter(organization_id=organization_id)
         category_id = self.request.query_params.get("category")
@@ -185,16 +225,23 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
         old_value = _snapshot(instance, self.audit_fields)
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.is_active = False
-            instance.save(update_fields=["is_active", "updated_at"])
+            instance.soft_delete(user=request.user, reason=_delete_reason(request))
             self._log_change(
                 request,
-                "disable_service",
+                "delete_service",
                 instance,
                 old_value=old_value,
                 new_value=_snapshot(instance, self.audit_fields),
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = Service.objects.get(pk=pk)
+        old_value = _snapshot(instance, self.audit_fields)
+        instance.restore()
+        self._log_change(request, "restore_service", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(self.get_serializer(instance).data)
 
 
 class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
@@ -208,6 +255,8 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
         if not is_platform_super_admin(self.request.user):
             org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
             queryset = queryset.filter(Q(services__organization__in=org_ids) | Q(services__organization__isnull=True)).distinct()
@@ -222,7 +271,7 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
             queryset = queryset.filter(parent__isnull=True)
         elif parent_id:
             queryset = queryset.filter(parent_id=parent_id)
-        return queryset.annotate(active_services_count=Count("services", filter=Q(services__is_active=True), distinct=True)).order_by(
+        return queryset.annotate(active_services_count=Count("services", filter=Q(services__is_active=True, services__is_deleted=False), distinct=True)).order_by(
             "sort_order", "display_order", "name_ar"
         )
 
@@ -231,15 +280,24 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
         old_value = _snapshot(instance, self.audit_fields)
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
+            instance.is_deleted = True
             instance.is_active = False
             try:
-                instance.save(update_fields=["is_active", "updated_at"])
+                instance.soft_delete(user=request.user, reason=_delete_reason(request))
             except DjangoValidationError as exc:
                 if hasattr(exc, "message_dict"):
                     raise ValidationError(exc.message_dict)
                 raise ValidationError(exc.messages)
-            self._log_change(request, "disable_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+            self._log_change(request, "delete_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = ServiceCategory.objects.get(pk=pk)
+        old_value = _snapshot(instance, self.audit_fields)
+        instance.restore()
+        self._log_change(request, "restore_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(self.get_serializer(instance).data)
 
     @action(detail=False, methods=["post"])
     def reorder(self, request):
@@ -294,9 +352,47 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
         return Response({"detail": "Categories reordered."})
 
 
+class RequiredDocumentDefinitionAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
+    serializer_class = AdminRequiredDocumentDefinitionSerializer
+    queryset = RequiredDocumentDefinition.objects.all()
+    permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
+    search_fields = ["code", "name_ar", "name_en"]
+    pagination_class = None
+    audit_entity_type = "RequiredDocumentDefinition"
+    audit_fields = ("code", "name_ar", "name_en", "max_file_size", "is_active")
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        active = _as_bool(self.request.query_params.get("is_active"))
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
+        if active is not None:
+            queryset = queryset.filter(is_active=active)
+        return queryset.order_by("sort_order", "name_ar")
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        old_value = _snapshot(instance, self.audit_fields)
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        if instance.service_links.filter(is_deleted=False).exists():
+            instance.soft_delete(user=request.user, reason=_delete_reason(request))
+        else:
+            instance.soft_delete(user=request.user, reason=_delete_reason(request))
+        self._log_change(request, "delete_required_document_definition", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = RequiredDocumentDefinition.objects.get(pk=pk)
+        old_value = _snapshot(instance, self.audit_fields)
+        instance.restore()
+        self._log_change(request, "restore_required_document_definition", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(self.get_serializer(instance).data)
+
+
 class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminRequiredDocumentRuleSerializer
-    queryset = ServiceRequiredDocument.objects.select_related("service").all()
+    queryset = ServiceRequiredDocument.objects.select_related("service", "document_definition").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["service__name_ar", "document_type", "name_ar", "name_en"]
     audit_entity_type = "ServiceRequiredDocument"
@@ -316,6 +412,8 @@ class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, views
         queryset = super().get_queryset()
         service_id = self.request.query_params.get("service")
         active = _as_bool(self.request.query_params.get("is_active"))
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
         if service_id:
             queryset = queryset.filter(service_id=service_id)
         if active is not None:
@@ -327,10 +425,17 @@ class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, views
         old_value = _snapshot(instance, self.audit_fields)
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.is_active = False
-            instance.save(update_fields=["is_active", "updated_at"])
-            self._log_change(request, "disable_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+            instance.soft_delete(user=request.user, reason=_delete_reason(request))
+            self._log_change(request, "delete_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = ServiceRequiredDocument.objects.get(pk=pk)
+        old_value = _snapshot(instance, self.audit_fields)
+        instance.restore()
+        self._log_change(request, "restore_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(self.get_serializer(instance).data)
 
 
 class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
@@ -352,6 +457,8 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.select_related("source_service__organization", "target_service__organization")
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
         if not is_platform_super_admin(self.request.user):
             org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
             queryset = queryset.filter(
@@ -407,12 +514,11 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             raise PermissionDenied("You do not have permission to deactivate service relations.")
 
         with transaction.atomic():
-            relation.is_active = False
-            relation.save(update_fields=["is_active", "updated_at"])
+            relation.soft_delete(user=request.user, reason=_delete_reason(request))
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_service_relation",
+                action="delete_service_relation",
                 entity_type="ServiceRelation",
                 entity_id=relation.pk,
                 old_value=old_value,
@@ -422,21 +528,23 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["delete"], url_path="hard-delete")
     def hard_delete(self, request, pk=None):
-        relation = self.get_object()
+        return self.destroy(request, pk=pk)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        relation = ServiceRelation.objects.get(pk=pk)
         old_value = relation_snapshot(relation)
-        self.enforce_delete_guard(request, instance=relation, old_value=old_value)
-        relation_id = relation.pk
-        with transaction.atomic():
-            relation.delete()
-            create_audit_log(
-                request=request,
-                user=request.user,
-                action="delete_service_relation",
-                entity_type="ServiceRelation",
-                entity_id=relation_id,
-                old_value=old_value,
-            )
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        relation.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_service_relation",
+            entity_type="ServiceRelation",
+            entity_id=relation.pk,
+            old_value=old_value,
+            new_value=relation_snapshot(relation),
+        )
+        return Response(self.get_serializer(relation).data)
 
 
 class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
@@ -452,6 +560,8 @@ class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMix
         service_id = self.request.query_params.get("service")
         provider_id = self.request.query_params.get("provider")
         active = _as_bool(self.request.query_params.get("is_active"))
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
         if service_id:
             queryset = queryset.filter(service_id=service_id)
         if provider_id:
@@ -465,10 +575,17 @@ class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMix
         old_value = _snapshot(instance, self.audit_fields)
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.is_active = False
-            instance.save(update_fields=["is_active", "updated_at"])
-            self._log_change(request, "disable_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+            instance.soft_delete(user=request.user, reason=_delete_reason(request))
+            self._log_change(request, "delete_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = ServiceProviderAssignment.objects.get(pk=pk)
+        old_value = _snapshot(instance, self.audit_fields)
+        instance.restore()
+        self._log_change(request, "restore_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
+        return Response(self.get_serializer(instance).data)
 
 
 class AddressAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
@@ -476,3 +593,25 @@ class AddressAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     queryset = Address.objects.select_related("user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["user__full_name", "city", "area", "street"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=False)
+        return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        old_value = _snapshot(instance, ("user_id", "city", "is_default"))
+        self.enforce_delete_guard(request, instance=instance, old_value=old_value)
+        instance.soft_delete(user=request.user, reason=_delete_reason(request))
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="delete_address",
+            entity_type="Address",
+            entity_id=instance.pk,
+            old_value=old_value,
+            new_value=_snapshot(instance, ("user_id", "city", "is_default")),
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

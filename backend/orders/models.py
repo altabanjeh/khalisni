@@ -148,6 +148,16 @@ class Order(models.Model):
         null=True,
         blank=True,
     )
+    expected_delivery_mode = models.CharField(
+        max_length=20,
+        default="duration",
+        blank=True,
+    )
+    expected_duration_value_snapshot = models.PositiveIntegerField(null=True, blank=True)
+    expected_duration_unit_snapshot = models.CharField(max_length=10, blank=True)
+    expected_delivery_start_date = models.DateField(null=True, blank=True)
+    expected_delivery_end_date = models.DateField(null=True, blank=True)
+    expected_delivery_note_snapshot = models.TextField(blank=True)
 
     final_price = models.DecimalField(
         max_digits=10,
@@ -377,15 +387,40 @@ class Order(models.Model):
         if self.assigned_provider_id and not self.assigned_provider_organization_id and self.assigned_provider.organization_id:
             self.assigned_provider_organization = self.assigned_provider.organization
 
-        if self.expected_delivery_date is None and self.service_id:
-            if self.service.estimated_duration_unit == self.service.DurationUnit.HOURS:
-                duration_delta = timedelta(hours=self.service.estimated_duration)
-            elif self.service.estimated_duration_unit == self.service.DurationUnit.WEEKS:
-                duration_delta = timedelta(weeks=self.service.estimated_duration)
+        if self.service_id:
+            if creating:
+                self.expected_delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
+                self.expected_duration_value_snapshot = self.service.estimated_duration
+                self.expected_duration_unit_snapshot = self.service.estimated_duration_unit
+                self.expected_delivery_start_date = getattr(self.service, "delivery_start_date", None)
+                self.expected_delivery_end_date = getattr(self.service, "delivery_end_date", None)
+                self.expected_delivery_note_snapshot = getattr(self.service, "delivery_note_ar", "") or getattr(self.service, "delivery_note_en", "")
             else:
-                duration_delta = timedelta(days=self.service.estimated_duration)
+                if not self.expected_delivery_mode:
+                    self.expected_delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
+                if self.expected_duration_value_snapshot is None:
+                    self.expected_duration_value_snapshot = self.service.estimated_duration
+                if not self.expected_duration_unit_snapshot:
+                    self.expected_duration_unit_snapshot = self.service.estimated_duration_unit
+                if not self.expected_delivery_start_date:
+                    self.expected_delivery_start_date = getattr(self.service, "delivery_start_date", None)
+                if not self.expected_delivery_end_date:
+                    self.expected_delivery_end_date = getattr(self.service, "delivery_end_date", None)
+                if not self.expected_delivery_note_snapshot:
+                    self.expected_delivery_note_snapshot = getattr(self.service, "delivery_note_ar", "") or getattr(self.service, "delivery_note_en", "")
 
-            self.expected_delivery_date = timezone.localdate() + duration_delta
+        if self.expected_delivery_date is None and self.service_id:
+            if getattr(self.service, "delivery_time_mode", "duration") == "date_range":
+                self.expected_delivery_date = self.service.delivery_end_date
+            else:
+                if self.service.estimated_duration_unit == self.service.DurationUnit.HOURS:
+                    duration_delta = timedelta(hours=self.service.estimated_duration)
+                elif self.service.estimated_duration_unit == self.service.DurationUnit.WEEKS:
+                    duration_delta = timedelta(weeks=self.service.estimated_duration)
+                else:
+                    duration_delta = timedelta(days=self.service.estimated_duration)
+
+                self.expected_delivery_date = timezone.localdate() + duration_delta
 
         now = timezone.now()
 

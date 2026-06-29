@@ -15,6 +15,7 @@ import {
   mockNotifications,
   mockOrders,
   mockProviders,
+  mockRequiredDocumentDefinitions,
   mockServices,
 } from '../utils/mockData'
 import { HELP_SCREEN_REGISTRY } from '../help/screenRegistry'
@@ -373,6 +374,12 @@ export const api = {
 
   getServices: async (params = {}) => withTestValue(() => servicesApi.getServices(params), mockServices),
   getCategories: async () => withTestValue(() => servicesApi.getCategories(), mockCategories),
+  getPublicServiceCategories: async () => withTestValue(() => servicesApi.getPublicServiceCategories(), mockCategories),
+  getPublicCategoryServices: async (slug) =>
+    withTestValue(
+      () => servicesApi.getPublicCategoryServices(slug),
+      mockServices.filter((item) => item.category?.slug === slug),
+    ),
   getService: async (slug) =>
     withTestValue(
       () => servicesApi.getService(slug),
@@ -463,6 +470,13 @@ export const api = {
   getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), mockCategories),
   reorderAdminCategories: servicesApi.reorderAdminCategories,
   getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), []),
+  getAdminRequiredDocumentDefinitions: async (params = {}) =>
+    withTestValue(() => servicesApi.getAdminRequiredDocumentDefinitions(params), mockRequiredDocumentDefinitions),
+  createAdminRequiredDocumentDefinition: async (payload) =>
+    withTestValue(() => servicesApi.createAdminRequiredDocumentDefinition(payload), { id: Date.now(), ...payload }),
+  updateAdminRequiredDocumentDefinition: async (id, payload) =>
+    withTestValue(() => servicesApi.updateAdminRequiredDocumentDefinition(id, payload), { id: Number(id), ...payload }),
+  deleteAdminRequiredDocumentDefinition: async (id) => withTestValue(() => servicesApi.deleteAdminRequiredDocumentDefinition(id), null),
   getAdminServiceRelations: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceRelations(params), []),
   createAdminServiceRelation: servicesApi.createAdminServiceRelation,
   updateAdminServiceRelation: servicesApi.updateAdminServiceRelation,

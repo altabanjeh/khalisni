@@ -25,6 +25,14 @@ export const servicesApi = {
     return unwrapList(await http.get('/services/categories/'))
   },
 
+  async getPublicServiceCategories() {
+    return unwrapList(await http.get('/public-site/service-categories/'))
+  },
+
+  async getPublicCategoryServices(slug) {
+    return unwrapList(await http.get(`/public-site/service-categories/${slug}/services/`))
+  },
+
   getService(slug) {
     return http.get(`/services/${slug}/`)
   },
@@ -43,6 +51,22 @@ export const servicesApi = {
 
   async getAdminServiceDocuments(params = {}) {
     return unwrapList(await http.get(`/admin/service-documents/${buildQuery(params)}`))
+  },
+
+  async getAdminRequiredDocumentDefinitions(params = {}) {
+    return unwrapList(await http.get(`/admin/required-document-definitions/${buildQuery(params)}`))
+  },
+
+  createAdminRequiredDocumentDefinition(payload) {
+    return http.post('/admin/required-document-definitions/', payload)
+  },
+
+  updateAdminRequiredDocumentDefinition(id, payload) {
+    return http.patch(`/admin/required-document-definitions/${id}/`, payload)
+  },
+
+  deleteAdminRequiredDocumentDefinition(id) {
+    return secureAdminDelete(`/admin/required-document-definitions/${id}/`)
   },
 
   async getAdminServiceRelations(params = {}) {

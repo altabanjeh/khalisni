@@ -12,6 +12,16 @@ interface PublicServiceCardProps {
   primaryLabel?: string;
 }
 
+function getPublicPrice(service: Service) {
+  if (service.pricing?.total_price != null) return Number(service.pricing.total_price);
+  if (service.total_fee != null) return Number(service.total_fee);
+  return Number(service.service_fee || 0) + Number(service.government_fee || 0);
+}
+
+function getDeliveryLabel(service: Service) {
+  return service.delivery_time?.label_ar || service.delivery_time?.label || `المدة: ${service.estimated_duration || 'غير محددة'} يوم`;
+}
+
 export function PublicServiceCard({
   service,
   onPress,
@@ -19,7 +29,8 @@ export function PublicServiceCard({
   primaryLabel = 'عرض التفاصيل',
 }: PublicServiceCardProps) {
   const Wrapper = onPress ? Pressable : View;
-  const totalFee = service.total_fee ?? (service.service_fee ?? 0) + (service.government_fee ?? 0);
+  const publicPrice = service.pricing?.total_price != null ? formatCurrency(getPublicPrice(service)) : null;
+  const priceLabel = publicPrice || service.pricing?.public_note_ar || 'السعر يحدد بعد المراجعة';
 
   return (
     <Wrapper onPress={onPress}>
@@ -32,8 +43,8 @@ export function PublicServiceCard({
           {service.description_ar || service.description_en || 'لا يوجد وصف مفصل لهذه الخدمة حالياً.'}
         </Text>
         <View style={styles.metaRow}>
-          <Text style={styles.metaText}>المدة: {service.estimated_duration || 'غير محددة'} يوم</Text>
-          <Text style={styles.priceText}>{formatCurrency(Number(totalFee || 0))}</Text>
+          <Text style={styles.metaText}>{getDeliveryLabel(service)}</Text>
+          <Text style={styles.priceText}>{priceLabel}</Text>
         </View>
         {onPrimaryAction ? (
           <Pressable onPress={onPrimaryAction} style={styles.cta}>

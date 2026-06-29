@@ -257,7 +257,7 @@ class Command(BaseCommand):
         )
 
     def _ensure_required_documents_approved(self, *, order, customer_user, reviewer):
-        for requirement in order.service.document_requirements.filter(is_active=True, is_required=True):
+        for requirement in order.service.document_requirements.filter(is_active=True, is_deleted=False, is_required=True):
             document = order.documents.filter(document_type=requirement.document_type, is_deleted=False).first()
             if not document:
                 document = create_order_document(

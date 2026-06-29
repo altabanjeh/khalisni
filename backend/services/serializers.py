@@ -6,6 +6,7 @@ from core.serializer_mixins import PkAsIdMixin
 from providers.models import ProviderProfile
 from services.models import (
     Address,
+    RequiredDocumentDefinition,
     Service,
     ServiceCategory,
     ServiceProviderAssignment,
@@ -36,6 +37,24 @@ SAFE_ADMIN_DOCUMENT_EXTENSIONS = {
 }
 
 
+def _public_total_price(service):
+    config = _matched_partner_config(service)
+    if config and config.custom_price is not None:
+        return config.custom_price
+    return service.total_fee
+
+
+def _public_pricing_payload(service):
+    total_price = _public_total_price(service)
+    return {
+        "total_price": total_price if service.show_total_price_public else None,
+        "government_fee": service.government_fee if service.show_government_fee_public else None,
+        "company_fee": service.service_fee if service.show_company_fee_public else None,
+        "public_note_ar": service.public_price_note_ar,
+        "public_note_en": service.public_price_note_en,
+    }
+
+
 class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     name = serializers.CharField(source="name_ar", read_only=True)
     description = serializers.CharField(source="description_ar", read_only=True)
@@ -43,6 +62,8 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     full_path_name = serializers.CharField(read_only=True)
     full_path_name_en = serializers.CharField(read_only=True)
     children = serializers.SerializerMethodField()
+    service_count = serializers.SerializerMethodField()
+    image = serializers.ImageField(read_only=True)
 
     class Meta:
         model = ServiceCategory
@@ -59,10 +80,13 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
             "description_en",
             "icon",
             "color",
+            "image",
             "display_order",
             "sort_order",
             "is_active",
+            "is_deleted",
             "show_on_public_site",
+            "service_count",
             "full_path_name",
             "full_path_name_en",
             "children",
@@ -71,8 +95,11 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     def get_children(self, obj):
         children = getattr(obj, "_prefetched_public_children", None)
         if children is None:
-            children = obj.children.filter(is_active=True, show_on_public_site=True).order_by("sort_order", "name_ar")
+            children = obj.children.filter(is_active=True, is_deleted=False, show_on_public_site=True).order_by("sort_order", "name_ar")
         return ServiceCategorySerializer(children, many=True, context=self.context).data
+
+    def get_service_count(self, obj):
+        return getattr(obj, "service_count", getattr(obj, "active_services_count", 0))
 
 
 class AdminCategoryRuleSerializer(serializers.ModelSerializer):
@@ -110,6 +137,7 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
             "display_order",
             "sort_order",
             "is_active",
+            "is_deleted",
             "show_on_public_site",
             "active_services_count",
             "services_preview",
@@ -288,11 +316,16 @@ class CustomerServiceRelationSerializer(serializers.ModelSerializer):
 
 class ServiceListSerializer(serializers.ModelSerializer):
     category = ServiceCategorySerializer(read_only=True)
-    total_fee = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     organization_id = serializers.IntegerField(read_only=True)
     scope = serializers.CharField(read_only=True)
     display_name = serializers.SerializerMethodField()
+    base_price = serializers.SerializerMethodField()
+    government_fee = serializers.SerializerMethodField()
+    service_fee = serializers.SerializerMethodField()
+    total_fee = serializers.SerializerMethodField()
     effective_total_fee = serializers.SerializerMethodField()
+    pricing = serializers.SerializerMethodField()
+    delivery_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -308,13 +341,17 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "description_ar",
             "description_en",
             "estimated_duration",
+            "estimated_duration_unit",
             "base_price",
             "government_fee",
             "service_fee",
             "total_fee",
             "effective_total_fee",
+            "pricing",
+            "delivery_time",
             "is_featured",
             "is_active",
+            "show_on_public_site",
         )
 
     def get_display_name(self, obj):
@@ -322,10 +359,25 @@ class ServiceListSerializer(serializers.ModelSerializer):
         return config.custom_name or obj.name_ar if config else obj.name_ar
 
     def get_effective_total_fee(self, obj):
-        config = _matched_partner_config(obj)
-        if config and config.custom_price is not None:
-            return config.custom_price
-        return obj.total_fee
+        return _public_total_price(obj) if obj.show_total_price_public else None
+
+    def get_base_price(self, obj):
+        return None
+
+    def get_government_fee(self, obj):
+        return obj.government_fee if obj.show_government_fee_public else None
+
+    def get_service_fee(self, obj):
+        return obj.service_fee if obj.show_company_fee_public else None
+
+    def get_total_fee(self, obj):
+        return _public_total_price(obj) if obj.show_total_price_public else None
+
+    def get_pricing(self, obj):
+        return _public_pricing_payload(obj)
+
+    def get_delivery_time(self, obj):
+        return obj.delivery_time_payload()
 
 
 class AdminServiceRuleSerializer(serializers.ModelSerializer):
@@ -336,6 +388,14 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
     organization_id = serializers.PrimaryKeyRelatedField(source="organization", queryset=ServiceCategory.objects.none(), write_only=True, required=False, allow_null=True)
     organization_name = serializers.CharField(source="organization.name", read_only=True)
     duration_display = serializers.SerializerMethodField()
+    required_document_ids = serializers.PrimaryKeyRelatedField(
+        source="required_document_definitions",
+        queryset=RequiredDocumentDefinition.objects.filter(is_active=True, is_deleted=False),
+        many=True,
+        write_only=True,
+        required=False,
+    )
+    required_documents = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -364,8 +424,18 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
             "base_price",
             "government_fee",
             "service_fee",
+            "show_total_price_public",
+            "show_government_fee_public",
+            "show_company_fee_public",
+            "public_price_note_ar",
+            "public_price_note_en",
             "estimated_duration",
             "estimated_duration_unit",
+            "delivery_time_mode",
+            "delivery_start_date",
+            "delivery_end_date",
+            "delivery_note_ar",
+            "delivery_note_en",
             "price_type",
             "terms_ar",
             "terms_en",
@@ -375,23 +445,35 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
             "is_online",
             "is_featured",
             "is_active",
+            "is_deleted",
+            "show_on_public_site",
             "display_order",
             "duration_display",
+            "required_document_ids",
+            "required_documents",
         )
         read_only_fields = ("duration_display",)
 
     def get_duration_display(self, obj):
-        return f"{obj.estimated_duration} {obj.get_estimated_duration_unit_display().lower()}"
+        return obj.delivery_time_payload().get("label_en")
+
+    def get_required_documents(self, obj):
+        requirements = obj.document_requirements.filter(is_deleted=False).select_related("document_definition").order_by("display_order", "name_ar")
+        return AdminRequiredDocumentRuleSerializer(requirements, many=True, context=self.context).data
 
     def create(self, validated_data):
+        required_document_definitions = validated_data.pop("required_document_definitions", [])
         validated_data["slug"] = validated_data.get("slug") or fallback_slug(
             validated_data.get("name_en"),
             validated_data.get("name_ar"),
             default_prefix="service",
         )
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        self._sync_required_documents(instance, required_document_definitions)
+        return instance
 
     def update(self, instance, validated_data):
+        required_document_definitions = validated_data.pop("required_document_definitions", None)
         if "slug" in validated_data:
             instance.slug = validated_data["slug"] or fallback_slug(
                 validated_data.get("name_en", instance.name_en),
@@ -405,18 +487,93 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
                 validated_data.get("name_ar", instance.name_ar),
                 default_prefix="service",
             )
-        return super().update(instance, validated_data)
+        instance = super().update(instance, validated_data)
+        if required_document_definitions is not None:
+            self._sync_required_documents(instance, required_document_definitions)
+        return instance
+
+    def _sync_required_documents(self, instance, definitions):
+        definition_ids = {definition.id for definition in definitions}
+        if not definitions and self.instance is None:
+            return
+
+        existing_links = {
+            link.document_definition_id: link
+            for link in instance.document_requirements.all()
+            if link.document_definition_id is not None
+        }
+
+        for definition in definitions:
+            link = existing_links.get(definition.id)
+            if link:
+                if link.is_deleted or not link.is_active:
+                    link.is_deleted = False
+                    link.is_active = True
+                    link.document_type = definition.code
+                    link.name_ar = definition.name_ar
+                    link.name_en = definition.name_en
+                    link.allowed_extensions = list(definition.allowed_extensions or [])
+                    link.max_file_size = definition.max_file_size
+                    link.save()
+                continue
+            ServiceRequiredDocument.objects.create(
+                service=instance,
+                document_definition=definition,
+                document_type=definition.code,
+                name_ar=definition.name_ar,
+                name_en=definition.name_en,
+                allowed_extensions=list(definition.allowed_extensions or []),
+                max_file_size=definition.max_file_size,
+                is_required=True,
+                is_active=True,
+            )
+
+        for definition_id, link in existing_links.items():
+            if definition_id not in definition_ids and not link.is_deleted:
+                link.soft_delete(reason="Removed from service requirement selection")
+
+
+class RequiredDocumentDefinitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequiredDocumentDefinition
+        fields = (
+            "id",
+            "code",
+            "name_ar",
+            "name_en",
+            "description_ar",
+            "description_en",
+            "allowed_extensions",
+            "allowed_mime_types",
+            "max_file_size",
+            "sort_order",
+            "is_active",
+            "is_deleted",
+        )
+
+
+class AdminRequiredDocumentDefinitionSerializer(RequiredDocumentDefinitionSerializer):
+    class Meta(RequiredDocumentDefinitionSerializer.Meta):
+        fields = RequiredDocumentDefinitionSerializer.Meta.fields
 
 
 class ServiceRequiredDocumentSerializer(serializers.ModelSerializer):
+    code = serializers.CharField(source="document_type", read_only=True)
+    definition_id = serializers.IntegerField(source="document_definition_id", read_only=True)
+
     class Meta:
         model = ServiceRequiredDocument
         fields = (
             "id",
             "service",
+            "definition_id",
+            "document_definition",
+            "code",
             "document_type",
             "name_ar",
             "name_en",
+            "instructions_ar",
+            "instructions_en",
             "is_required",
             "allowed_extensions",
             "max_file_size",
@@ -425,12 +582,18 @@ class ServiceRequiredDocumentSerializer(serializers.ModelSerializer):
             "provider_can_view_file",
             "display_order",
             "is_active",
+            "is_deleted",
         )
 
 
 class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
+    document_definition = RequiredDocumentDefinitionSerializer(read_only=True)
     service_name = serializers.CharField(source="service.name_ar", read_only=True)
     service_id = serializers.PrimaryKeyRelatedField(source="service", queryset=Service.objects.all())
+    document_definition_id = serializers.PrimaryKeyRelatedField(
+        source="document_definition",
+        queryset=RequiredDocumentDefinition.objects.filter(is_active=True, is_deleted=False),
+    )
     allowed_extension_options = serializers.SerializerMethodField()
     max_file_size_limit = serializers.SerializerMethodField()
 
@@ -440,9 +603,13 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
             "id",
             "service_name",
             "service_id",
+            "document_definition",
+            "document_definition_id",
             "document_type",
             "name_ar",
             "name_en",
+            "instructions_ar",
+            "instructions_en",
             "is_required",
             "allowed_extensions",
             "allowed_extension_options",
@@ -453,6 +620,7 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
             "provider_can_view_file",
             "display_order",
             "is_active",
+            "is_deleted",
         )
         read_only_fields = ("allowed_extension_options", "max_file_size_limit")
 
@@ -461,6 +629,11 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
 
     def get_max_file_size_limit(self, obj):
         return getattr(settings, "FILE_UPLOAD_MAX_SIZE", 0)
+
+    def run_validators(self, value):
+        if self.instance is not None and isinstance(value, dict) and "is_deleted" not in value:
+            value = {**value, "is_deleted": self.instance.is_deleted}
+        return super().run_validators(value)
 
     def validate_allowed_extensions(self, value):
         normalized = []
@@ -483,6 +656,19 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
                 f"Maximum file size cannot exceed {max_allowed_size} bytes."
             )
         return value
+
+    def validate(self, attrs):
+        definition = attrs.get("document_definition") or getattr(self.instance, "document_definition", None)
+        if definition is None:
+            raise serializers.ValidationError({"document_definition_id": "Document definition is required."})
+        attrs["document_type"] = definition.code
+        attrs["name_ar"] = definition.name_ar
+        attrs["name_en"] = definition.name_en
+        if not attrs.get("allowed_extensions"):
+            attrs["allowed_extensions"] = list(definition.allowed_extensions or [])
+        if not attrs.get("max_file_size"):
+            attrs["max_file_size"] = definition.max_file_size
+        return attrs
 
 
 class ServiceProviderAssignmentSerializer(PkAsIdMixin, serializers.ModelSerializer):
@@ -522,7 +708,7 @@ class AddressAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
 
 
 class ServiceDetailSerializer(ServiceListSerializer):
-    required_documents = ServiceRequiredDocumentSerializer(source="document_requirements", many=True, read_only=True)
+    required_documents = serializers.SerializerMethodField()
     steps = serializers.SerializerMethodField()
     steps_en = serializers.SerializerMethodField()
     related_services = serializers.SerializerMethodField()
@@ -569,8 +755,12 @@ class ServiceDetailSerializer(ServiceListSerializer):
         ]
 
     def get_related_services(self, obj):
-        related = obj.category.services.filter(is_active=True).exclude(pk=obj.pk)[:4]
+        related = obj.category.services.filter(is_active=True, is_deleted=False, show_on_public_site=True).exclude(pk=obj.pk)[:4]
         return RelatedServiceSerializer(related, many=True).data
+
+    def get_required_documents(self, obj):
+        requirements = obj.document_requirements.filter(is_active=True, is_deleted=False).select_related("document_definition").order_by("display_order", "name_ar")
+        return ServiceRequiredDocumentSerializer(requirements, many=True, context=self.context).data
 
     def _completed_service_ids(self):
         request = self.context.get("request")
@@ -586,7 +776,9 @@ class ServiceDetailSerializer(ServiceListSerializer):
         relations = obj.incoming_relations.filter(
             relation_type=ServiceRelation.RelationType.PREREQUISITE,
             is_active=True,
+            is_deleted=False,
             source_service__is_active=True,
+            source_service__is_deleted=False,
         ).select_related("source_service", "target_service")
         if organization is not None:
             relations = relations.filter(source_service_id__in=visible_ids)
@@ -606,7 +798,9 @@ class ServiceDetailSerializer(ServiceListSerializer):
                 ServiceRelation.RelationType.OPTIONAL_BUNDLE,
             ],
             is_active=True,
+            is_deleted=False,
             target_service__is_active=True,
+            target_service__is_deleted=False,
         ).select_related("source_service", "target_service")
         if organization is not None:
             relations = relations.filter(target_service_id__in=visible_ids)

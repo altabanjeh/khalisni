@@ -109,6 +109,21 @@ class OrderAPITests(APITestCase):
         self.customer.refresh_from_db()
         self.assertEqual(self.customer.phone, "0795555555")
 
+    def test_customer_order_snapshots_date_range_delivery_configuration(self):
+        self.service.delivery_time_mode = Service.DeliveryTimeMode.DATE_RANGE
+        self.service.delivery_start_date = "2026-07-01"
+        self.service.delivery_end_date = "2026-09-30"
+        self.service.delivery_note_ar = "Depends on government cycle."
+        self.service.save()
+
+        order = self._create_customer_order(phone="0795555500")
+
+        self.assertEqual(order.expected_delivery_mode, Service.DeliveryTimeMode.DATE_RANGE)
+        self.assertEqual(str(order.expected_delivery_start_date), "2026-07-01")
+        self.assertEqual(str(order.expected_delivery_end_date), "2026-09-30")
+        self.assertEqual(str(order.expected_delivery_date), "2026-09-30")
+        self.assertEqual(order.expected_delivery_note_snapshot, "Depends on government cycle.")
+
     def test_anonymous_user_cannot_create_order(self):
         response = self.client.post(
             "/api/orders/",

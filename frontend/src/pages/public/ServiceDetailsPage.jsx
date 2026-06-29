@@ -29,8 +29,9 @@ function ServiceDetailsPage() {
   const categoryName = getLocalizedField(service.category, { ar: 'name_ar', en: 'name_en' }, language)
   const requiredDocuments = (service.required_documents || [])
     .map((item, index) => ({
-      id: item?.id || item?.document_type || `required-document-${index}`,
+      id: item?.id || item?.definition_id || item?.document_type || `required-document-${index}`,
       label: getRequiredDocumentLabel(item, language),
+      instructions: getLocalizedField(item, { ar: 'instructions_ar', en: 'instructions_en' }, language, ''),
     }))
     .filter((item) => item.label)
   const prerequisiteServices = service.prerequisite_services || []
@@ -44,6 +45,11 @@ function ServiceDetailsPage() {
         'Deliver the final result',
       ]
 
+  const pricing = service.pricing || {}
+  const deliveryTime = service.delivery_time || {}
+  const visiblePriceNote = isArabic ? pricing.public_note_ar : pricing.public_note_en
+  const deliveryLabel = isArabic ? deliveryTime.label_ar || deliveryTime.label : deliveryTime.label_en || deliveryTime.label
+
   return (
     <div className="space-y-8">
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -53,22 +59,39 @@ function ServiceDetailsPage() {
           <p className="mt-5 text-sm leading-8 text-slate-600">{serviceDescription}</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl bg-brand-50 p-4">
-              <p className="text-xs text-slate-500">{isArabic ? 'المدة المتوقعة' : 'Estimated duration'}</p>
+              <p className="text-xs text-slate-500">{isArabic ? 'مدة التنفيذ' : 'Delivery time'}</p>
+              <p className="mt-2 font-bold text-ink">{deliveryLabel || (isArabic ? 'يحدد لاحقاً' : 'Shared later')}</p>
+            </div>
+            <div className="rounded-2xl bg-brand-50 p-4">
+              <p className="text-xs text-slate-500">{isArabic ? 'السعر الظاهر' : 'Visible price'}</p>
               <p className="mt-2 font-bold text-ink">
-                {isArabic
-                  ? `${service.estimated_duration} يوم`
-                  : `${service.estimated_duration} ${service.estimated_duration_unit || 'days'}`}
+                {pricing.total_price != null
+                  ? formatCurrency(pricing.total_price, language)
+                  : isArabic
+                    ? 'يحدد بعد المراجعة'
+                    : 'Shared after review'}
               </p>
             </div>
             <div className="rounded-2xl bg-brand-50 p-4">
-              <p className="text-xs text-slate-500">{isArabic ? 'رسوم الخدمة' : 'Service fee'}</p>
-              <p className="mt-2 font-bold text-ink">{formatCurrency(service.service_fee, language)}</p>
-            </div>
-            <div className="rounded-2xl bg-brand-50 p-4">
-              <p className="text-xs text-slate-500">{isArabic ? 'الرسوم الحكومية' : 'Government fee'}</p>
-              <p className="mt-2 font-bold text-ink">{formatCurrency(service.government_fee, language)}</p>
+              <p className="text-xs text-slate-500">{isArabic ? 'تفاصيل الرسوم' : 'Fee details'}</p>
+              <p className="mt-2 font-bold text-ink">
+                {pricing.government_fee != null || pricing.company_fee != null
+                  ? [
+                      pricing.government_fee != null ? `${isArabic ? 'حكومي' : 'Gov'}: ${formatCurrency(pricing.government_fee, language)}` : null,
+                      pricing.company_fee != null ? `${isArabic ? 'خدمة' : 'Service'}: ${formatCurrency(pricing.company_fee, language)}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' | ')
+                  : isArabic
+                    ? 'تفاصيل الرسوم مخفية'
+                    : 'Fees hidden'}
+              </p>
             </div>
           </div>
+          {visiblePriceNote ? <p className="mt-4 text-sm text-slate-500">{visiblePriceNote}</p> : null}
+          {(isArabic ? deliveryTime.note_ar : deliveryTime.note_en) ? (
+            <p className="mt-2 text-sm text-slate-500">{isArabic ? deliveryTime.note_ar : deliveryTime.note_en}</p>
+          ) : null}
         </div>
         <div className="glass-panel p-6">
           <h2 className="text-xl font-bold text-ink">{isArabic ? 'اطلب هذه الخدمة' : 'Request this service'}</h2>
@@ -89,9 +112,15 @@ function ServiceDetailsPage() {
           <ul className="mt-5 space-y-3">
             {requiredDocuments.map((item) => (
               <li key={item.id} className="rounded-2xl border border-brand-100 bg-white px-4 py-3 text-sm">
-                {item.label}
+                <p className="font-semibold text-ink">{item.label}</p>
+                {item.instructions ? <p className="mt-1 text-slate-500">{item.instructions}</p> : null}
               </li>
             ))}
+            {!requiredDocuments.length ? (
+              <li className="rounded-2xl border border-dashed border-border bg-white px-4 py-3 text-sm text-slate-500">
+                {isArabic ? 'لا توجد وثائق إلزامية محددة حالياً.' : 'No required documents are listed for this service.'}
+              </li>
+            ) : null}
           </ul>
         </div>
         <div className="glass-panel p-6">
@@ -124,13 +153,7 @@ function ServiceDetailsPage() {
                       item.is_completed ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
                     }`}
                   >
-                    {item.is_completed
-                      ? isArabic
-                        ? 'مكتملة'
-                        : 'Completed'
-                      : isArabic
-                        ? 'غير مكتملة'
-                        : 'Incomplete'}
+                    {item.is_completed ? (isArabic ? 'مكتملة' : 'Completed') : isArabic ? 'غير مكتملة' : 'Incomplete'}
                   </span>
                 </div>
                 <p className="mt-3 text-sm text-slate-600">
@@ -138,15 +161,6 @@ function ServiceDetailsPage() {
                     || (isArabic
                       ? 'هذه الخدمة مطلوبة قبل متابعة الطلب.'
                       : 'This service is required before the request can continue.')}
-                </p>
-                <p className="mt-2 text-xs font-semibold text-slate-500">
-                  {item.is_required
-                    ? isArabic
-                      ? 'متطلب إلزامي'
-                      : 'Required prerequisite'
-                    : isArabic
-                      ? 'متطلب اختياري'
-                      : 'Optional prerequisite'}
                 </p>
               </div>
             ))}
@@ -157,28 +171,13 @@ function ServiceDetailsPage() {
       {recommendedServices.length ? (
         <section className="glass-panel p-6">
           <h2 className="text-xl font-bold text-ink">{isArabic ? 'خدمات مقترحة بعد الإكمال' : 'Recommended services after completion'}</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            {isArabic
-              ? 'هذه خدمات مرتبطة قد تحتاجها بعد إنهاء هذه المعاملة.'
-              : 'These related services may be useful after this request is completed.'}
-          </p>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             {recommendedServices.map((item) => (
               <div key={item.id} className="rounded-3xl border border-border bg-white p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-bold text-ink">{getServiceName(item, 'target_service', language)}</p>
-                    <p className="mt-2 text-xs font-semibold text-brand-700">
-                      {item.relation_type === 'recommended_after'
-                        ? isArabic
-                          ? 'مقترح بعد الإنجاز'
-                          : 'Recommended after completion'
-                        : item.relation_type === 'optional_bundle'
-                          ? isArabic
-                            ? 'خيار إضافي'
-                            : 'Optional bundle'
-                          : item.relation_type_label}
-                    </p>
+                    <p className="mt-2 text-xs font-semibold text-brand-700">{item.relation_type_label}</p>
                   </div>
                   {item.target_service?.slug ? (
                     <Link className="text-sm font-semibold text-brand-700" to={`/services/${item.target_service.slug}`}>

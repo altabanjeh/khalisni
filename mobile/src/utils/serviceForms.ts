@@ -80,7 +80,14 @@ export function formatBytes(bytes: number) {
 export function getRequiredDocumentLabel(item?: string | ServiceRequirement | null) {
   if (typeof item === 'string') return item;
   if (!item) return '';
-  return item.name_ar || item.name_en || item.document_type || '';
+  return (
+    item.name_ar ||
+    item.document_definition?.name_ar ||
+    item.name_en ||
+    item.document_definition?.name_en ||
+    item.document_type ||
+    ''
+  );
 }
 
 export function getRequiredDocumentType(item?: string | ServiceRequirement | null, index = 0) {

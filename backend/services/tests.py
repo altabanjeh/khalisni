@@ -6,7 +6,7 @@ from accounts.models import CustomUser
 from audit.models import AuditLog
 from organizations.models import Organization, OrganizationMembership
 from orders.models import Order
-from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
+from services.models import RequiredDocumentDefinition, Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
 
 
 class ServiceManagementPermissionTests(APITestCase):
@@ -103,11 +103,19 @@ class ServiceManagementPermissionTests(APITestCase):
             estimated_duration=2,
         )
         self.client.force_authenticate(self.admin)
+        definition = RequiredDocumentDefinition.objects.create(
+            code="national_id",
+            name_ar="National ID",
+            name_en="National ID",
+            allowed_extensions=[".pdf", ".jpg"],
+            max_file_size=5242880,
+        )
 
         create_response = self.client.post(
             "/api/admin/service-documents/",
             {
                 "service_id": service.id,
+                "document_definition_id": definition.id,
                 "document_type": "national_id",
                 "name_ar": "هوية",
                 "name_en": "National ID",
@@ -139,6 +147,52 @@ class ServiceManagementPermissionTests(APITestCase):
                 entity_id=str(requirement_id),
             ).exists()
         )
+
+    def test_admin_can_manage_required_document_definitions(self):
+        self.client.force_authenticate(self.admin)
+
+        create_response = self.client.post(
+            "/api/admin/required-document-definitions/",
+            {
+                "code": "family_book",
+                "name_ar": "Family Book",
+                "name_en": "Family Book",
+                "description_ar": "Used for family status requests.",
+                "description_en": "Used for family status requests.",
+                "allowed_extensions": [".pdf", ".jpg"],
+                "max_file_size": 5242880,
+                "sort_order": 1,
+                "is_active": True,
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        definition_id = create_response.data["id"]
+
+        update_response = self.client.patch(
+            f"/api/admin/required-document-definitions/{definition_id}/",
+            {"description_ar": "Updated definition"},
+            format="json",
+        )
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            RequiredDocumentDefinition.objects.get(pk=definition_id).description_ar,
+            "Updated definition",
+        )
+
+        duplicate_response = self.client.post(
+            "/api/admin/required-document-definitions/",
+            {
+                "code": "family_book",
+                "name_ar": "Family Book Copy",
+                "name_en": "Family Book Copy",
+                "allowed_extensions": [".pdf"],
+                "max_file_size": 1024,
+                "is_active": True,
+            },
+            format="json",
+        )
+        self.assertEqual(duplicate_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_admin_service_delete_soft_disables_used_service(self):
         service = Service.objects.create(
@@ -781,3 +835,82 @@ class ServiceCategoryReorderScopeTests(APITestCase):
         self.category_a.refresh_from_db()
         self.assertEqual(self.category_a.sort_order, 7)
         self.assertEqual(self.category_a.display_order, 7)
+
+
+class ServiceCatalogEnhancementTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.category = ServiceCategory.objects.create(
+            name_ar="Public Services",
+            name_en="Public Services",
+            slug="public-services",
+            show_on_public_site=True,
+            is_active=True,
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name_ar="Enhanced Service",
+            name_en="Enhanced Service",
+            slug="enhanced-service",
+            description_ar="Details",
+            estimated_duration=10,
+            estimated_duration_unit="days",
+            base_price=10,
+            government_fee=5,
+            service_fee=7,
+            show_total_price_public=True,
+            show_government_fee_public=False,
+            show_company_fee_public=False,
+            delivery_time_mode=Service.DeliveryTimeMode.DATE_RANGE,
+            delivery_start_date="2026-07-01",
+            delivery_end_date="2026-09-30",
+            public_price_note_ar="قد تتغير الرسوم",
+        )
+        self.definition = RequiredDocumentDefinition.objects.create(
+            code="national_id",
+            name_ar="National ID",
+            name_en="National ID",
+            allowed_extensions=[".pdf"],
+            max_file_size=1024 * 1024,
+        )
+        ServiceRequiredDocument.objects.create(
+            service=self.service,
+            document_definition=self.definition,
+            document_type=self.definition.code,
+            name_ar=self.definition.name_ar,
+            name_en=self.definition.name_en,
+            is_required=True,
+            allowed_extensions=[".pdf"],
+            max_file_size=1024 * 1024,
+        )
+
+    def test_public_service_detail_returns_structured_pricing_delivery_and_definition_data(self):
+        response = self.client.get(f"/api/services/{self.service.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(str(response.data["pricing"]["total_price"]), "22.00")
+        self.assertIsNone(response.data["pricing"]["government_fee"])
+        self.assertIsNone(response.data["pricing"]["company_fee"])
+        self.assertEqual(response.data["delivery_time"]["mode"], "date_range")
+        self.assertEqual(response.data["delivery_time"]["start_date"], "2026-07-01")
+        self.assertEqual(response.data["delivery_time"]["end_date"], "2026-09-30")
+        self.assertEqual(response.data["required_documents"][0]["definition_id"], self.definition.id)
+        self.assertEqual(response.data["required_documents"][0]["code"], "national_id")
+
+    def test_public_category_cards_return_service_count(self):
+        response = self.client.get("/api/public-site/service-categories/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["slug"], self.category.slug)
+        self.assertEqual(response.data[0]["service_count"], 1)
+
+    def test_soft_deleted_service_is_hidden_from_public_endpoints(self):
+        self.service.soft_delete(reason="Retired")
+
+        services_response = self.client.get("/api/services/")
+        categories_response = self.client.get("/api/public-site/service-categories/")
+
+        self.assertEqual(services_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(services_response.data, [])
+        self.assertEqual(categories_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(categories_response.data, [])

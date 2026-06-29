@@ -644,7 +644,7 @@ def get_fallback_action_guides(screen_key: str):
 def build_service_fallback(service: Service):
     required_documents = []
     optional_documents = []
-    for requirement in service.document_requirements.filter(is_active=True).order_by("display_order", "requirement_id"):
+    for requirement in service.document_requirements.filter(is_active=True, is_deleted=False).order_by("display_order", "requirement_id"):
         item = requirement.name_ar or requirement.document_type
         if requirement.is_required:
             required_documents.append(item)

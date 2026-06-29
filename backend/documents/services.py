@@ -44,6 +44,7 @@ def create_order_document(
         requirement = order.service.document_requirements.filter(
             document_type=document_type,
             is_active=True,
+            is_deleted=False,
         ).first()
 
     initial_status = Document.DocumentStatus.UPLOADED
@@ -198,6 +199,7 @@ def can_user_download_document(*, user, document):
         requirement = order.service.document_requirements.filter(
             document_type=document.document_type,
             is_active=True,
+            is_deleted=False,
         ).first()
         return bool(requirement and requirement.provider_can_view_file)
 

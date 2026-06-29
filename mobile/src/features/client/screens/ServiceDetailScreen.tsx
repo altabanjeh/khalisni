@@ -17,6 +17,9 @@ export function ServiceDetailScreen({ route, navigation }: { route: any; navigat
   const slug = route.params?.slug;
   const query = useQuery({ queryKey: ['service', slug], queryFn: () => servicesApi.getService(slug), enabled: !!slug });
 
+  const pricing = query.data?.pricing ?? {};
+  const deliveryTime = query.data?.delivery_time ?? {};
+
   return (
     <AppScreen title="تفاصيل الخدمة">
       {query.isLoading ? <LoadingState /> : null}
@@ -31,16 +34,25 @@ export function ServiceDetailScreen({ route, navigation }: { route: any; navigat
             </Text>
             <View style={styles.metricRow}>
               <AppCard variant="muted" style={styles.metricCard}>
-                <Text style={styles.metricLabel}>المدة المتوقعة</Text>
-                <Text style={styles.metricValue}>{query.data.estimated_duration || 'غير محددة'} يوم</Text>
+                <Text style={styles.metricLabel}>التسليم</Text>
+                <Text style={styles.metricValue}>{deliveryTime.label_ar || deliveryTime.label || 'يحدد لاحقاً'}</Text>
               </AppCard>
               <AppCard variant="muted" style={styles.metricCard}>
-                <Text style={styles.metricLabel}>رسوم الخدمة</Text>
-                <Text style={styles.metricValue}>{formatCurrency(query.data.service_fee ?? 0)}</Text>
+                <Text style={styles.metricLabel}>السعر الظاهر</Text>
+                <Text style={styles.metricValue}>
+                  {pricing.total_price != null ? formatCurrency(Number(pricing.total_price)) : pricing.public_note_ar || 'يحدد بعد المراجعة'}
+                </Text>
               </AppCard>
               <AppCard variant="muted" style={styles.metricCard}>
-                <Text style={styles.metricLabel}>الرسوم الحكومية</Text>
-                <Text style={styles.metricValue}>{formatCurrency(query.data.government_fee ?? 0)}</Text>
+                <Text style={styles.metricLabel}>تفاصيل الرسوم</Text>
+                <Text style={styles.metricValue}>
+                  {pricing.government_fee != null || pricing.company_fee != null
+                    ? [
+                        pricing.government_fee != null ? `حكومي: ${formatCurrency(Number(pricing.government_fee))}` : null,
+                        pricing.company_fee != null ? `خدمة: ${formatCurrency(Number(pricing.company_fee))}` : null,
+                      ].filter(Boolean).join(' | ')
+                    : 'الرسوم التفصيلية مخفية'}
+                </Text>
               </AppCard>
             </View>
             <AppButton
@@ -56,7 +68,7 @@ export function ServiceDetailScreen({ route, navigation }: { route: any; navigat
                 <AppCard key={document.id || `${document.document_type}-${index}`} variant="muted">
                   <Text style={styles.listItemTitle}>{getRequiredDocumentLabel(document)}</Text>
                   <Text style={styles.listItemText}>
-                    {document.is_required === false ? 'اختياري' : 'مطلوب'}
+                    {document.instructions_ar || (document.is_required === false ? 'ملف اختياري' : 'ملف مطلوب')}
                   </Text>
                 </AppCard>
               ))}

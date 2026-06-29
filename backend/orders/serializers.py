@@ -262,7 +262,7 @@ class ProviderOrderDetailSerializer(ProviderOrderListSerializer):
 
 
 class PublicOrderCreateSerializer(serializers.Serializer):
-    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.filter(is_active=True))
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.filter(is_active=True, is_deleted=False))
     organization = serializers.CharField(required=False, allow_blank=True)
     branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), required=False, allow_null=True)
     full_name = serializers.CharField(max_length=255)
@@ -322,7 +322,7 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError({"branch_id": "Branch must belong to the selected organization."})
 
         service = attrs["service"]
-        requirements = list(service.document_requirements.filter(is_active=True).order_by("display_order", "name_ar"))
+        requirements = list(service.document_requirements.filter(is_active=True, is_deleted=False).order_by("display_order", "name_ar"))
         requirements_by_type = {requirement.document_type: requirement for requirement in requirements}
         required_types = {requirement.document_type for requirement in requirements if requirement.is_required}
 
