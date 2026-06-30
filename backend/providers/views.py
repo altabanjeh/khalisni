@@ -149,24 +149,46 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         old_value = {
             "is_available": provider.is_available,
             "user_is_active": provider.user.is_active,
+            "is_deleted": provider.is_deleted,
         }
         self.enforce_delete_guard(request, instance=provider, old_value=old_value)
         with transaction.atomic():
-            provider.user.is_active = False
-            provider.user.save(update_fields=["is_active", "updated_at"])
-            provider.is_available = False
-            provider.save(update_fields=["is_available", "updated_at"])
+            provider.soft_delete(user=request.user)
+            provider.user.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_provider_profile",
+                action="delete_provider_profile",
                 entity_type="ProviderProfile",
                 entity_id=provider.pk,
                 entity_name=provider.user.full_name,
                 old_value=old_value,
-                new_value={"is_available": provider.is_available, "user_is_active": provider.user.is_active},
+                new_value={"is_available": provider.is_available, "user_is_active": provider.user.is_active, "is_deleted": provider.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])
+    def restore(self, request, pk=None):
+        provider = ProviderProfile.objects.select_related("user").get(pk=pk)
+        old_value = {
+            "is_available": provider.is_available,
+            "user_is_active": provider.user.is_active,
+            "is_deleted": provider.is_deleted,
+        }
+        provider.restore()
+        if getattr(provider.user, "is_deleted", False):
+            provider.user.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_provider_profile",
+            entity_type="ProviderProfile",
+            entity_id=provider.pk,
+            entity_name=provider.user.full_name,
+            old_value=old_value,
+            new_value={"is_available": provider.is_available, "user_is_active": provider.user.is_active, "is_deleted": provider.is_deleted},
+        )
+        return response.Response(ProviderAdminListSerializer(provider).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])
     def approval(self, request, pk=None):

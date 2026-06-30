@@ -35,6 +35,33 @@ function filterSoftDeleted(records, params = {}) {
   return records
 }
 
+function softDeleteMockRecord(records, id, extra = {}) {
+  return records.map((record) =>
+    Number(record.id) === Number(id)
+      ? {
+          ...record,
+          ...extra,
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+        }
+      : record,
+  )
+}
+
+function restoreMockRecord(records, id, extra = {}) {
+  return records.map((record) =>
+    Number(record.id) === Number(id)
+      ? {
+          ...record,
+          ...extra,
+          is_deleted: false,
+          deleted_at: null,
+          delete_reason: '',
+        }
+      : record,
+  )
+}
+
 const reviewStatuses = ['NEW', 'UNDER_REVIEW', 'WAITING_CUSTOMER']
 const providerStatuses = ['ASSIGNED', 'IN_PROGRESS', 'READY_FOR_DELIVERY', 'COMPLETED']
 
@@ -48,7 +75,7 @@ const mockNotificationCenter = mockNotifications.map((notification, index) => ({
 }))
 let mockPublicMissingServiceRequests = [...mockMissingServiceRequests]
 const mockRoleOptions = ['admin', 'customer', 'employee', 'support', 'provider']
-const mockUsers = [
+let mockUsers = [
   {
     id: 1,
     full_name: 'Ù…Ø´Ø±Ù Ø§Ù„Ù†Ø¸Ø§Ù…',
@@ -164,7 +191,7 @@ const mockEmployeeReports = {
     { day: '2026-04-22', total: 3 },
   ],
 }
-const mockNotificationTemplates = [
+let mockNotificationTemplates = [
   { template_id: 1, key: 'missing_documents_followup', channel: 'system', title_ar: 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø·Ù„Ø¨', message_ar: 'ÙŠØ±Ø¬Ù‰ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ« Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ.' },
   { template_id: 2, key: 'review_started', channel: 'system', title_ar: 'Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', message_ar: 'ØªÙ… Ø¨Ø¯Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø·Ù„Ø¨Ùƒ.' },
 ]
@@ -328,7 +355,7 @@ const mockHelpGuideMetadata = {
   ],
   can_manage_help_guides: true,
 }
-const mockPublicAdvertisements = [
+let mockPublicAdvertisements = [
   {
     id: 1,
     advertisement_id: 1,
@@ -352,9 +379,9 @@ const mockPublicAdvertisements = [
 ]
 const mockPublicHomepage = {
   ...fallbackHomepagePayload,
-  advertisements: mockPublicAdvertisements,
   important_alert: null,
 }
+let mockProviderRecords = mockProviders.map((provider) => ({ ...provider, is_deleted: Boolean(provider.is_deleted) }))
 
 export const api = {
   register: async (payload) =>
@@ -392,9 +419,14 @@ export const api = {
       () => servicesApi.getService(slug),
       mockServices.find((item) => item.slug === slug) || mockServices[0],
     ),
-  getPublicHomepage: async () => withTestValue(() => publicSiteApi.getPublicHomepage(), mockPublicHomepage),
+  getPublicHomepage: async () =>
+    withTestValue(() => publicSiteApi.getPublicHomepage(), {
+      ...mockPublicHomepage,
+      advertisements: mockPublicAdvertisements.filter((item) => !item.is_deleted),
+    }),
   getPublicTheme: async () => withTestValue(() => publicSiteApi.getPublicTheme(), fallbackPublicTheme),
-  getPublicAdvertisements: async () => withTestValue(() => publicSiteApi.getPublicAdvertisements(), mockPublicAdvertisements),
+  getPublicAdvertisements: async () =>
+    withTestValue(() => publicSiteApi.getPublicAdvertisements(), mockPublicAdvertisements.filter((item) => !item.is_deleted)),
   createPublicMissingServiceRequest: async (payload) =>
     withTestValue(
       () => publicSiteApi.createPublicMissingServiceRequest(payload),
@@ -509,10 +541,25 @@ export const api = {
   updateAdminService: servicesApi.updateAdminService,
   deleteAdminService: servicesApi.deleteAdminService,
   restoreAdminService: async (id) => withTestValue(() => servicesApi.restoreAdminService(id), null),
-  getAdminUsers: async () => withTestValue(() => servicesApi.getAdminUsers(), mockUsers),
+  getAdminUsers: async (params = {}) => withTestValue(() => servicesApi.getAdminUsers(params), filterSoftDeleted(mockUsers, params)),
   createAdminUser: servicesApi.createAdminUser,
   updateAdminUser: servicesApi.updateAdminUser,
-  deleteAdminUser: servicesApi.deleteAdminUser,
+  deleteAdminUser: async (id, payload = {}) =>
+    withTestValue(
+      () => servicesApi.deleteAdminUser(id, payload),
+      (() => {
+        mockUsers = softDeleteMockRecord(mockUsers, id, { is_active: false, delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminUser: async (id) =>
+    withTestValue(
+      () => servicesApi.restoreAdminUser(id),
+      (() => {
+        mockUsers = restoreMockRecord(mockUsers, id, { is_active: true })
+        return null
+      })(),
+    ),
   getSystemSettings: async () => withTestValue(() => servicesApi.getSystemSettings(), mockSystemSettings),
   createSystemSetting: servicesApi.createSystemSetting,
   updateSystemSetting: servicesApi.updateSystemSetting,
@@ -532,8 +579,8 @@ export const api = {
   updateAdminPublicSiteContent: publicSiteApi.updateAdminPublicSiteContent,
   getAdminPublicSiteTheme: async () => withTestValue(() => publicSiteApi.getAdminPublicSiteTheme(), fallbackPublicTheme),
   updateAdminPublicSiteTheme: publicSiteApi.updateAdminPublicSiteTheme,
-  getAdminPublicSiteAdvertisements: async () =>
-    withTestValue(() => publicSiteApi.getAdminPublicSiteAdvertisements(), mockPublicAdvertisements),
+  getAdminPublicSiteAdvertisements: async (params = {}) =>
+    withTestValue(() => publicSiteApi.getAdminPublicSiteAdvertisements(params), filterSoftDeleted(mockPublicAdvertisements, params)),
   getMissingServiceRequests: async (params = {}) =>
     withTestValue(
       () => publicSiteApi.getMissingServiceRequests(params),
@@ -577,7 +624,22 @@ export const api = {
     ),
   createAdminPublicSiteAdvertisement: publicSiteApi.createAdminPublicSiteAdvertisement,
   updateAdminPublicSiteAdvertisement: publicSiteApi.updateAdminPublicSiteAdvertisement,
-  deleteAdminPublicSiteAdvertisement: publicSiteApi.deleteAdminPublicSiteAdvertisement,
+  deleteAdminPublicSiteAdvertisement: async (id, payload = {}) =>
+    withTestValue(
+      () => publicSiteApi.deleteAdminPublicSiteAdvertisement(id, payload),
+      (() => {
+        mockPublicAdvertisements = softDeleteMockRecord(mockPublicAdvertisements, id, { delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminPublicSiteAdvertisement: async (id) =>
+    withTestValue(
+      () => publicSiteApi.restoreAdminPublicSiteAdvertisement(id),
+      (() => {
+        mockPublicAdvertisements = restoreMockRecord(mockPublicAdvertisements, id)
+        return null
+      })(),
+    ),
   getDailyReport: async () =>
     withTestValue(() => servicesApi.getDailyReport(), {
       date: '2026-04-24',
@@ -600,20 +662,58 @@ export const api = {
       provider_performance: mockAdminDashboard.provider_performance,
     }),
 
-  getProviders: async (params = {}) => withTestValue(() => providersApi.getProviders(params), mockProviders),
+  getProviders: async (params = {}) => withTestValue(() => providersApi.getProviders(params), filterSoftDeleted(mockProviderRecords, params)),
   createProvider: providersApi.createProvider,
   updateProvider: providersApi.updateProvider,
-  deleteProvider: providersApi.deleteProvider,
+  deleteProvider: async (id, payload = {}) =>
+    withTestValue(
+      () => providersApi.deleteProvider(id, payload),
+      (() => {
+        mockProviderRecords = softDeleteMockRecord(mockProviderRecords, id, {
+          account_active: false,
+          delete_reason: payload.delete_reason || '',
+        })
+        return null
+      })(),
+    ),
+  restoreProvider: async (id) =>
+    withTestValue(
+      () => providersApi.restoreProvider(id),
+      (() => {
+        mockProviderRecords = restoreMockRecord(mockProviderRecords, id, { account_active: true })
+        return null
+      })(),
+    ),
   updateProviderApproval: providersApi.updateProviderApproval,
   updateProviderActivation: providersApi.updateProviderActivation,
   getNotifications: async () => withTestValue(() => notificationsApi.getNotifications(), mockNotifications),
   getNotificationCenter: async () => withTestValue(() => notificationsApi.getNotificationCenter(), mockNotificationCenter),
   getAuditLogs: async (params = {}) => withTestValue(() => notificationsApi.getAuditLogs(params), mockAuditLogs),
-  getEmployeeNotificationTemplates: async () => withTestValue(() => notificationsApi.getEmployeeNotificationTemplates(), mockNotificationTemplates),
-  getAdminNotificationTemplates: async (params = {}) => withTestValue(() => notificationsApi.getAdminNotificationTemplates(params), mockNotificationTemplates),
+  getEmployeeNotificationTemplates: async () =>
+    withTestValue(() => notificationsApi.getEmployeeNotificationTemplates(), mockNotificationTemplates.filter((item) => !item.is_deleted)),
+  getAdminNotificationTemplates: async (params = {}) =>
+    withTestValue(() => notificationsApi.getAdminNotificationTemplates(params), filterSoftDeleted(mockNotificationTemplates, params)),
   createAdminNotificationTemplate: notificationsApi.createAdminNotificationTemplate,
   updateAdminNotificationTemplate: notificationsApi.updateAdminNotificationTemplate,
-  deleteAdminNotificationTemplate: notificationsApi.deleteAdminNotificationTemplate,
+  deleteAdminNotificationTemplate: async (id, payload = {}) =>
+    withTestValue(
+      () => notificationsApi.deleteAdminNotificationTemplate(id, payload),
+      (() => {
+        mockNotificationTemplates = softDeleteMockRecord(mockNotificationTemplates, id, {
+          is_active: false,
+          delete_reason: payload.delete_reason || '',
+        })
+        return null
+      })(),
+    ),
+  restoreAdminNotificationTemplate: async (id) =>
+    withTestValue(
+      () => notificationsApi.restoreAdminNotificationTemplate(id),
+      (() => {
+        mockNotificationTemplates = restoreMockRecord(mockNotificationTemplates, id, { is_active: true })
+        return null
+      })(),
+    ),
   previewNotificationTemplate: async (payload) =>
     withTestValue(() => notificationsApi.previewNotificationTemplate(payload), {
       title_ar: payload?.title_ar || '',
@@ -642,12 +742,12 @@ export const api = {
         screen_key: params?.screen_key || '',
         screen_label: HELP_SCREEN_REGISTRY.find((item) => item.screen_key === params?.screen_key)?.label || '',
         workflow_status: params?.workflow_status || '',
-        fields: mockHelpFields.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
-        actions: mockHelpActions.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+        fields: mockHelpFields.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
+        actions: mockHelpActions.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
         service: null,
-        workflows: mockHelpWorkflows.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
-        results: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
-        screen_guides: mockHelpGuides.filter((guide) => !params?.screen_key || guide.screen_key === params.screen_key),
+        workflows: mockHelpWorkflows.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
+        results: mockHelpGuides.filter((guide) => !guide.is_deleted && (!params?.screen_key || guide.screen_key === params.screen_key)),
+        screen_guides: mockHelpGuides.filter((guide) => !guide.is_deleted && (!params?.screen_key || guide.screen_key === params.screen_key)),
       },
     ),
   getHelpGuideIndex: async (params = {}) =>
@@ -657,6 +757,7 @@ export const api = {
       slug: params?.slug || '',
       preview_role: params?.preview_role || '',
       guides: mockHelpGuides.filter((guide) => {
+        if (guide.is_deleted) return false
         if (params?.category && guide.category !== params.category) return false
         if (params?.slug && guide.slug !== params.slug) return false
         const search = String(params?.q || params?.search || '').trim().toLowerCase()
@@ -665,39 +766,39 @@ export const api = {
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(search))
       }),
-      quick_links: mockHelpGuides.filter((guide) => guide.is_quick_link),
+      quick_links: mockHelpGuides.filter((guide) => guide.is_quick_link && !guide.is_deleted),
       ...mockHelpGuideMetadata,
     }),
   searchHelp: async (params = {}) =>
     withTestValue(() => helpGuidesApi.searchHelp(params), {
       query: params?.q || '',
-      screens: mockHelpGuides,
-      actions: mockHelpActions,
-      fields: mockHelpFields,
+      screens: mockHelpGuides.filter((item) => !item.is_deleted),
+      actions: mockHelpActions.filter((item) => !item.is_deleted),
+      fields: mockHelpFields.filter((item) => !item.is_deleted),
       services: [],
-      workflows: mockHelpWorkflows,
+      workflows: mockHelpWorkflows.filter((item) => !item.is_deleted),
     }),
   getFieldHelp: async (params = {}) =>
     withTestValue(
       () => helpGuidesApi.getFieldHelp(params),
-      mockHelpFields.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+      mockHelpFields.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
     ),
   getActionHelp: async (params = {}) =>
     withTestValue(
       () => helpGuidesApi.getActionHelp(params),
-      mockHelpActions.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+      mockHelpActions.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
     ),
   getWorkflowHelp: async (params = {}) =>
     withTestValue(
       () => helpGuidesApi.getWorkflowHelp(params),
-      mockHelpWorkflows.filter((item) => !params?.screen_key || item.screen_key === params.screen_key),
+      mockHelpWorkflows.filter((item) => !item.is_deleted && (!params?.screen_key || item.screen_key === params.screen_key)),
     ),
   getServiceHelp: async (serviceId, params = {}) =>
     withTestValue(() => helpGuidesApi.getServiceHelp(serviceId, params), null),
   getHelpGuides: async (params = {}) =>
     withTestValue(
       () => helpGuidesApi.getHelpGuides(params),
-      mockHelpGuides.filter((guide) => {
+      filterSoftDeleted(mockHelpGuides, params).filter((guide) => {
         const screenKey = String(params?.screen_key || '').trim()
         const search = String(params?.search || '').trim().toLowerCase()
         if (screenKey && guide.screen_key !== screenKey) return false
@@ -709,7 +810,7 @@ export const api = {
     ),
   getHelpGuideMetadata: async () => withTestValue(() => helpGuidesApi.getHelpGuideMetadata(), mockHelpGuideMetadata),
   getAdminHelpScreens: async (params = {}) =>
-    withTestValue(() => helpGuidesApi.getAdminHelpScreens(params), mockHelpGuides),
+    withTestValue(() => helpGuidesApi.getAdminHelpScreens(params), filterSoftDeleted(mockHelpGuides, params)),
   createAdminHelpScreen: async (payload) =>
     withTestValue(
       () => helpGuidesApi.createAdminHelpScreen(payload),
@@ -766,29 +867,81 @@ export const api = {
     withTestValue(
       () => helpGuidesApi.deleteAdminHelpScreen(id),
       (() => {
-        mockHelpGuides = mockHelpGuides.map((guide) =>
-          guide.id === Number(id) ? { ...guide, is_active: false } : guide,
-        )
+        mockHelpGuides = softDeleteMockRecord(mockHelpGuides, id, { is_active: false })
         return null
       })(),
     ),
-  getAdminHelpFields: async () => withTestValue(() => helpGuidesApi.getAdminHelpFields(), mockHelpFields),
+  restoreAdminHelpScreen: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.restoreAdminHelpScreen(id),
+      (() => {
+        mockHelpGuides = restoreMockRecord(mockHelpGuides, id, { is_active: true })
+        return null
+      })(),
+    ),
+  getAdminHelpFields: async (params = {}) => withTestValue(() => helpGuidesApi.getAdminHelpFields(params), filterSoftDeleted(mockHelpFields, params)),
   createAdminHelpField: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpField(payload), { id: Date.now(), ...payload }),
   updateAdminHelpField: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpField(id, payload), { id: Number(id), ...payload }),
-  deleteAdminHelpField: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpField(id), null),
-  getAdminHelpActions: async () => withTestValue(() => helpGuidesApi.getAdminHelpActions(), mockHelpActions),
+  deleteAdminHelpField: async (id, payload = {}) =>
+    withTestValue(
+      () => helpGuidesApi.deleteAdminHelpField(id, payload),
+      (() => {
+        mockHelpFields = softDeleteMockRecord(mockHelpFields, id, { is_active: false, delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminHelpField: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.restoreAdminHelpField(id),
+      (() => {
+        mockHelpFields = restoreMockRecord(mockHelpFields, id, { is_active: true })
+        return null
+      })(),
+    ),
+  getAdminHelpActions: async (params = {}) => withTestValue(() => helpGuidesApi.getAdminHelpActions(params), filterSoftDeleted(mockHelpActions, params)),
   createAdminHelpAction: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpAction(payload), { id: Date.now(), ...payload }),
   updateAdminHelpAction: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpAction(id, payload), { id: Number(id), ...payload }),
-  deleteAdminHelpAction: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpAction(id), null),
-  getAdminHelpServices: async () => withTestValue(() => helpGuidesApi.getAdminHelpServices(), []),
+  deleteAdminHelpAction: async (id, payload = {}) =>
+    withTestValue(
+      () => helpGuidesApi.deleteAdminHelpAction(id, payload),
+      (() => {
+        mockHelpActions = softDeleteMockRecord(mockHelpActions, id, { is_active: false, delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminHelpAction: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.restoreAdminHelpAction(id),
+      (() => {
+        mockHelpActions = restoreMockRecord(mockHelpActions, id, { is_active: true })
+        return null
+      })(),
+    ),
+  getAdminHelpServices: async (params = {}) => withTestValue(() => helpGuidesApi.getAdminHelpServices(params), filterSoftDeleted([], params)),
   createAdminHelpService: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpService(payload), { id: Date.now(), ...payload }),
   updateAdminHelpService: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpService(id, payload), { id: Number(id), ...payload }),
-  deleteAdminHelpService: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpService(id), null),
-  getAdminHelpWorkflows: async () => withTestValue(() => helpGuidesApi.getAdminHelpWorkflows(), mockHelpWorkflows),
+  deleteAdminHelpService: async (id, payload = {}) => withTestValue(() => helpGuidesApi.deleteAdminHelpService(id, payload), null),
+  restoreAdminHelpService: async (id) => withTestValue(() => helpGuidesApi.restoreAdminHelpService(id), null),
+  getAdminHelpWorkflows: async (params = {}) => withTestValue(() => helpGuidesApi.getAdminHelpWorkflows(params), filterSoftDeleted(mockHelpWorkflows, params)),
   createAdminHelpWorkflow: async (payload) => withTestValue(() => helpGuidesApi.createAdminHelpWorkflow(payload), { id: Date.now(), ...payload }),
   updateAdminHelpWorkflow: async (id, payload) => withTestValue(() => helpGuidesApi.updateAdminHelpWorkflow(id, payload), { id: Number(id), ...payload }),
-  deleteAdminHelpWorkflow: async (id) => withTestValue(() => helpGuidesApi.deleteAdminHelpWorkflow(id), null),
-  getAdminHelpScreenshots: async () => withTestValue(() => helpGuidesApi.getAdminHelpScreenshots(), mockHelpScreenshots),
+  deleteAdminHelpWorkflow: async (id, payload = {}) =>
+    withTestValue(
+      () => helpGuidesApi.deleteAdminHelpWorkflow(id, payload),
+      (() => {
+        mockHelpWorkflows = softDeleteMockRecord(mockHelpWorkflows, id, { is_active: false, delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminHelpWorkflow: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.restoreAdminHelpWorkflow(id),
+      (() => {
+        mockHelpWorkflows = restoreMockRecord(mockHelpWorkflows, id, { is_active: true })
+        return null
+      })(),
+    ),
+  getAdminHelpScreenshots: async (params = {}) => withTestValue(() => helpGuidesApi.getAdminHelpScreenshots(params), filterSoftDeleted(mockHelpScreenshots, params)),
   createAdminHelpScreenshot: async (payload) =>
     withTestValue(
       () => helpGuidesApi.createAdminHelpScreenshot(payload),
@@ -806,11 +959,19 @@ export const api = {
         return mockHelpScreenshots.find((item) => item.id === Number(id)) || null
       })(),
     ),
-  deleteAdminHelpScreenshot: async (id) =>
+  deleteAdminHelpScreenshot: async (id, payload = {}) =>
     withTestValue(
-      () => helpGuidesApi.deleteAdminHelpScreenshot(id),
+      () => helpGuidesApi.deleteAdminHelpScreenshot(id, payload),
       (() => {
-        mockHelpScreenshots = mockHelpScreenshots.filter((item) => item.id !== Number(id))
+        mockHelpScreenshots = softDeleteMockRecord(mockHelpScreenshots, id, { is_active: false, delete_reason: payload.delete_reason || '' })
+        return null
+      })(),
+    ),
+  restoreAdminHelpScreenshot: async (id) =>
+    withTestValue(
+      () => helpGuidesApi.restoreAdminHelpScreenshot(id),
+      (() => {
+        mockHelpScreenshots = restoreMockRecord(mockHelpScreenshots, id, { is_active: true })
         return null
       })(),
     ),
@@ -825,7 +986,7 @@ export const api = {
       in_progress: 3,
       completed: 12,
       delayed: 1,
-      provider: mockProviders[0],
+      provider: mockProviderRecords[0],
     }),
   getProviderOrders: async () => withTestValue(() => providersApi.getProviderOrders(), mockProviderOrders),
   getProviderOrder: providersApi.getProviderOrder,

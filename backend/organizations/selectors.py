@@ -31,8 +31,10 @@ def active_memberships_for_user(user):
     return OrganizationMembership.objects.select_related("organization", "branch").filter(
         user=user,
         is_active=True,
+        is_deleted=False,
         organization__is_active=True,
-    )
+        organization__is_deleted=False,
+    ).filter(Q(branch__isnull=True) | Q(branch__is_deleted=False))
 
 
 def membership_roles_for_user(user):
@@ -106,7 +108,7 @@ def is_customer_user(user):
 
 def organizations_for_user(user, *, organization_type=None):
     memberships = active_memberships_for_user(user)
-    queryset = Organization.objects.filter(memberships__in=memberships).distinct()
+    queryset = Organization.objects.filter(is_deleted=False, memberships__in=memberships).distinct()
     if organization_type:
         queryset = queryset.filter(organization_type=organization_type)
     return queryset
@@ -116,7 +118,7 @@ def branches_for_user(user, *, organization=None):
     memberships = active_memberships_for_user(user).exclude(branch=None)
     if organization is not None:
         memberships = memberships.filter(organization=organization)
-    return Branch.objects.filter(memberships__in=memberships).distinct()
+    return Branch.objects.filter(is_deleted=False, memberships__in=memberships).distinct()
 
 
 def primary_partner_for_user(user):
@@ -134,7 +136,7 @@ def customer_organization_for_user(user):
 def resolve_organization_by_ref(ref):
     if not ref:
         return None
-    queryset = Organization.objects.filter(is_active=True)
+    queryset = Organization.objects.filter(is_active=True, is_deleted=False)
     if str(ref).isdigit():
         return queryset.filter(pk=ref).first()
     return queryset.filter(slug=str(ref)).first()

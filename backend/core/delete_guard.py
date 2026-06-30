@@ -47,6 +47,19 @@ def _extract_delete_password(request):
     return str(raw_password or "").strip()
 
 
+def _extract_delete_reason(request):
+    try:
+        raw_reason = request.data.get("delete_reason", "")
+    except Exception:  # pragma: no cover - request.data can fail only on malformed requests
+        raw_reason = ""
+    return str(raw_reason or "").strip()
+
+
+def _include_deleted(request):
+    value = request.query_params.get("include_deleted", "")
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def is_admin_delete_user(user):
     return bool(user and getattr(user, "is_authenticated", False) and is_platform_super_admin(user))
 
@@ -176,6 +189,16 @@ class AdminDeleteGuardMixin:
     def get_delete_instance(self):
         return self.get_object()
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        request = getattr(self, "request", None)
+        model = getattr(queryset, "model", None)
+        if request is None or model is None or not hasattr(model, "is_deleted"):
+            return queryset
+        if _include_deleted(request):
+            return queryset
+        return queryset.filter(is_deleted=False)
+
     def get_delete_entity_type(self, instance=None):
         if getattr(self, "audit_entity_type", ""):
             return self.audit_entity_type
@@ -228,6 +251,9 @@ class AdminDeleteGuardMixin:
         raise PermissionDenied("Only admin users can delete or deactivate records.")
 
     def perform_delete_action(self, instance):
+        if hasattr(instance, "soft_delete"):
+            instance.soft_delete(user=self.request.user, reason=_extract_delete_reason(self.request))
+            return
         self.perform_destroy(instance)
 
     def log_delete_success(self, request, instance, *, old_value=None, new_value=None):
@@ -249,7 +275,8 @@ class AdminDeleteGuardMixin:
         try:
             with transaction.atomic():
                 self.perform_delete_action(instance)
-                self.log_delete_success(request, instance, old_value=old_value, new_value=None)
+                new_value = self.get_delete_old_value(instance) if hasattr(instance, "is_deleted") else None
+                self.log_delete_success(request, instance, old_value=old_value, new_value=new_value)
         except Exception as exc:
             log_delete_failure(
                 request=request,

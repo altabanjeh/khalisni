@@ -19,6 +19,9 @@ class OrganizationSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )
@@ -37,6 +40,9 @@ class BranchSerializer(serializers.ModelSerializer):
             "address",
             "phone",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )
@@ -59,6 +65,9 @@ class OrganizationMembershipSerializer(serializers.ModelSerializer):
             "branch_name",
             "role",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
         )
 
@@ -78,6 +87,9 @@ class OrganizationBrandingSerializer(serializers.ModelSerializer):
             "public_site_title",
             "public_site_description",
             "show_public_page",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )
@@ -99,6 +111,9 @@ class PartnerServiceConfigSerializer(serializers.ModelSerializer):
             "custom_name",
             "custom_price",
             "visible_to_customers",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )

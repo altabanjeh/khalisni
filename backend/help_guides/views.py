@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.db import transaction
 from rest_framework import permissions, response, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
@@ -243,7 +244,7 @@ class BaseAdminGuideViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        return self.queryset.order_by(*self.ordering)
+        return super().get_queryset().order_by(*self.ordering)
 
     def perform_create(self, serializer):
         instance = serializer.save(created_by=self.request.user, updated_by=self.request.user)
@@ -269,23 +270,43 @@ class BaseAdminGuideViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        old_value = {"is_active": instance.is_active}
+        old_value = {"is_active": instance.is_active, "is_deleted": instance.is_deleted}
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.is_active = False
+            instance.soft_delete(user=request.user)
             instance.updated_by = request.user
-            instance.save(update_fields=["is_active", "updated_by", "updated_at"])
+            instance.save(update_fields=["updated_by", "updated_at"])
             create_audit_log(
                 request=request,
                 user=request.user,
-                action=f"deactivate_{instance.__class__.__name__.lower()}",
+                action=f"delete_{instance.__class__.__name__.lower()}",
                 entity_type=instance.__class__.__name__,
                 entity_id=instance.pk,
                 entity_name=getattr(instance, "title", "") or getattr(instance, "caption", ""),
                 old_value=old_value,
-                new_value={"is_active": False},
+                new_value={"is_active": instance.is_active, "is_deleted": instance.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = self.queryset.model.objects.get(pk=pk)
+        old_value = {"is_active": instance.is_active, "is_deleted": instance.is_deleted}
+        instance.restore()
+        if hasattr(instance, "updated_by_id"):
+            instance.updated_by = request.user
+            instance.save(update_fields=["updated_by", "updated_at"])
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action=f"restore_{instance.__class__.__name__.lower()}",
+            entity_type=instance.__class__.__name__,
+            entity_id=instance.pk,
+            entity_name=getattr(instance, "title", "") or getattr(instance, "caption", ""),
+            old_value=old_value,
+            new_value={"is_active": instance.is_active, "is_deleted": instance.is_deleted},
+        )
+        return response.Response(self.get_serializer(instance).data)
 
 
 class HelpGuideViewSet(BaseAdminGuideViewSet):

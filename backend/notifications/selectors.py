@@ -12,7 +12,7 @@ def get_notifications_for_user(user):
     notifications tied to orders they are allowed to work on, and admins see
     the full stream.
     """
-    queryset = Notification.objects.select_related("recipient", "actor", "order", "template")
+    queryset = Notification.objects.select_related("recipient", "actor", "order", "template").filter(is_deleted=False)
 
     if not user or not user.is_authenticated:
         return queryset.none()

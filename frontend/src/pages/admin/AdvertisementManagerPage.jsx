@@ -63,7 +63,12 @@ function applyServerErrors(error, setError, setFeedback) {
 
 function AdvertisementManagerPage() {
   const { isArabic } = useLanguage()
-  const { data: advertisements = [], loading, reload } = useAsyncData(() => api.getAdminPublicSiteAdvertisements(), [], [])
+  const [statusFilter, setStatusFilter] = useState('active')
+  const { data: advertisements = [], loading, reload } = useAsyncData(
+    () => api.getAdminPublicSiteAdvertisements({ status: statusFilter }),
+    [statusFilter],
+    [],
+  )
   const [selectedId, setSelectedId] = useState(null)
   const [feedback, setFeedback] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -165,6 +170,18 @@ function AdvertisementManagerPage() {
     }
   }
 
+  async function handleRestore(id) {
+    if (!window.confirm('Restore this advertisement?')) return
+    try {
+      await api.restoreAdminPublicSiteAdvertisement(id)
+      broadcastPublicSiteUpdate('advertisement-restore')
+      setFeedback({ type: 'success', text: 'Advertisement restored.' })
+      reload()
+    } catch (error) {
+      setFeedback({ type: 'error', text: getDisplayError(error) })
+    }
+  }
+
   const columns = [
     { key: 'title_ar', label: 'العنوان' },
     {
@@ -199,6 +216,53 @@ function AdvertisementManagerPage() {
     },
   ]
 
+  const tableColumns = [
+    {
+      key: 'title_display',
+      label: isArabic ? 'العنوان' : 'Title',
+      render: (row) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>{row.title_ar}</span>
+          {row.is_deleted ? (
+            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
+              {isArabic ? 'محذوف' : 'Deleted'}
+            </span>
+          ) : null}
+        </div>
+      ),
+    },
+    columns[1],
+    columns[2],
+    columns[3],
+    {
+      key: 'status_display',
+      label: isArabic ? 'الحالة' : 'Status',
+      render: (row) => (row.is_deleted ? (isArabic ? 'محذوف' : 'Deleted') : row.is_active ? (isArabic ? 'نشط' : 'Active') : (isArabic ? 'موقوف' : 'Inactive')),
+    },
+    {
+      key: 'actions_display',
+      label: isArabic ? 'الإجراءات' : 'Actions',
+      render: (row) => (
+        <div className="flex gap-2">
+          {row.is_deleted ? (
+            <button className="btn-secondary px-3 py-2 text-xs" onClick={() => handleRestore(row.id)} type="button">
+              {isArabic ? 'استعادة' : 'Restore'}
+            </button>
+          ) : (
+            <>
+              <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
+                {isArabic ? 'تعديل' : 'Edit'}
+              </button>
+              <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger" onClick={() => handleDelete(row.id)} type="button">
+                {isArabic ? 'حذف' : 'Delete'}
+              </button>
+            </>
+          )}
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div className="page-section space-y-6">
       <PageHeader
@@ -219,10 +283,19 @@ function AdvertisementManagerPage() {
           <div className="text-sm text-slate-500">جاري تحميل الإعلانات...</div>
         ) : (
           <DataTable
-            columns={columns}
+            columns={tableColumns}
             emptyDescription="أضف أول إعلان لعرضه أسفل البطل أو في قسم الإعلانات العامة."
             emptyTitle="لا توجد إعلانات"
+            mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+            rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
             rows={advertisements}
+            toolbar={
+              <select className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+                <option value="active">{isArabic ? 'Ø§Ù„Ù†Ø´Ø·Ø©' : 'Active'}</option>
+                <option value="deleted">{isArabic ? 'Ø§Ù„Ù…Ø­Ø°ÙˆÙØ©' : 'Deleted'}</option>
+                <option value="all">{isArabic ? 'Ø§Ù„ÙƒÙ„' : 'All'}</option>
+              </select>
+            }
           />
         )}
         <div className="mt-4">

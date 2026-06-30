@@ -8,6 +8,7 @@ from django.db import models, transaction
 from django.utils import timezone
 
 from core.choices import OrderPriority, OrderStatus, UserRole
+from core.models import SoftDeleteModel
 from workflow.rules import get_allowed_order_transitions
 from workflow.services import validate_order_transition
 
@@ -614,7 +615,7 @@ class OrderStatusLog(models.Model):
         return f"{self.order} | {self.old_status} -> {self.new_status}"
 
 
-class OrderNote(models.Model):
+class OrderNote(SoftDeleteModel):
     """
     Notes attached to an order.
 
@@ -737,7 +738,7 @@ class OrderAssignmentHistory(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-class OrderIssue(models.Model):
+class OrderIssue(SoftDeleteModel):
     issue_id = models.BigAutoField(primary_key=True)
 
     order = models.ForeignKey(
@@ -791,7 +792,7 @@ class OrderIssue(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-class Rating(models.Model):
+class Rating(SoftDeleteModel):
     """
     Customer rating for a completed order.
 

@@ -1,6 +1,7 @@
 import { Search, Shield, TriangleAlert, UsersRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import AdminSoftDeleteModal from '../../components/AdminSoftDeleteModal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
@@ -156,12 +157,14 @@ function PermissionsPanel({ user, onSaved }) {
 
 function AdminUsersRolesPage() {
   const { toast } = useToast()
-  const { data: users = [], loading, reload } = useAsyncData(() => api.getAdminUsers(), [], [])
+  const [statusFilter, setStatusFilter] = useState('active')
+  const { data: users = [], loading, reload } = useAsyncData(() => api.getAdminUsers({ status: statusFilter }), [statusFilter], [])
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [activeTab, setActiveTab] = useState('info')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const userForm = useForm({ defaultValues: defaultUserValues })
@@ -261,12 +264,12 @@ function AdminUsersRolesPage() {
     }
   }
 
-  async function handleDeleteConfirm() {
+  async function handleDeleteConfirm(payload) {
     if (!pendingDelete) return
     const user = pendingDelete
     setPendingDelete(null)
     try {
-      await api.deleteAdminUser(user.id)
+      await api.deleteAdminUser(user.id, payload)
       if (String(selectedUserId) === String(user.id)) closeForm()
       reload()
       toast('تم تعطيل المستخدم.', 'success')
@@ -284,6 +287,30 @@ function AdminUsersRolesPage() {
         placeholder="بحث بالاسم أو البريد أو الهاتف..."
         value={search}
       />
+    </div>
+  )
+
+  async function handleRestoreConfirm() {
+    if (!pendingRestore) return
+    const user = pendingRestore
+    setPendingRestore(null)
+    try {
+      await api.restoreAdminUser(user.id)
+      reload()
+      toast('User restored.', 'success')
+    } catch (error) {
+      toast(getDisplayError(error), 'error')
+    }
+  }
+
+  const filtersToolbar = (
+    <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
+      {toolbar}
+      <select className="field text-sm" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+        <option value="active">Active</option>
+        <option value="deleted">Deleted</option>
+        <option value="all">All</option>
+      </select>
     </div>
   )
 
@@ -325,6 +352,82 @@ function AdminUsersRolesPage() {
       },
     },
   ]
+
+  const tableColumns = [
+    ...columns.slice(0, 3),
+    {
+      key: 'role_display',
+      label: 'Role',
+      render: (row) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>{roleLabels[row.role] || row.role}</span>
+          {row.is_deleted ? (
+            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
+              Deleted
+            </span>
+          ) : null}
+        </div>
+      ),
+    },
+    {
+      key: 'status_display',
+      label: 'Status',
+      render: (row) => <StatusBadge status={row.is_deleted ? 'REJECTED' : row.is_active ? 'VERIFIED' : 'PENDING_REVIEW'} />,
+    },
+    {
+      key: 'actions_display',
+      label: 'Actions',
+      render: (row) => {
+        const canManageRecord = canManageUserRecord(row, canManageAdminUsers)
+        return (
+          <div className="flex gap-2">
+            {row.is_deleted ? (
+              <button
+                className="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!canManageRecord}
+                onClick={() => setPendingRestore(row)}
+                type="button"
+              >
+                Restore
+              </button>
+            ) : (
+              <>
+                <button
+                  className="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!canManageRecord}
+                  onClick={() => openEditForm(row.id)}
+                  type="button"
+                >
+                  Edit
+                </button>
+                <button
+                  className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!canManageRecord}
+                  onClick={() => setPendingDelete(row)}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
+        )
+      },
+    },
+  ]
+
+  function renderMobileCard(row) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-bold text-ink">{row.full_name}</p>
+          <StatusBadge status={row.is_deleted ? 'REJECTED' : row.is_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
+        </div>
+        <p className="text-sm text-slate-600">{row.email}</p>
+        <p className="text-sm text-slate-500">{roleLabels[row.role] || row.role}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="page-section space-y-6">
@@ -380,23 +483,16 @@ function AdminUsersRolesPage() {
       </section>
 
       <DataTable
-        columns={columns}
+        columns={tableColumns}
         emptyDescription="أضف أول مستخدم تشغيلي من هذه الشاشة. حسابات العملاء تُنشأ تلقائياً."
         emptyTitle="لا يوجد مستخدمون"
         loading={loading}
-        mobileCard={(row) => (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">{row.full_name}</p>
-              <StatusBadge status={row.is_active ? 'VERIFIED' : 'REJECTED'} />
-            </div>
-            <p className="text-sm text-slate-600">{row.email}</p>
-            <p className="text-sm text-slate-500">{roleLabels[row.role] || row.role}</p>
-          </div>
-        )}
+        mobileCard={renderMobileCard}
+        mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
         pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
+        rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
         rows={paginated}
-        toolbar={toolbar}
+        toolbar={filtersToolbar}
       />
 
       <FormModal
@@ -499,6 +595,15 @@ function AdminUsersRolesPage() {
           )}
         </div>
       </FormModal>
+
+      <ConfirmModal
+        confirmLabel="Restore"
+        description={`This will restore "${pendingRestore?.full_name || ''}" back to active admin lists.`}
+        onClose={() => setPendingRestore(null)}
+        onConfirm={handleRestoreConfirm}
+        open={!!pendingRestore}
+        title="Restore user"
+      />
 
       <ConfirmModal
         confirmLabel="نعم، عطّل الحساب"

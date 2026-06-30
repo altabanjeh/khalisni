@@ -194,12 +194,14 @@ function HelpGuideManagementPage() {
   ]
   const [activeTab, setActiveTab] = useState('screens')
   const [search, setSearch] = useState('')
+  const [recordStatus, setRecordStatus] = useState('active')
   const [roleFilter, setRoleFilter] = useState('')
   const [screenFilter, setScreenFilter] = useState('')
   const [serviceFilter, setServiceFilter] = useState('')
   const [selectedRecord, setSelectedRecord] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const form = useForm({ defaultValues: DEFAULT_VALUES.screens })
 
@@ -210,18 +212,18 @@ function HelpGuideManagementPage() {
   )
   const { data: permissions = {}, loading: permissionsLoading } = useAsyncData(() => api.getAvailablePermissions(), [], {})
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
-  const { data: screens = [], loading: screensLoading, reload: reloadScreens } = useAsyncData(() => api.getAdminHelpScreens(), [], [])
-  const { data: screenshots = [], loading: screenshotsLoading, reload: reloadScreenshots } = useAsyncData(() => api.getAdminHelpScreenshots(), [], [])
-  const { data: fields = [], loading: fieldsLoading, reload: reloadFields } = useAsyncData(() => api.getAdminHelpFields(), [], [])
-  const { data: actions = [], loading: actionsLoading, reload: reloadActions } = useAsyncData(() => api.getAdminHelpActions(), [], [])
+  const { data: screens = [], loading: screensLoading, reload: reloadScreens } = useAsyncData(() => api.getAdminHelpScreens({ status: recordStatus }), [recordStatus], [])
+  const { data: screenshots = [], loading: screenshotsLoading, reload: reloadScreenshots } = useAsyncData(() => api.getAdminHelpScreenshots({ status: recordStatus }), [recordStatus], [])
+  const { data: fields = [], loading: fieldsLoading, reload: reloadFields } = useAsyncData(() => api.getAdminHelpFields({ status: recordStatus }), [recordStatus], [])
+  const { data: actions = [], loading: actionsLoading, reload: reloadActions } = useAsyncData(() => api.getAdminHelpActions({ status: recordStatus }), [recordStatus], [])
   const { data: serviceGuides = [], loading: serviceGuidesLoading, reload: reloadServiceGuides } = useAsyncData(
-    () => api.getAdminHelpServices(),
-    [],
+    () => api.getAdminHelpServices({ status: recordStatus }),
+    [recordStatus],
     [],
   )
   const { data: workflows = [], loading: workflowsLoading, reload: reloadWorkflows } = useAsyncData(
-    () => api.getAdminHelpWorkflows(),
-    [],
+    () => api.getAdminHelpWorkflows({ status: recordStatus }),
+    [recordStatus],
     [],
   )
 
@@ -240,6 +242,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpScreen,
         update: api.updateAdminHelpScreen,
         remove: api.deleteAdminHelpScreen,
+        restore: api.restoreAdminHelpScreen,
         summary: (row) => row.title,
         columns: [
           { key: 'title', label: 'Title' },
@@ -284,6 +287,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpScreenshot,
         update: api.updateAdminHelpScreenshot,
         remove: api.deleteAdminHelpScreenshot,
+        restore: api.restoreAdminHelpScreenshot,
         summary: (row) => row.caption,
         columns: [
           { key: 'caption', label: 'Caption' },
@@ -310,6 +314,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpField,
         update: api.updateAdminHelpField,
         remove: api.deleteAdminHelpField,
+        restore: api.restoreAdminHelpField,
         summary: (row) => row.field_label,
         columns: [
           { key: 'field_label', label: 'Field' },
@@ -354,6 +359,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpAction,
         update: api.updateAdminHelpAction,
         remove: api.deleteAdminHelpAction,
+        restore: api.restoreAdminHelpAction,
         summary: (row) => row.button_label,
         columns: [
           { key: 'button_label', label: 'Button' },
@@ -391,6 +397,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpService,
         update: api.updateAdminHelpService,
         remove: api.deleteAdminHelpService,
+        restore: api.restoreAdminHelpService,
         summary: (row) => row.service_name || row.service,
         columns: [
           { key: 'service_name', label: 'Service' },
@@ -431,6 +438,7 @@ function HelpGuideManagementPage() {
         create: api.createAdminHelpWorkflow,
         update: api.updateAdminHelpWorkflow,
         remove: api.deleteAdminHelpWorkflow,
+        restore: api.restoreAdminHelpWorkflow,
         summary: (row) => row.workflow_key,
         columns: [
           { key: 'workflow_key', label: 'Workflow key' },
@@ -588,8 +596,50 @@ function HelpGuideManagementPage() {
     }
   }
 
+  async function handleRestore() {
+    if (!pendingRestore || !currentConfig.restore) return
+    try {
+      await currentConfig.restore(pendingRestore.id)
+      toast(`${currentConfig.title} restored.`, 'success')
+      currentConfig.reload()
+      setPendingRestore(null)
+    } catch (error) {
+      toast(getDisplayError(error), 'error')
+    }
+  }
+
   const loading = metadataLoading || permissionsLoading || servicesLoading || screensLoading || screenshotsLoading || fieldsLoading || actionsLoading || serviceGuidesLoading || workflowsLoading
   const previewValues = form.watch()
+  const tableColumns = [
+    ...currentConfig.columns,
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row) => (row.is_deleted ? 'Deleted' : row.is_active === false ? 'Inactive' : 'Active'),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (row) => (
+        <div className="flex gap-2">
+          {row.is_deleted ? (
+            <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore(row)} type="button">
+              Restore
+            </button>
+          ) : (
+            <>
+              <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEdit(row)} type="button">
+                Edit
+              </button>
+              <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger" onClick={() => setPendingDelete(row)} type="button">
+                Deactivate
+              </button>
+            </>
+          )}
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="page-section space-y-6">
@@ -641,29 +691,20 @@ function HelpGuideManagementPage() {
               </option>
             ))}
           </select>
+          <select className="field" onChange={(event) => setRecordStatus(event.target.value)} value={recordStatus}>
+            <option value="active">Active</option>
+            <option value="deleted">Deleted</option>
+            <option value="all">All</option>
+          </select>
         </div>
 
         <DataTable
-          columns={[
-            ...currentConfig.columns,
-            {
-              key: 'actions',
-              label: 'Actions',
-              render: (row) => (
-                <div className="flex gap-2">
-                  <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEdit(row)} type="button">
-                    Edit
-                  </button>
-                  <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger" onClick={() => setPendingDelete(row)} type="button">
-                    Deactivate
-                  </button>
-                </div>
-              ),
-            },
-          ]}
+          columns={tableColumns}
           emptyDescription={`Add the first ${currentConfig.title.toLowerCase()} to extend the in-app guide.`}
           emptyTitle={`No ${currentConfig.title.toLowerCase()}s found`}
           loading={loading}
+          mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+          rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
           rows={filteredRows}
         />
       </section>
@@ -786,6 +827,14 @@ function HelpGuideManagementPage() {
         open={!!pendingDelete}
         title={`Deactivate ${currentConfig.title}`}
         variant="danger"
+      />
+      <ConfirmModal
+        confirmLabel="Restore"
+        description={`This will restore "${pendingRestore ? currentConfig.summary(pendingRestore) : ''}" back to active help content.`}
+        onClose={() => setPendingRestore(null)}
+        onConfirm={handleRestore}
+        open={!!pendingRestore}
+        title={`Restore ${currentConfig.title}`}
       />
     </div>
   )

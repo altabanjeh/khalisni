@@ -34,7 +34,7 @@ class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
 
 class ManualNotificationSerializer(serializers.Serializer):
     template_id = serializers.PrimaryKeyRelatedField(
-        queryset=NotificationTemplate.objects.filter(is_active=True, channel=Notification.Channel.SYSTEM)
+        queryset=NotificationTemplate.objects.filter(is_active=True, is_deleted=False, channel=Notification.Channel.SYSTEM)
     )
 
     def validate_template_id(self, value):
@@ -65,6 +65,9 @@ class NotificationTemplateSerializer(serializers.ModelSerializer):
             "message_ar",
             "message_en",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
             "available_placeholders",

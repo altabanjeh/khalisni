@@ -207,22 +207,38 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
-        old_value = {"role": user.role, "is_active": user.is_active}
+        old_value = {"role": user.role, "is_active": user.is_active, "is_deleted": user.is_deleted}
         self.enforce_delete_guard(request, instance=user, old_value=old_value)
         with transaction.atomic():
-            user.is_active = False
-            user.save(update_fields=["is_active", "updated_at"])
+            user.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_admin_user",
+                action="delete_admin_user",
                 entity_type="CustomUser",
                 entity_id=user.pk,
                 entity_name=user.full_name,
                 old_value=old_value,
-                new_value={"is_active": user.is_active},
+                new_value={"is_active": user.is_active, "is_deleted": user.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        user = CustomUser.objects.get(pk=pk)
+        old_value = {"role": user.role, "is_active": user.is_active, "is_deleted": user.is_deleted}
+        user.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_admin_user",
+            entity_type="CustomUser",
+            entity_id=user.pk,
+            entity_name=user.full_name,
+            old_value=old_value,
+            new_value={"is_active": user.is_active, "is_deleted": user.is_deleted},
+        )
+        return response.Response(self.get_serializer(user).data)
 
     @action(detail=True, methods=["get", "patch"], url_path="permissions")
     def user_permissions(self, request, pk=None):

@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 
+from core.models import SoftDeleteModel
 
 def _validate_permission_key(value: str, *, field_name: str) -> None:
     if not value:
@@ -15,7 +16,7 @@ def _validate_permission_key(value: str, *, field_name: str) -> None:
         raise ValidationError({field_name: "Permission does not exist in the current system."})
 
 
-class HelpGuide(models.Model):
+class HelpGuide(SoftDeleteModel):
     class Category(models.TextChoices):
         NAVIGATION = "navigation", "Navigation"
         ACCOUNT = "account", "Account access"
@@ -119,7 +120,7 @@ class HelpGuide(models.Model):
         _validate_permission_key(self.related_permission, field_name="related_permission")
 
 
-class HelpGuideScreenshot(models.Model):
+class HelpGuideScreenshot(SoftDeleteModel):
     screenshot_id = models.BigAutoField(primary_key=True)
     help_guide = models.ForeignKey(
         HelpGuide,
@@ -161,7 +162,7 @@ class HelpGuideScreenshot(models.Model):
             )
 
 
-class HelpGuideBase(models.Model):
+class HelpGuideBase(SoftDeleteModel):
     screen_key = models.CharField(max_length=100, blank=True, db_index=True)
     role = models.CharField(
         max_length=40,

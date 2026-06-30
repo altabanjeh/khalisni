@@ -4,6 +4,7 @@ from django.core.validators import EmailValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils import timezone
 
+from core.models import SoftDeleteModel
 from public_site.validators import (
     HEX_COLOR_VALIDATOR,
     PublicSiteImageValidator,
@@ -147,12 +148,12 @@ class PublicPageContent(TimeStampedModel):
 class AdvertisementQuerySet(models.QuerySet):
     def currently_public(self, now=None):
         current_time = now or timezone.now()
-        return self.filter(is_active=True, start_date__lte=current_time).filter(
+        return self.filter(is_deleted=False, is_active=True, start_date__lte=current_time).filter(
             models.Q(end_date__isnull=True) | models.Q(end_date__gte=current_time)
         ).order_by("display_order", "-start_date", "-advertisement_id")
 
 
-class Advertisement(TimeStampedModel):
+class Advertisement(SoftDeleteModel, TimeStampedModel):
     class Type(models.TextChoices):
         NEW_SERVICE = "new_service", "New service"
         OFFICE_ANNOUNCEMENT = "office_announcement", "Office announcement"

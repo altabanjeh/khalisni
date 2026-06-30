@@ -58,6 +58,9 @@ class ProviderAdminListSerializer(serializers.ModelSerializer):
             "is_available",
             "is_approved",
             "account_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "approval_status_label",
             "capability_summary",
             "created_at",
@@ -81,7 +84,7 @@ class ProviderAdminSerializer(serializers.ModelSerializer):
     service_category_ids = serializers.PrimaryKeyRelatedField(
         source="service_categories",
         many=True,
-        queryset=ServiceCategory.objects.all(),
+        queryset=ServiceCategory.objects.filter(is_deleted=False),
         required=False,
     )
     service_categories = serializers.SlugRelatedField(many=True, slug_field="name_ar", read_only=True)
@@ -109,6 +112,9 @@ class ProviderAdminSerializer(serializers.ModelSerializer):
             "account_active",
             "rating",
             "total_completed_orders",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "approval_status_label",
         )

@@ -16,6 +16,33 @@ function normalizeMissingServiceRequest(record) {
   return withId(record, 'request_id')
 }
 
+function normalizeSoftDeleteParams(params = {}) {
+  const nextParams = { ...params }
+  const status = String(nextParams.status || '').trim().toLowerCase()
+  delete nextParams.status
+
+  if (status === 'all' || status === 'deleted') {
+    nextParams.include_deleted = true
+  }
+
+  return {
+    params: nextParams,
+    status,
+  }
+}
+
+function filterSoftDeleted(records, status) {
+  if (status === 'deleted') {
+    return records.filter((record) => record?.is_deleted)
+  }
+
+  if (status === 'active') {
+    return records.filter((record) => !record?.is_deleted)
+  }
+
+  return records
+}
+
 function appendFormDataValue(formData, key, value) {
   if (value == null) return
   if (typeof FileList !== 'undefined' && value instanceof FileList) {
@@ -73,12 +100,14 @@ export const publicSiteApi = {
   },
 
   async getAdminPublicSiteAdvertisements(params = {}) {
+    const normalized = normalizeSoftDeleteParams(params)
     const query = new URLSearchParams()
-    Object.entries(params || {}).forEach(([key, value]) => {
+    Object.entries(normalized.params || {}).forEach(([key, value]) => {
       if (value != null && value !== '') query.append(key, String(value))
     })
     const suffix = query.toString() ? `?${query.toString()}` : ''
-    return unwrapList(await http.get(`/admin/public-site/advertisements/${suffix}`)).map(normalizeAdvertisement)
+    const records = unwrapList(await http.get(`/admin/public-site/advertisements/${suffix}`)).map(normalizeAdvertisement)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminPublicSiteAdvertisement(payload) {
@@ -89,8 +118,12 @@ export const publicSiteApi = {
     return normalizeAdvertisement(await http.patch(`/admin/public-site/advertisements/${id}/`, toFormData(payload)))
   },
 
-  deleteAdminPublicSiteAdvertisement(id) {
-    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`)
+  deleteAdminPublicSiteAdvertisement(id, payload = {}) {
+    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`, { data: payload })
+  },
+
+  restoreAdminPublicSiteAdvertisement(id) {
+    return http.post(`/admin/public-site/advertisements/${id}/restore/`)
   },
 
   async getMissingServiceRequests(params = {}) {

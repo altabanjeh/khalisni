@@ -200,8 +200,10 @@ export const servicesApi = {
     return http.post(`/admin/services/${id}/restore/`)
   },
 
-  async getAdminUsers() {
-    return unwrapList(await http.get('/admin/users/'))
+  async getAdminUsers(params = {}) {
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/users/${buildQuery(normalized.params)}`))
+    return filterSoftDeleted(records, normalized.status)
   },
 
   createAdminUser(payload) {
@@ -212,8 +214,12 @@ export const servicesApi = {
     return http.patch(`/admin/users/${id}/`, payload)
   },
 
-  deleteAdminUser(id) {
-    return secureAdminDelete(`/admin/users/${id}/`)
+  deleteAdminUser(id, payload = {}) {
+    return secureAdminDelete(`/admin/users/${id}/`, { data: payload })
+  },
+
+  restoreAdminUser(id) {
+    return http.post(`/admin/users/${id}/restore/`)
   },
 
   async getSystemSettings() {

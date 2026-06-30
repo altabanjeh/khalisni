@@ -152,7 +152,7 @@ class OrderDetailSerializer(OrderListSerializer):
     documents = serializers.SerializerMethodField()
     status_logs = OrderStatusLogSerializer(read_only=True, many=True)
     notes = serializers.SerializerMethodField()
-    rating = RatingSerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
 
     class Meta(OrderListSerializer.Meta):
         fields = OrderListSerializer.Meta.fields + (
@@ -181,7 +181,7 @@ class OrderDetailSerializer(OrderListSerializer):
     def get_documents(self, obj):
         request = self.context.get("request")
         public_track = self.context.get("public_track", False)
-        queryset = obj.documents.all()
+        queryset = obj.documents.filter(is_deleted=False)
         if public_track:
             queryset = queryset.filter(is_final_document=True)
         user = getattr(request, "user", None)
@@ -192,12 +192,18 @@ class OrderDetailSerializer(OrderListSerializer):
     def get_notes(self, obj):
         public_track = self.context.get("public_track", False)
         request = self.context.get("request")
-        queryset = obj.notes.select_related("user")
+        queryset = obj.notes.filter(is_deleted=False).select_related("user")
         if public_track:
             queryset = queryset.filter(visibility=OrderNote.Visibility.CUSTOMER)
         elif request and request.user.is_authenticated and request.user.role == CustomUser.Role.CUSTOMER:
             queryset = queryset.filter(visibility=OrderNote.Visibility.CUSTOMER)
         return OrderNoteSerializer(queryset, many=True).data
+
+    def get_rating(self, obj):
+        rating = getattr(obj, "rating", None)
+        if not rating or getattr(rating, "is_deleted", False):
+            return None
+        return RatingSerializer(rating).data
 
 
 class ProviderOrderStatusLogSerializer(serializers.ModelSerializer):
@@ -247,7 +253,7 @@ class ProviderOrderDetailSerializer(ProviderOrderListSerializer):
 
     def get_provider_instructions(self, obj):
         return list(
-            obj.notes.filter(visibility=OrderNote.Visibility.PROVIDER).values_list("note", flat=True)
+            obj.notes.filter(is_deleted=False, visibility=OrderNote.Visibility.PROVIDER).values_list("note", flat=True)
         )
 
     def get_documents(self, obj):
@@ -255,7 +261,7 @@ class ProviderOrderDetailSerializer(ProviderOrderListSerializer):
         user = getattr(request, "user", None)
         queryset = [
             document
-            for document in obj.documents.all()
+            for document in obj.documents.filter(is_deleted=False)
             if can_user_download_document(user=user, document=document)
         ]
         return ProviderDocumentSerializer(queryset, many=True, context={"request": request}).data
@@ -419,7 +425,7 @@ class TrackOrderSerializer(serializers.ModelSerializer):
 
     def get_final_documents(self, obj):
         request = self.context.get("request")
-        docs = obj.documents.filter(is_final_document=True)
+        docs = obj.documents.filter(is_deleted=False, is_final_document=True)
         return DocumentSerializer(docs, many=True, context={"request": request}).data
 
 

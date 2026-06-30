@@ -22,7 +22,7 @@ from orders.selectors import get_reviewable_orders_for_user
 
 class AdminNotificationListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
-    queryset = Notification.objects.select_related("recipient", "actor", "order", "template")
+    queryset = Notification.objects.select_related("recipient", "actor", "order", "template").filter(is_deleted=False)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -32,7 +32,7 @@ class AdminNotificationListAPIView(generics.ListCreateAPIView):
 
 class AdminNotificationDetailAPIView(AdminDeleteGuardMixin, generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
-    queryset = Notification.objects.select_related("recipient", "actor", "order", "template")
+    queryset = Notification.objects.select_related("recipient", "actor", "order", "template").all()
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -50,7 +50,7 @@ class AdminNotificationDetailAPIView(AdminDeleteGuardMixin, generics.RetrieveUpd
         }
         self.enforce_delete_guard(request, instance=notification, old_value=old_value)
         with transaction.atomic():
-            notification.delete()
+            notification.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
@@ -59,6 +59,7 @@ class AdminNotificationDetailAPIView(AdminDeleteGuardMixin, generics.RetrieveUpd
                 entity_id=notification.pk,
                 entity_name=notification.title,
                 old_value=old_value,
+                new_value={"is_deleted": notification.is_deleted, "is_active": getattr(notification, "is_active", None)},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -110,6 +111,7 @@ class EmployeeNotificationTemplateListAPIView(generics.ListAPIView):
     def get_queryset(self):
         return NotificationTemplate.objects.filter(
             is_active=True,
+            is_deleted=False,
             channel=Notification.Channel.SYSTEM,
         ).order_by("key")
 
@@ -160,19 +162,35 @@ class NotificationTemplateAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelView
         old_value = {"is_active": template.is_active}
         self.enforce_delete_guard(request, instance=template, old_value=old_value)
         with transaction.atomic():
-            template.is_active = False
-            template.save(update_fields=["is_active", "updated_at"])
+            template.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="disable_notification_template",
+                action="delete_notification_template",
                 entity_type="NotificationTemplate",
                 entity_id=template.pk,
                 entity_name=template.key,
                 old_value=old_value,
-                new_value={"is_active": False},
+                new_value={"is_active": template.is_active, "is_deleted": template.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        template = NotificationTemplate.objects.get(pk=pk)
+        old_value = {"is_active": template.is_active, "is_deleted": template.is_deleted}
+        template.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_notification_template",
+            entity_type="NotificationTemplate",
+            entity_id=template.pk,
+            entity_name=template.key,
+            old_value=old_value,
+            new_value={"is_active": template.is_active, "is_deleted": template.is_deleted},
+        )
+        return response.Response(self.get_serializer(template).data)
 
     @action(detail=False, methods=["post"])
     def preview(self, request):

@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 
 from core.choices import UserRole
+from core.models import SoftDeleteModel
 
 
 class CustomUserManager(BaseUserManager):
@@ -40,7 +41,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(SoftDeleteModel, AbstractBaseUser, PermissionsMixin):
     Role = UserRole
 
     user_id = models.BigAutoField(primary_key=True)

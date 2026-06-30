@@ -3,8 +3,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 
+from core.models import SoftDeleteModel
 
-class Organization(models.Model):
+class Organization(SoftDeleteModel):
     class OrganizationType(models.TextChoices):
         PLATFORM = "platform", "Platform"
         PARTNER = "partner", "Partner"
@@ -52,7 +53,7 @@ class Organization(models.Model):
             self.slug = slugify(self.name)
 
 
-class Branch(models.Model):
+class Branch(SoftDeleteModel):
     branch_id = models.BigAutoField(primary_key=True)
     organization = models.ForeignKey(
         Organization,
@@ -90,7 +91,7 @@ class Branch(models.Model):
             raise ValidationError({"organization": "Branches can only belong to active organizations."})
 
 
-class OrganizationMembership(models.Model):
+class OrganizationMembership(SoftDeleteModel):
     class MembershipRole(models.TextChoices):
         PLATFORM_SUPER_ADMIN = "platform_super_admin", "Platform super admin"
         PLATFORM_SUPPORT = "platform_support", "Platform support"
@@ -197,7 +198,7 @@ class OrganizationMembership(models.Model):
             raise ValidationError(errors)
 
 
-class OrganizationBranding(models.Model):
+class OrganizationBranding(SoftDeleteModel):
     organization = models.OneToOneField(
         Organization,
         on_delete=models.CASCADE,
@@ -223,7 +224,7 @@ class OrganizationBranding(models.Model):
         return self.pk
 
 
-class PartnerServiceConfig(models.Model):
+class PartnerServiceConfig(SoftDeleteModel):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,

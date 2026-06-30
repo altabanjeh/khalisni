@@ -23,7 +23,7 @@ from services.models import Service
 
 
 def _guide_queryset():
-    return HelpGuide.objects.prefetch_related(
+    return HelpGuide.objects.filter(is_deleted=False).prefetch_related(
         "screenshots",
         "related_guides",
     )
@@ -93,7 +93,7 @@ def get_readable_help_guides_queryset(user, *, preview_role: str = "", include_p
 
 def get_readable_entity_queryset(model, user, *, preview_role: str = "", include_permission_restricted: bool = False):
     return _apply_visibility_filters(
-        model.objects.all(),
+        model.objects.filter(is_deleted=False),
         user=user,
         preview_role=preview_role,
         include_permission_restricted=include_permission_restricted,
@@ -257,6 +257,7 @@ def get_service_guide_for_context(user, *, service_id, screen_key: str = "", pre
     try:
         service = (
             Service.objects.select_related("category")
+            .filter(is_deleted=False, category__is_deleted=False)
             .prefetch_related("document_requirements", "incoming_relations__source_service", "outgoing_relations__target_service")
             .get(pk=service_id)
         )

@@ -4,8 +4,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from core.models import SoftDeleteModel
 
-class ProviderProfile(models.Model):
+class ProviderProfile(SoftDeleteModel):
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.PROTECT,

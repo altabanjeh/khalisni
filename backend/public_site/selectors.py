@@ -19,11 +19,10 @@ def get_active_public_page_content():
 
 def get_current_public_advertisements(now=None):
     current_time = now or timezone.now()
-    return Advertisement.objects.currently_public(current_time)
+    return Advertisement.objects.filter(is_deleted=False).currently_public(current_time)
 
 
 def get_current_important_alert(now=None):
     return get_current_public_advertisements(now).filter(
         advertisement_type=Advertisement.Type.IMPORTANT_ALERT
     ).order_by("display_order", "-start_date", "-advertisement_id").first()
-

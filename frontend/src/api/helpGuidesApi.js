@@ -8,6 +8,33 @@ function normalizeRecord(record) {
   return withId(record, 'id')
 }
 
+function normalizeSoftDeleteParams(params = {}) {
+  const nextParams = { ...params }
+  const status = String(nextParams.status || '').trim().toLowerCase()
+  delete nextParams.status
+
+  if (status === 'all' || status === 'deleted') {
+    nextParams.include_deleted = true
+  }
+
+  return {
+    params: nextParams,
+    status,
+  }
+}
+
+function filterSoftDeleted(records, status) {
+  if (status === 'deleted') {
+    return records.filter((record) => record?.is_deleted)
+  }
+
+  if (status === 'active') {
+    return records.filter((record) => !record?.is_deleted)
+  }
+
+  return records
+}
+
 export const helpGuidesApi = {
   async getCurrentHelpGuides(params = {}) {
     return http.get(`/help/current/${buildQuery(params)}`)
@@ -42,7 +69,9 @@ export const helpGuidesApi = {
   },
 
   async getAdminHelpScreens(params = {}) {
-    return unwrapList(await http.get(`/help/admin/screens/${buildQuery(params)}`)).map(normalizeScreen)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/screens/${buildQuery(normalized.params)}`)).map(normalizeScreen)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpScreen(payload) {
@@ -53,12 +82,18 @@ export const helpGuidesApi = {
     return normalizeScreen(await http.patch(`/help/admin/screens/${id}/`, payload))
   },
 
-  deleteAdminHelpScreen(id) {
-    return secureAdminDelete(`/help/admin/screens/${id}/`)
+  deleteAdminHelpScreen(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/screens/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpScreen(id) {
+    return http.post(`/help/admin/screens/${id}/restore/`)
   },
 
   async getAdminHelpFields(params = {}) {
-    return unwrapList(await http.get(`/help/admin/fields/${buildQuery(params)}`)).map(normalizeRecord)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/fields/${buildQuery(normalized.params)}`)).map(normalizeRecord)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpField(payload) {
@@ -69,12 +104,18 @@ export const helpGuidesApi = {
     return normalizeRecord(await http.patch(`/help/admin/fields/${id}/`, payload))
   },
 
-  deleteAdminHelpField(id) {
-    return secureAdminDelete(`/help/admin/fields/${id}/`)
+  deleteAdminHelpField(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/fields/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpField(id) {
+    return http.post(`/help/admin/fields/${id}/restore/`)
   },
 
   async getAdminHelpActions(params = {}) {
-    return unwrapList(await http.get(`/help/admin/actions/${buildQuery(params)}`)).map(normalizeRecord)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/actions/${buildQuery(normalized.params)}`)).map(normalizeRecord)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpAction(payload) {
@@ -85,12 +126,18 @@ export const helpGuidesApi = {
     return normalizeRecord(await http.patch(`/help/admin/actions/${id}/`, payload))
   },
 
-  deleteAdminHelpAction(id) {
-    return secureAdminDelete(`/help/admin/actions/${id}/`)
+  deleteAdminHelpAction(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/actions/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpAction(id) {
+    return http.post(`/help/admin/actions/${id}/restore/`)
   },
 
   async getAdminHelpServices(params = {}) {
-    return unwrapList(await http.get(`/help/admin/services/${buildQuery(params)}`)).map(normalizeRecord)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/services/${buildQuery(normalized.params)}`)).map(normalizeRecord)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpService(payload) {
@@ -101,12 +148,18 @@ export const helpGuidesApi = {
     return normalizeRecord(await http.patch(`/help/admin/services/${id}/`, payload))
   },
 
-  deleteAdminHelpService(id) {
-    return secureAdminDelete(`/help/admin/services/${id}/`)
+  deleteAdminHelpService(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/services/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpService(id) {
+    return http.post(`/help/admin/services/${id}/restore/`)
   },
 
   async getAdminHelpWorkflows(params = {}) {
-    return unwrapList(await http.get(`/help/admin/workflows/${buildQuery(params)}`)).map(normalizeRecord)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/workflows/${buildQuery(normalized.params)}`)).map(normalizeRecord)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpWorkflow(payload) {
@@ -117,12 +170,18 @@ export const helpGuidesApi = {
     return normalizeRecord(await http.patch(`/help/admin/workflows/${id}/`, payload))
   },
 
-  deleteAdminHelpWorkflow(id) {
-    return secureAdminDelete(`/help/admin/workflows/${id}/`)
+  deleteAdminHelpWorkflow(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/workflows/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpWorkflow(id) {
+    return http.post(`/help/admin/workflows/${id}/restore/`)
   },
 
   async getAdminHelpScreenshots(params = {}) {
-    return unwrapList(await http.get(`/help/admin/screenshots/${buildQuery(params)}`)).map(normalizeRecord)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/help/admin/screenshots/${buildQuery(normalized.params)}`)).map(normalizeRecord)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminHelpScreenshot(payload) {
@@ -133,8 +192,12 @@ export const helpGuidesApi = {
     return normalizeRecord(await http.patch(`/help/admin/screenshots/${id}/`, payload))
   },
 
-  deleteAdminHelpScreenshot(id) {
-    return secureAdminDelete(`/help/admin/screenshots/${id}/`)
+  deleteAdminHelpScreenshot(id, payload = {}) {
+    return secureAdminDelete(`/help/admin/screenshots/${id}/`, { data: payload })
+  },
+
+  restoreAdminHelpScreenshot(id) {
+    return http.post(`/help/admin/screenshots/${id}/restore/`)
   },
 
   getHelpGuideMetadata() {

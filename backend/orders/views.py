@@ -43,6 +43,7 @@ from orders.serializers import (
 )
 from orders.services import (
     add_order_note,
+    archive_order,
     assign_provider_to_order,
     cancel_order,
     complete_order,
@@ -299,15 +300,16 @@ class AdminOrderRecordViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         old_value = {"status": order.status, "order_number": order.order_number}
         self.enforce_delete_guard(request, instance=order, old_value=old_value)
         with transaction.atomic():
+            archive_order(order=order, actor=request.user, note="Archived from admin delete action.", request=request)
             create_audit_log(
                 request=request,
-                action="delete_order_record",
+                action="archive_order_record",
                 entity_type="Order",
                 entity_id=order.pk,
                 entity_name=order.order_number,
                 old_value=old_value,
+                new_value={"status": order.status, "order_number": order.order_number},
             )
-            order.delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 

@@ -35,9 +35,11 @@ def _normalize_status_label(status_value: str) -> str:
 def _serialize_related_pages(obj):
     related_guides = _get_value(obj, "related_guides", [])
     if hasattr(related_guides, "all"):
-        related_guides = related_guides.all()
+        related_guides = related_guides.filter(is_deleted=False)
     serialized = []
     for guide in related_guides or []:
+        if bool(_get_value(guide, "is_deleted", False)):
+            continue
         serialized.append(
             {
                 "id": _get_value(guide, "id", _get_value(guide, "pk")),
@@ -54,9 +56,11 @@ def _serialize_related_pages(obj):
 def _serialize_screenshots(obj):
     screenshots = _get_value(obj, "screenshots", [])
     if hasattr(screenshots, "all"):
-        screenshots = screenshots.all()
+        screenshots = screenshots.filter(is_deleted=False)
     serialized = []
     for screenshot in screenshots or []:
+        if bool(_get_value(screenshot, "is_deleted", False)):
+            continue
         if not bool(_get_value(screenshot, "is_active", True)):
             continue
         image = _get_value(screenshot, "image")
@@ -268,7 +272,7 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
     workflow_status_label = serializers.SerializerMethodField()
     screenshots = serializers.SerializerMethodField()
     related_pages = serializers.SerializerMethodField()
-    related_guides = serializers.PrimaryKeyRelatedField(many=True, queryset=HelpGuide.objects.all(), required=False)
+    related_guides = serializers.PrimaryKeyRelatedField(many=True, queryset=HelpGuide.objects.filter(is_deleted=False), required=False)
 
     class Meta:
         model = HelpGuide
@@ -305,6 +309,9 @@ class HelpGuideAdminSerializer(BaseGuideAdminSerializer):
             "screenshots",
             "display_order",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_by",
             "created_by_name",
             "updated_by",
@@ -440,6 +447,9 @@ class HelpGuideScreenshotAdminSerializer(PkAsIdMixin, serializers.ModelSerialize
             "step_reference",
             "display_order",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )

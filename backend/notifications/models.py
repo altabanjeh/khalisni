@@ -4,9 +4,10 @@ from django.db import models
 from django.utils import timezone
 
 from core.choices import NotificationType as SystemNotificationType
+from core.models import SoftDeleteModel
 
 
-class Notification(models.Model):
+class Notification(SoftDeleteModel):
     class Channel(models.TextChoices):
         SYSTEM = "system", "System"
         EMAIL = "email", "Email"
@@ -270,7 +271,7 @@ class Notification(models.Model):
         return f"{self.channel} | {self.title} | {self.status}"
     
 
-class NotificationTemplate(models.Model):
+class NotificationTemplate(SoftDeleteModel):
     class Channel(models.TextChoices):
         SYSTEM = "system", "System"
         EMAIL = "email", "Email"

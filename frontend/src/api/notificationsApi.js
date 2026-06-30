@@ -1,5 +1,32 @@
 import { buildQuery, http, secureAdminDelete, unwrapList } from './client'
 
+function normalizeSoftDeleteParams(params = {}) {
+  const nextParams = { ...params }
+  const status = String(nextParams.status || '').trim().toLowerCase()
+  delete nextParams.status
+
+  if (status === 'all' || status === 'deleted') {
+    nextParams.include_deleted = true
+  }
+
+  return {
+    params: nextParams,
+    status,
+  }
+}
+
+function filterSoftDeleted(records, status) {
+  if (status === 'deleted') {
+    return records.filter((record) => record?.is_deleted)
+  }
+
+  if (status === 'active') {
+    return records.filter((record) => !record?.is_deleted)
+  }
+
+  return records
+}
+
 function withTemplateId(record) {
   if (!record) return record
   if (record.id != null) return record
@@ -26,7 +53,9 @@ export const notificationsApi = {
   },
 
   async getAdminNotificationTemplates(params = {}) {
-    return unwrapList(await http.get(`/admin/notification-templates/${buildQuery(params)}`)).map(withTemplateId)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/notification-templates/${buildQuery(normalized.params)}`)).map(withTemplateId)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   createAdminNotificationTemplate(payload) {
@@ -37,8 +66,12 @@ export const notificationsApi = {
     return http.patch(`/admin/notification-templates/${id}/`, payload)
   },
 
-  deleteAdminNotificationTemplate(id) {
-    return secureAdminDelete(`/admin/notification-templates/${id}/`)
+  deleteAdminNotificationTemplate(id, payload = {}) {
+    return secureAdminDelete(`/admin/notification-templates/${id}/`, { data: payload })
+  },
+
+  restoreAdminNotificationTemplate(id) {
+    return http.post(`/admin/notification-templates/${id}/restore/`)
   },
 
   previewNotificationTemplate(payload) {

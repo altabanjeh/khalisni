@@ -64,22 +64,38 @@ class OrganizationViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         organization = self.get_object()
-        old_value = {"name": organization.name, "is_active": organization.is_active}
+        old_value = {"name": organization.name, "is_active": organization.is_active, "is_deleted": organization.is_deleted}
         self.enforce_delete_guard(request, instance=organization, old_value=old_value)
         with transaction.atomic():
-            organization.is_active = False
-            organization.save(update_fields=["is_active", "updated_at"])
+            organization.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_organization",
+                action="delete_organization",
                 entity_type="Organization",
                 entity_id=organization.pk,
                 entity_name=organization.name,
                 old_value=old_value,
-                new_value={"name": organization.name, "is_active": organization.is_active},
+                new_value={"name": organization.name, "is_active": organization.is_active, "is_deleted": organization.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        organization = Organization.objects.get(pk=pk)
+        old_value = {"name": organization.name, "is_active": organization.is_active, "is_deleted": organization.is_deleted}
+        organization.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_organization",
+            entity_type="Organization",
+            entity_id=organization.pk,
+            entity_name=organization.name,
+            old_value=old_value,
+            new_value={"name": organization.name, "is_active": organization.is_active, "is_deleted": organization.is_deleted},
+        )
+        return response.Response(self.get_serializer(organization).data)
 
 
 class BranchViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
@@ -123,22 +139,38 @@ class BranchViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         branch = self.get_object()
-        old_value = {"name": branch.name, "is_active": branch.is_active}
+        old_value = {"name": branch.name, "is_active": branch.is_active, "is_deleted": branch.is_deleted}
         self.enforce_delete_guard(request, instance=branch, old_value=old_value)
         with transaction.atomic():
-            branch.is_active = False
-            branch.save(update_fields=["is_active", "updated_at"])
+            branch.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_branch",
+                action="delete_branch",
                 entity_type="Branch",
                 entity_id=branch.pk,
                 entity_name=branch.name,
                 old_value=old_value,
-                new_value={"name": branch.name, "is_active": branch.is_active},
+                new_value={"name": branch.name, "is_active": branch.is_active, "is_deleted": branch.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        branch = Branch.objects.get(pk=pk)
+        old_value = {"name": branch.name, "is_active": branch.is_active, "is_deleted": branch.is_deleted}
+        branch.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_branch",
+            entity_type="Branch",
+            entity_id=branch.pk,
+            entity_name=branch.name,
+            old_value=old_value,
+            new_value={"name": branch.name, "is_active": branch.is_active, "is_deleted": branch.is_deleted},
+        )
+        return response.Response(self.get_serializer(branch).data)
 
 
 class OrganizationMembershipViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
@@ -180,22 +212,38 @@ class OrganizationMembershipViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet
 
     def destroy(self, request, *args, **kwargs):
         membership = self.get_object()
-        old_value = {"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active}
+        old_value = {"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active, "is_deleted": membership.is_deleted}
         self.enforce_delete_guard(request, instance=membership, old_value=old_value)
         with transaction.atomic():
-            membership.is_active = False
-            membership.save(update_fields=["is_active"])
+            membership.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="deactivate_membership",
+                action="delete_membership",
                 entity_type="OrganizationMembership",
                 entity_id=membership.pk,
                 entity_name=str(membership),
                 old_value=old_value,
-                new_value={"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active},
+                new_value={"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active, "is_deleted": membership.is_deleted},
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        membership = OrganizationMembership.objects.get(pk=pk)
+        old_value = {"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active, "is_deleted": membership.is_deleted}
+        membership.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_membership",
+            entity_type="OrganizationMembership",
+            entity_id=membership.pk,
+            entity_name=str(membership),
+            old_value=old_value,
+            new_value={"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active, "is_deleted": membership.is_deleted},
+        )
+        return response.Response(self.get_serializer(membership).data)
 
 
 class OrganizationBrandingViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
@@ -267,16 +315,17 @@ class PartnerServiceConfigViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             "is_enabled": config.is_enabled,
             "visible_to_customers": config.visible_to_customers,
             "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+            "is_deleted": config.is_deleted,
         }
         self.enforce_delete_guard(request, instance=config, old_value=old_value)
         with transaction.atomic():
-            config.is_enabled = False
+            config.soft_delete(user=request.user)
             config.visible_to_customers = False
-            config.save(update_fields=["is_enabled", "visible_to_customers", "updated_at"])
+            config.save(update_fields=["visible_to_customers", "updated_at"])
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="disable_partner_service_config",
+                action="delete_partner_service_config",
                 entity_type="PartnerServiceConfig",
                 entity_id=config.pk,
                 entity_name=str(config),
@@ -285,9 +334,37 @@ class PartnerServiceConfigViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                     "is_enabled": config.is_enabled,
                     "visible_to_customers": config.visible_to_customers,
                     "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+                    "is_deleted": config.is_deleted,
                 },
             )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        config = PartnerServiceConfig.objects.get(pk=pk)
+        old_value = {
+            "is_enabled": config.is_enabled,
+            "visible_to_customers": config.visible_to_customers,
+            "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+            "is_deleted": config.is_deleted,
+        }
+        config.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_partner_service_config",
+            entity_type="PartnerServiceConfig",
+            entity_id=config.pk,
+            entity_name=str(config),
+            old_value=old_value,
+            new_value={
+                "is_enabled": config.is_enabled,
+                "visible_to_customers": config.visible_to_customers,
+                "custom_price": str(config.custom_price) if config.custom_price is not None else None,
+                "is_deleted": config.is_deleted,
+            },
+        )
+        return response.Response(self.get_serializer(config).data)
 
 
 class PartnerOnboardingAPIView(APIView):

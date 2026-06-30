@@ -153,8 +153,8 @@ class CustomerProfileAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
 
 class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, allow_blank=False)
-    organization_id = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.filter(is_active=True), required=False, allow_null=True, write_only=True)
-    branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), required=False, allow_null=True, write_only=True)
+    organization_id = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.filter(is_active=True, is_deleted=False), required=False, allow_null=True, write_only=True)
+    branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True, is_deleted=False), required=False, allow_null=True, write_only=True)
     membership_role = serializers.ChoiceField(choices=OrganizationMembership.MembershipRole.choices, required=False, allow_null=True, write_only=True)
     memberships = MembershipSummarySerializer(source="organization_memberships", many=True, read_only=True)
     is_staff = serializers.BooleanField(read_only=True)
@@ -182,6 +182,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
             "role_options",
             "current_permissions",
             "memberships",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "created_at",
             "updated_at",
         )

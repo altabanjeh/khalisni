@@ -203,6 +203,9 @@ class AdvertisementAdminSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
             "is_active",
+            "is_deleted",
+            "deleted_at",
+            "delete_reason",
             "is_currently_public",
             "created_at",
             "updated_at",
@@ -221,7 +224,7 @@ class HomepagePayloadSerializer(serializers.Serializer):
 
 class MissingServiceRequestPublicSerializer(serializers.ModelSerializer):
     matched_service_id = serializers.PrimaryKeyRelatedField(
-        queryset=MissingServiceRequest._meta.get_field("matched_service").remote_field.model.objects.all(),
+        queryset=MissingServiceRequest._meta.get_field("matched_service").remote_field.model.objects.filter(is_deleted=False),
         source="matched_service",
         required=False,
         allow_null=True,

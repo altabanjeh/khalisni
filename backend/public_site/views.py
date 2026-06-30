@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions, status, viewsets
 from django.db import transaction
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -308,7 +309,7 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.delete()
+            instance.soft_delete(user=request.user)
             create_audit_log(
                 request=request,
                 user=request.user,
@@ -317,9 +318,26 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                 entity_id=instance.pk,
                 entity_name=instance.title_ar or instance.title_en,
                 old_value=old_value,
-                new_value=None,
+                new_value=_snapshot(instance, ("title_ar", "advertisement_type", "display_order", "start_date", "end_date", "is_active", "is_deleted")),
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, pk=None):
+        instance = Advertisement.objects.get(pk=pk)
+        old_value = _snapshot(instance, ("title_ar", "advertisement_type", "display_order", "start_date", "end_date", "is_active", "is_deleted"))
+        instance.restore()
+        create_audit_log(
+            request=request,
+            user=request.user,
+            action="restore_public_site_advertisement",
+            entity_type="PublicSiteAdvertisement",
+            entity_id=instance.pk,
+            entity_name=instance.title_ar or instance.title_en,
+            old_value=old_value,
+            new_value=_snapshot(instance, ("title_ar", "advertisement_type", "display_order", "start_date", "end_date", "is_active", "is_deleted")),
+        )
+        return Response(self.get_serializer(instance).data)
 
 
 class MissingServiceRequestViewSet(viewsets.ModelViewSet):

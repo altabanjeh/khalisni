@@ -52,12 +52,14 @@ function Field({ label, children, hint }) {
 
 function ProvidersManagementPage() {
   const { toast } = useToast()
-  const { data: providers = [], loading, reload } = useAsyncData(() => api.getProviders(), [], [])
+  const [statusFilter, setStatusFilter] = useState('active')
+  const { data: providers = [], loading, reload } = useAsyncData(() => api.getProviders({ status: statusFilter }), [statusFilter], [])
   const { data: assignments = [], loading: assignmentsLoading } = useAsyncData(() => api.getAdminServiceAssignments(), [], [])
   const { data: categories = [], loading: categoriesLoading } = useAsyncData(() => api.getAdminCategories(), [], [])
   const [selectedProviderId, setSelectedProviderId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const providerForm = useForm({ defaultValues: defaultProviderValues })
 
@@ -177,6 +179,19 @@ function ProvidersManagementPage() {
     }
   }
 
+  async function handleRestoreConfirm() {
+    if (!pendingRestore) return
+    const provider = pendingRestore
+    setPendingRestore(null)
+    try {
+      await api.restoreProvider(provider.id)
+      reload()
+      toast('Provider restored.', 'success')
+    } catch (error) {
+      toast(getDisplayError(error), 'error')
+    }
+  }
+
   const assignmentMap = assignments.reduce((accumulator, assignment) => {
     const providerId = String(assignment.provider_id || '')
     if (!providerId || !assignment.service_name) return accumulator
@@ -246,6 +261,71 @@ function ProvidersManagementPage() {
     },
   ]
 
+  const tableColumns = [
+    {
+      key: 'provider_display',
+      label: 'Provider',
+      render: (row) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>{row.full_name}</span>
+          {row.is_deleted ? (
+            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
+              Deleted
+            </span>
+          ) : null}
+        </div>
+      ),
+    },
+    columns[1],
+    columns[2],
+    columns[3],
+    columns[4],
+    columns[5],
+    {
+      key: 'actions_display',
+      label: 'Actions',
+      render: (row) => (
+        <div className="flex flex-wrap gap-2">
+          {row.is_deleted ? (
+            <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore(row)} type="button">
+              Restore
+            </button>
+          ) : (
+            <>
+              <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
+                Edit
+              </button>
+              <button
+                className="btn-secondary px-3 py-2 text-xs"
+                onClick={() => handleApprovalChange(row, row.is_approved ? 'reject' : 'approve')}
+                type="button"
+              >
+                {row.is_approved ? 'Unapprove' : 'Approve'}
+              </button>
+              <button
+                className="btn-secondary px-3 py-2 text-xs"
+                onClick={() => handleActivationChange(row, !row.account_active)}
+                type="button"
+              >
+                {row.account_active ? 'Deactivate' : 'Activate'}
+              </button>
+              <Link className="btn-secondary px-3 py-2 text-xs" to={`/admin/provider-services?provider=${row.id}`}>
+                Manage services
+              </Link>
+              <button
+                className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
+                onClick={() => setPendingDelete(row)}
+                type="button"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div className="page-section space-y-6">
       <PageHeader
@@ -288,7 +368,7 @@ function ProvidersManagementPage() {
       </section>
 
       <DataTable
-        columns={columns}
+        columns={tableColumns}
         emptyDescription="أضف مزود خدمة جديدا ليظهر في مسار التعيين والمراجعة."
         emptyTitle="لا يوجد مزودون"
         loading={loading || assignmentsLoading || categoriesLoading}
@@ -296,13 +376,22 @@ function ProvidersManagementPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold text-ink">{row.full_name}</p>
-              <StatusBadge status={row.account_active ? 'VERIFIED' : 'REJECTED'} />
+              <StatusBadge status={row.is_deleted ? 'REJECTED' : row.account_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
             </div>
             <p className="text-sm text-slate-600">{row.provider_type || 'مزود خدمة'}</p>
             <p className="text-sm text-slate-500">{row.service_categories?.join('، ') || 'بدون فئات'}</p>
           </div>
         )}
+        mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+        rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
         rows={providers}
+        toolbar={
+          <select className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+            <option value="active">Active</option>
+            <option value="deleted">Deleted</option>
+            <option value="all">All</option>
+          </select>
+        }
       />
 
       <FormModal
@@ -392,6 +481,15 @@ function ProvidersManagementPage() {
           </div>
         </form>
       </FormModal>
+
+      <ConfirmModal
+        confirmLabel="Restore"
+        description={`This will restore "${pendingRestore?.full_name || ''}" back to provider management screens.`}
+        onClose={() => setPendingRestore(null)}
+        onConfirm={handleRestoreConfirm}
+        open={!!pendingRestore}
+        title="Restore provider"
+      />
 
       <ConfirmModal
         confirmLabel="نعم، عطّل المزود"
