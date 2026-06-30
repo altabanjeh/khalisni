@@ -291,9 +291,9 @@ function AdvertisementManagerPage() {
             rows={advertisements}
             toolbar={
               <select className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
-                <option value="active">{isArabic ? 'Ø§Ù„Ù†Ø´Ø·Ø©' : 'Active'}</option>
-                <option value="deleted">{isArabic ? 'Ø§Ù„Ù…Ø­Ø°ÙˆÙØ©' : 'Deleted'}</option>
-                <option value="all">{isArabic ? 'Ø§Ù„ÙƒÙ„' : 'All'}</option>
+                <option value="active">Active</option>
+                <option value="deleted">Deleted</option>
+                <option value="all">All</option>
               </select>
             }
           />
