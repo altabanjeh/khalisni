@@ -11,6 +11,8 @@ function ConfirmModal({
   cancelLabel = 'إلغاء',
   variant = 'default',
   loading = false,
+  confirmDisabled = false,
+  children,
 }) {
   useEffect(() => {
     if (!open) return
@@ -34,16 +36,18 @@ function ConfirmModal({
         )}
         <h3 className="text-xl font-bold text-ink">{title}</h3>
         {description && <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>}
+        {children ? <div className="mt-4">{children}</div> : null}
         <div className="mt-6 flex gap-3">
           <button
             className={isDanger ? 'btn-danger flex-1' : 'btn-primary flex-1'}
             onClick={onConfirm}
-            disabled={loading}
+            disabled={loading || confirmDisabled}
+            type="button"
           >
             {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : null}
             {confirmLabel}
           </button>
-          <button className="btn-secondary flex-1" onClick={onClose} disabled={loading}>
+          <button className="btn-secondary flex-1" onClick={onClose} disabled={loading} type="button">
             {cancelLabel}
           </button>
         </div>

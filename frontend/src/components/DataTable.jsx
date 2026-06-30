@@ -26,6 +26,8 @@ function DataTable({
   mobileCard,
   loading = false,
   pagination,
+  rowClassName,
+  mobileCardClassName,
 }) {
   const { t } = useLanguage()
   const [isTableLayout, setIsTableLayout] = useState(() =>
@@ -96,7 +98,10 @@ function DataTable({
                     </div>
                   ))
                 : rows.map((row) => (
-                    <div key={row.id} className="table-card">
+                    <div
+                      key={row.id}
+                      className={`table-card ${mobileCardClassName ? mobileCardClassName(row) : ''}`.trim()}
+                    >
                       {mobileCard ? mobileCard(row) : renderDefaultMobileCard(row)}
                     </div>
                   ))}
@@ -121,7 +126,10 @@ function DataTable({
                       <SkeletonRows columns={columns} />
                     ) : (
                       rows.map((row) => (
-                        <tr key={row.id} className="transition hover:bg-brand-50/40">
+                        <tr
+                          key={row.id}
+                          className={`transition hover:bg-brand-50/40 ${rowClassName ? rowClassName(row) : ''}`.trim()}
+                        >
                           {columns.map((column) => (
                             <td key={column.key} className="px-4 py-4 align-top text-slate-700">
                               {column.render ? column.render(row) : row[column.key]}

@@ -28,6 +28,13 @@ async function withTestValue(requester, testValue) {
   return requester()
 }
 
+function filterSoftDeleted(records, params = {}) {
+  const status = String(params?.status || '').trim().toLowerCase()
+  if (status === 'deleted') return records.filter((record) => record?.is_deleted)
+  if (status === 'active') return records.filter((record) => !record?.is_deleted)
+  return records
+}
+
 const reviewStatuses = ['NEW', 'UNDER_REVIEW', 'WAITING_CUSTOMER']
 const providerStatuses = ['ASSIGNED', 'IN_PROGRESS', 'READY_FOR_DELIVERY', 'COMPLETED']
 
@@ -466,34 +473,42 @@ export const api = {
   completeOrder: ordersApi.completeOrder,
   rejectOrder: ordersApi.rejectOrder,
 
-  getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), mockServices),
-  getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), mockCategories),
+  getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), filterSoftDeleted(mockServices, params)),
+  getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), filterSoftDeleted(mockCategories, params)),
   reorderAdminCategories: servicesApi.reorderAdminCategories,
-  getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), []),
+  getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), filterSoftDeleted([], params)),
   getAdminRequiredDocumentDefinitions: async (params = {}) =>
-    withTestValue(() => servicesApi.getAdminRequiredDocumentDefinitions(params), mockRequiredDocumentDefinitions),
+    withTestValue(() => servicesApi.getAdminRequiredDocumentDefinitions(params), filterSoftDeleted(mockRequiredDocumentDefinitions, params)),
   createAdminRequiredDocumentDefinition: async (payload) =>
     withTestValue(() => servicesApi.createAdminRequiredDocumentDefinition(payload), { id: Date.now(), ...payload }),
   updateAdminRequiredDocumentDefinition: async (id, payload) =>
     withTestValue(() => servicesApi.updateAdminRequiredDocumentDefinition(id, payload), { id: Number(id), ...payload }),
-  deleteAdminRequiredDocumentDefinition: async (id) => withTestValue(() => servicesApi.deleteAdminRequiredDocumentDefinition(id), null),
-  getAdminServiceRelations: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceRelations(params), []),
+  deleteAdminRequiredDocumentDefinition: async (id, payload = {}) =>
+    withTestValue(() => servicesApi.deleteAdminRequiredDocumentDefinition(id, payload), null),
+  restoreAdminRequiredDocumentDefinition: async (id) =>
+    withTestValue(() => servicesApi.restoreAdminRequiredDocumentDefinition(id), null),
+  getAdminServiceRelations: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceRelations(params), filterSoftDeleted([], params)),
   createAdminServiceRelation: servicesApi.createAdminServiceRelation,
   updateAdminServiceRelation: servicesApi.updateAdminServiceRelation,
   deleteAdminServiceRelation: servicesApi.deleteAdminServiceRelation,
+  restoreAdminServiceRelation: async (id) => withTestValue(() => servicesApi.restoreAdminServiceRelation(id), null),
   createAdminServiceDocument: servicesApi.createAdminServiceDocument,
   updateAdminServiceDocument: servicesApi.updateAdminServiceDocument,
   deleteAdminServiceDocument: servicesApi.deleteAdminServiceDocument,
-  getAdminServiceAssignments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceAssignments(params), []),
+  restoreAdminServiceDocument: async (id) => withTestValue(() => servicesApi.restoreAdminServiceDocument(id), null),
+  getAdminServiceAssignments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceAssignments(params), filterSoftDeleted([], params)),
   createAdminServiceAssignment: servicesApi.createAdminServiceAssignment,
   updateAdminServiceAssignment: servicesApi.updateAdminServiceAssignment,
   deleteAdminServiceAssignment: servicesApi.deleteAdminServiceAssignment,
+  restoreAdminServiceAssignment: async (id) => withTestValue(() => servicesApi.restoreAdminServiceAssignment(id), null),
   createAdminCategory: servicesApi.createAdminCategory,
   updateAdminCategory: servicesApi.updateAdminCategory,
   deleteAdminCategory: servicesApi.deleteAdminCategory,
+  restoreAdminCategory: async (id) => withTestValue(() => servicesApi.restoreAdminCategory(id), null),
   createAdminService: servicesApi.createAdminService,
   updateAdminService: servicesApi.updateAdminService,
   deleteAdminService: servicesApi.deleteAdminService,
+  restoreAdminService: async (id) => withTestValue(() => servicesApi.restoreAdminService(id), null),
   getAdminUsers: async () => withTestValue(() => servicesApi.getAdminUsers(), mockUsers),
   createAdminUser: servicesApi.createAdminUser,
   updateAdminUser: servicesApi.updateAdminUser,

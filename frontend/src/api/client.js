@@ -413,7 +413,12 @@ export const http = {
 }
 
 export function secureAdminDelete(url, config = {}) {
-  const deletePassword = config.deletePassword || config.data?.delete_password || promptDeletePassword()
+  const hasExplicitDeletePassword =
+    Object.prototype.hasOwnProperty.call(config, 'deletePassword')
+    || Object.prototype.hasOwnProperty.call(config.data || {}, 'delete_password')
+  const deletePassword = hasExplicitDeletePassword
+    ? (config.deletePassword ?? config.data?.delete_password ?? '')
+    : promptDeletePassword()
   const data = {
     ...(config.data || {}),
     delete_password: deletePassword,

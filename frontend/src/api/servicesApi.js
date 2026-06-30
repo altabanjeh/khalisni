@@ -16,6 +16,33 @@ function normalizeSetting(record) {
   return withId(record, 'setting_id')
 }
 
+function normalizeSoftDeleteParams(params = {}) {
+  const nextParams = { ...params }
+  const status = String(nextParams.status || '').trim().toLowerCase()
+  delete nextParams.status
+
+  if (status === 'all' || status === 'deleted') {
+    nextParams.include_deleted = true
+  }
+
+  return {
+    params: nextParams,
+    status,
+  }
+}
+
+function filterSoftDeleted(records, status) {
+  if (status === 'deleted') {
+    return records.filter((record) => record?.is_deleted)
+  }
+
+  if (status === 'active') {
+    return records.filter((record) => !record?.is_deleted)
+  }
+
+  return records
+}
+
 export const servicesApi = {
   async getServices(params = {}) {
     return unwrapList(await http.get(`/services/${buildQuery(params)}`))
@@ -38,11 +65,15 @@ export const servicesApi = {
   },
 
   async getAdminServices(params = {}) {
-    return unwrapList(await http.get(`/admin/services/${buildQuery(params)}`)).map(normalizeService)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/services/${buildQuery(normalized.params)}`)).map(normalizeService)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async getAdminCategories(params = {}) {
-    return unwrapList(await http.get(`/admin/categories/${buildQuery(params)}`)).map(normalizeCategory)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/categories/${buildQuery(normalized.params)}`)).map(normalizeCategory)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   reorderAdminCategories(items) {
@@ -50,11 +81,15 @@ export const servicesApi = {
   },
 
   async getAdminServiceDocuments(params = {}) {
-    return unwrapList(await http.get(`/admin/service-documents/${buildQuery(params)}`))
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/service-documents/${buildQuery(normalized.params)}`))
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async getAdminRequiredDocumentDefinitions(params = {}) {
-    return unwrapList(await http.get(`/admin/required-document-definitions/${buildQuery(params)}`))
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/required-document-definitions/${buildQuery(normalized.params)}`))
+    return filterSoftDeleted(records, normalized.status)
   },
 
   createAdminRequiredDocumentDefinition(payload) {
@@ -65,12 +100,18 @@ export const servicesApi = {
     return http.patch(`/admin/required-document-definitions/${id}/`, payload)
   },
 
-  deleteAdminRequiredDocumentDefinition(id) {
-    return secureAdminDelete(`/admin/required-document-definitions/${id}/`)
+  deleteAdminRequiredDocumentDefinition(id, payload = {}) {
+    return secureAdminDelete(`/admin/required-document-definitions/${id}/`, { data: payload })
+  },
+
+  restoreAdminRequiredDocumentDefinition(id) {
+    return http.post(`/admin/required-document-definitions/${id}/restore/`)
   },
 
   async getAdminServiceRelations(params = {}) {
-    return unwrapList(await http.get(`/admin/service-relations/${buildQuery(params)}`)).map(normalizeServiceRelation)
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/service-relations/${buildQuery(normalized.params)}`)).map(normalizeServiceRelation)
+    return filterSoftDeleted(records, normalized.status)
   },
 
   async createAdminServiceRelation(payload) {
@@ -81,8 +122,12 @@ export const servicesApi = {
     return normalizeServiceRelation(await http.patch(`/admin/service-relations/${id}/`, payload))
   },
 
-  deleteAdminServiceRelation(id) {
-    return secureAdminDelete(`/admin/service-relations/${id}/`)
+  deleteAdminServiceRelation(id, payload = {}) {
+    return secureAdminDelete(`/admin/service-relations/${id}/`, { data: payload })
+  },
+
+  restoreAdminServiceRelation(id) {
+    return http.post(`/admin/service-relations/${id}/restore/`)
   },
 
   createAdminServiceDocument(payload) {
@@ -93,12 +138,18 @@ export const servicesApi = {
     return http.patch(`/admin/service-documents/${id}/`, payload)
   },
 
-  deleteAdminServiceDocument(id) {
-    return secureAdminDelete(`/admin/service-documents/${id}/`)
+  deleteAdminServiceDocument(id, payload = {}) {
+    return secureAdminDelete(`/admin/service-documents/${id}/`, { data: payload })
+  },
+
+  restoreAdminServiceDocument(id) {
+    return http.post(`/admin/service-documents/${id}/restore/`)
   },
 
   async getAdminServiceAssignments(params = {}) {
-    return unwrapList(await http.get(`/admin/service-provider-assignments/${buildQuery(params)}`))
+    const normalized = normalizeSoftDeleteParams(params)
+    const records = unwrapList(await http.get(`/admin/service-provider-assignments/${buildQuery(normalized.params)}`))
+    return filterSoftDeleted(records, normalized.status)
   },
 
   createAdminServiceAssignment(payload) {
@@ -109,8 +160,12 @@ export const servicesApi = {
     return http.patch(`/admin/service-provider-assignments/${id}/`, payload)
   },
 
-  deleteAdminServiceAssignment(id) {
-    return secureAdminDelete(`/admin/service-provider-assignments/${id}/`)
+  deleteAdminServiceAssignment(id, payload = {}) {
+    return secureAdminDelete(`/admin/service-provider-assignments/${id}/`, { data: payload })
+  },
+
+  restoreAdminServiceAssignment(id) {
+    return http.post(`/admin/service-provider-assignments/${id}/restore/`)
   },
 
   async createAdminCategory(payload) {
@@ -121,8 +176,12 @@ export const servicesApi = {
     return normalizeCategory(await http.patch(`/admin/categories/${id}/`, payload))
   },
 
-  deleteAdminCategory(id) {
-    return secureAdminDelete(`/admin/categories/${id}/`)
+  deleteAdminCategory(id, payload = {}) {
+    return secureAdminDelete(`/admin/categories/${id}/`, { data: payload })
+  },
+
+  restoreAdminCategory(id) {
+    return http.post(`/admin/categories/${id}/restore/`)
   },
 
   async createAdminService(payload) {
@@ -133,8 +192,12 @@ export const servicesApi = {
     return normalizeService(await http.patch(`/admin/services/${id}/`, payload))
   },
 
-  deleteAdminService(id) {
-    return secureAdminDelete(`/admin/services/${id}/`)
+  deleteAdminService(id, payload = {}) {
+    return secureAdminDelete(`/admin/services/${id}/`, { data: payload })
+  },
+
+  restoreAdminService(id) {
+    return http.post(`/admin/services/${id}/restore/`)
   },
 
   async getAdminUsers() {

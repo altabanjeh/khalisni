@@ -1,6 +1,7 @@
 import { GitBranchPlus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import AdminSoftDeleteModal from '../../components/AdminSoftDeleteModal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
@@ -83,27 +84,26 @@ function ServiceRelationsManagementPage() {
   const form = useForm({ defaultValues })
   const [selectedRelationId, setSelectedRelationId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [pendingDeactivate, setPendingDeactivate] = useState(null)
+  const [pendingDelete, setPendingDelete] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [filters, setFilters] = useState({
     source_service: '',
     target_service: '',
     relation_type: '',
     is_active: 'true',
+    status: 'active',
   })
 
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
   const { data: categories = [] } = useAsyncData(() => api.getAdminCategories(), [], [])
   const { data: relations = [], loading: relationsLoading, reload } = useAsyncData(
     () => api.getAdminServiceRelations(filters),
-    [filters.source_service, filters.target_service, filters.relation_type, filters.is_active],
+    [filters.source_service, filters.target_service, filters.relation_type, filters.is_active, filters.status],
     [],
   )
 
-  const activeServices = useMemo(
-    () => services.filter((service) => service.is_active !== false),
-    [services],
-  )
+  const activeServices = useMemo(() => services.filter((service) => service.is_active !== false && !service.is_deleted), [services])
   const sourceCategoryId = form.watch('source_category_id')
   const targetCategoryId = form.watch('target_category_id')
   const sourceServices = sourceCategoryId
@@ -182,19 +182,30 @@ function ServiceRelationsManagementPage() {
     }
   }
 
-  async function handleDeactivateConfirm() {
-    if (!pendingDeactivate) return
-
-    const relationId = pendingDeactivate.id
-    setPendingDeactivate(null)
+  async function handleDeleteConfirm(payload) {
+    if (!pendingDelete) return
+    const relationId = pendingDelete.id
+    setPendingDelete(null)
 
     try {
-      await api.deleteAdminServiceRelation(relationId)
-      toast(isArabic ? 'تم إيقاف العلاقة.' : 'Service relation deactivated.', 'success')
+      await api.deleteAdminServiceRelation(relationId, payload)
+      toast(isArabic ? 'تم حذف العلاقة من المسارات النشطة.' : 'Service relation deleted from active flows.', 'success')
       reload()
-      if (String(selectedRelationId) === String(relationId)) {
-        closeForm()
-      }
+      if (String(selectedRelationId) === String(relationId)) closeForm()
+    } catch (error) {
+      toast(getDisplayError(error), 'error')
+    }
+  }
+
+  async function handleRestoreConfirm() {
+    if (!pendingRestore) return
+    const relationId = pendingRestore.id
+    setPendingRestore(null)
+
+    try {
+      await api.restoreAdminServiceRelation(relationId)
+      toast(isArabic ? 'تمت استعادة العلاقة.' : 'Service relation restored.', 'success')
+      reload()
     } catch (error) {
       toast(getDisplayError(error), 'error')
     }
@@ -204,7 +215,16 @@ function ServiceRelationsManagementPage() {
     {
       key: 'source_service_name',
       label: isArabic ? 'الخدمة المصدر' : 'Source Service',
-      render: (row) => row.source_service_name || row.source_service?.name_ar || (isArabic ? 'غير معروف' : 'Unknown'),
+      render: (row) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>{row.source_service_name || row.source_service?.name_ar || (isArabic ? 'غير معروف' : 'Unknown')}</span>
+          {row.is_deleted ? (
+            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
+              {isArabic ? 'محذوفة' : 'Deleted'}
+            </span>
+          ) : null}
+        </div>
+      ),
     },
     {
       key: 'target_service_name',
@@ -220,23 +240,34 @@ function ServiceRelationsManagementPage() {
     {
       key: 'is_active',
       label: isArabic ? 'الحالة' : 'Status',
-      render: (row) => (row.is_active ? (isArabic ? 'مفعّل' : 'Active') : (isArabic ? 'موقف' : 'Inactive')),
+      render: (row) => {
+        if (row.is_deleted) return isArabic ? 'محذوفة' : 'Deleted'
+        return row.is_active ? (isArabic ? 'مفعّلة' : 'Active') : (isArabic ? 'موقفة' : 'Inactive')
+      },
     },
     {
       key: 'actions',
       label: isArabic ? 'الإجراءات' : 'Actions',
       render: (row) => (
         <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
-            {isArabic ? 'تعديل' : 'Edit'}
-          </button>
-          <button
-            className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
-            onClick={() => setPendingDeactivate(row)}
-            type="button"
-          >
-            {isArabic ? 'إيقاف' : 'Deactivate'}
-          </button>
+          {row.is_deleted ? (
+            <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore(row)} type="button">
+              {isArabic ? 'استعادة' : 'Restore'}
+            </button>
+          ) : (
+            <>
+              <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
+                {isArabic ? 'تعديل' : 'Edit'}
+              </button>
+              <button
+                className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
+                onClick={() => setPendingDelete(row)}
+                type="button"
+              >
+                {isArabic ? 'حذف' : 'Delete'}
+              </button>
+            </>
+          )}
         </div>
       ),
     },
@@ -248,7 +279,11 @@ function ServiceRelationsManagementPage() {
         title={isArabic ? 'إدارة علاقات الخدمات' : 'Service Relations Management'}
         eyebrow={isArabic ? 'قواعد الخدمات' : 'Service Rules'}
         icon={GitBranchPlus}
-        description={isArabic ? 'عرّف الشروط المسبقة والتوصيات اللاحقة والحزم الاختيارية والبدائل بدون تعديل برمجي.' : 'Define prerequisites, recommendations, optional bundles, and alternatives without code changes.'}
+        description={
+          isArabic
+            ? 'عرّف الشروط المسبقة والتوصيات اللاحقة والحزم الاختيارية والبدائل بدون تعديل برمجي.'
+            : 'Define prerequisites, recommendations, optional bundles, and alternatives without code changes.'
+        }
         actions={
           <button className="btn-primary" onClick={openCreateForm} type="button">
             {isArabic ? '+ علاقة جديدة' : '+ New Relation'}
@@ -269,10 +304,22 @@ function ServiceRelationsManagementPage() {
         columns={columns}
         rows={relations}
         loading={relationsLoading || servicesLoading}
+        rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
+        mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
         emptyTitle={isArabic ? 'لا توجد علاقات خدمات' : 'No service relations found'}
         emptyDescription={isArabic ? 'أنشئ أول قاعدة أعمال لربط الخدمات.' : 'Create the first business rule to connect services.'}
         toolbar={
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <select
+              className="field"
+              value={filters.status}
+              onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}
+            >
+              <option value="active">{isArabic ? 'النشطة' : 'Active'}</option>
+              <option value="deleted">{isArabic ? 'المحذوفة' : 'Deleted'}</option>
+              <option value="all">{isArabic ? 'الكل' : 'All'}</option>
+            </select>
+
             <select
               className="field"
               value={filters.source_service}
@@ -318,7 +365,7 @@ function ServiceRelationsManagementPage() {
               onChange={(event) => setFilters((current) => ({ ...current, is_active: event.target.value }))}
             >
               <option value="">{isArabic ? 'جميع الحالات' : 'All statuses'}</option>
-              <option value="true">{isArabic ? 'المفعّلة فقط' : 'Active only'}</option>
+              <option value="true">{isArabic ? 'المفعلة فقط' : 'Active only'}</option>
               <option value="false">{isArabic ? 'الموقوفة فقط' : 'Inactive only'}</option>
             </select>
           </div>
@@ -327,7 +374,9 @@ function ServiceRelationsManagementPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold text-ink">{row.source_service_name || row.source_service?.name_ar}</p>
-              <span className="text-sm text-slate-500">{row.is_active ? (isArabic ? 'مفعّل' : 'Active') : (isArabic ? 'موقف' : 'Inactive')}</span>
+              <span className="text-sm text-slate-500">
+                {row.is_deleted ? (isArabic ? 'محذوفة' : 'Deleted') : row.is_active ? (isArabic ? 'مفعّلة' : 'Active') : (isArabic ? 'موقفة' : 'Inactive')}
+              </span>
             </div>
             <p className="text-sm text-slate-600">{isArabic ? 'الهدف: ' : 'Target: '}{row.target_service_name || row.target_service?.name_ar}</p>
             <p className="text-sm text-slate-500">{row.relation_type_label}</p>
@@ -340,7 +389,11 @@ function ServiceRelationsManagementPage() {
         onClose={closeForm}
         size="lg"
         title={selectedRelation ? (isArabic ? 'تعديل العلاقة' : 'Edit Service Relation') : (isArabic ? 'علاقة جديدة' : 'New Service Relation')}
-        description={isArabic ? 'استخدم قواعد الأعمال لتمكين فريق التشغيل من التحكم في تبعيات الخدمات واقتراحات المتابعة.' : 'Use business-friendly rules so operations teams can control service dependencies and follow-up suggestions.'}
+        description={
+          isArabic
+            ? 'استخدم قواعد الأعمال لتمكين فريق التشغيل من التحكم في تبعيات الخدمات واقتراحات المتابعة.'
+            : 'Use business-friendly rules so operations teams can control service dependencies and follow-up suggestions.'
+        }
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeForm} type="button">
@@ -391,7 +444,7 @@ function ServiceRelationsManagementPage() {
             >
               <select className="field" {...form.register('source_category_id')}>
                 <option value="">{isArabic ? 'جميع التصنيفات' : 'All categories'}</option>
-                {categories.map((category) => (
+                {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.full_path_name || category.name_ar}
                   </option>
@@ -405,7 +458,7 @@ function ServiceRelationsManagementPage() {
             >
               <select className="field" {...form.register('target_category_id')}>
                 <option value="">{isArabic ? 'جميع التصنيفات' : 'All categories'}</option>
-                {categories.map((category) => (
+                {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.full_path_name || category.name_ar}
                   </option>
@@ -435,34 +488,68 @@ function ServiceRelationsManagementPage() {
           {selectedRelationType === 'prerequisite' ? (
             <CheckboxField
               label={isArabic ? 'هذا الشرط إلزامي' : 'This prerequisite is mandatory'}
-              hint={isArabic ? 'الشروط الإلزامية تمنع إرسال الطلب حتى تُكتمل الخدمة المصدر.' : 'Mandatory prerequisites block ordering until the source service is completed.'}
+              hint={
+                isArabic
+                  ? 'الشروط الإلزامية تمنع إرسال الطلب حتى تُكتمل الخدمة المصدر.'
+                  : 'Mandatory prerequisites block ordering until the source service is completed.'
+              }
               registration={form.register('is_required')}
             />
           ) : null}
 
           <Field
             label={isArabic ? 'رسالة للعميل' : 'Customer message'}
-            hint={isArabic ? 'ملاحظة اختيارية بلغة بسيطة تُعرض للعملاء في تفاصيل الخدمة والإشعارات.' : 'Optional plain-language note shown to customers in the service details and notifications.'}
+            hint={
+              isArabic
+                ? 'ملاحظة اختيارية بلغة بسيطة تُعرض للعملاء في تفاصيل الخدمة والإشعارات.'
+                : 'Optional plain-language note shown to customers in the service details and notifications.'
+            }
           >
             <textarea className="field min-h-28" {...form.register('message_to_customer')} />
           </Field>
 
           <CheckboxField
             label={isArabic ? 'العلاقة مفعّلة' : 'Relation is active'}
-            hint={isArabic ? 'العلاقات الموقوفة تبقى في السجل لكنها لا تؤثر على الطلبات والتوصيات.' : 'Inactive relations stay in history but are ignored by ordering and recommendations.'}
+            hint={
+              isArabic
+                ? 'العلاقات الموقوفة تبقى في السجل لكنها لا تؤثر على الطلبات والتوصيات.'
+                : 'Inactive relations stay in history but are ignored by ordering and recommendations.'
+            }
             registration={form.register('is_active')}
           />
         </form>
       </FormModal>
 
+      <AdminSoftDeleteModal
+        confirmLabel={isArabic ? 'تأكيد الحذف' : 'Confirm delete'}
+        description={
+          isArabic
+            ? `سيتم إخفاء العلاقة بين "${pendingDelete?.source_service_name || pendingDelete?.source_service?.name_ar || ''}" و "${pendingDelete?.target_service_name || pendingDelete?.target_service?.name_ar || ''}" من النظام.`
+            : `This will hide the relation between "${pendingDelete?.source_service_name || pendingDelete?.source_service?.name_ar || ''}" and "${pendingDelete?.target_service_name || pendingDelete?.target_service?.name_ar || ''}" from the system.`
+        }
+        impact={
+          isArabic
+            ? 'لن تؤثر العلاقة المحذوفة على الطلبات الجديدة أو التوصيات، بينما يبقى السجل محفوظاً للتدقيق.'
+            : 'Deleted relations stop affecting new orders and recommendations while remaining available for audit.'
+        }
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        open={!!pendingDelete}
+        requireReason
+        title={isArabic ? 'حذف العلاقة' : 'Delete service relation'}
+      />
+
       <ConfirmModal
-        open={!!pendingDeactivate}
-        onClose={() => setPendingDeactivate(null)}
-        onConfirm={handleDeactivateConfirm}
-        title={isArabic ? 'إيقاف العلاقة' : 'Deactivate Service Relation'}
-        description={isArabic ? 'ستتوقف القاعدة عن التأثير على الطلبات والتوصيات، لكن السجل التاريخي سيبقى محفوظاً.' : 'The rule will stop affecting ordering and recommendations, but the audit history will remain.'}
-        confirmLabel={isArabic ? 'إيقاف' : 'Deactivate'}
-        variant="danger"
+        confirmLabel={isArabic ? 'استعادة' : 'Restore'}
+        description={
+          isArabic
+            ? 'ستعود العلاقة إلى محرك القواعد ويمكن استخدامها في الطلبات الجديدة.'
+            : 'This will restore the rule back into the relation engine for new orders.'
+        }
+        onClose={() => setPendingRestore(null)}
+        onConfirm={handleRestoreConfirm}
+        open={!!pendingRestore}
+        title={isArabic ? 'استعادة العلاقة' : 'Restore service relation'}
       />
     </div>
   )
