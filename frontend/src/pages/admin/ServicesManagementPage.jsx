@@ -69,11 +69,29 @@ const defaultDefinitionValues = {
   name_en: '',
   description_ar: '',
   description_en: '',
-  allowed_extensions_text: '.pdf, .jpg, .png',
+  allowed_extensions: ['.pdf', '.jpg', '.png'],
   max_file_size: 10485760,
   sort_order: 0,
   is_active: true,
 }
+
+const SERVICE_CURRENCY_CODE = 'JOD'
+const DOCUMENT_EXTENSION_OPTIONS = [
+  { value: '.pdf', label: 'PDF document' },
+  { value: '.jpg', label: 'JPG image' },
+  { value: '.jpeg', label: 'JPEG image' },
+  { value: '.png', label: 'PNG image' },
+  { value: '.doc', label: 'Word DOC' },
+  { value: '.docx', label: 'Word DOCX' },
+]
+const DOCUMENT_SIZE_OPTIONS = [
+  { value: 1 * 1024 * 1024, label: '1 MB' },
+  { value: 2 * 1024 * 1024, label: '2 MB' },
+  { value: 5 * 1024 * 1024, label: '5 MB' },
+  { value: 10 * 1024 * 1024, label: '10 MB' },
+  { value: 15 * 1024 * 1024, label: '15 MB' },
+  { value: 20 * 1024 * 1024, label: '20 MB' },
+]
 
 function CheckboxField({ label, registration }) {
   return (
@@ -116,11 +134,13 @@ function SectionCard({ icon: Icon, title, description, action, children }) {
   )
 }
 
-function toExtensionArray(value) {
-  return String(value || '')
-    .split(/[\n,]/)
-    .map((item) => item.trim())
-    .filter(Boolean)
+function getDocumentExtensionLabel(value) {
+  return DOCUMENT_EXTENSION_OPTIONS.find((option) => option.value === value)?.label || value
+}
+
+function formatExtensionList(value) {
+  const items = Array.isArray(value) ? value : []
+  return items.map(getDocumentExtensionLabel).join(', ') || 'Not set'
 }
 
 const schemaFieldTypeOptions = [
@@ -391,9 +411,10 @@ function normalizeSelectedIds(value) {
 }
 
 function formatDefinitionSummary(definition) {
-  const extensions = (definition.allowed_extensions || []).join(', ')
+  const extensions = formatExtensionList(definition.allowed_extensions)
   if (!extensions) return 'بدون امتدادات مخصصة'
-  return `${extensions} | ${definition.max_file_size || 0} bytes`
+  const sizeOption = DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(definition.max_file_size || 0))
+  return `${extensions} | ${sizeOption?.label || 'Custom size'}`
 }
 
 function ServicesManagementPage() {
@@ -440,6 +461,7 @@ function ServicesManagementPage() {
   const serviceNameAr = serviceForm.watch('name_ar')
   const serviceNameEn = serviceForm.watch('name_en')
   const deliveryTimeMode = serviceForm.watch('delivery_time_mode')
+  const selectedDefinitionExtensions = definitionForm.watch('allowed_extensions') || []
   const selectedRequiredDocumentIds = normalizeSelectedIds(serviceForm.watch('required_document_ids'))
 
   const selectedCategory = useMemo(
@@ -538,7 +560,7 @@ function ServicesManagementPage() {
             name_en: selectedDefinition.name_en || '',
             description_ar: selectedDefinition.description_ar || '',
             description_en: selectedDefinition.description_en || '',
-            allowed_extensions_text: (selectedDefinition.allowed_extensions || []).join(', '),
+            allowed_extensions: selectedDefinition.allowed_extensions || ['.pdf'],
             max_file_size: selectedDefinition.max_file_size ?? 10485760,
             sort_order: selectedDefinition.sort_order ?? 0,
             is_active: Boolean(selectedDefinition.is_active),
@@ -752,7 +774,12 @@ function ServicesManagementPage() {
         name_en: values.name_en.trim(),
         description_ar: values.description_ar.trim(),
         description_en: values.description_en.trim(),
-        allowed_extensions: toExtensionArray(values.allowed_extensions_text),
+        allowed_extensions: Array.isArray(values.allowed_extensions)
+          ? values.allowed_extensions.filter(Boolean)
+          : String(values.allowed_extensions || '')
+              .split(',')
+              .map((item) => item.trim())
+              .filter(Boolean),
         max_file_size: Number(values.max_file_size || 0),
         sort_order: Number(values.sort_order || 0),
         is_active: Boolean(values.is_active),
@@ -966,7 +993,12 @@ function ServicesManagementPage() {
     {
       key: 'allowed_extensions',
       label: 'Extensions',
-      render: (row) => (row.allowed_extensions || []).join(', ') || 'Not set',
+      render: (row) => formatExtensionList(row.allowed_extensions),
+    },
+    {
+      key: 'max_file_size',
+      label: 'Max size',
+      render: (row) => DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(row.max_file_size || 0))?.label || 'Custom size',
     },
     { key: 'sort_order', label: 'Order' },
     {
@@ -1300,14 +1332,17 @@ function ServicesManagementPage() {
               <h3 className="text-base font-bold text-ink">التسعير والظهور العام</h3>
               <p className="text-sm leading-6 text-slate-600">كل الرسوم تحفظ داخلياً دائماً، لكنك تختار ما يظهر على الموقع العام.</p>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              <Field label="السعر الأساسي">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <Field hint={`جميع الأسعار تستخدم ${SERVICE_CURRENCY_CODE}.`} label="العملة">
+                <input className="field bg-slate-50 text-slate-600" readOnly value={SERVICE_CURRENCY_CODE} />
+              </Field>
+              <Field label={`السعر الأساسي (${SERVICE_CURRENCY_CODE})`}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('base_price')} />
               </Field>
-              <Field label="رسوم الشركة">
+              <Field label={`رسوم الشركة (${SERVICE_CURRENCY_CODE})`}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('service_fee')} />
               </Field>
-              <Field label="الرسوم الحكومية">
+              <Field label={`الرسوم الحكومية (${SERVICE_CURRENCY_CODE})`}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('government_fee')} />
               </Field>
             </div>
@@ -1440,11 +1475,36 @@ function ServicesManagementPage() {
             <textarea className="field min-h-24" {...definitionForm.register('description_en')} />
           </Field>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="مثال: .pdf, .jpg, .png" label="الامتدادات المسموحة">
-              <input className="field" {...definitionForm.register('allowed_extensions_text')} />
+            <Field hint="اختر أنواع الملفات التي يسمح برفعها." label="أنواع الملفات المسموحة">
+              <div className="grid gap-3 md:grid-cols-1">
+                {DOCUMENT_EXTENSION_OPTIONS.map((option) => (
+                  <label key={option.value} className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm">
+                    <input
+                      checked={selectedDefinitionExtensions.includes(option.value)}
+                      onChange={(event) =>
+                        definitionForm.setValue(
+                          'allowed_extensions',
+                          event.target.checked
+                            ? [...selectedDefinitionExtensions, option.value]
+                            : selectedDefinitionExtensions.filter((item) => item !== option.value),
+                          { shouldDirty: true },
+                        )
+                      }
+                      type="checkbox"
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
             </Field>
-            <Field hint="بالبايت" label="الحد الأقصى للحجم">
-              <input className="field" min="1" type="number" {...definitionForm.register('max_file_size')} />
+            <Field hint="اختر الحد الأقصى من قائمة جاهزة." label="الحد الأقصى لحجم الملف">
+              <select className="field" {...definitionForm.register('max_file_size')}>
+                {DOCUMENT_SIZE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </Field>
           </div>
           <CheckboxField label="التعريف نشط" registration={definitionForm.register('is_active')} />

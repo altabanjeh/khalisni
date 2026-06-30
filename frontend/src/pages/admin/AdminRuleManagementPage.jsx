@@ -126,7 +126,12 @@ const DEFAULT_DELETE_GUARD_FORM = {
   confirm_delete_password: '',
 }
 
+const SERVICE_CURRENCY_CODE = 'JOD'
 const SAFE_FILE_TYPES = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx']
+const DOCUMENT_SIZE_OPTIONS = [1, 2, 5, 10, 15, 20].map((sizeInMb) => ({
+  value: sizeInMb * 1024 * 1024,
+  label: `${sizeInMb} MB`,
+}))
 const PAYMENT_STATUS_OPTIONS = ['pending', 'processing', 'paid', 'failed', 'cancelled', 'refunded', 'partially_refunded']
 const SYSTEM_SETTING_KEYS = ['site.homepage', 'site.contact']
 const SETTING_DEFINITIONS = {
@@ -189,6 +194,11 @@ function buildDocumentType(currentValue, values) {
 
 function toMb(bytes) {
   return `${(Number(bytes || 0) / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function formatPriceWithCurrency(value) {
+  const amount = Number(value || 0)
+  return `${amount.toFixed(2)} ${SERVICE_CURRENCY_CODE}`
 }
 
 function EmptyHelp({ title, text, warning = '' }) {
@@ -278,6 +288,18 @@ function AdminRuleManagementPage() {
     days: tx('أيام', 'Days'),
     weeks: tx('أسابيع', 'Weeks'),
   }
+  const fileExtensionLabels = {
+    '.pdf': tx('Ù…Ù„Ù PDF', 'PDF document'),
+    '.jpg': tx('ØµÙˆØ±Ø© JPG', 'JPG image'),
+    '.jpeg': tx('ØµÙˆØ±Ø© JPEG', 'JPEG image'),
+    '.png': tx('ØµÙˆØ±Ø© PNG', 'PNG image'),
+    '.doc': tx('Ù…Ù„Ù Word DOC', 'Word DOC'),
+    '.docx': tx('Ù…Ù„Ù Word DOCX', 'Word DOCX'),
+  }
+  const formatExtensionList = (value) =>
+    (Array.isArray(value) ? value : [])
+      .map((item) => fileExtensionLabels[item] || item)
+      .join(', ') || tx('ØºÙŠØ± Ù…Ø­Ø¯Ø¯', 'Not set')
   const tabLabels = {
     services: tx('الخدمات والأسعار', 'Services and pricing'),
     documents: tx('المستندات المطلوبة', 'Required documents'),
@@ -834,7 +856,7 @@ function AdminRuleManagementPage() {
   const serviceColumns = [
     { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
     { key: 'category_name', label: tx('التصنيف', 'Category') },
-    { key: 'base_price', label: tx('السعر الأساسي', 'Base price') },
+    { key: 'base_price', label: tx('السعر الأساسي', 'Base price'), render: (row) => formatPriceWithCurrency(row.base_price) },
     { key: 'duration_display', label: tx('المدة التقديرية', 'Estimated duration') },
     { key: 'provider_required', label: tx('يتطلب مزوداً', 'Provider required'), render: (row) => (row.provider_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'requires_manual_review', label: tx('مراجعة الموظف', 'Employee review'), render: (row) => (row.requires_manual_review ? tx('مطلوبة', 'Required') : tx('غير مطلوبة', 'Not required')) },
@@ -869,8 +891,12 @@ function AdminRuleManagementPage() {
     { key: 'service_name', label: tx('الخدمة', 'Service') },
     { key: 'name', label: tx('اسم المستند', 'Document name'), render: (row) => getLocalizedName(row) },
     { key: 'is_required', label: tx('المتطلب', 'Requirement'), render: (row) => (row.is_required ? tx('مطلوب', 'Required') : tx('اختياري', 'Optional')) },
-    { key: 'allowed_extensions', label: tx('أنواع الملفات', 'File types'), render: (row) => (row.allowed_extensions || []).join(', ') || tx('غير محدد', 'Not set') },
-    { key: 'max_file_size', label: tx('الحد الأقصى للحجم', 'Max size'), render: (row) => toMb(row.max_file_size) },
+    { key: 'allowed_extensions', label: tx('أنواع الملفات', 'File types'), render: (row) => formatExtensionList(row.allowed_extensions) },
+    {
+      key: 'max_file_size',
+      label: tx('الحد الأقصى للحجم', 'Max size'),
+      render: (row) => DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(row.max_file_size || 0))?.label || toMb(row.max_file_size),
+    },
     {
       key: 'actions',
       label: tx('الإجراءات', 'Actions'),
@@ -1382,7 +1408,7 @@ function AdminRuleManagementPage() {
           )}
           warning={tx('تظهر تغييرات الأسعار للموظفين فوراً ويتم تسجيلها في سجل التدقيق.', 'Price changes are visible to staff immediately and are recorded in the audit log.')}
         />
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Field label={tx('التصنيف', 'Category')} help={tx('اختر التصنيف التجاري الظاهر للمشرفين والعملاء.', 'Choose the business category shown to admins and clients.')}>
             <select className="field" value={serviceForm.category_id} onChange={(event) => setServiceForm({ ...serviceForm, category_id: event.target.value })}>
               <option value="">{tx('اختر التصنيف', 'Choose category')}</option>
@@ -1399,13 +1425,16 @@ function AdminRuleManagementPage() {
           <Field label={tx('الاسم الإنجليزي', 'English name')} help={tx('يستخدم في الشاشات الثنائية اللغة والتقارير.', 'Used in bilingual screens and reports.')}>
             <input className="field" value={serviceForm.name_en} onChange={(event) => setServiceForm({ ...serviceForm, name_en: event.target.value })} />
           </Field>
-          <Field label={tx('السعر الأساسي', 'Base price')} help={tx('المبلغ الرئيسي للخدمة قبل الرسوم الأخرى.', 'Main service amount before other fees.')}>
+          <Field label={tx('العملة', 'Currency')} help={tx('جميع الأسعار في هذه الشاشة تحفظ بنفس العملة.', 'All prices in this screen use the same currency.')}>
+            <input className="field bg-slate-50 text-slate-600" readOnly value={SERVICE_CURRENCY_CODE} />
+          </Field>
+          <Field label={tx(`السعر الأساسي (${SERVICE_CURRENCY_CODE})`, `Base price (${SERVICE_CURRENCY_CODE})`)} help={tx('المبلغ الرئيسي للخدمة قبل الرسوم الأخرى.', 'Main service amount before other fees.')}>
             <input className="field" type="number" value={serviceForm.base_price} onChange={(event) => setServiceForm({ ...serviceForm, base_price: event.target.value })} />
           </Field>
-          <Field label={tx('الرسوم الحكومية', 'Government fee')} help={tx('مبلغ حكومي اختياري إذا كانت الخدمة تتطلبه.', 'Optional government amount if this service needs it.')}>
+          <Field label={tx(`الرسوم الحكومية (${SERVICE_CURRENCY_CODE})`, `Government fee (${SERVICE_CURRENCY_CODE})`)} help={tx('مبلغ حكومي اختياري إذا كانت الخدمة تتطلبه.', 'Optional government amount if this service needs it.')}>
             <input className="field" type="number" value={serviceForm.government_fee} onChange={(event) => setServiceForm({ ...serviceForm, government_fee: event.target.value })} />
           </Field>
-          <Field label={tx('رسوم خدمة إضافية', 'Extra service fee')} help={tx('أي رسوم داخلية إضافية يسمح بها نموذج العمل.', 'Any extra internal fee allowed by the business model.')}>
+          <Field label={tx(`رسوم خدمة إضافية (${SERVICE_CURRENCY_CODE})`, `Extra service fee (${SERVICE_CURRENCY_CODE})`)} help={tx('أي رسوم داخلية إضافية يسمح بها نموذج العمل.', 'Any extra internal fee allowed by the business model.')}>
             <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
           </Field>
           <Field label={tx('المدة التقديرية', 'Estimated duration')} help={tx('استخدم رقماً بسيطاً للمشرفين غير التقنيين.', 'Use a simple number for non-technical admins.')}>
@@ -1484,12 +1513,18 @@ function AdminRuleManagementPage() {
                   }
                   type="checkbox"
                 />
-                <span>{extension}</span>
+                <span>{fileExtensionLabels[extension] || extension}</span>
               </label>
             ))}
           </div>
-          <Field label={tx('الحد الأقصى للحجم بالبايت', 'Maximum size in bytes')} help={tx('اجعلها بسيطة. يطبق النظام أيضاً حداً عاماً للسلامة.', 'Keep this simple. The system also applies a global safety limit.')}>
-            <input className="field" type="number" value={documentForm.max_file_size} onChange={(event) => setDocumentForm({ ...documentForm, max_file_size: event.target.value })} />
+          <Field label={tx('الحد الأقصى لحجم الملف', 'Maximum file size')} help={tx('اختر قيمة جاهزة وواضحة بدل إدخال رقم تقني.', 'Choose a ready-made value instead of entering a technical number.')}>
+            <select className="field" value={documentForm.max_file_size} onChange={(event) => setDocumentForm({ ...documentForm, max_file_size: event.target.value })}>
+              {DOCUMENT_SIZE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </Field>
           <div className="grid gap-3">
             <ToggleField checked={documentForm.is_required} help={tx('المستندات المطلوبة تمنع تقدم الطلب حتى يتم رفعها واعتمادها.', 'Required documents block order progress until uploaded and approved.')} label={tx('مستند مطلوب', 'Required document')} onChange={(value) => setDocumentForm({ ...documentForm, is_required: value })} />
