@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from rest_framework.throttling import ScopedRateThrottle
@@ -123,6 +126,24 @@ class OrderAPITests(APITestCase):
         self.assertEqual(str(order.expected_delivery_end_date), "2026-09-30")
         self.assertEqual(str(order.expected_delivery_date), "2026-09-30")
         self.assertEqual(order.expected_delivery_note_snapshot, "Depends on government cycle.")
+
+    def test_customer_order_snapshots_relative_duration_range_delivery_configuration(self):
+        self.service.delivery_time_mode = Service.DeliveryTimeMode.DURATION_RANGE
+        self.service.estimated_duration_unit = Service.DurationUnit.DAYS
+        self.service.estimated_duration_min = 2
+        self.service.estimated_duration_max = 4
+        self.service.estimated_duration = 4
+        self.service.delivery_note_ar = "Depends on document readiness."
+        self.service.save()
+
+        order = self._create_customer_order(phone="0795555501")
+
+        self.assertEqual(order.expected_delivery_mode, Service.DeliveryTimeMode.DURATION_RANGE)
+        self.assertEqual(order.expected_duration_value_snapshot, 4)
+        self.assertEqual(str(order.expected_delivery_start_date), str(timezone.localdate() + timedelta(days=2)))
+        self.assertEqual(str(order.expected_delivery_end_date), str(timezone.localdate() + timedelta(days=4)))
+        self.assertEqual(str(order.expected_delivery_date), str(timezone.localdate() + timedelta(days=4)))
+        self.assertEqual(order.expected_delivery_note_snapshot, "Depends on document readiness.")
 
     def test_anonymous_user_cannot_create_order(self):
         response = self.client.post(

@@ -379,7 +379,7 @@ function CustomerCreateOrderPage() {
               <div className="panel-muted p-4">
                 <p className="text-xs text-slate-500">المدة المتوقعة</p>
                 <p className="mt-2 font-bold text-ink">
-                  {selectedService ? `${selectedService.estimated_duration} ${selectedService.estimated_duration_unit || 'days'}` : 'غير محدد'}
+                  {selectedService ? selectedService.delivery_time?.label_ar || selectedService.delivery_time?.label || 'غير محدد' : 'غير محدد'}
                 </p>
               </div>
             </div>

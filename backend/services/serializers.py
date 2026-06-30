@@ -430,6 +430,8 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
             "public_price_note_ar",
             "public_price_note_en",
             "estimated_duration",
+            "estimated_duration_min",
+            "estimated_duration_max",
             "estimated_duration_unit",
             "delivery_time_mode",
             "delivery_start_date",

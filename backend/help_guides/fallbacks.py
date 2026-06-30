@@ -691,7 +691,7 @@ def build_service_fallback(service: Service):
         "common_errors": "Uploading unclear files\nChoosing the wrong service\nLeaving required service fields blank",
         "common_rejection_reasons": "Documents do not match the request\nMandatory service data is incorrect\nThe request does not meet the service prerequisites",
         "common_missing_document_reasons": "Unreadable upload\nWrong document type\nA required document was not attached",
-        "estimated_processing_time": f"{service.estimated_duration} {service.estimated_duration_unit}",
+        "estimated_processing_time": service.delivery_time_payload().get("label_en") or f"{service.estimated_duration} {service.estimated_duration_unit}",
         "price_rule": f"{service.get_price_type_display()} pricing with a total fee of {service.total_fee}.",
         "provider_requirement": "Provider assignment required." if service.provider_required else "No provider assignment required.",
         "source": "registry",

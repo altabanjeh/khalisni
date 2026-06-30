@@ -897,6 +897,22 @@ class ServiceCatalogEnhancementTests(APITestCase):
         self.assertEqual(response.data["required_documents"][0]["definition_id"], self.definition.id)
         self.assertEqual(response.data["required_documents"][0]["code"], "national_id")
 
+    def test_public_service_detail_returns_relative_duration_range_payload(self):
+        self.service.delivery_time_mode = Service.DeliveryTimeMode.DURATION_RANGE
+        self.service.estimated_duration_min = 2
+        self.service.estimated_duration_max = 4
+        self.service.estimated_duration = 4
+        self.service.estimated_duration_unit = Service.DurationUnit.DAYS
+        self.service.save()
+
+        response = self.client.get(f"/api/services/{self.service.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["delivery_time"]["mode"], "duration_range")
+        self.assertEqual(response.data["delivery_time"]["expected_duration_min"], 2)
+        self.assertEqual(response.data["delivery_time"]["expected_duration_max"], 4)
+        self.assertEqual(response.data["delivery_time"]["expected_duration_unit"], "days")
+
     def test_public_category_cards_return_service_count(self):
         response = self.client.get("/api/public-site/service-categories/")
 

@@ -1,4 +1,3 @@
-from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -393,8 +392,9 @@ class Order(models.Model):
                 self.expected_delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
                 self.expected_duration_value_snapshot = self.service.estimated_duration
                 self.expected_duration_unit_snapshot = self.service.estimated_duration_unit
-                self.expected_delivery_start_date = getattr(self.service, "delivery_start_date", None)
-                self.expected_delivery_end_date = getattr(self.service, "delivery_end_date", None)
+                if self.expected_delivery_mode == "date_range":
+                    self.expected_delivery_start_date = getattr(self.service, "delivery_start_date", None)
+                    self.expected_delivery_end_date = getattr(self.service, "delivery_end_date", None)
                 self.expected_delivery_note_snapshot = getattr(self.service, "delivery_note_ar", "") or getattr(self.service, "delivery_note_en", "")
             else:
                 if not self.expected_delivery_mode:
@@ -403,25 +403,27 @@ class Order(models.Model):
                     self.expected_duration_value_snapshot = self.service.estimated_duration
                 if not self.expected_duration_unit_snapshot:
                     self.expected_duration_unit_snapshot = self.service.estimated_duration_unit
-                if not self.expected_delivery_start_date:
+                if self.expected_delivery_mode == "date_range" and not self.expected_delivery_start_date:
                     self.expected_delivery_start_date = getattr(self.service, "delivery_start_date", None)
-                if not self.expected_delivery_end_date:
+                if self.expected_delivery_mode == "date_range" and not self.expected_delivery_end_date:
                     self.expected_delivery_end_date = getattr(self.service, "delivery_end_date", None)
                 if not self.expected_delivery_note_snapshot:
                     self.expected_delivery_note_snapshot = getattr(self.service, "delivery_note_ar", "") or getattr(self.service, "delivery_note_en", "")
 
         if self.expected_delivery_date is None and self.service_id:
-            if getattr(self.service, "delivery_time_mode", "duration") == "date_range":
+            delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
+            if delivery_mode == "date_range":
                 self.expected_delivery_date = self.service.delivery_end_date
+            elif delivery_mode == "duration_range":
+                base_date = timezone.localdate()
+                min_duration = self.service.estimated_duration_min or self.service.estimated_duration or 1
+                max_duration = self.service.estimated_duration_max or self.service.estimated_duration or min_duration
+                self.expected_duration_value_snapshot = max_duration
+                self.expected_delivery_start_date = base_date + self.service.to_duration_delta(min_duration)
+                self.expected_delivery_end_date = base_date + self.service.to_duration_delta(max_duration)
+                self.expected_delivery_date = self.expected_delivery_end_date
             else:
-                if self.service.estimated_duration_unit == self.service.DurationUnit.HOURS:
-                    duration_delta = timedelta(hours=self.service.estimated_duration)
-                elif self.service.estimated_duration_unit == self.service.DurationUnit.WEEKS:
-                    duration_delta = timedelta(weeks=self.service.estimated_duration)
-                else:
-                    duration_delta = timedelta(days=self.service.estimated_duration)
-
-                self.expected_delivery_date = timezone.localdate() + duration_delta
+                self.expected_delivery_date = timezone.localdate() + self.service.to_duration_delta(self.service.estimated_duration)
 
         now = timezone.now()
 

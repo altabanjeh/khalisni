@@ -46,7 +46,10 @@ const DEFAULT_SERVICE_FORM = {
   government_fee: '0.00',
   service_fee: '0.00',
   estimated_duration: 1,
+  estimated_duration_min: 1,
+  estimated_duration_max: 3,
   estimated_duration_unit: 'days',
+  delivery_time_mode: 'duration',
   price_type: 'fixed',
   provider_required: true,
   requires_manual_review: true,
@@ -397,7 +400,10 @@ function AdminRuleManagementPage() {
             government_fee: selectedService.government_fee ?? '0.00',
             service_fee: selectedService.service_fee ?? '0.00',
             estimated_duration: selectedService.estimated_duration ?? 1,
+            estimated_duration_min: selectedService.estimated_duration_min ?? selectedService.estimated_duration ?? 1,
+            estimated_duration_max: selectedService.estimated_duration_max ?? selectedService.estimated_duration ?? 1,
             estimated_duration_unit: selectedService.estimated_duration_unit || 'days',
+            delivery_time_mode: selectedService.delivery_time_mode === 'date_range' ? 'duration' : selectedService.delivery_time_mode || 'duration',
             price_type: selectedService.price_type || 'fixed',
             provider_required: Boolean(selectedService.provider_required),
             requires_manual_review: Boolean(selectedService.requires_manual_review),
@@ -627,10 +633,18 @@ function AdminRuleManagementPage() {
 
   async function handleServiceSave() {
     try {
+      const isDurationRange = serviceForm.delivery_time_mode === 'duration_range'
+      const durationMin = Number(serviceForm.estimated_duration_min || serviceForm.estimated_duration || 1)
+      const durationMax = Number(serviceForm.estimated_duration_max || serviceForm.estimated_duration || durationMin)
       const payload = {
         ...serviceForm,
         category_id: Number(serviceForm.category_id),
-        estimated_duration: Number(serviceForm.estimated_duration || 1),
+        estimated_duration: isDurationRange ? durationMax : Number(serviceForm.estimated_duration || 1),
+        estimated_duration_min: isDurationRange ? durationMin : null,
+        estimated_duration_max: isDurationRange ? durationMax : null,
+        delivery_time_mode: serviceForm.delivery_time_mode,
+        delivery_start_date: null,
+        delivery_end_date: null,
         display_order: Number(serviceForm.display_order || 0),
       }
       if (selectedService) {
@@ -1437,8 +1451,11 @@ function AdminRuleManagementPage() {
           <Field label={tx(`رسوم خدمة إضافية (${SERVICE_CURRENCY_CODE})`, `Extra service fee (${SERVICE_CURRENCY_CODE})`)} help={tx('أي رسوم داخلية إضافية يسمح بها نموذج العمل.', 'Any extra internal fee allowed by the business model.')}>
             <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
           </Field>
-          <Field label={tx('المدة التقديرية', 'Estimated duration')} help={tx('استخدم رقماً بسيطاً للمشرفين غير التقنيين.', 'Use a simple number for non-technical admins.')}>
-            <input className="field" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
+          <Field label={tx('نوع المدة المتوقعة', 'Expected time type')} help={tx('استخدم مدة واحدة أو نطاقاً نسبياً يبدأ من تاريخ طلب العميل.', 'Use a single duration or a relative range that starts from the customer order date.')}>
+            <select className="field" value={serviceForm.delivery_time_mode} onChange={(event) => setServiceForm({ ...serviceForm, delivery_time_mode: event.target.value })}>
+              <option value="duration">{tx('مدة متوقعة', 'Expected duration')}</option>
+              <option value="duration_range">{tx('نطاق متوقع', 'Expected range')}</option>
+            </select>
           </Field>
           <Field label={tx('وحدة المدة', 'Duration unit')} help={tx('اختر أوضح وحدة للعمليات.', 'Choose the clearest unit for operations.')}>
             <select className="field" value={serviceForm.estimated_duration_unit} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_unit: event.target.value })}>
@@ -1447,6 +1464,20 @@ function AdminRuleManagementPage() {
               <option value="weeks">{durationUnitLabels.weeks}</option>
             </select>
           </Field>
+          {serviceForm.delivery_time_mode === 'duration_range' ? (
+            <>
+              <Field label={tx('من', 'From')} help={tx('أقل مدة متوقعة بعد تاريخ الطلب.', 'Minimum expected time after the order date.')}>
+                <input className="field" min="1" type="number" value={serviceForm.estimated_duration_min} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_min: event.target.value })} />
+              </Field>
+              <Field label={tx('إلى', 'To')} help={tx('أقصى مدة متوقعة بعد تاريخ الطلب.', 'Maximum expected time after the order date.')}>
+                <input className="field" min="1" type="number" value={serviceForm.estimated_duration_max} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_max: event.target.value })} />
+              </Field>
+            </>
+          ) : (
+            <Field label={tx('المدة التقديرية', 'Estimated duration')} help={tx('استخدم رقماً بسيطاً للمشرفين غير التقنيين.', 'Use a simple number for non-technical admins.')}>
+              <input className="field" min="1" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
+            </Field>
+          )}
           <Field label={tx('الوصف العربي', 'Arabic description')} help={tx('اشرح الخدمة بلغة بسيطة.', 'Explain the service in simple language.')}>
             <textarea className="field min-h-28" value={serviceForm.description_ar} onChange={(event) => setServiceForm({ ...serviceForm, description_ar: event.target.value })} />
           </Field>

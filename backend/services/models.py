@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -166,6 +167,7 @@ class Service(SoftDeleteModel):
 
     class DeliveryTimeMode(models.TextChoices):
         DURATION = "duration", "Expected duration"
+        DURATION_RANGE = "duration_range", "Expected duration range"
         DATE_RANGE = "date_range", "Date range"
 
     service_id = models.BigAutoField(primary_key=True)
@@ -258,6 +260,16 @@ class Service(SoftDeleteModel):
         default=1,
         validators=[MinValueValidator(1)]
     )
+    estimated_duration_min = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)]
+    )
+    estimated_duration_max = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)]
+    )
 
     estimated_duration_unit = models.CharField(
         max_length=10,
@@ -346,6 +358,19 @@ class Service(SoftDeleteModel):
     def total_fee(self):
         return self.base_price + self.government_fee + self.service_fee
 
+    def get_duration_unit_label_en(self):
+        return self.get_estimated_duration_unit_display().lower()
+
+    def get_duration_unit_label_ar(self):
+        return "يوم" if self.estimated_duration_unit == self.DurationUnit.DAYS else "ساعة" if self.estimated_duration_unit == self.DurationUnit.HOURS else "أسبوع"
+
+    def to_duration_delta(self, value):
+        if self.estimated_duration_unit == self.DurationUnit.HOURS:
+            return timedelta(hours=value)
+        if self.estimated_duration_unit == self.DurationUnit.WEEKS:
+            return timedelta(weeks=value)
+        return timedelta(days=value)
+
     def delivery_time_payload(self):
         if self.delivery_time_mode == self.DeliveryTimeMode.DATE_RANGE:
             start_date = self.delivery_start_date.isoformat() if self.delivery_start_date else None
@@ -365,8 +390,28 @@ class Service(SoftDeleteModel):
                 "note_en": self.delivery_note_en,
             }
 
-        unit_label_en = self.get_estimated_duration_unit_display().lower()
-        unit_label_ar = "يوم" if self.estimated_duration_unit == self.DurationUnit.DAYS else "ساعة" if self.estimated_duration_unit == self.DurationUnit.HOURS else "أسبوع"
+        unit_label_en = self.get_duration_unit_label_en()
+        unit_label_ar = self.get_duration_unit_label_ar()
+        if self.delivery_time_mode == self.DeliveryTimeMode.DURATION_RANGE:
+            min_value = self.estimated_duration_min
+            max_value = self.estimated_duration_max
+            label_en = f"Expected completion: {min_value} to {max_value} {unit_label_en}"
+            label_ar = f"المدة المتوقعة: من {min_value} إلى {max_value} {unit_label_ar}"
+            return {
+                "mode": self.delivery_time_mode,
+                "label": label_en,
+                "label_ar": label_ar,
+                "label_en": label_en,
+                "start_date": None,
+                "end_date": None,
+                "expected_duration": self.estimated_duration,
+                "expected_duration_min": min_value,
+                "expected_duration_max": max_value,
+                "expected_duration_unit": self.estimated_duration_unit,
+                "note_ar": self.delivery_note_ar,
+                "note_en": self.delivery_note_en,
+            }
+
         label_en = f"Expected completion: {self.estimated_duration} {unit_label_en}"
         label_ar = f"المدة المتوقعة: {self.estimated_duration} {unit_label_ar}"
         return {
@@ -377,6 +422,8 @@ class Service(SoftDeleteModel):
             "start_date": None,
             "end_date": None,
             "expected_duration": self.estimated_duration,
+            "expected_duration_min": None,
+            "expected_duration_max": None,
             "expected_duration_unit": self.estimated_duration_unit,
             "note_ar": self.delivery_note_ar,
             "note_en": self.delivery_note_en,
@@ -400,6 +447,13 @@ class Service(SoftDeleteModel):
                 errors["delivery_end_date"] = "End date is required for date-range delivery."
             if self.delivery_start_date and self.delivery_end_date and self.delivery_end_date < self.delivery_start_date:
                 errors["delivery_end_date"] = "End date must be on or after the start date."
+        elif self.delivery_time_mode == self.DeliveryTimeMode.DURATION_RANGE:
+            if not self.estimated_duration_min:
+                errors["estimated_duration_min"] = "Minimum expected duration is required for duration-range mode."
+            if not self.estimated_duration_max:
+                errors["estimated_duration_max"] = "Maximum expected duration is required for duration-range mode."
+            if self.estimated_duration_min and self.estimated_duration_max and self.estimated_duration_max < self.estimated_duration_min:
+                errors["estimated_duration_max"] = "Maximum expected duration must be greater than or equal to the minimum duration."
         else:
             if not self.estimated_duration:
                 errors["estimated_duration"] = "Expected duration is required for duration mode."
@@ -420,6 +474,18 @@ class Service(SoftDeleteModel):
         is_new = self.pk is None
         if self.is_deleted:
             self.is_active = False
+        if self.delivery_time_mode == self.DeliveryTimeMode.DURATION:
+            self.estimated_duration_min = None
+            self.estimated_duration_max = None
+            self.delivery_start_date = None
+            self.delivery_end_date = None
+        elif self.delivery_time_mode == self.DeliveryTimeMode.DURATION_RANGE:
+            self.delivery_start_date = None
+            self.delivery_end_date = None
+            self.estimated_duration = self.estimated_duration_max or self.estimated_duration_min or self.estimated_duration or 1
+        elif self.delivery_time_mode == self.DeliveryTimeMode.DATE_RANGE:
+            self.estimated_duration_min = None
+            self.estimated_duration_max = None
         exclude = ["service_number"] if not self.service_number else None
         self.full_clean(exclude=exclude)
 

@@ -46,10 +46,10 @@ const defaultServiceValues = {
   public_price_note_ar: '',
   public_price_note_en: '',
   estimated_duration: 1,
+  estimated_duration_min: 1,
+  estimated_duration_max: 3,
   estimated_duration_unit: 'days',
   delivery_time_mode: 'duration',
-  delivery_start_date: '',
-  delivery_end_date: '',
   delivery_note_ar: '',
   delivery_note_en: '',
   price_type: 'fixed',
@@ -524,10 +524,10 @@ function ServicesManagementPage() {
             public_price_note_ar: selectedService.public_price_note_ar || '',
             public_price_note_en: selectedService.public_price_note_en || '',
             estimated_duration: selectedService.estimated_duration ?? 1,
+            estimated_duration_min: selectedService.estimated_duration_min ?? selectedService.estimated_duration ?? 1,
+            estimated_duration_max: selectedService.estimated_duration_max ?? selectedService.estimated_duration ?? 1,
             estimated_duration_unit: selectedService.estimated_duration_unit || 'days',
-            delivery_time_mode: selectedService.delivery_time_mode || 'duration',
-            delivery_start_date: selectedService.delivery_start_date || '',
-            delivery_end_date: selectedService.delivery_end_date || '',
+            delivery_time_mode: selectedService.delivery_time_mode === 'date_range' ? 'duration' : selectedService.delivery_time_mode || 'duration',
             delivery_note_ar: selectedService.delivery_note_ar || '',
             delivery_note_en: selectedService.delivery_note_en || '',
             price_type: selectedService.price_type || 'fixed',
@@ -684,6 +684,9 @@ function ServicesManagementPage() {
       }
 
       const requiredDocumentIds = normalizeSelectedIds(values.required_document_ids).map((item) => Number(item))
+      const isDurationRange = values.delivery_time_mode === 'duration_range'
+      const durationMin = Number(values.estimated_duration_min || values.estimated_duration || 1)
+      const durationMax = Number(values.estimated_duration_max || values.estimated_duration || durationMin)
       const payload = {
         category_id: Number(values.category_id),
         name_ar: values.name_ar.trim(),
@@ -705,11 +708,13 @@ function ServicesManagementPage() {
         show_company_fee_public: Boolean(values.show_company_fee_public),
         public_price_note_ar: values.public_price_note_ar.trim(),
         public_price_note_en: values.public_price_note_en.trim(),
-        estimated_duration: Number(values.estimated_duration || 1),
+        estimated_duration: isDurationRange ? durationMax : Number(values.estimated_duration || 1),
+        estimated_duration_min: isDurationRange ? durationMin : null,
+        estimated_duration_max: isDurationRange ? durationMax : null,
         estimated_duration_unit: values.estimated_duration_unit,
         delivery_time_mode: values.delivery_time_mode,
-        delivery_start_date: values.delivery_start_date || null,
-        delivery_end_date: values.delivery_end_date || null,
+        delivery_start_date: null,
+        delivery_end_date: null,
         delivery_note_ar: values.delivery_note_ar.trim(),
         delivery_note_en: values.delivery_note_en.trim(),
         price_type: values.price_type,
@@ -1370,7 +1375,7 @@ function ServicesManagementPage() {
               <Field label="نوع التسليم">
                 <select className="field" {...serviceForm.register('delivery_time_mode')}>
                   <option value="duration">مدة متوقعة</option>
-                  <option value="date_range">فترة زمنية</option>
+                  <option value="duration_range">نطاق زمني متوقع</option>
                 </select>
               </Field>
               <Field label="نوع السعر">
@@ -1390,13 +1395,13 @@ function ServicesManagementPage() {
               </Field>
             </div>
 
-            {deliveryTimeMode === 'date_range' ? (
+            {deliveryTimeMode === 'duration_range' ? (
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="من تاريخ">
-                  <input className="field" type="date" {...serviceForm.register('delivery_start_date')} />
+                <Field label="من">
+                  <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration_min')} />
                 </Field>
-                <Field label="إلى تاريخ">
-                  <input className="field" type="date" {...serviceForm.register('delivery_end_date')} />
+                <Field label="إلى">
+                  <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration_max')} />
                 </Field>
               </div>
             ) : (
