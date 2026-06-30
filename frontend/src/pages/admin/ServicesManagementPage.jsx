@@ -1,4 +1,4 @@
-﻿import { Files, FolderTree, Settings } from 'lucide-react'
+import { Files, FolderTree, Settings } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import AdminSoftDeleteModal from '../../components/AdminSoftDeleteModal'
@@ -124,14 +124,14 @@ function toExtensionArray(value) {
 }
 
 const schemaFieldTypeOptions = [
-  { value: 'text', label: 'Ù†Øµ Ù‚ØµÙŠØ±' },
-  { value: 'textarea', label: 'Ù†Øµ Ø·ÙˆÙŠÙ„' },
-  { value: 'number', label: 'Ø±Ù‚Ù…' },
-  { value: 'email', label: 'Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ' },
-  { value: 'tel', label: 'Ø±Ù‚Ù… Ù‡Ø§ØªÙ' },
-  { value: 'date', label: 'ØªØ§Ø±ÙŠØ®' },
-  { value: 'select', label: 'Ù‚Ø§Ø¦Ù…Ø© Ø®ÙŠØ§Ø±Ø§Øª' },
-  { value: 'checkbox', label: 'ØµØ­ / Ø®Ø·Ø£' },
+  { value: 'text', label: 'نص قصير' },
+  { value: 'textarea', label: 'نص طويل' },
+  { value: 'number', label: 'رقم' },
+  { value: 'email', label: 'بريد إلكتروني' },
+  { value: 'tel', label: 'رقم هاتف' },
+  { value: 'date', label: 'تاريخ' },
+  { value: 'select', label: 'قائمة خيارات' },
+  { value: 'checkbox', label: 'صح / خطأ' },
 ]
 
 let schemaFieldRowCounter = 0
@@ -222,11 +222,11 @@ function validateSchemaFieldRows(fields) {
     if (isSchemaFieldRowBlank(field)) return
 
     if (!field.label_ar.trim() && !field.label.trim()) {
-      errors.push(`Ø§Ù„Ø­Ù‚Ù„ ${index + 1}: Ø£Ø¶Ù Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø°ÙŠ Ø³ÙŠØ¸Ù‡Ø± Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù….`)
+      errors.push(`الحقل ${index + 1}: أضف الاسم الذي سيظهر للمستخدم.`)
     }
 
     if (normalizeSchemaFieldType(field.type) === 'select' && !parseSchemaOptionsText(field.options_text).length) {
-      errors.push(`Ø§Ù„Ø­Ù‚Ù„ ${index + 1}: Ø£Ø¶Ù Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©ØŒ ÙƒÙ„ Ø®ÙŠØ§Ø± ÙÙŠ Ø³Ø·Ø± Ù…Ù†ÙØµÙ„.`)
+      errors.push(`الحقل ${index + 1}: أضف خيارات القائمة، كل خيار في سطر منفصل.`)
     }
   })
 
@@ -259,13 +259,13 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
     <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <h3 className="text-base font-bold text-ink">Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„</h3>
+          <h3 className="text-base font-bold text-ink">البيانات المطلوبة من العميل</h3>
           <p className="text-sm leading-6 text-slate-600">
-            Ø£Ø¶Ù Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„ØªÙŠ Ø³ÙŠÙ…Ù„Ø¤Ù‡Ø§ Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¹Ù†Ø¯ Ø·Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©ØŒ ÙˆØ³ÙŠØªÙ… ØªÙˆÙ„ÙŠØ¯ JSON ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ ÙÙŠ Ø§Ù„Ø®Ù„ÙÙŠØ©.
+            أضف الحقول التي سيملؤها العميل عند طلب الخدمة، وسيتم توليد JSON تلقائياً في الخلفية.
           </p>
         </div>
         <button className="btn-secondary whitespace-nowrap" onClick={onAddField} type="button">
-          + Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨
+          + حقل مطلوب
         </button>
       </div>
 
@@ -275,9 +275,9 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
             <div key={field.row_id} className="space-y-4 rounded-[1.5rem] border border-border bg-white p-4 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-bold text-ink">Ø§Ù„Ø­Ù‚Ù„ {index + 1}</p>
+                  <p className="text-sm font-bold text-ink">الحقل {index + 1}</p>
                   <p className="text-xs text-slate-500">
-                    Ø§Ù„Ù…Ø¹Ø±Ù‘Ù Ø§Ù„Ù…ÙˆÙ„Ù‘Ø¯: <span className="font-mono text-ink">{getGeneratedSchemaFieldName(field, index)}</span>
+                    المعرّف المولّد: <span className="font-mono text-ink">{getGeneratedSchemaFieldName(field, index)}</span>
                   </p>
                 </div>
                 <button
@@ -285,20 +285,20 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                   onClick={() => onRemoveField(field.row_id)}
                   type="button"
                 >
-                  Ø­Ø°Ù Ø§Ù„Ø­Ù‚Ù„
+                  حذف الحقل
                 </button>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø¸Ø§Ù‡Ø± Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+                <Field label="الاسم الظاهر بالعربية">
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'label_ar', event.target.value)}
-                    placeholder="Ù…Ø«Ø§Ù„: Ø±Ù‚Ù… Ø§Ù„Ø¬ÙˆØ§Ø²"
+                    placeholder="مثال: رقم الجواز"
                     value={field.label_ar}
                   />
                 </Field>
-                <Field hint="ÙŠÙØ³ØªØ®Ø¯Ù… Ø£ÙŠØ¶Ø§Ù‹ Ù„ØªÙˆÙ„ÙŠØ¯ Ù…Ø¹Ø±Ù‘Ù Ù…Ù†Ø§Ø³Ø¨ Ø¥Ø°Ø§ ØªÙØ±Ùƒ Ø§Ù„Ø­Ù‚Ù„ Ø§Ù„ØªÙ‚Ù†ÙŠ ÙØ§Ø±ØºØ§Ù‹." label="Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø¸Ø§Ù‡Ø± Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+                <Field hint="يُستخدم أيضاً لتوليد معرّف مناسب إذا تُرك الحقل التقني فارغاً." label="الاسم الظاهر بالإنجليزية">
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'label', event.target.value)}
@@ -309,7 +309,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field hint="Ø§Ø®ØªÙŠØ§Ø±ÙŠ. Ø¥Ù† ØªÙØ±Ùƒ ÙØ§Ø±ØºØ§Ù‹ Ø³Ù†ÙˆÙ„Ù‘Ø¯Ù‡ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹." label="Ø§Ù„Ù…Ø¹Ø±Ù‘Ù Ø§Ù„ØªÙ‚Ù†ÙŠ">
+                <Field hint="اختياري. إن تُرك فارغاً سنولّده تلقائياً." label="المعرّف التقني">
                   <input
                     className="field font-mono"
                     dir="ltr"
@@ -318,7 +318,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                     value={field.technical_name}
                   />
                 </Field>
-                <Field label="Ù†ÙˆØ¹ Ø§Ù„Ø­Ù‚Ù„">
+                <Field label="نوع الحقل">
                   <select className="field" onChange={(event) => onChangeField(field.row_id, 'type', event.target.value)} value={field.type}>
                     {schemaFieldTypeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -330,15 +330,15 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Ù†Øµ ØªÙˆØ¶ÙŠØ­ÙŠ">
+                <Field label="نص توضيحي">
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'placeholder', event.target.value)}
-                    placeholder="Ø£Ø¯Ø®Ù„ Ø±Ù‚Ù… Ø§Ù„Ø¬ÙˆØ§Ø²"
+                    placeholder="أدخل رقم الجواز"
                     value={field.placeholder}
                   />
                 </Field>
-                <Field label="Ø´Ø±Ø­ Ø¥Ø¶Ø§ÙÙŠ">
+                <Field label="شرح إضافي">
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'help_text', event.target.value)}
@@ -348,7 +348,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               {field.type === 'select' ? (
-                <Field hint="ÙƒÙ„ Ø®ÙŠØ§Ø± ÙÙŠ Ø³Ø·Ø± Ù…Ù†ÙØµÙ„." label="Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©">
+                <Field hint="كل خيار في سطر منفصل." label="خيارات القائمة">
                   <textarea
                     className="field min-h-28"
                     onChange={(event) => onChangeField(field.row_id, 'options_text', event.target.value)}
@@ -358,7 +358,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               ) : null}
 
               <CheckboxField
-                label="Ø§Ù„Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨ Ø¹Ù†Ø¯ Ø§Ù„Ø·Ù„Ø¨"
+                label="الحقل مطلوب عند الطلب"
                 registration={{
                   checked: field.required,
                   onChange: (event) => onChangeField(field.row_id, 'required', event.target.checked),
@@ -369,7 +369,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
         </div>
       ) : (
         <div className="rounded-[1.5rem] border border-dashed border-border bg-white px-4 py-6 text-sm text-slate-500">
-          Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø§Ù„Ø®Ø¯Ù…Ø© ØªØ­ØªØ§Ø¬ Ø¨ÙŠØ§Ù†Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙØ£Ø¶ÙÙ‡Ø§ Ù…Ù† Ù‡Ù†Ø§. Ø¥Ø°Ø§ Ù„Ù… ØªØ­ØªØ¬ Ø£ÙŠ Ø­Ù‚ÙˆÙ„ Ø¥Ø¶Ø§ÙÙŠØ© Ø³ÙŠØ¨Ù‚Ù‰ JSON ÙØ§Ø±ØºØ§Ù‹.
+          إذا كانت الخدمة تحتاج بيانات إضافية من العميل فأضفها من هنا. إذا لم تحتج أي حقول إضافية سيبقى JSON فارغاً.
         </div>
       )}
 
@@ -392,7 +392,7 @@ function normalizeSelectedIds(value) {
 
 function formatDefinitionSummary(definition) {
   const extensions = (definition.allowed_extensions || []).join(', ')
-  if (!extensions) return 'Ø¨Ø¯ÙˆÙ† Ø§Ù…ØªØ¯Ø§Ø¯Ø§Øª Ù…Ø®ØµØµØ©'
+  if (!extensions) return 'بدون امتدادات مخصصة'
   return `${extensions} | ${definition.max_file_size || 0} bytes`
 }
 
@@ -614,10 +614,10 @@ function ServicesManagementPage() {
 
       if (selectedCategory) {
         await api.updateAdminCategory(selectedCategory.id, payload)
-        toast('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„ÙØ¦Ø©.', 'success')
+        toast('تم تحديث الفئة.', 'success')
       } else {
         await api.createAdminCategory(payload)
-        toast('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙØ¦Ø©.', 'success')
+        toast('تم إنشاء الفئة.', 'success')
       }
 
       reloadCategories()
@@ -646,7 +646,7 @@ function ServicesManagementPage() {
       } catch {
         serviceForm.setError('required_information_schema_text', {
           type: 'manual',
-          message: 'ØµÙŠØºØ© JSON ØºÙŠØ± ØµØ§Ù„Ø­Ø©.',
+          message: 'صيغة JSON غير صالحة.',
         })
         setSubmitting(false)
         return
@@ -655,7 +655,7 @@ function ServicesManagementPage() {
       if (!Array.isArray(requiredInformationSchema)) {
         serviceForm.setError('required_information_schema_text', {
           type: 'manual',
-          message: 'ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† Ø§Ù„Ø¨Ù†ÙŠØ© Ù…ØµÙÙˆÙØ© JSON.',
+          message: 'يجب أن تكون البنية مصفوفة JSON.',
         })
         setSubmitting(false)
         return
@@ -703,10 +703,10 @@ function ServicesManagementPage() {
 
       if (selectedService) {
         await api.updateAdminService(selectedService.id, payload)
-        toast('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø®Ø¯Ù…Ø©.', 'success')
+        toast('تم تحديث الخدمة.', 'success')
       } else {
         await api.createAdminService(payload)
-        toast('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©.', 'success')
+        toast('تم إنشاء الخدمة.', 'success')
       }
 
       reloadServices()
@@ -760,10 +760,10 @@ function ServicesManagementPage() {
 
       if (selectedDefinition) {
         await api.updateAdminRequiredDocumentDefinition(selectedDefinition.id, payload)
-        toast('ØªÙ… ØªØ­Ø¯ÙŠØ« ØªØ¹Ø±ÙŠÙ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©.', 'success')
+        toast('تم تحديث تعريف الوثيقة.', 'success')
       } else {
         await api.createAdminRequiredDocumentDefinition(payload)
-        toast('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ ØªØ¹Ø±ÙŠÙ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©.', 'success')
+        toast('تم إنشاء تعريف الوثيقة.', 'success')
       }
 
       reloadDefinitions()
@@ -787,20 +787,20 @@ function ServicesManagementPage() {
         await api.deleteAdminCategory(item.id, payload)
         reloadCategories()
         reloadServices()
-        toast('ØªÙ… ØªØ¹Ø·ÙŠÙ„ Ø§Ù„ÙØ¦Ø©.', 'success')
+        toast('تم تعطيل الفئة.', 'success')
       }
 
       if (type === 'service') {
         await api.deleteAdminService(item.id, payload)
         reloadServices()
-        toast('ØªÙ… ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø©.', 'success')
+        toast('تم تعطيل الخدمة.', 'success')
       }
 
       if (type === 'definition') {
         await api.deleteAdminRequiredDocumentDefinition(item.id, payload)
         reloadDefinitions()
         reloadServices()
-        toast('ØªÙ… ØªØ¹Ø·ÙŠÙ„ ØªØ¹Ø±ÙŠÙ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©.', 'success')
+        toast('تم تعطيل تعريف الوثيقة.', 'success')
       }
 
       if (
@@ -839,7 +839,7 @@ function ServicesManagementPage() {
         reloadServices()
       }
 
-      toast(isArabic ? 'ØªÙ…Øª Ø§Ù„Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø¨Ù†Ø¬Ø§Ø­.' : 'Record restored successfully.', 'success')
+      toast(isArabic ? 'تمت الاستعادة بنجاح.' : 'Record restored successfully.', 'success')
     } catch (error) {
       toast(getDisplayError(error), 'error')
     }
@@ -1005,41 +1005,41 @@ function ServicesManagementPage() {
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        description="Ø¥Ø¯Ø§Ø±Ø© Ù…ÙˆØ­Ø¯Ø© Ù„Ù„ÙØ¦Ø§Øª ÙˆØ§Ù„Ø®Ø¯Ù…Ø§Øª ÙˆØªØ¹Ø±ÙŠÙØ§Øª Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©. Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© ØªÙÙ†Ø´Ø£ Ù…Ø±Ø© ÙˆØ§Ø­Ø¯Ø©ØŒ Ø«Ù… ØªÙØ±Ø¨Ø· Ø¨Ø§Ù„Ø®Ø¯Ù…Ø© Ù…Ù† Ø¯Ø§Ø®Ù„ Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø®Ø¯Ù…Ø© Ù†ÙØ³Ù‡."
-        eyebrow="Ø§Ù„Ø®Ø¯Ù…Ø§Øª"
+        description="إدارة موحدة للفئات والخدمات وتعريفات الوثائق الرئيسية. الوثيقة تُنشأ مرة واحدة، ثم تُربط بالخدمة من داخل نموذج الخدمة نفسه."
+        eyebrow="الخدمات"
         icon={Settings}
-        title="Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø®Ø¯Ù…Ø§Øª"
+        title="إدارة الخدمات"
       />
 
       <section className="glass-panel grid gap-4 p-5 md:grid-cols-3">
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">Ø§Ù„ÙØ¦Ø§Øª</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">Ù†Ø¸Ù‘Ù… ÙƒØ±ÙˆØª Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ø§Ù… ÙˆÙ…Ø³Ø§Ø±Ø§Øª Ø§Ù„Ø¹Ø±Ø¶ Ù…Ù† Ù†ÙØ³ Ø§Ù„ØµÙØ­Ø©.</p>
+          <p className="text-sm font-bold text-ink">الفئات</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">نظّم كروت الموقع العام ومسارات العرض من نفس الصفحة.</p>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">Ø§Ù„Ø®Ø¯Ù…Ø§Øª</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">ØªØ­ÙƒÙ… Ø¨Ø§Ù„ØªØ³Ø¹ÙŠØ±ØŒ Ù…Ø¯Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ…ØŒ Ø§Ù„Ø¸Ù‡ÙˆØ± Ø§Ù„Ø¹Ø§Ù…ØŒ ÙˆØ§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„.</p>
+          <p className="text-sm font-bold text-ink">الخدمات</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">تحكم بالتسعير، مدة التسليم، الظهور العام، والبيانات المطلوبة من العميل.</p>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">ØªØ¹Ø±ÙŠÙØ§Øª Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">Ø£Ù†Ø´Ø¦ ØªØ¹Ø±ÙŠÙ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© Ù…Ø±Ø© ÙˆØ§Ø­Ø¯Ø© Ø«Ù… Ø§Ø®ØªØ±Ù‡ Ù…Ù† Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø¨Ø¯Ù„ ØªÙƒØ±Ø§Ø± Ù†ÙØ³ Ø§Ù„Ù†ØµÙˆØµ.</p>
+          <p className="text-sm font-bold text-ink">تعريفات الوثائق</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">أنشئ تعريف الوثيقة مرة واحدة ثم اختره من الخدمات بدل تكرار نفس النصوص.</p>
         </div>
       </section>
 
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openCategoryForm()} type="button">
-            + ÙØ¦Ø© Ø¬Ø¯ÙŠØ¯Ø©
+            + فئة جديدة
           </button>
         }
-        description="Ø£Ù†Ø´Ø¦ Ø§Ù„ÙØ¦Ø§Øª ÙˆØ¹Ø¯Ù‘Ù„Ù‡Ø§ ÙˆØ¹Ø·Ù‘Ù„Ù‡Ø§ Ù…Ù† Ø´Ø§Ø´Ø© Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ù†ÙØ³Ù‡Ø§."
+        description="أنشئ الفئات وعدّلها وعطّلها من شاشة الخدمات نفسها."
         icon={FolderTree}
-        title="Ø§Ù„ÙØ¦Ø§Øª"
+        title="الفئات"
       >
         <DataTable
           columns={categoryColumns}
-          emptyDescription="Ø£Ø¶Ù Ø£ÙˆÙ„ ÙØ¦Ø© Ù„ØªÙ†Ø¸ÙŠÙ… Ø§Ù„Ø®Ø¯Ù…Ø§Øª."
-          emptyTitle="Ù„Ø§ ØªÙˆØ¬Ø¯ ÙØ¦Ø§Øª"
+          emptyDescription="أضف أول فئة لتنظيم الخدمات."
+          emptyTitle="لا توجد فئات"
           loading={categoriesLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
@@ -1059,17 +1059,17 @@ function ServicesManagementPage() {
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openServiceForm()} type="button">
-            + Ø®Ø¯Ù…Ø© Ø¬Ø¯ÙŠØ¯Ø©
+            + خدمة جديدة
           </button>
         }
-        description="ÙƒÙ„ Ø®ØµØ§Ø¦Øµ Ø§Ù„Ø®Ø¯Ù…Ø© Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ù…ÙˆØ¬ÙˆØ¯Ø© Ù‡Ù†Ø§ØŒ Ø¨Ù…Ø§ ÙÙŠÙ‡Ø§ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© ÙˆØ¢Ù„ÙŠØ© Ø¹Ø±Ø¶ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ù„Ù„Ø¹Ø§Ù…Ø©."
+        description="كل خصائص الخدمة الأساسية موجودة هنا، بما فيها اختيار الوثائق الرئيسية وآلية عرض الأسعار للعامة."
         icon={Settings}
-        title="Ø§Ù„Ø®Ø¯Ù…Ø§Øª"
+        title="الخدمات"
       >
         <DataTable
           columns={serviceColumns}
-          emptyDescription="Ø£Ø¶Ù Ø£ÙˆÙ„ Ø®Ø¯Ù…Ø© Ù„ØªØ¸Ù‡Ø± ÙÙŠ Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆÙ„ÙˆØ­Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„."
-          emptyTitle="Ù„Ø§ ØªÙˆØ¬Ø¯ Ø®Ø¯Ù…Ø§Øª"
+          emptyDescription="أضف أول خدمة لتظهر في الموقع ولوحات التشغيل."
+          emptyTitle="لا توجد خدمات"
           loading={servicesLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
@@ -1082,7 +1082,7 @@ function ServicesManagementPage() {
                 <option value="all">All</option>
               </select>
               <select className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
-                <option value="">ÙƒÙ„ Ø§Ù„ÙØ¦Ø§Øª</option>
+                <option value="">كل الفئات</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.full_path_name || category.name_ar}
@@ -1097,17 +1097,17 @@ function ServicesManagementPage() {
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openDefinitionForm()} type="button">
-            + ØªØ¹Ø±ÙŠÙ ÙˆØ«ÙŠÙ‚Ø©
+            + تعريف وثيقة
           </button>
         }
-        description="Ù‡Ø°Ù‡ Ù‡ÙŠ Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ø§Ù„ØªÙŠ ÙŠØ®ØªØ§Ø± Ù…Ù†Ù‡Ø§ Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù„ÙƒÙ„ Ø®Ø¯Ù…Ø©."
+        description="هذه هي القائمة الرئيسية التي يختار منها المسؤول الوثائق المطلوبة لكل خدمة."
         icon={Files}
-        title="ØªØ¹Ø±ÙŠÙØ§Øª Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚"
+        title="تعريفات الوثائق"
       >
         <DataTable
           columns={definitionColumns}
-          emptyDescription="Ø£Ø¶Ù Ø£ÙˆÙ„ ØªØ¹Ø±ÙŠÙ ÙˆØ«ÙŠÙ‚Ø© Ø±Ø¦ÙŠØ³ÙŠ."
-          emptyTitle="Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ¹Ø±ÙŠÙØ§Øª ÙˆØ«Ø§Ø¦Ù‚"
+          emptyDescription="أضف أول تعريف وثيقة رئيسي."
+          emptyTitle="لا توجد تعريفات وثائق"
           loading={definitionsLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
@@ -1125,33 +1125,33 @@ function ServicesManagementPage() {
       </SectionCard>
 
       <FormModal
-        description="Ø¹Ø¯Ù‘Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙØ¦Ø© Ù…Ù† Ù‡Ù†Ø§ Ø¨Ø¯Ù„ ØªÙˆØ²ÙŠØ¹Ù‡Ø§ Ø¹Ù„Ù‰ Ø´Ø§Ø´Ø© Ø£Ø®Ø±Ù‰."
+        description="عدّل بيانات الفئة من هنا بدل توزيعها على شاشة أخرى."
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              Ø¥Ù„ØºØ§Ø¡
+              إلغاء
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="service-category-form" type="submit">
-              {selectedCategory ? 'Ø­ÙØ¸ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª' : 'Ø¥Ø¶Ø§ÙØ© Ø§Ù„ÙØ¦Ø©'}
+              {selectedCategory ? 'حفظ التعديلات' : 'إضافة الفئة'}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'category'}
         size="lg"
-        title={selectedCategory ? `ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ÙØ¦Ø©: ${selectedCategory.name_ar}` : 'ÙØ¦Ø© Ø¬Ø¯ÙŠØ¯Ø©'}
+        title={selectedCategory ? `تعديل الفئة: ${selectedCategory.name_ar}` : 'فئة جديدة'}
       >
         <form className="space-y-4" id="service-category-form" onSubmit={categoryForm.handleSubmit(handleCategorySubmit)}>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+            <Field label="الاسم بالعربية">
               <input className="field" {...categoryForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+            <Field label="الاسم بالإنجليزية">
               <input className="field" {...categoryForm.register('name_en', { required: true })} />
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="Ø¥Ø°Ø§ ØªØ±ÙƒØªÙ‡ ÙØ§Ø±ØºØ§Ù‹ Ø³ÙŠÙÙˆÙ„Ø¯ Ù…Ù† Ø§Ù„Ø§Ø³Ù…." label="Ø§Ù„Ù…Ø¹Ø±Ù‘Ù">
+            <Field hint="إذا تركته فارغاً سيُولد من الاسم." label="المعرّف">
               <input
                 className="field"
                 {...categoryForm.register('slug', {
@@ -1159,7 +1159,7 @@ function ServicesManagementPage() {
                 })}
               />
             </Field>
-            <Field label="Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø©">
+            <Field label="الأيقونة">
               <input
                 className="field"
                 {...categoryForm.register('icon', {
@@ -1168,40 +1168,40 @@ function ServicesManagementPage() {
               />
             </Field>
           </div>
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+          <Field label="الوصف بالعربية">
             <textarea className="field min-h-24" {...categoryForm.register('description_ar')} />
           </Field>
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+          <Field label="الوصف بالإنجليزية">
             <textarea className="field min-h-24" {...categoryForm.register('description_en')} />
           </Field>
-          <Field label="ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¹Ø±Ø¶">
+          <Field label="ترتيب العرض">
             <input className="field" type="number" {...categoryForm.register('display_order')} />
           </Field>
-          <CheckboxField label="Ø§Ù„ÙØ¦Ø© Ù†Ø´Ø·Ø©" registration={categoryForm.register('is_active')} />
+          <CheckboxField label="الفئة نشطة" registration={categoryForm.register('is_active')} />
         </form>
       </FormModal>
 
       <FormModal
-        description="ØªØ­Ø±ÙŠØ± ÙƒØ§Ù…Ù„ Ù„Ù„Ø®Ø¯Ù…Ø©: Ø¨ÙŠØ§Ù†Ø§ØªÙ‡Ø§ØŒ Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø¹Ø§Ù…ØŒ Ø§Ù„ØªØ³Ù„ÙŠÙ…ØŒ Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŒ ÙˆØ¨Ù†ÙŠØ© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©."
+        description="تحرير كامل للخدمة: بياناتها، التسعير العام، التسليم، الوثائق الرئيسية، وبنية البيانات المطلوبة."
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              Ø¥Ù„ØºØ§Ø¡
+              إلغاء
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="service-form" type="submit">
-              {selectedService ? 'Ø­ÙØ¸ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª' : 'Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø®Ø¯Ù…Ø©'}
+              {selectedService ? 'حفظ التعديلات' : 'إضافة الخدمة'}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'service'}
         size="xl"
-        title={selectedService ? `ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø©: ${selectedService.name_ar}` : 'Ø®Ø¯Ù…Ø© Ø¬Ø¯ÙŠØ¯Ø©'}
+        title={selectedService ? `تعديل الخدمة: ${selectedService.name_ar}` : 'خدمة جديدة'}
       >
         <form className="space-y-5" id="service-form" onSubmit={serviceForm.handleSubmit(handleServiceSubmit)}>
-          <Field label="Ø§Ù„ÙØ¦Ø©">
+          <Field label="الفئة">
             <select className="field" {...serviceForm.register('category_id', { required: true })}>
-              <option value="">Ø§Ø®ØªØ± Ø§Ù„ÙØ¦Ø©</option>
+              <option value="">اختر الفئة</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name_ar}
@@ -1211,16 +1211,16 @@ function ServicesManagementPage() {
           </Field>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Ø§Ø³Ù… Ø§Ù„Ø®Ø¯Ù…Ø© Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+            <Field label="اسم الخدمة بالعربية">
               <input className="field" {...serviceForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="Ø§Ø³Ù… Ø§Ù„Ø®Ø¯Ù…Ø© Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+            <Field label="اسم الخدمة بالإنجليزية">
               <input className="field" {...serviceForm.register('name_en')} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="Ø¥Ø°Ø§ ØªØ±ÙƒØªÙ‡ ÙØ§Ø±ØºØ§Ù‹ Ø³ÙŠÙÙˆÙ„Ø¯ Ù…Ù† Ø§Ù„Ø§Ø³Ù…." label="Ø§Ù„Ù…Ø¹Ø±Ù‘Ù">
+            <Field hint="إذا تركته فارغاً سيُولد من الاسم." label="المعرّف">
               <input
                 className="field"
                 {...serviceForm.register('slug', {
@@ -1228,24 +1228,24 @@ function ServicesManagementPage() {
                 })}
               />
             </Field>
-            <Field label="ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¹Ø±Ø¶">
+            <Field label="ترتيب العرض">
               <input className="field" type="number" {...serviceForm.register('display_order')} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="ÙˆØµÙ Ù…Ø®ØªØµØ± Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+            <Field label="وصف مختصر بالعربية">
               <input className="field" {...serviceForm.register('short_description_ar')} />
             </Field>
-            <Field label="ÙˆØµÙ Ù…Ø®ØªØµØ± Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+            <Field label="وصف مختصر بالإنجليزية">
               <input className="field" {...serviceForm.register('short_description_en')} />
             </Field>
           </div>
 
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+          <Field label="الوصف بالعربية">
             <textarea className="field min-h-28" {...serviceForm.register('description_ar', { required: true })} />
           </Field>
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+          <Field label="الوصف بالإنجليزية">
             <textarea className="field min-h-28" {...serviceForm.register('description_en')} />
           </Field>
 
@@ -1263,8 +1263,8 @@ function ServicesManagementPage() {
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">ØªØ¹Ø±ÙŠÙØ§Øª Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©</h3>
-              <p className="text-sm leading-6 text-slate-600">Ø§Ø®ØªØ± Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©. Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯Ø©ØŒ Ø£Ù†Ø´Ø¦Ù‡Ø§ Ø£ÙˆÙ„Ø§Ù‹ Ù…Ù† Ù‚Ø³Ù… ØªØ¹Ø±ÙŠÙØ§Øª Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚.</p>
+              <h3 className="text-base font-bold text-ink">تعريفات الوثائق المطلوبة</h3>
+              <p className="text-sm leading-6 text-slate-600">اختر من القائمة الرئيسية. إذا كانت الوثيقة غير موجودة، أنشئها أولاً من قسم تعريفات الوثائق.</p>
             </div>
             {definitions.length ? (
               <div className="grid gap-3 md:grid-cols-2">
@@ -1289,38 +1289,38 @@ function ServicesManagementPage() {
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-border bg-white px-4 py-5 text-sm text-slate-500">
-                Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ¹Ø±ÙŠÙØ§Øª ÙˆØ«Ø§Ø¦Ù‚ Ø¨Ø¹Ø¯. Ø£Ø¶Ù ØªØ¹Ø±ÙŠÙØ§Ù‹ Ø±Ø¦ÙŠØ³ÙŠØ§Ù‹ Ø«Ù… Ø¹Ø¯ Ù„Ø§Ø®ØªÙŠØ§Ø±Ù‡ Ø¯Ø§Ø®Ù„ Ø§Ù„Ø®Ø¯Ù…Ø©.
+                لا توجد تعريفات وثائق بعد. أضف تعريفاً رئيسياً ثم عد لاختياره داخل الخدمة.
               </div>
             )}
-            <p className="text-sm text-slate-500">Ø§Ù„Ù…Ø­Ø¯Ø¯ Ø§Ù„Ø¢Ù†: {selectedRequiredDocumentIds.length} ØªØ¹Ø±ÙŠÙ</p>
+            <p className="text-sm text-slate-500">المحدد الآن: {selectedRequiredDocumentIds.length} تعريف</p>
           </div>
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„Ø¸Ù‡ÙˆØ± Ø§Ù„Ø¹Ø§Ù…</h3>
-              <p className="text-sm leading-6 text-slate-600">ÙƒÙ„ Ø§Ù„Ø±Ø³ÙˆÙ… ØªØ­ÙØ¸ Ø¯Ø§Ø®Ù„ÙŠØ§Ù‹ Ø¯Ø§Ø¦Ù…Ø§Ù‹ØŒ Ù„ÙƒÙ†Ùƒ ØªØ®ØªØ§Ø± Ù…Ø§ ÙŠØ¸Ù‡Ø± Ø¹Ù„Ù‰ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ø§Ù….</p>
+              <h3 className="text-base font-bold text-ink">التسعير والظهور العام</h3>
+              <p className="text-sm leading-6 text-slate-600">كل الرسوم تحفظ داخلياً دائماً، لكنك تختار ما يظهر على الموقع العام.</p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <Field label="Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ">
+              <Field label="السعر الأساسي">
                 <input className="field" step="0.01" type="number" {...serviceForm.register('base_price')} />
               </Field>
-              <Field label="Ø±Ø³ÙˆÙ… Ø§Ù„Ø´Ø±ÙƒØ©">
+              <Field label="رسوم الشركة">
                 <input className="field" step="0.01" type="number" {...serviceForm.register('service_fee')} />
               </Field>
-              <Field label="Ø§Ù„Ø±Ø³ÙˆÙ… Ø§Ù„Ø­ÙƒÙˆÙ…ÙŠØ©">
+              <Field label="الرسوم الحكومية">
                 <input className="field" step="0.01" type="number" {...serviceForm.register('government_fee')} />
               </Field>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
-              <CheckboxField label="Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ù„Ù„Ø¹Ø§Ù…Ø©" registration={serviceForm.register('show_total_price_public')} />
-              <CheckboxField label="Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ø±Ø³ÙˆÙ… Ø§Ù„Ø­ÙƒÙˆÙ…ÙŠØ© Ù„Ù„Ø¹Ø§Ù…Ø©" registration={serviceForm.register('show_government_fee_public')} />
-              <CheckboxField label="Ø¥Ø¸Ù‡Ø§Ø± Ø±Ø³ÙˆÙ… Ø§Ù„Ø´Ø±ÙƒØ© Ù„Ù„Ø¹Ø§Ù…Ø©" registration={serviceForm.register('show_company_fee_public')} />
+              <CheckboxField label="إظهار السعر الإجمالي للعامة" registration={serviceForm.register('show_total_price_public')} />
+              <CheckboxField label="إظهار الرسوم الحكومية للعامة" registration={serviceForm.register('show_government_fee_public')} />
+              <CheckboxField label="إظهار رسوم الشركة للعامة" registration={serviceForm.register('show_company_fee_public')} />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø³Ø¹Ø± Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+              <Field label="ملاحظة السعر بالعربية">
                 <textarea className="field min-h-24" {...serviceForm.register('public_price_note_ar')} />
               </Field>
-              <Field label="Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø³Ø¹Ø± Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+              <Field label="ملاحظة السعر بالإنجليزية">
                 <textarea className="field min-h-24" {...serviceForm.register('public_price_note_en')} />
               </Field>
             </div>
@@ -1328,17 +1328,17 @@ function ServicesManagementPage() {
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">Ø§Ù„ØªØ³Ù„ÙŠÙ…</h3>
-              <p className="text-sm leading-6 text-slate-600">ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ù…Ø¯Ø© Ù…ØªÙˆÙ‚Ø¹Ø© Ø£Ùˆ ÙØªØ±Ø© Ù…Ù† ØªØ§Ø±ÙŠØ® Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ® Ù„Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„ØªÙŠ ØªØªØ£Ø«Ø± Ø¨Ø¬Ù‡Ø© Ø®Ø§Ø±Ø¬ÙŠØ©.</p>
+              <h3 className="text-base font-bold text-ink">التسليم</h3>
+              <p className="text-sm leading-6 text-slate-600">يمكنك استخدام مدة متوقعة أو فترة من تاريخ إلى تاريخ للخدمات التي تتأثر بجهة خارجية.</p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <Field label="Ù†ÙˆØ¹ Ø§Ù„ØªØ³Ù„ÙŠÙ…">
+              <Field label="نوع التسليم">
                 <select className="field" {...serviceForm.register('delivery_time_mode')}>
-                  <option value="duration">Ù…Ø¯Ø© Ù…ØªÙˆÙ‚Ø¹Ø©</option>
-                  <option value="date_range">ÙØªØ±Ø© Ø²Ù…Ù†ÙŠØ©</option>
+                  <option value="duration">مدة متوقعة</option>
+                  <option value="date_range">فترة زمنية</option>
                 </select>
               </Field>
-              <Field label="Ù†ÙˆØ¹ Ø§Ù„Ø³Ø¹Ø±">
+              <Field label="نوع السعر">
                 <select className="field" {...serviceForm.register('price_type')}>
                   <option value="fixed">Fixed</option>
                   <option value="starts_from">Starts from</option>
@@ -1346,7 +1346,7 @@ function ServicesManagementPage() {
                   <option value="free">Free</option>
                 </select>
               </Field>
-              <Field label="ÙˆØ­Ø¯Ø© Ø§Ù„Ù…Ø¯Ø©">
+              <Field label="وحدة المدة">
                 <select className="field" {...serviceForm.register('estimated_duration_unit')}>
                   <option value="hours">Hours</option>
                   <option value="days">Days</option>
@@ -1357,97 +1357,97 @@ function ServicesManagementPage() {
 
             {deliveryTimeMode === 'date_range' ? (
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Ù…Ù† ØªØ§Ø±ÙŠØ®">
+                <Field label="من تاريخ">
                   <input className="field" type="date" {...serviceForm.register('delivery_start_date')} />
                 </Field>
-                <Field label="Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ®">
+                <Field label="إلى تاريخ">
                   <input className="field" type="date" {...serviceForm.register('delivery_end_date')} />
                 </Field>
               </div>
             ) : (
-              <Field label="Ù…Ø¯Ø© Ø§Ù„ØªÙ†ÙÙŠØ°">
+              <Field label="مدة التنفيذ">
                 <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration')} />
               </Field>
             )}
 
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ… Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+              <Field label="ملاحظة التسليم بالعربية">
                 <textarea className="field min-h-24" {...serviceForm.register('delivery_note_ar')} />
               </Field>
-              <Field label="Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ… Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+              <Field label="ملاحظة التسليم بالإنجليزية">
                 <textarea className="field min-h-24" {...serviceForm.register('delivery_note_en')} />
               </Field>
             </div>
           </div>
 
-          <Field label="Ø§Ù„Ø´Ø±ÙˆØ· Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+          <Field label="الشروط بالعربية">
             <textarea className="field min-h-24" {...serviceForm.register('terms_ar')} />
           </Field>
-          <Field label="Ø§Ù„Ø´Ø±ÙˆØ· Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+          <Field label="الشروط بالإنجليزية">
             <textarea className="field min-h-24" {...serviceForm.register('terms_en')} />
           </Field>
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <CheckboxField label="Ø§Ù„Ø®Ø¯Ù…Ø© Ù†Ø´Ø·Ø©" registration={serviceForm.register('is_active')} />
-            <CheckboxField label="ØªØ¸Ù‡Ø± ÙÙŠ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ø§Ù…" registration={serviceForm.register('show_on_public_site')} />
-            <CheckboxField label="ØªÙ†ÙØ° Ø£ÙˆÙ†Ù„Ø§ÙŠÙ†" registration={serviceForm.register('is_online')} />
-            <CheckboxField label="ØªØ­ØªØ§Ø¬ Ù…Ø²ÙˆØ¯ Ø®Ø¯Ù…Ø©" registration={serviceForm.register('provider_required')} />
-            <CheckboxField label="ØªØ­ØªØ§Ø¬ Ù…Ø±Ø§Ø¬Ø¹Ø© ÙŠØ¯ÙˆÙŠØ©" registration={serviceForm.register('requires_manual_review')} />
-            <CheckboxField label="ØªØ­ØªØ§Ø¬ Ù…ÙˆØ¹Ø¯" registration={serviceForm.register('requires_appointment')} />
-            <CheckboxField label="Ø®Ø¯Ù…Ø© Ù…Ù…ÙŠØ²Ø©" registration={serviceForm.register('is_featured')} />
+            <CheckboxField label="الخدمة نشطة" registration={serviceForm.register('is_active')} />
+            <CheckboxField label="تظهر في الموقع العام" registration={serviceForm.register('show_on_public_site')} />
+            <CheckboxField label="تنفذ أونلاين" registration={serviceForm.register('is_online')} />
+            <CheckboxField label="تحتاج مزود خدمة" registration={serviceForm.register('provider_required')} />
+            <CheckboxField label="تحتاج مراجعة يدوية" registration={serviceForm.register('requires_manual_review')} />
+            <CheckboxField label="تحتاج موعد" registration={serviceForm.register('requires_appointment')} />
+            <CheckboxField label="خدمة مميزة" registration={serviceForm.register('is_featured')} />
           </div>
         </form>
       </FormModal>
 
       <FormModal
-        description="Ø£Ù†Ø´Ø¦ Ø£Ùˆ Ø¹Ø¯Ù‘Ù„ ØªØ¹Ø±ÙŠÙ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ Ø§Ù„Ø°ÙŠ Ø³ÙŠÙØ³ØªØ®Ø¯Ù… Ø¯Ø§Ø®Ù„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª."
+        description="أنشئ أو عدّل تعريف الوثيقة الرئيسي الذي سيُستخدم داخل الخدمات."
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              Ø¥Ù„ØºØ§Ø¡
+              إلغاء
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="document-definition-form" type="submit">
-              {selectedDefinition ? 'Ø­ÙØ¸ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª' : 'Ø¥Ø¶Ø§ÙØ© Ø§Ù„ØªØ¹Ø±ÙŠÙ'}
+              {selectedDefinition ? 'حفظ التعديلات' : 'إضافة التعريف'}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'definition'}
         size="lg"
-        title={selectedDefinition ? `ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªØ¹Ø±ÙŠÙ: ${selectedDefinition.name_ar}` : 'ØªØ¹Ø±ÙŠÙ ÙˆØ«ÙŠÙ‚Ø© Ø¬Ø¯ÙŠØ¯'}
+        title={selectedDefinition ? `تعديل التعريف: ${selectedDefinition.name_ar}` : 'تعريف وثيقة جديد'}
       >
         <form className="space-y-4" id="document-definition-form" onSubmit={definitionForm.handleSubmit(handleDefinitionSubmit)}>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="ÙƒÙˆØ¯ Ø«Ø§Ø¨Øª ÙŠÙØ³ØªØ®Ø¯Ù… ÙÙŠ Ø§Ù„Ø±Ø¨Ø· ÙˆØ§Ù„ØªØ­Ù‚Ù‚." label="Ø§Ù„ÙƒÙˆØ¯">
+            <Field hint="كود ثابت يُستخدم في الربط والتحقق." label="الكود">
               <input className="field font-mono" {...definitionForm.register('code', { required: true })} />
             </Field>
-            <Field label="ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¹Ø±Ø¶">
+            <Field label="ترتيب العرض">
               <input className="field" type="number" {...definitionForm.register('sort_order')} />
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+            <Field label="الاسم بالعربية">
               <input className="field" {...definitionForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+            <Field label="الاسم بالإنجليزية">
               <input className="field" {...definitionForm.register('name_en')} />
             </Field>
           </div>
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+          <Field label="الوصف بالعربية">
             <textarea className="field min-h-24" {...definitionForm.register('description_ar')} />
           </Field>
-          <Field label="Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©">
+          <Field label="الوصف بالإنجليزية">
             <textarea className="field min-h-24" {...definitionForm.register('description_en')} />
           </Field>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="Ù…Ø«Ø§Ù„: .pdf, .jpg, .png" label="Ø§Ù„Ø§Ù…ØªØ¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø³Ù…ÙˆØ­Ø©">
+            <Field hint="مثال: .pdf, .jpg, .png" label="الامتدادات المسموحة">
               <input className="field" {...definitionForm.register('allowed_extensions_text')} />
             </Field>
-            <Field hint="Ø¨Ø§Ù„Ø¨Ø§ÙŠØª" label="Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ù„Ø­Ø¬Ù…">
+            <Field hint="بالبايت" label="الحد الأقصى للحجم">
               <input className="field" min="1" type="number" {...definitionForm.register('max_file_size')} />
             </Field>
           </div>
-          <CheckboxField label="Ø§Ù„ØªØ¹Ø±ÙŠÙ Ù†Ø´Ø·" registration={definitionForm.register('is_active')} />
+          <CheckboxField label="التعريف نشط" registration={definitionForm.register('is_active')} />
         </form>
       </FormModal>
 
