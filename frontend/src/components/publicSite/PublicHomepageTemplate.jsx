@@ -330,6 +330,17 @@ function PublicHomepageTemplate({
 
   const bannerAdvertisements = advertisements.slice(0, 3)
   const whatsappUrl = getWhatsappUrl(content.whatsapp_number)
+  const featuredCategoryLinks = Array.from(
+    allServices.reduce((accumulator, service) => {
+      const slug = service.category?.slug
+      if (!slug || accumulator.has(slug)) return accumulator
+      accumulator.set(slug, {
+        slug,
+        name: getLocalizedField(service.category, { ar: 'name_ar', en: 'name_en' }, language),
+      })
+      return accumulator
+    }, new Map()).values(),
+  ).slice(0, 6)
 
   useEffect(() => {
     setChatMessages((currentMessages) => {
@@ -727,6 +738,19 @@ function PublicHomepageTemplate({
             <span className="rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">{copy.previewModeLabel}</span>
           )}
         </div>
+        {featuredCategoryLinks.length ? (
+          <div className="flex flex-wrap gap-3">
+            {featuredCategoryLinks.map((category) => (
+              <Link
+                key={category.slug}
+                className="rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+                to={`/services?category=${encodeURIComponent(category.slug)}`}
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        ) : null}
         {loadingServices ? (
           <LoadingSpinner />
         ) : (
