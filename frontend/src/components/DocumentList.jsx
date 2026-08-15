@@ -36,7 +36,7 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default' 
   if (!documents.length) {
     return (
       <div className={isPublic
-        ? 'rounded-lg border border-dashed border-[var(--khalsni-public-border)] bg-white/10 px-5 py-6 text-sm font-semibold text-white/50'
+        ? 'rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-white px-5 py-6 text-sm font-semibold text-slate-500'
         : 'rounded-3xl border border-dashed border-border bg-white/100 px-5 py-6 text-sm text-slate-500'}
       >
         {isArabic ? 'لا توجد مستندات مرفوعة لهذا الطلب حتى الآن.' : 'No uploaded documents are available for this order yet.'}
@@ -54,19 +54,19 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default' 
 
         return (
           <div key={document.id} className={isPublic
-            ? 'flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/10 px-4 py-4'
+            ? 'flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white px-4 py-4 shadow-sm'
             : 'flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-white px-4 py-4'}
           >
             <div className="min-w-0 flex-1">
-              <p className={isPublic ? 'font-semibold text-white' : 'font-semibold text-ink'}>{document.original_filename}</p>
-              <p className={isPublic ? 'mt-1 text-xs text-white/50' : 'mt-1 text-xs text-slate-500'}>{document.document_type}</p>
+              <p className={isPublic ? 'font-semibold text-ink' : 'font-semibold text-ink'}>{document.original_filename}</p>
+              <p className={isPublic ? 'mt-1 text-xs text-slate-500' : 'mt-1 text-xs text-slate-500'}>{document.document_type}</p>
             </div>
             <div className="flex items-center gap-3">
               {document.status ? <StatusBadge status={document.status} /> : null}
               {isAnonymousMode ? (
                 <a
                   className={isPublic
-                    ? 'inline-flex h-9 items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 text-xs font-extrabold text-white transition hover:bg-white/15'
+                    ? 'inline-flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-xs font-extrabold text-[var(--khalsni-public-text)] transition hover:bg-[var(--khalsni-public-bg-secondary)]'
                     : 'btn-secondary px-4 py-2 text-xs'}
                   href={anonymousUrl}
                 >
@@ -75,7 +75,7 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default' 
               ) : (
                 <button
                   className={isPublic
-                    ? 'inline-flex h-9 items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 text-xs font-extrabold text-white transition hover:bg-white/15 disabled:opacity-60'
+                    ? 'inline-flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-xs font-extrabold text-[var(--khalsni-public-text)] transition hover:bg-[var(--khalsni-public-bg-secondary)] disabled:opacity-60'
                     : 'btn-secondary px-4 py-2 text-xs disabled:opacity-60'}
                   disabled={downloading[document.id]}
                   onClick={() => handleAuthenticatedDownload(document)}

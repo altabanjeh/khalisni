@@ -1,6 +1,6 @@
 function PageHeader({ icon: Icon, eyebrow, title, description, badge, actions }) {
   return (
-    <header className="rounded-[2rem] border border-border bg-white p-5 shadow-soft sm:p-6">
+    <header className="rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
       <div className="flex items-start gap-4">
         {Icon ? (

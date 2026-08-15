@@ -13,13 +13,13 @@ function KhalsniLogo({ logoUrl }) {
   }
 
   return (
-    <span className="flex items-center gap-2 text-white">
+    <span className="flex items-center gap-2 text-[var(--khalsni-public-text)]">
       <span className="text-right leading-none">
         <span className="block text-[1.16rem] font-extrabold">خلصني</span>
-        <span className="block text-[0.56rem] font-bold tracking-wide text-white/70">Khalsni</span>
+        <span className="block text-[0.56rem] font-bold tracking-wide text-slate-500">Khalsni</span>
       </span>
-      <span className="relative grid h-8 w-8 place-items-center rounded-full border-2 border-white">
-        <span className="h-3 w-[1.125rem] rotate-[-35deg] border-b-[3px] border-r-[3px] border-white" />
+      <span className="relative grid h-8 w-8 place-items-center rounded-full border-2 border-[var(--khalsni-public-primary)]">
+        <span className="h-3 w-[1.125rem] rotate-[-35deg] border-b-[3px] border-r-[3px] border-[var(--khalsni-public-primary)]" />
       </span>
     </span>
   )
@@ -57,8 +57,8 @@ function PublicLayoutContent() {
   }, [mobileMenuOpen])
 
   return (
-    <div className="min-h-screen bg-[var(--khalsni-public-bg)] text-white" dir={direction}>
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#020714]/95 backdrop-blur-xl">
+    <div className="min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
+      <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
             <Link className="shrink-0" to="/" aria-label="Khalsni home">
@@ -72,9 +72,9 @@ function PublicLayoutContent() {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `relative whitespace-nowrap px-1.5 py-5 text-white/80 transition hover:text-white lg:px-4 ${
+                    `relative whitespace-nowrap px-1.5 py-5 text-slate-600 transition hover:text-[var(--khalsni-public-primary)] lg:px-4 ${
                       isActive
-                        ? 'text-white after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--khalsni-public-primary)]'
+                        ? 'text-[var(--khalsni-public-primary)] after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--khalsni-public-primary)]'
                         : ''
                     }`
                   }
@@ -86,17 +86,17 @@ function PublicLayoutContent() {
 
             <div className="hidden shrink-0 items-center gap-2 min-[700px]:flex">
               {user ? (
-                <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
+                <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
                   <UserRound className="h-4 w-4" />
                   بوابتي
                 </Link>
               ) : (
                 <>
-                  <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/login">
+                  <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/login">
                     <LogIn className="h-4 w-4" />
                     تسجيل الدخول
                   </Link>
-                  <Link className="inline-flex h-9 items-center justify-center rounded-md border border-white/45 px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-white/10" to="/register">
+                  <Link className="inline-flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-3 text-[0.7rem] font-extrabold text-[var(--khalsni-public-text)] transition hover:bg-[var(--khalsni-public-bg-secondary)]" to="/register">
                     إنشاء حساب
                   </Link>
                 </>
@@ -106,7 +106,7 @@ function PublicLayoutContent() {
             <button
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? 'إغلاق قائمة التنقل' : 'فتح قائمة التنقل'}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white min-[700px]:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] min-[700px]:hidden"
               onClick={() => setMobileMenuOpen((current) => !current)}
               type="button"
             >
@@ -116,7 +116,7 @@ function PublicLayoutContent() {
         </div>
 
         {mobileMenuOpen ? (
-          <div className="border-t border-white/10 bg-[#06132d] min-[700px]:hidden">
+          <div className="border-t border-[var(--khalsni-public-border)] bg-white min-[700px]:hidden">
             <div className="kh-public-container py-4">
               <nav className="grid gap-1 text-right text-sm font-bold">
                 {links.map((link) => (
@@ -125,7 +125,7 @@ function PublicLayoutContent() {
                     key={link.to}
                     to={link.to}
                     className={({ isActive }) =>
-                      `rounded-md px-4 py-3 ${isActive ? 'bg-[var(--khalsni-public-primary)] text-white' : 'text-white/100 hover:bg-white/10 hover:text-white'}`
+                      `rounded-[var(--radius-md)] px-4 py-3 ${isActive ? 'bg-[var(--khalsni-public-primary)] text-white' : 'text-slate-700 hover:bg-[var(--khalsni-public-bg-secondary)] hover:text-[var(--khalsni-public-primary)]'}`
                     }
                   >
                     {link.label}
@@ -134,17 +134,17 @@ function PublicLayoutContent() {
               </nav>
               <div className="mt-4 grid gap-3">
                 {user ? (
-                  <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to={portalPath}>
+                  <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to={portalPath}>
                     <UserRound className="h-4 w-4" />
                     بوابتي
                   </Link>
                 ) : (
                   <>
-                    <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to="/login">
+                    <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to="/login">
                       <LogIn className="h-4 w-4" />
                       تسجيل الدخول
                     </Link>
-                    <Link className="inline-flex h-11 items-center justify-center rounded-md border border-white/40 px-4 text-sm font-bold text-white" to="/register">
+                    <Link className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-bold text-[var(--khalsni-public-text)]" to="/register">
                       إنشاء حساب
                     </Link>
                   </>
@@ -159,17 +159,17 @@ function PublicLayoutContent() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-white/10 bg-[#020814]">
+      <footer className="border-t border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-bg-secondary)]">
         <div className="kh-public-container py-7">
           <div className="grid gap-8 text-right md:grid-cols-[1.2fr_0.75fr_0.75fr_1fr]">
             <div>
               <KhalsniLogo logoUrl={theme.logo_url} />
-              <p className="mt-4 max-w-sm text-sm leading-7 text-white/70">
+              <p className="mt-4 max-w-sm text-sm leading-7 text-slate-600">
                 {footerText || 'منصة إلكترونية ذكية لإنجاز المعاملات الحكومية والإدارية بسهولة وأمان من مكان واحد.'}
               </p>
               <div className="mt-5 flex justify-end gap-2">
                 {['f', 'x', 'ig', 'in', '▶'].map((item) => (
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-white/5 text-[0.65rem] font-bold text-white/70" key={item}>
+                  <span className="grid h-8 w-8 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-white text-[0.65rem] font-bold text-slate-500" key={item}>
                     {item}
                   </span>
                 ))}
@@ -177,35 +177,35 @@ function PublicLayoutContent() {
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-white">خدماتنا</h2>
-              <div className="mt-4 grid gap-2 text-sm text-white/60">
-                <Link className="hover:text-white" to="/services?search=العقارات">العقارات والأراضي</Link>
-                <Link className="hover:text-white" to="/services?search=الشركات">الشركات والأعمال</Link>
-                <Link className="hover:text-white" to="/services?search=الضرائب">الضرائب والرسوم</Link>
-                <Link className="hover:text-white" to="/services?search=الدولية">الخدمات الدولية</Link>
-                <Link className="hover:text-white" to="/contact">طلب خاص</Link>
+              <h2 className="text-sm font-extrabold text-ink">خدماتنا</h2>
+              <div className="mt-4 grid gap-2 text-sm text-slate-600">
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services?search=العقارات">العقارات والأراضي</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services?search=الشركات">الشركات والأعمال</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services?search=الضرائب">الضرائب والرسوم</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services?search=الدولية">الخدمات الدولية</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/contact">طلب خاص</Link>
               </div>
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-white">روابط سريعة</h2>
-              <div className="mt-4 grid gap-2 text-sm text-white/60">
-                <Link className="hover:text-white" to="/">الرئيسية</Link>
-                <Link className="hover:text-white" to="/services">الخدمات</Link>
-                <Link className="hover:text-white" to="/track-order">تتبع الطلب</Link>
-                <Link className="hover:text-white" to="/faq">المساعدة</Link>
-                <Link className="hover:text-white" to="/privacy">سياسة الخصوصية</Link>
+              <h2 className="text-sm font-extrabold text-ink">روابط سريعة</h2>
+              <div className="mt-4 grid gap-2 text-sm text-slate-600">
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/">الرئيسية</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services">الخدمات</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/track-order">تتبع الطلب</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/faq">المساعدة</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/privacy">سياسة الخصوصية</Link>
               </div>
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-white">تواصل معنا</h2>
-              <div className="mt-4 grid gap-3 text-sm text-white/70">
-                <a className="flex items-center justify-end gap-2 hover:text-white" href={`tel:${content.contact_phone || '+962790000000'}`}>
+              <h2 className="text-sm font-extrabold text-ink">تواصل معنا</h2>
+              <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                <a className="flex items-center justify-end gap-2 hover:text-[var(--khalsni-public-primary)]" href={`tel:${content.contact_phone || '+962790000000'}`}>
                   <span>{content.contact_phone || '+962 7 9000 0000'}</span>
                   <Phone className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
                 </a>
-                <a className="flex items-center justify-end gap-2 hover:text-white" href={`mailto:${content.email || 'info@khalisni.com'}`}>
+                <a className="flex items-center justify-end gap-2 hover:text-[var(--khalsni-public-primary)]" href={`mailto:${content.email || 'info@khalisni.com'}`}>
                   <span>{content.email || 'info@khalisni.com'}</span>
                   <Mail className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
                 </a>
@@ -216,7 +216,7 @@ function PublicLayoutContent() {
               </div>
             </div>
           </div>
-          <p className="mt-7 border-t border-white/10 pt-5 text-center text-xs text-white/55">
+          <p className="mt-7 border-t border-[var(--khalsni-public-border)] pt-5 text-center text-xs text-slate-500">
             جميع الحقوق محفوظة © 2026 خلصني
           </p>
         </div>
@@ -224,7 +224,7 @@ function PublicLayoutContent() {
 
       <Link
         aria-label="تواصل مع الدعم"
-        className="fixed bottom-5 left-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-2xl shadow-blue-950/40 transition hover:bg-[var(--khalsni-public-primary-hover)]"
+        className="fixed bottom-5 left-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-lg transition hover:bg-[var(--khalsni-public-primary-hover)]"
         to="/contact"
       >
         <MessageCircle className="h-7 w-7" />
