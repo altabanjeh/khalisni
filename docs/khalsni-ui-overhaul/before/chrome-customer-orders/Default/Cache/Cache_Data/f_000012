@@ -1,0 +1,350 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/public/RegisterPage.jsx");const useState = __vite__cjsImport0_react["useState"];const _jsxDEV = __vite__cjsImport6_react_jsxDevRuntime["jsxDEV"];import __vite__cjsImport0_react from "/node_modules/.vite/deps/react.js?v=64ceb9b2";
+import { useForm } from "/node_modules/.vite/deps/react-hook-form.js?v=25590acb";
+import { Link, useNavigate, useSearchParams } from "/node_modules/.vite/deps/react-router-dom.js?v=6a5bb7d2";
+import { api } from "/src/api/services.js";
+import { getDisplayError } from "/src/api/client.js";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+var _jsxFileName = "D:/ghassan/frontend/src/pages/public/RegisterPage.jsx";
+import __vite__cjsImport6_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=64ceb9b2";
+var _s = $RefreshSig$();
+function getSafeNextPath(value) {
+	return value && value.startsWith("/") ? value : "";
+}
+function RegisterPage() {
+	_s();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const { isArabic } = useLanguage();
+	const [error, setError] = useState("");
+	const nextPath = getSafeNextPath(searchParams.get("next"));
+	const { register, handleSubmit, setError: setFieldError, formState: { errors, isSubmitting } } = useForm({ defaultValues: {
+		full_name: "",
+		phone: "",
+		email: "",
+		national_id: "",
+		password: ""
+	} });
+	async function onSubmit(values) {
+		setError("");
+		try {
+			const createdUser = await api.register(values);
+			const loginParams = new URLSearchParams();
+			loginParams.set("registered", "1");
+			if (nextPath) {
+				loginParams.set("next", nextPath);
+			}
+			if (createdUser?.email) {
+				loginParams.set("email", createdUser.email);
+			}
+			navigate(`/login?${loginParams.toString()}`, { replace: true });
+		} catch (submitError) {
+			const fieldErrors = submitError?.fieldErrors || {};
+			let hasFieldErrors = false;
+			Object.entries(fieldErrors).forEach(([fieldName, messages]) => {
+				if (!messages?.length) return;
+				hasFieldErrors = true;
+				setFieldError(fieldName, {
+					type: "server",
+					message: messages[0]
+				});
+			});
+			if (!hasFieldErrors) {
+				setError(getDisplayError(submitError));
+			}
+		}
+	}
+	return /* @__PURE__ */ _jsxDEV("div", {
+		className: "mx-auto max-w-2xl glass-panel p-6",
+		children: [
+			/* @__PURE__ */ _jsxDEV("p", {
+				className: "text-sm font-bold text-brand-600",
+				children: isArabic ? "إنشاء حساب عميل" : "Create a customer account"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 64,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("h1", {
+				className: "mt-2 text-3xl font-extrabold text-ink",
+				children: isArabic ? "أنشئ حسابك قبل طلب الخدمة" : "Create your account before requesting a service"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 65,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("p", {
+				className: "mt-4 text-sm leading-7 text-slate-600",
+				children: isArabic ? "يجب إنشاء حساب عميل أولاً، ثم تسجيل الدخول، وبعدها يمكنك إرسال الطلب ومتابعته من لوحة العميل." : "Create a customer account first, then sign in to submit and track your request from the customer dashboard."
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 66,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("form", {
+				className: "mt-8 grid gap-4 md:grid-cols-2",
+				onSubmit: handleSubmit(onSubmit),
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						className: "md:col-span-2",
+						children: [
+							/* @__PURE__ */ _jsxDEV("label", {
+								htmlFor: "reg-full-name",
+								className: "mb-2 block text-sm font-semibold",
+								children: isArabic ? "الاسم الكامل" : "Full name"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 74,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("input", {
+								id: "reg-full-name",
+								className: "field",
+								...register("full_name", { required: isArabic ? "الاسم الكامل مطلوب" : "Full name is required" })
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 75,
+								columnNumber: 11
+							}, this),
+							errors.full_name ? /* @__PURE__ */ _jsxDEV("p", {
+								className: "mt-2 text-sm text-danger",
+								children: errors.full_name.message
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 76,
+								columnNumber: 31
+							}, this) : null
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 73,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							htmlFor: "reg-phone",
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "رقم الهاتف" : "Phone number"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 80,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							id: "reg-phone",
+							className: "field",
+							...register("phone", { required: isArabic ? "رقم الهاتف مطلوب" : "Phone number is required" })
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 81,
+							columnNumber: 11
+						}, this),
+						errors.phone ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.phone.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 82,
+							columnNumber: 27
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 79,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							htmlFor: "reg-email",
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "البريد الإلكتروني" : "Email"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 86,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							id: "reg-email",
+							className: "field",
+							type: "email",
+							...register("email", { required: isArabic ? "البريد الإلكتروني مطلوب" : "Email is required" })
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 87,
+							columnNumber: 11
+						}, this),
+						errors.email ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.email.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 88,
+							columnNumber: 27
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 85,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							htmlFor: "reg-national-id",
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "الرقم الوطني" : "National ID"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 92,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							id: "reg-national-id",
+							className: "field",
+							...register("national_id")
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 93,
+							columnNumber: 11
+						}, this),
+						errors.national_id ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.national_id.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 94,
+							columnNumber: 33
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 91,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							htmlFor: "reg-password",
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "كلمة المرور" : "Password"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 98,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							id: "reg-password",
+							className: "field",
+							type: "password",
+							...register("password", {
+								required: isArabic ? "كلمة المرور مطلوبة" : "Password is required",
+								minLength: {
+									value: 8,
+									message: isArabic ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل" : "Password must be at least 8 characters"
+								}
+							})
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 99,
+							columnNumber: 11
+						}, this),
+						errors.password ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.password.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 111,
+							columnNumber: 30
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 97,
+						columnNumber: 9
+					}, this),
+					error ? /* @__PURE__ */ _jsxDEV("p", {
+						className: "md:col-span-2 text-sm text-danger",
+						children: error
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 114,
+						columnNumber: 18
+					}, this) : null,
+					/* @__PURE__ */ _jsxDEV("div", {
+						className: "md:col-span-2 space-y-3",
+						children: [/* @__PURE__ */ _jsxDEV("button", {
+							className: "btn-primary w-full",
+							disabled: isSubmitting,
+							type: "submit",
+							children: isSubmitting ? isArabic ? "جارٍ إنشاء الحساب..." : "Creating account..." : isArabic ? "إنشاء الحساب" : "Create account"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 117,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("p", {
+							className: "text-center text-sm text-slate-600",
+							children: [
+								isArabic ? "لديك حساب بالفعل؟" : "Already have an account?",
+								" ",
+								/* @__PURE__ */ _jsxDEV(Link, {
+									className: "font-semibold text-brand-700 hover:text-brand-800",
+									to: nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login",
+									children: isArabic ? "سجل الدخول" : "Sign in"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 122,
+									columnNumber: 13
+								}, this)
+							]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 120,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 116,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 72,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 63,
+		columnNumber: 5
+	}, this);
+}
+_s(RegisterPage, "6rW0FQNQQj9WryUdGJ2mYBbwzpc=", false, function() {
+	return [
+		useNavigate,
+		useSearchParams,
+		useLanguage,
+		useForm
+	];
+});
+_c = RegisterPage;
+export default RegisterPage;
+var _c;
+$RefreshReg$(_c, "RegisterPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/src/pages/public/RegisterPage.jsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("D:/ghassan/frontend/src/pages/public/RegisterPage.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("D:/ghassan/frontend/src/pages/public/RegisterPage.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "D:/ghassan/frontend/src/pages/public/RegisterPage.jsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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d0JBQUMsT0FBRDtNQUFLLFdBQVU7Z0JBQWYsQ0FDRSx3QkFBQyxVQUFEO09BQVEsV0FBVTtPQUFxQixVQUFVO09BQWMsTUFBSztpQkFDakUsZUFBZ0IsV0FBVyx5QkFBeUIsd0JBQXlCLFdBQVcsaUJBQWlCO09BQ25HOzs7O2dCQUNULHdCQUFDLEtBQUQ7T0FBRyxXQUFVO2lCQUFiO1FBQ0csV0FBVyxzQkFBc0I7UUFBNEI7UUFDOUQsd0JBQUMsTUFBRDtTQUNFLFdBQVU7U0FDVixJQUFJLFdBQVcsZUFBZSxtQkFBbUIsU0FBUyxLQUFLO21CQUU5RCxXQUFXLGVBQWU7U0FDdEI7Ozs7O1FBQ0w7Ozs7O2VBQ0E7Ozs7OztLQUNEOzs7Ozs7R0FDSDs7Ozs7Ozs7Ozs7Ozs7RUFFVDs7QUFFRCxlQUFlIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIlJlZ2lzdGVyUGFnZS5qc3giXSwidmVyc2lvbiI6Mywic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCdcbmltcG9ydCB7IHVzZUZvcm0gfSBmcm9tICdyZWFjdC1ob29rLWZvcm0nXG5pbXBvcnQgeyBMaW5rLCB1c2VOYXZpZ2F0ZSwgdXNlU2VhcmNoUGFyYW1zIH0gZnJvbSAncmVhY3Qtcm91dGVyLWRvbSdcbmltcG9ydCB7IGFwaSB9IGZyb20gJy4uLy4uL2FwaS9zZXJ2aWNlcydcbmltcG9ydCB7IGdldERpc3BsYXlFcnJvciB9IGZyb20gJy4uLy4uL2FwaS9jbGllbnQnXG5pbXBvcnQgeyB1c2VMYW5ndWFnZSB9IGZyb20gJy4uLy4uL2NvbnRleHQvTGFuZ3VhZ2VDb250ZXh0J1xuXG5mdW5jdGlvbiBnZXRTYWZlTmV4dFBhdGgodmFsdWUpIHtcbiAgcmV0dXJuIHZhbHVlICYmIHZhbHVlLnN0YXJ0c1dpdGgoJy8nKSA/IHZhbHVlIDogJydcbn1cblxuZnVuY3Rpb24gUmVnaXN0ZXJQYWdlKCkge1xuICBjb25zdCBuYXZpZ2F0ZSA9IHVzZU5hdmlnYXRlKClcbiAgY29uc3QgW3NlYXJjaFBhcmFtc10gPSB1c2VTZWFyY2hQYXJhbXMoKVxuICBjb25zdCB7IGlzQXJhYmljIH0gPSB1c2VMYW5ndWFnZSgpXG4gIGNvbnN0IFtlcnJvciwgc2V0RXJyb3JdID0gdXNlU3RhdGUoJycpXG4gIGNvbnN0IG5leHRQYXRoID0gZ2V0U2FmZU5leHRQYXRoKHNlYXJjaFBhcmFtcy5nZXQoJ25leHQnKSlcbiAgY29uc3Qge1xuICAgIHJlZ2lzdGVyLFxuICAgIGhhbmRsZVN1Ym1pdCxcbiAgICBzZXRFcnJvcjogc2V0RmllbGRFcnJvcixcbiAgICBmb3JtU3RhdGU6IHsgZXJyb3JzLCBpc1N1Ym1pdHRpbmcgfSxcbiAgfSA9IHVzZUZvcm0oe1xuICAgIGRlZmF1bHRWYWx1ZXM6IHtcbiAgICAgIGZ1bGxfbmFtZTogJycsXG4gICAgICBwaG9uZTogJycsXG4gICAgICBlbWFpbDogJycsXG4gICAgICBuYXRpb25hbF9pZDogJycsXG4gICAgICBwYXNzd29yZDogJycsXG4gICAgfSxcbiAgfSlcblxuICBhc3luYyBmdW5jdGlvbiBvblN1Ym1pdCh2YWx1ZXMpIHtcbiAgICBzZXRFcnJvcignJylcbiAgICB0cnkge1xuICAgICAgY29uc3QgY3JlYXRlZFVzZXIgPSBhd2FpdCBhcGkucmVnaXN0ZXIodmFsdWVzKVxuICAgICAgY29uc3QgbG9naW5QYXJhbXMgPSBuZXcgVVJMU2VhcmNoUGFyYW1zKClcbiAgICAgIGxvZ2luUGFyYW1zLnNldCgncmVnaXN0ZXJlZCcsICcxJylcbiAgICAgIGlmIChuZXh0UGF0aCkge1xuICAgICAgICBsb2dpblBhcmFtcy5zZXQoJ25leHQnLCBuZXh0UGF0aClcbiAgICAgIH1cbiAgICAgIGlmIChjcmVhdGVkVXNlcj8uZW1haWwpIHtcbiAgICAgICAgbG9naW5QYXJhbXMuc2V0KCdlbWFpbCcsIGNyZWF0ZWRVc2VyLmVtYWlsKVxuICAgICAgfVxuICAgICAgbmF2aWdhdGUoYC9sb2dpbj8ke2xvZ2luUGFyYW1zLnRvU3RyaW5nKCl9YCwgeyByZXBsYWNlOiB0cnVlIH0pXG4gICAgfSBjYXRjaCAoc3VibWl0RXJyb3IpIHtcbiAgICAgIGNvbnN0IGZpZWxkRXJyb3JzID0gc3VibWl0RXJyb3I/LmZpZWxkRXJyb3JzIHx8IHt9XG4gICAgICBsZXQgaGFzRmllbGRFcnJvcnMgPSBmYWxzZVxuXG4gICAgICBPYmplY3QuZW50cmllcyhmaWVsZEVycm9ycykuZm9yRWFjaCgoW2ZpZWxkTmFtZSwgbWVzc2FnZXNdKSA9PiB7XG4gICAgICAgIGlmICghbWVzc2FnZXM/Lmxlbmd0aCkgcmV0dXJuXG4gICAgICAgIGhhc0ZpZWxkRXJyb3JzID0gdHJ1ZVxuICAgICAgICBzZXRGaWVsZEVycm9yKGZpZWxkTmFtZSwgeyB0eXBlOiAnc2VydmVyJywgbWVzc2FnZTogbWVzc2FnZXNbMF0gfSlcbiAgICAgIH0pXG5cbiAgICAgIGlmICghaGFzRmllbGRFcnJvcnMpIHtcbiAgICAgICAgc2V0RXJyb3IoZ2V0RGlzcGxheUVycm9yKHN1Ym1pdEVycm9yKSlcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwibXgtYXV0byBtYXgtdy0yeGwgZ2xhc3MtcGFuZWwgcC02XCI+XG4gICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtYm9sZCB0ZXh0LWJyYW5kLTYwMFwiPntpc0FyYWJpYyA/ICfYpdmG2LTYp9ihINit2LPYp9ioINi52YXZitmEJyA6ICdDcmVhdGUgYSBjdXN0b21lciBhY2NvdW50J308L3A+XG4gICAgICA8aDEgY2xhc3NOYW1lPVwibXQtMiB0ZXh0LTN4bCBmb250LWV4dHJhYm9sZCB0ZXh0LWlua1wiPntpc0FyYWJpYyA/ICfYo9mG2LTYpiDYrdiz2KfYqNmDINmC2KjZhCDYt9mE2Kgg2KfZhNiu2K/ZhdipJyA6ICdDcmVhdGUgeW91ciBhY2NvdW50IGJlZm9yZSByZXF1ZXN0aW5nIGEgc2VydmljZSd9PC9oMT5cbiAgICAgIDxwIGNsYXNzTmFtZT1cIm10LTQgdGV4dC1zbSBsZWFkaW5nLTcgdGV4dC1zbGF0ZS02MDBcIj5cbiAgICAgICAge2lzQXJhYmljXG4gICAgICAgICAgPyAn2YrYrNioINil2YbYtNin2KEg2K3Ys9in2Kgg2LnZhdmK2YQg2KPZiNmE2KfZi9iMINir2YUg2KrYs9is2YrZhCDYp9mE2K/YrtmI2YTYjCDZiNio2LnYr9mH2Kcg2YrZhdmD2YbZgyDYpdix2LPYp9mEINin2YTYt9mE2Kgg2YjZhdiq2KfYqNi52KrZhyDZhdmGINmE2YjYrdipINin2YTYudmF2YrZhC4nXG4gICAgICAgICAgOiAnQ3JlYXRlIGEgY3VzdG9tZXIgYWNjb3VudCBmaXJzdCwgdGhlbiBzaWduIGluIHRvIHN1Ym1pdCBhbmQgdHJhY2sgeW91ciByZXF1ZXN0IGZyb20gdGhlIGN1c3RvbWVyIGRhc2hib2FyZC4nfVxuICAgICAgPC9wPlxuXG4gICAgICA8Zm9ybSBjbGFzc05hbWU9XCJtdC04IGdyaWQgZ2FwLTQgbWQ6Z3JpZC1jb2xzLTJcIiBvblN1Ym1pdD17aGFuZGxlU3VibWl0KG9uU3VibWl0KX0+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWQ6Y29sLXNwYW4tMlwiPlxuICAgICAgICAgIDxsYWJlbCBodG1sRm9yPVwicmVnLWZ1bGwtbmFtZVwiIGNsYXNzTmFtZT1cIm1iLTIgYmxvY2sgdGV4dC1zbSBmb250LXNlbWlib2xkXCI+e2lzQXJhYmljID8gJ9in2YTYp9iz2YUg2KfZhNmD2KfZhdmEJyA6ICdGdWxsIG5hbWUnfTwvbGFiZWw+XG4gICAgICAgICAgPGlucHV0IGlkPVwicmVnLWZ1bGwtbmFtZVwiIGNsYXNzTmFtZT1cImZpZWxkXCIgey4uLnJlZ2lzdGVyKCdmdWxsX25hbWUnLCB7IHJlcXVpcmVkOiBpc0FyYWJpYyA/ICfYp9mE2KfYs9mFINin2YTZg9in2YXZhCDZhdi32YTZiNioJyA6ICdGdWxsIG5hbWUgaXMgcmVxdWlyZWQnIH0pfSAvPlxuICAgICAgICAgIHtlcnJvcnMuZnVsbF9uYW1lID8gPHAgY2xhc3NOYW1lPVwibXQtMiB0ZXh0LXNtIHRleHQtZGFuZ2VyXCI+e2Vycm9ycy5mdWxsX25hbWUubWVzc2FnZX08L3A+IDogbnVsbH1cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8bGFiZWwgaHRtbEZvcj1cInJlZy1waG9uZVwiIGNsYXNzTmFtZT1cIm1iLTIgYmxvY2sgdGV4dC1zbSBmb250LXNlbWlib2xkXCI+e2lzQXJhYmljID8gJ9ix2YLZhSDYp9mE2YfYp9iq2YEnIDogJ1Bob25lIG51bWJlcid9PC9sYWJlbD5cbiAgICAgICAgICA8aW5wdXQgaWQ9XCJyZWctcGhvbmVcIiBjbGFzc05hbWU9XCJmaWVsZFwiIHsuLi5yZWdpc3RlcigncGhvbmUnLCB7IHJlcXVpcmVkOiBpc0FyYWJpYyA/ICfYsdmC2YUg2KfZhNmH2KfYqtmBINmF2LfZhNmI2KgnIDogJ1Bob25lIG51bWJlciBpcyByZXF1aXJlZCcgfSl9IC8+XG4gICAgICAgICAge2Vycm9ycy5waG9uZSA/IDxwIGNsYXNzTmFtZT1cIm10LTIgdGV4dC1zbSB0ZXh0LWRhbmdlclwiPntlcnJvcnMucGhvbmUubWVzc2FnZX08L3A+IDogbnVsbH1cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8bGFiZWwgaHRtbEZvcj1cInJlZy1lbWFpbFwiIGNsYXNzTmFtZT1cIm1iLTIgYmxvY2sgdGV4dC1zbSBmb250LXNlbWlib2xkXCI+e2lzQXJhYmljID8gJ9in2YTYqNix2YrYryDYp9mE2KXZhNmD2KrYsdmI2YbZiicgOiAnRW1haWwnfTwvbGFiZWw+XG4gICAgICAgICAgPGlucHV0IGlkPVwicmVnLWVtYWlsXCIgY2xhc3NOYW1lPVwiZmllbGRcIiB0eXBlPVwiZW1haWxcIiB7Li4ucmVnaXN0ZXIoJ2VtYWlsJywgeyByZXF1aXJlZDogaXNBcmFiaWMgPyAn2KfZhNio2LHZitivINin2YTYpdmE2YPYqtix2YjZhtmKINmF2LfZhNmI2KgnIDogJ0VtYWlsIGlzIHJlcXVpcmVkJyB9KX0gLz5cbiAgICAgICAgICB7ZXJyb3JzLmVtYWlsID8gPHAgY2xhc3NOYW1lPVwibXQtMiB0ZXh0LXNtIHRleHQtZGFuZ2VyXCI+e2Vycm9ycy5lbWFpbC5tZXNzYWdlfTwvcD4gOiBudWxsfVxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICA8ZGl2PlxuICAgICAgICAgIDxsYWJlbCBodG1sRm9yPVwicmVnLW5hdGlvbmFsLWlkXCIgY2xhc3NOYW1lPVwibWItMiBibG9jayB0ZXh0LXNtIGZvbnQtc2VtaWJvbGRcIj57aXNBcmFiaWMgPyAn2KfZhNix2YLZhSDYp9mE2YjYt9mG2YonIDogJ05hdGlvbmFsIElEJ308L2xhYmVsPlxuICAgICAgICAgIDxpbnB1dCBpZD1cInJlZy1uYXRpb25hbC1pZFwiIGNsYXNzTmFtZT1cImZpZWxkXCIgey4uLnJlZ2lzdGVyKCduYXRpb25hbF9pZCcpfSAvPlxuICAgICAgICAgIHtlcnJvcnMubmF0aW9uYWxfaWQgPyA8cCBjbGFzc05hbWU9XCJtdC0yIHRleHQtc20gdGV4dC1kYW5nZXJcIj57ZXJyb3JzLm5hdGlvbmFsX2lkLm1lc3NhZ2V9PC9wPiA6IG51bGx9XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIDxkaXY+XG4gICAgICAgICAgPGxhYmVsIGh0bWxGb3I9XCJyZWctcGFzc3dvcmRcIiBjbGFzc05hbWU9XCJtYi0yIGJsb2NrIHRleHQtc20gZm9udC1zZW1pYm9sZFwiPntpc0FyYWJpYyA/ICfZg9mE2YXYqSDYp9mE2YXYsdmI2LEnIDogJ1Bhc3N3b3JkJ308L2xhYmVsPlxuICAgICAgICAgIDxpbnB1dFxuICAgICAgICAgICAgaWQ9XCJyZWctcGFzc3dvcmRcIlxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiZmllbGRcIlxuICAgICAgICAgICAgdHlwZT1cInBhc3N3b3JkXCJcbiAgICAgICAgICAgIHsuLi5yZWdpc3RlcigncGFzc3dvcmQnLCB7XG4gICAgICAgICAgICAgIHJlcXVpcmVkOiBpc0FyYWJpYyA/ICfZg9mE2YXYqSDYp9mE2YXYsdmI2LEg2YXYt9mE2YjYqNipJyA6ICdQYXNzd29yZCBpcyByZXF1aXJlZCcsXG4gICAgICAgICAgICAgIG1pbkxlbmd0aDoge1xuICAgICAgICAgICAgICAgIHZhbHVlOiA4LFxuICAgICAgICAgICAgICAgIG1lc3NhZ2U6IGlzQXJhYmljID8gJ9mD2YTZhdipINin2YTZhdix2YjYsSDZitis2Kgg2KPZhiDYqtmD2YjZhiA4INij2K3YsdmBINi52YTZiSDYp9mE2KPZgtmEJyA6ICdQYXNzd29yZCBtdXN0IGJlIGF0IGxlYXN0IDggY2hhcmFjdGVycycsXG4gICAgICAgICAgICAgIH0sXG4gICAgICAgICAgICB9KX1cbiAgICAgICAgICAvPlxuICAgICAgICAgIHtlcnJvcnMucGFzc3dvcmQgPyA8cCBjbGFzc05hbWU9XCJtdC0yIHRleHQtc20gdGV4dC1kYW5nZXJcIj57ZXJyb3JzLnBhc3N3b3JkLm1lc3NhZ2V9PC9wPiA6IG51bGx9XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIHtlcnJvciA/IDxwIGNsYXNzTmFtZT1cIm1kOmNvbC1zcGFuLTIgdGV4dC1zbSB0ZXh0LWRhbmdlclwiPntlcnJvcn08L3A+IDogbnVsbH1cblxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1kOmNvbC1zcGFuLTIgc3BhY2UteS0zXCI+XG4gICAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJidG4tcHJpbWFyeSB3LWZ1bGxcIiBkaXNhYmxlZD17aXNTdWJtaXR0aW5nfSB0eXBlPVwic3VibWl0XCI+XG4gICAgICAgICAgICB7aXNTdWJtaXR0aW5nID8gKGlzQXJhYmljID8gJ9is2KfYsdmNINil2YbYtNin2KEg2KfZhNit2LPYp9ioLi4uJyA6ICdDcmVhdGluZyBhY2NvdW50Li4uJykgOiBpc0FyYWJpYyA/ICfYpdmG2LTYp9ihINin2YTYrdiz2KfYqCcgOiAnQ3JlYXRlIGFjY291bnQnfVxuICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHRleHQtc20gdGV4dC1zbGF0ZS02MDBcIj5cbiAgICAgICAgICAgIHtpc0FyYWJpYyA/ICfZhNiv2YrZgyDYrdiz2KfYqCDYqNin2YTZgdi52YTYnycgOiAnQWxyZWFkeSBoYXZlIGFuIGFjY291bnQ/J317JyAnfVxuICAgICAgICAgICAgPExpbmtcbiAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB0ZXh0LWJyYW5kLTcwMCBob3Zlcjp0ZXh0LWJyYW5kLTgwMFwiXG4gICAgICAgICAgICAgIHRvPXtuZXh0UGF0aCA/IGAvbG9naW4/bmV4dD0ke2VuY29kZVVSSUNvbXBvbmVudChuZXh0UGF0aCl9YCA6ICcvbG9naW4nfVxuICAgICAgICAgICAgPlxuICAgICAgICAgICAgICB7aXNBcmFiaWMgPyAn2LPYrNmEINin2YTYr9iu2YjZhCcgOiAnU2lnbiBpbid9XG4gICAgICAgICAgICA8L0xpbms+XG4gICAgICAgICAgPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZm9ybT5cbiAgICA8L2Rpdj5cbiAgKVxufVxuXG5leHBvcnQgZGVmYXVsdCBSZWdpc3RlclBhZ2VcbiJdfQ==

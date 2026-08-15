@@ -33,7 +33,7 @@ function Topbar({ title, onMenuClick }) {
   }, [])
 
   return (
-    <header className="glass-panel relative flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
+    <header className="relative flex flex-col gap-4 rounded-[2rem] border border-border bg-white p-4 shadow-soft sm:p-5 md:flex-row md:items-center md:justify-between">
       <div className="flex min-w-0 items-center gap-3">
         <button
           aria-label={t('topbar.openSidebar', 'فتح القائمة الجانبية')}
@@ -75,7 +75,7 @@ function Topbar({ title, onMenuClick }) {
 
         <LanguageSwitcher className="w-full justify-center sm:w-auto" />
 
-        <div className="flex w-full items-center gap-3 rounded-3xl border border-brand-100 bg-brand-50/80 px-4 py-2.5 text-sm sm:min-w-[220px] sm:w-auto">
+        <div className="flex w-full items-center gap-3 rounded-[var(--radius)] border border-brand-100 bg-brand-50 px-4 py-2.5 text-sm sm:min-w-[220px] sm:w-auto">
           <span className="icon-chip h-10 w-10 rounded-2xl bg-white">
             <UserRound className="h-4 w-4" />
           </span>

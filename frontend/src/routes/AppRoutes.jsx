@@ -42,6 +42,7 @@ import RegisterPage from '../pages/public/RegisterPage'
 import ResetPasswordPage from '../pages/public/ResetPasswordPage'
 
 const CreateOrderPage = lazy(() => import('../pages/public/CreateOrderPage'))
+const ServiceCategoryPage = lazy(() => import('../pages/public/ServiceCategoryPage'))
 const TrackOrderPage = lazy(() => import('../pages/public/TrackOrderPage'))
 const AboutPage = lazy(() => import('../pages/public/AboutPage'))
 const ContactPage = lazy(() => import('../pages/public/ContactPage'))
@@ -156,6 +157,7 @@ function AppRoutes() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/category/:slug" element={<ServiceCategoryPage />} />
             <Route path="/services/:slug" element={<ServiceDetailsPage />} />
             <Route path="/create-order" element={<CreateOrderPage />} />
             <Route path="/track-order" element={<TrackOrderPage />} />

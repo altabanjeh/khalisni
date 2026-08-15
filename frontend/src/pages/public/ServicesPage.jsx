@@ -1,12 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Layers3, Search, Sparkles } from 'lucide-react'
+import { Layers3, RotateCcw, Search, Sparkles } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
-import LoadingSpinner from '../../components/LoadingSpinner'
+import CategoryCard from '../../components/CategoryCard'
 import ServiceCard from '../../components/ServiceCard'
+import {
+  PublicButton,
+  PublicCard,
+  PublicEmptyState,
+  PublicHero,
+  PublicLoading,
+  PublicPageShell,
+  PublicPanel,
+  PublicSearchInput,
+} from '../../components/public/PublicPage'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { getLocalizedField } from '../../utils/i18n'
+import { getCategoryDescription, getCategoryName } from '../../utils/servicePresentation'
+
+function isPublicRecord(record) {
+  return record && record.is_deleted !== true && record.is_active !== false && record.show_on_public_site !== false
+}
 
 function ServicesPage() {
   const { language, isArabic } = useLanguage()
@@ -18,19 +32,21 @@ function ServicesPage() {
 
   const { data: categories = [] } = useAsyncData(() => api.getPublicServiceCategories(), [], [])
   const { data: services = [], loading } = useAsyncData(() => api.getServices(), [], [])
+  const publicServices = useMemo(() => services.filter(isPublicRecord), [services])
+  const publicCategories = useMemo(() => categories.filter(isPublicRecord), [categories])
 
   const serviceCountsByCategory = useMemo(() => {
-    return services.reduce((accumulator, service) => {
+    return publicServices.reduce((accumulator, service) => {
       const slug = service.category?.slug || 'uncategorized'
       accumulator[slug] = (accumulator[slug] || 0) + 1
       return accumulator
     }, {})
-  }, [services])
+  }, [publicServices])
 
   const filteredServices = useMemo(() => {
     const normalizedSearch = searchParam.trim().toLowerCase()
 
-    return services.filter((service) => {
+    return publicServices.filter((service) => {
       const matchesCategory = !activeCategory || service.category?.slug === activeCategory
       if (!matchesCategory) return false
       if (!normalizedSearch) return true
@@ -39,7 +55,7 @@ function ServicesPage() {
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     })
-  }, [activeCategory, searchParam, services])
+  }, [activeCategory, publicServices, searchParam])
 
   const categorySections = useMemo(() => {
     const sectionsBySlug = new Map()
@@ -48,38 +64,29 @@ function ServicesPage() {
       const category = service.category || {}
       const slug = category.slug || 'uncategorized'
       if (!sectionsBySlug.has(slug)) {
-        sectionsBySlug.set(slug, {
-          slug,
-          category,
-          services: [],
-        })
+        sectionsBySlug.set(slug, { slug, category, services: [] })
       }
       sectionsBySlug.get(slug).services.push(service)
     })
 
-    const orderedSections = categories
+    const orderedSections = publicCategories
       .map((category) => {
         const section = sectionsBySlug.get(category.slug)
         if (!section) return null
-        return {
-          ...section,
-          category: { ...category, ...section.category },
-        }
+        return { ...section, category: { ...category, ...section.category } }
       })
       .filter(Boolean)
 
     sectionsBySlug.forEach((section, slug) => {
-      if (!orderedSections.some((item) => item.slug === slug)) {
-        orderedSections.push(section)
-      }
+      if (!orderedSections.some((item) => item.slug === slug)) orderedSections.push(section)
     })
 
     return orderedSections
-  }, [categories, filteredServices])
+  }, [filteredServices, publicCategories])
 
   const featuredCategories = useMemo(() => {
-    return categories.filter((category) => (serviceCountsByCategory[category.slug] || 0) > 0)
-  }, [categories, serviceCountsByCategory])
+    return publicCategories.filter((category) => (serviceCountsByCategory[category.slug] || 0) > 0)
+  }, [publicCategories, serviceCountsByCategory])
 
   function updateSearchParams(nextSearch, nextCategory) {
     const nextParams = new URLSearchParams()
@@ -92,169 +99,123 @@ function ServicesPage() {
     const value = event.target.value
     setInputValue(value)
     clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      updateSearchParams(value, activeCategory)
-    }, 300)
+    debounceRef.current = setTimeout(() => updateSearchParams(value, activeCategory), 300)
   }
 
   function handleCategorySelect(slug) {
     updateSearchParams(inputValue, slug === activeCategory ? '' : slug)
   }
 
-  useEffect(() => {
-    setInputValue(searchParam)
-  }, [searchParam])
-
-  useEffect(() => {
-    return () => clearTimeout(debounceRef.current)
-  }, [])
+  useEffect(() => setInputValue(searchParam), [searchParam])
+  useEffect(() => () => clearTimeout(debounceRef.current), [])
 
   return (
-    <div className="space-y-8">
-      <section className="glass-panel overflow-hidden p-0">
-        <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="p-6 sm:p-8">
-            <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">
-              <Layers3 className="h-4 w-4" />
-              {isArabic ? 'دليل الخدمات العامة' : 'Public service directory'}
-            </p>
-            <h1 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
-              {isArabic ? 'تصفح الخدمات حسب التصنيف بشكل أوضح وأسهل' : 'Browse services by category in a clearer, easier layout'}
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-8 text-slate-600 sm:text-base">
-              {isArabic
-                ? 'كل تصنيف يظهر كقسم مستقل، وداخله بطاقات الخدمات المرتبطة به. هذا يجعل المستخدم العام يصل للخدمة المطلوبة أسرع بدون التنقل العشوائي.'
-                : 'Each category appears as its own section, with its services shown inside it. This helps public users reach the right service faster without jumping around.'}
-            </p>
-
-            <div className="mt-6 relative">
-              <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 ${isArabic ? 'right-4' : 'left-4'}`} />
-              <input
-                className={`field ${isArabic ? 'pr-10' : 'pl-10'}`}
-                onChange={handleSearchChange}
-                placeholder={isArabic ? 'ابحث باسم الخدمة أو التصنيف' : 'Search by service or category'}
-                value={inputValue}
-              />
+    <PublicPageShell>
+      <PublicHero
+        eyebrow={isArabic ? 'دليل الخدمات العامة' : 'Public service directory'}
+        icon={Layers3}
+        title={isArabic ? 'تصفح خدمات خلصني بنفس تجربة الصفحة الرئيسية' : 'Browse Khalsni services'}
+        description={isArabic ? 'ابحث حسب الخدمة أو التصنيف، ثم انتقل إلى تفاصيل الخدمة أو ابدأ الطلب من المسار الرسمي.' : 'Search by service or category, then open details or start the official request flow.'}
+        action={(
+          <div className="grid min-w-[16rem] gap-3 rounded-lg border border-white/10 bg-white/10 p-4">
+            <div className="flex items-center gap-2 text-sm font-bold text-white/75">
+              <Sparkles className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
+              {isArabic ? 'ملخص سريع' : 'Quick overview'}
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <PublicCard><p className="text-2xl font-extrabold">{featuredCategories.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'تصنيف' : 'Categories'}</p></PublicCard>
+              <PublicCard><p className="text-2xl font-extrabold">{publicServices.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'خدمة' : 'Services'}</p></PublicCard>
+              <PublicCard><p className="text-2xl font-extrabold">{filteredServices.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'نتيجة' : 'Results'}</p></PublicCard>
             </div>
           </div>
+        )}
+      />
 
-          <div className="border-t border-border bg-slate-50/70 p-6 sm:p-8 lg:border-l lg:border-t-0">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-brand-700 shadow-soft">
-              <Sparkles className="h-4 w-4" />
-              {isArabic ? 'اختصار سريع' : 'Quick overview'}
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-              <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-soft">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{isArabic ? 'التصنيفات النشطة' : 'Active categories'}</p>
-                <p className="mt-3 text-3xl font-extrabold text-ink">{featuredCategories.length}</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-soft">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{isArabic ? 'الخدمات المتاحة' : 'Available services'}</p>
-                <p className="mt-3 text-3xl font-extrabold text-ink">{services.length}</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-soft">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{isArabic ? 'النتائج الحالية' : 'Current results'}</p>
-                <p className="mt-3 text-3xl font-extrabold text-ink">{filteredServices.length}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-brand-700">{isArabic ? 'التصفح حسب التصنيف' : 'Browse by category'}</p>
-            <h2 className="section-title">{isArabic ? 'ابدأ من الجهة أو نوع المعاملة' : 'Start with the authority or request type'}</h2>
-          </div>
+      <PublicPanel>
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+          <PublicSearchInput
+            onChange={handleSearchChange}
+            placeholder={isArabic ? 'ابحث باسم الخدمة أو التصنيف' : 'Search by service or category'}
+            value={inputValue}
+          />
           {(activeCategory || searchParam) ? (
-            <button className="btn-secondary px-4 py-2 text-sm" onClick={() => updateSearchParams('', '')} type="button">
+            <PublicButton onClick={() => updateSearchParams('', '')} type="button" variant="secondary">
+              <RotateCcw className="h-4 w-4" />
               {isArabic ? 'إعادة ضبط التصفية' : 'Reset filters'}
-            </button>
+            </PublicButton>
           ) : null}
         </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          <button
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${!activeCategory ? 'border-brand-600 bg-brand-600 text-white' : 'border-border bg-white text-slate-600 hover:border-brand-200 hover:text-ink'}`}
-            onClick={() => handleCategorySelect('')}
-            type="button"
-          >
-            {isArabic ? 'كل الخدمات' : 'All services'}
-          </button>
-          {featuredCategories.map((category) => {
-            const isActive = category.slug === activeCategory
-            const categoryName = getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, language)
+        {featuredCategories.length ? (
+          <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
+            <button
+              className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${!activeCategory ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-white/15 bg-white/10 text-white/75 hover:bg-white/15'}`}
+              onClick={() => handleCategorySelect('')}
+              type="button"
+            >
+              {isArabic ? 'كل الخدمات' : 'All services'}
+            </button>
+            {featuredCategories.map((category) => {
+              const isActive = category.slug === activeCategory
+              const categoryName = getCategoryName(category, language, isArabic ? 'تصنيف خدمات' : 'Service category')
+              return (
+                <button
+                  key={category.id || category.slug}
+                  className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${isActive ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-white/15 bg-white/10 text-white/75 hover:bg-white/15'}`}
+                  onClick={() => handleCategorySelect(category.slug)}
+                  type="button"
+                >
+                  {categoryName} · {serviceCountsByCategory[category.slug] || 0}
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
+      </PublicPanel>
 
-            return (
-              <button
-                key={category.id}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${isActive ? 'border-brand-600 bg-brand-600 text-white' : 'border-border bg-white text-slate-600 hover:border-brand-200 hover:text-ink'}`}
-                onClick={() => handleCategorySelect(category.slug)}
-                type="button"
-              >
-                {categoryName} · {serviceCountsByCategory[category.slug] || 0}
-              </button>
-            )
-          })}
-        </div>
-      </section>
+      {featuredCategories.length ? (
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {featuredCategories.slice(0, 8).map((category) => (
+            <CategoryCard key={category.id || category.slug} category={category} count={serviceCountsByCategory[category.slug] || 0} />
+          ))}
+        </section>
+      ) : null}
 
       {loading ? (
-        <LoadingSpinner />
+        <PublicLoading />
       ) : categorySections.length ? (
-        <section className="space-y-6">
+        <section className="space-y-5">
           {categorySections.map((section) => {
-            const categoryName = getLocalizedField(section.category, { ar: 'name_ar', en: 'name_en' }, language, isArabic ? 'خدمات عامة' : 'General services')
-            const categoryDescription = getLocalizedField(
-              section.category,
-              { ar: 'description_ar', en: 'description_en' },
-              language,
-              isArabic ? 'خدمات مرتبة داخل هذا التصنيف لتسهيل الوصول.' : 'Services are grouped here to make browsing easier.',
-            )
+            const categoryName = getCategoryName(section.category, language, isArabic ? 'خدمات عامة' : 'General services')
+            const categoryDescription = getCategoryDescription(section.category, language, isArabic ? 'خدمات مرتبة داخل هذا التصنيف لتسهيل الوصول.' : 'Services grouped here to make browsing easier.')
 
             return (
-              <article key={section.slug} className="glass-panel overflow-hidden p-0">
-                <div className="border-b border-border bg-slate-50/70 p-6 sm:p-7">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="max-w-3xl">
-                      <p className="text-sm font-bold text-brand-700">{isArabic ? 'تصنيف الخدمات' : 'Service category'}</p>
-                      <h3 className="mt-2 text-2xl font-extrabold text-ink sm:text-3xl">{categoryName}</h3>
-                      <p className="mt-3 text-sm leading-7 text-slate-600">{categoryDescription}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-soft">
-                        {section.services.length} {isArabic ? 'خدمة' : 'services'}
-                      </span>
-                      <button className="btn-secondary px-4 py-2 text-sm" onClick={() => handleCategorySelect(section.slug)} type="button">
-                        {activeCategory === section.slug ? (isArabic ? 'فتح كل التصنيفات' : 'Show all categories') : isArabic ? 'عرض هذا التصنيف فقط' : 'Focus on this category'}
-                      </button>
-                    </div>
+              <PublicPanel key={section.slug}>
+                <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'تصنيف الخدمات' : 'Service category'}</p>
+                    <h2 className="mt-1 text-2xl font-extrabold text-white">{categoryName}</h2>
+                    <p className="mt-2 max-w-3xl text-sm font-semibold leading-7 text-white/50">{categoryDescription}</p>
                   </div>
+                  <span className="w-fit rounded-md border border-white/10 bg-white/10 px-4 py-2 text-sm font-bold text-white/75">
+                    {section.services.length} {isArabic ? 'خدمة' : 'services'}
+                  </span>
                 </div>
-
-                <div className="p-6 sm:p-7">
-                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {section.services.map((service) => (
-                      <ServiceCard key={service.id} service={service} />
-                    ))}
-                  </div>
+                <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {section.services.map((service) => <ServiceCard key={service.id} service={service} />)}
                 </div>
-              </article>
+              </PublicPanel>
             )
           })}
         </section>
       ) : (
-        <div className="glass-panel p-8 text-center">
-          <p className="text-lg font-bold text-ink">{isArabic ? 'لا توجد نتائج مطابقة' : 'No matching results'}</p>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            {isArabic
-              ? 'جرّب تصنيفاً آخر أو عدّل عبارة البحث للوصول إلى الخدمة المناسبة.'
-              : 'Try another category or adjust the search phrase to find the right service.'}
-          </p>
-        </div>
+        <PublicEmptyState
+          icon={Search}
+          title={isArabic ? 'لا توجد نتائج مطابقة' : 'No matching results'}
+          description={isArabic ? 'جرّب تصنيفاً آخر أو عدّل عبارة البحث للوصول إلى الخدمة المناسبة.' : 'Try another category or adjust the search phrase.'}
+        />
       )}
-    </div>
+    </PublicPageShell>
   )
 }
 

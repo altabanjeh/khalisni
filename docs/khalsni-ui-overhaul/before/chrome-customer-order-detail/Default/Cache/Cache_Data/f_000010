@@ -1,0 +1,218 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/public/ResetPasswordPage.jsx");const useState = __vite__cjsImport0_react["useState"];const _jsxDEV = __vite__cjsImport6_react_jsxDevRuntime["jsxDEV"];import __vite__cjsImport0_react from "/node_modules/.vite/deps/react.js?v=64ceb9b2";
+import { useForm } from "/node_modules/.vite/deps/react-hook-form.js?v=25590acb";
+import { Link, useNavigate, useParams } from "/node_modules/.vite/deps/react-router-dom.js?v=6a5bb7d2";
+import { api } from "/src/api/services.js";
+import { getDisplayError } from "/src/api/client.js";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+var _jsxFileName = "D:/ghassan/frontend/src/pages/public/ResetPasswordPage.jsx";
+import __vite__cjsImport6_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=64ceb9b2";
+var _s = $RefreshSig$();
+function ResetPasswordPage() {
+	_s();
+	const navigate = useNavigate();
+	const { token = "" } = useParams();
+	const { isArabic } = useLanguage();
+	const [error, setError] = useState("");
+	const { register, handleSubmit, setError: setFieldError, formState: { errors, isSubmitting } } = useForm({ defaultValues: {
+		new_password: "",
+		confirm_new_password: ""
+	} });
+	async function onSubmit(values) {
+		setError("");
+		try {
+			await api.resetPassword(token, values);
+			navigate("/login?reset=1", { replace: true });
+		} catch (submitError) {
+			const fieldErrors = submitError?.fieldErrors || {};
+			let hasFieldErrors = false;
+			Object.entries(fieldErrors).forEach(([fieldName, messages]) => {
+				if (!messages?.length) return;
+				hasFieldErrors = true;
+				setFieldError(fieldName, {
+					type: "server",
+					message: messages[0]
+				});
+			});
+			if (!hasFieldErrors) {
+				setError(getDisplayError(submitError));
+			}
+		}
+	}
+	return /* @__PURE__ */ _jsxDEV("div", {
+		className: "mx-auto max-w-xl glass-panel p-6",
+		children: [
+			/* @__PURE__ */ _jsxDEV("p", {
+				className: "text-sm font-bold text-brand-600",
+				children: isArabic ? "تعيين كلمة مرور جديدة" : "Reset password"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 48,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("h1", {
+				className: "mt-2 text-3xl font-extrabold text-ink",
+				children: isArabic ? "اختر كلمة مرور جديدة" : "Choose a new password"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 49,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("p", {
+				className: "mt-4 text-sm leading-7 text-slate-600",
+				children: isArabic ? "أدخل كلمة المرور الجديدة مرتين. سيتم استخدام الرابط مرة واحدة فقط وينتهي خلال 30 دقيقة." : "Enter your new password twice. The reset link can only be used once and expires after 30 minutes."
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 50,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("form", {
+				className: "mt-8 space-y-4",
+				onSubmit: handleSubmit(onSubmit),
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "كلمة المرور الجديدة" : "New password"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 58,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							autoComplete: "new-password",
+							className: "field",
+							type: "password",
+							...register("new_password", { required: isArabic ? "كلمة المرور الجديدة مطلوبة" : "New password is required" })
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 59,
+							columnNumber: 11
+						}, this),
+						errors.new_password ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.new_password.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 67,
+							columnNumber: 34
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 57,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", { children: [
+						/* @__PURE__ */ _jsxDEV("label", {
+							className: "mb-2 block text-sm font-semibold",
+							children: isArabic ? "تأكيد كلمة المرور الجديدة" : "Confirm new password"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 70,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("input", {
+							autoComplete: "new-password",
+							className: "field",
+							type: "password",
+							...register("confirm_new_password", { required: isArabic ? "تأكيد كلمة المرور مطلوب" : "Password confirmation is required" })
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 71,
+							columnNumber: 11
+						}, this),
+						errors.confirm_new_password ? /* @__PURE__ */ _jsxDEV("p", {
+							className: "mt-2 text-sm text-danger",
+							children: errors.confirm_new_password.message
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 79,
+							columnNumber: 42
+						}, this) : null
+					] }, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 69,
+						columnNumber: 9
+					}, this),
+					error ? /* @__PURE__ */ _jsxDEV("p", {
+						className: "text-sm text-danger",
+						children: error
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 81,
+						columnNumber: 18
+					}, this) : null,
+					/* @__PURE__ */ _jsxDEV("button", {
+						className: "btn-primary w-full",
+						disabled: isSubmitting,
+						type: "submit",
+						children: isSubmitting ? isArabic ? "جارٍ إعادة التعيين..." : "Resetting..." : isArabic ? "إعادة تعيين كلمة المرور" : "Reset password"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 82,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("p", {
+						className: "text-center text-sm text-slate-600",
+						children: /* @__PURE__ */ _jsxDEV(Link, {
+							className: "font-semibold text-brand-700 hover:text-brand-800",
+							to: "/login",
+							children: isArabic ? "العودة إلى تسجيل الدخول" : "Back to sign in"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 86,
+							columnNumber: 11
+						}, this)
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 85,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 56,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 47,
+		columnNumber: 5
+	}, this);
+}
+_s(ResetPasswordPage, "Nyg0JooC7U6d+i7T3PQ2Y7C2OF4=", false, function() {
+	return [
+		useNavigate,
+		useParams,
+		useLanguage,
+		useForm
+	];
+});
+_c = ResetPasswordPage;
+export default ResetPasswordPage;
+var _c;
+$RefreshReg$(_c, "ResetPasswordPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/src/pages/public/ResetPasswordPage.jsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("D:/ghassan/frontend/src/pages/public/ResetPasswordPage.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("D:/ghassan/frontend/src/pages/public/ResetPasswordPage.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "D:/ghassan/frontend/src/pages/public/ResetPasswordPage.jsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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Ozs7O0VBRVQ7O0FBRUQsZUFBZSIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJSZXNldFBhc3N3b3JkUGFnZS5qc3giXSwidmVyc2lvbiI6Mywic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCdcbmltcG9ydCB7IHVzZUZvcm0gfSBmcm9tICdyZWFjdC1ob29rLWZvcm0nXG5pbXBvcnQgeyBMaW5rLCB1c2VOYXZpZ2F0ZSwgdXNlUGFyYW1zIH0gZnJvbSAncmVhY3Qtcm91dGVyLWRvbSdcbmltcG9ydCB7IGFwaSB9IGZyb20gJy4uLy4uL2FwaS9zZXJ2aWNlcydcbmltcG9ydCB7IGdldERpc3BsYXlFcnJvciB9IGZyb20gJy4uLy4uL2FwaS9jbGllbnQnXG5pbXBvcnQgeyB1c2VMYW5ndWFnZSB9IGZyb20gJy4uLy4uL2NvbnRleHQvTGFuZ3VhZ2VDb250ZXh0J1xuXG5mdW5jdGlvbiBSZXNldFBhc3N3b3JkUGFnZSgpIHtcbiAgY29uc3QgbmF2aWdhdGUgPSB1c2VOYXZpZ2F0ZSgpXG4gIGNvbnN0IHsgdG9rZW4gPSAnJyB9ID0gdXNlUGFyYW1zKClcbiAgY29uc3QgeyBpc0FyYWJpYyB9ID0gdXNlTGFuZ3VhZ2UoKVxuICBjb25zdCBbZXJyb3IsIHNldEVycm9yXSA9IHVzZVN0YXRlKCcnKVxuICBjb25zdCB7XG4gICAgcmVnaXN0ZXIsXG4gICAgaGFuZGxlU3VibWl0LFxuICAgIHNldEVycm9yOiBzZXRGaWVsZEVycm9yLFxuICAgIGZvcm1TdGF0ZTogeyBlcnJvcnMsIGlzU3VibWl0dGluZyB9LFxuICB9ID0gdXNlRm9ybSh7XG4gICAgZGVmYXVsdFZhbHVlczoge1xuICAgICAgbmV3X3Bhc3N3b3JkOiAnJyxcbiAgICAgIGNvbmZpcm1fbmV3X3Bhc3N3b3JkOiAnJyxcbiAgICB9LFxuICB9KVxuXG4gIGFzeW5jIGZ1bmN0aW9uIG9uU3VibWl0KHZhbHVlcykge1xuICAgIHNldEVycm9yKCcnKVxuICAgIHRyeSB7XG4gICAgICBhd2FpdCBhcGkucmVzZXRQYXNzd29yZCh0b2tlbiwgdmFsdWVzKVxuICAgICAgbmF2aWdhdGUoJy9sb2dpbj9yZXNldD0xJywgeyByZXBsYWNlOiB0cnVlIH0pXG4gICAgfSBjYXRjaCAoc3VibWl0RXJyb3IpIHtcbiAgICAgIGNvbnN0IGZpZWxkRXJyb3JzID0gc3VibWl0RXJyb3I/LmZpZWxkRXJyb3JzIHx8IHt9XG4gICAgICBsZXQgaGFzRmllbGRFcnJvcnMgPSBmYWxzZVxuXG4gICAgICBPYmplY3QuZW50cmllcyhmaWVsZEVycm9ycykuZm9yRWFjaCgoW2ZpZWxkTmFtZSwgbWVzc2FnZXNdKSA9PiB7XG4gICAgICAgIGlmICghbWVzc2FnZXM/Lmxlbmd0aCkgcmV0dXJuXG4gICAgICAgIGhhc0ZpZWxkRXJyb3JzID0gdHJ1ZVxuICAgICAgICBzZXRGaWVsZEVycm9yKGZpZWxkTmFtZSwgeyB0eXBlOiAnc2VydmVyJywgbWVzc2FnZTogbWVzc2FnZXNbMF0gfSlcbiAgICAgIH0pXG5cbiAgICAgIGlmICghaGFzRmllbGRFcnJvcnMpIHtcbiAgICAgICAgc2V0RXJyb3IoZ2V0RGlzcGxheUVycm9yKHN1Ym1pdEVycm9yKSlcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwibXgtYXV0byBtYXgtdy14bCBnbGFzcy1wYW5lbCBwLTZcIj5cbiAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1ib2xkIHRleHQtYnJhbmQtNjAwXCI+e2lzQXJhYmljID8gJ9iq2LnZitmK2YYg2YPZhNmF2Kkg2YXYsdmI2LEg2KzYr9mK2K/YqScgOiAnUmVzZXQgcGFzc3dvcmQnfTwvcD5cbiAgICAgIDxoMSBjbGFzc05hbWU9XCJtdC0yIHRleHQtM3hsIGZvbnQtZXh0cmFib2xkIHRleHQtaW5rXCI+e2lzQXJhYmljID8gJ9in2K7YqtixINmD2YTZhdipINmF2LHZiNixINis2K/Zitiv2KknIDogJ0Nob29zZSBhIG5ldyBwYXNzd29yZCd9PC9oMT5cbiAgICAgIDxwIGNsYXNzTmFtZT1cIm10LTQgdGV4dC1zbSBsZWFkaW5nLTcgdGV4dC1zbGF0ZS02MDBcIj5cbiAgICAgICAge2lzQXJhYmljXG4gICAgICAgICAgPyAn2KPYr9iu2YQg2YPZhNmF2Kkg2KfZhNmF2LHZiNixINin2YTYrNiv2YrYr9ipINmF2LHYqtmK2YYuINiz2YrYqtmFINin2LPYqtiu2K/Yp9mFINin2YTYsdin2KjYtyDZhdix2Kkg2YjYp9it2K/YqSDZgdmC2Lcg2YjZitmG2KrZh9mKINiu2YTYp9mEIDMwINiv2YLZitmC2KkuJ1xuICAgICAgICAgIDogJ0VudGVyIHlvdXIgbmV3IHBhc3N3b3JkIHR3aWNlLiBUaGUgcmVzZXQgbGluayBjYW4gb25seSBiZSB1c2VkIG9uY2UgYW5kIGV4cGlyZXMgYWZ0ZXIgMzAgbWludXRlcy4nfVxuICAgICAgPC9wPlxuXG4gICAgICA8Zm9ybSBjbGFzc05hbWU9XCJtdC04IHNwYWNlLXktNFwiIG9uU3VibWl0PXtoYW5kbGVTdWJtaXQob25TdWJtaXQpfT5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwibWItMiBibG9jayB0ZXh0LXNtIGZvbnQtc2VtaWJvbGRcIj57aXNBcmFiaWMgPyAn2YPZhNmF2Kkg2KfZhNmF2LHZiNixINin2YTYrNiv2YrYr9ipJyA6ICdOZXcgcGFzc3dvcmQnfTwvbGFiZWw+XG4gICAgICAgICAgPGlucHV0XG4gICAgICAgICAgICBhdXRvQ29tcGxldGU9XCJuZXctcGFzc3dvcmRcIlxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiZmllbGRcIlxuICAgICAgICAgICAgdHlwZT1cInBhc3N3b3JkXCJcbiAgICAgICAgICAgIHsuLi5yZWdpc3RlcignbmV3X3Bhc3N3b3JkJywge1xuICAgICAgICAgICAgICByZXF1aXJlZDogaXNBcmFiaWMgPyAn2YPZhNmF2Kkg2KfZhNmF2LHZiNixINin2YTYrNiv2YrYr9ipINmF2LfZhNmI2KjYqScgOiAnTmV3IHBhc3N3b3JkIGlzIHJlcXVpcmVkJyxcbiAgICAgICAgICAgIH0pfVxuICAgICAgICAgIC8+XG4gICAgICAgICAge2Vycm9ycy5uZXdfcGFzc3dvcmQgPyA8cCBjbGFzc05hbWU9XCJtdC0yIHRleHQtc20gdGV4dC1kYW5nZXJcIj57ZXJyb3JzLm5ld19wYXNzd29yZC5tZXNzYWdlfTwvcD4gOiBudWxsfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwibWItMiBibG9jayB0ZXh0LXNtIGZvbnQtc2VtaWJvbGRcIj57aXNBcmFiaWMgPyAn2KrYo9mD2YrYryDZg9mE2YXYqSDYp9mE2YXYsdmI2LEg2KfZhNis2K/Zitiv2KknIDogJ0NvbmZpcm0gbmV3IHBhc3N3b3JkJ308L2xhYmVsPlxuICAgICAgICAgIDxpbnB1dFxuICAgICAgICAgICAgYXV0b0NvbXBsZXRlPVwibmV3LXBhc3N3b3JkXCJcbiAgICAgICAgICAgIGNsYXNzTmFtZT1cImZpZWxkXCJcbiAgICAgICAgICAgIHR5cGU9XCJwYXNzd29yZFwiXG4gICAgICAgICAgICB7Li4ucmVnaXN0ZXIoJ2NvbmZpcm1fbmV3X3Bhc3N3b3JkJywge1xuICAgICAgICAgICAgICByZXF1aXJlZDogaXNBcmFiaWMgPyAn2KrYo9mD2YrYryDZg9mE2YXYqSDYp9mE2YXYsdmI2LEg2YXYt9mE2YjYqCcgOiAnUGFzc3dvcmQgY29uZmlybWF0aW9uIGlzIHJlcXVpcmVkJyxcbiAgICAgICAgICAgIH0pfVxuICAgICAgICAgIC8+XG4gICAgICAgICAge2Vycm9ycy5jb25maXJtX25ld19wYXNzd29yZCA/IDxwIGNsYXNzTmFtZT1cIm10LTIgdGV4dC1zbSB0ZXh0LWRhbmdlclwiPntlcnJvcnMuY29uZmlybV9uZXdfcGFzc3dvcmQubWVzc2FnZX08L3A+IDogbnVsbH1cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIHtlcnJvciA/IDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1kYW5nZXJcIj57ZXJyb3J9PC9wPiA6IG51bGx9XG4gICAgICAgIDxidXR0b24gY2xhc3NOYW1lPVwiYnRuLXByaW1hcnkgdy1mdWxsXCIgZGlzYWJsZWQ9e2lzU3VibWl0dGluZ30gdHlwZT1cInN1Ym1pdFwiPlxuICAgICAgICAgIHtpc1N1Ym1pdHRpbmcgPyAoaXNBcmFiaWMgPyAn2KzYp9ix2Y0g2KXYudin2K/YqSDYp9mE2KrYudmK2YrZhi4uLicgOiAnUmVzZXR0aW5nLi4uJykgOiBpc0FyYWJpYyA/ICfYpdi52KfYr9ipINiq2LnZitmK2YYg2YPZhNmF2Kkg2KfZhNmF2LHZiNixJyA6ICdSZXNldCBwYXNzd29yZCd9XG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciB0ZXh0LXNtIHRleHQtc2xhdGUtNjAwXCI+XG4gICAgICAgICAgPExpbmsgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB0ZXh0LWJyYW5kLTcwMCBob3Zlcjp0ZXh0LWJyYW5kLTgwMFwiIHRvPVwiL2xvZ2luXCI+XG4gICAgICAgICAgICB7aXNBcmFiaWMgPyAn2KfZhNi52YjYr9ipINil2YTZiSDYqtiz2KzZitmEINin2YTYr9iu2YjZhCcgOiAnQmFjayB0byBzaWduIGluJ31cbiAgICAgICAgICA8L0xpbms+XG4gICAgICAgIDwvcD5cbiAgICAgIDwvZm9ybT5cbiAgICA8L2Rpdj5cbiAgKVxufVxuXG5leHBvcnQgZGVmYXVsdCBSZXNldFBhc3N3b3JkUGFnZVxuIl19

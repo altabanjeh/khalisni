@@ -12,11 +12,9 @@ const PAGE_SIZE = 15
 
 function SummaryCard({ icon: Icon, label, value }) {
   return (
-    <div className="glass-panel p-5">
+    <div className="rounded-[2rem] border border-border bg-white p-5 shadow-soft">
       <div className="flex items-center gap-3">
-        <span className="icon-chip">
-          <Icon className="h-5 w-5" />
-        </span>
+        <span className="icon-chip"><Icon className="h-5 w-5" /></span>
         <div>
           <p className="text-sm text-slate-500">{label}</p>
           <p className="mt-1 text-2xl font-extrabold text-ink">{value}</p>
@@ -68,7 +66,7 @@ function MyOrdersPage() {
       label: 'الإجراء',
       render: (row) => (
         <Link className="btn-secondary px-4 py-2 text-xs" to={`/customer/orders/${row.id}`}>
-          عرض التفاصيل
+          فتح مساحة الطلب
         </Link>
       ),
     },
@@ -77,10 +75,11 @@ function MyOrdersPage() {
   return (
     <div className="page-section">
       <PageHeader
-        description="تابع كل طلباتك الحالية من مكان واحد، وابحث بسرعة عن أي طلب للوصول إلى المستندات والحالة والخطوات المطلوبة منك."
+        description="قائمة أوضح لكل طلباتك مع بحث سريع، حالة مرئية، وبطاقات مريحة على الهاتف."
         eyebrow="العميل"
         icon={ClipboardList}
         title="طلباتي"
+        actions={<Link className="btn-primary" to="/customer/orders/new">طلب جديد</Link>}
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -90,42 +89,46 @@ function MyOrdersPage() {
         <SummaryCard icon={Wallet} label="طلبات مكتملة" value={summary.completed} />
       </div>
 
+      <section className="rounded-[2rem] border border-border bg-white p-5 shadow-soft">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              className="field pr-9"
+              onChange={handleSearch}
+              placeholder="ابحث برقم الطلب أو اسم الخدمة"
+              value={query}
+            />
+          </div>
+          <div className="rounded-xl border border-border bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+            {total} طلب {query.trim() ? 'مطابق للبحث' : 'في السجل'}
+          </div>
+        </div>
+      </section>
+
       <DataTable
         columns={columns}
         emptyDescription="يمكنك إنشاء طلب جديد من شاشة الخدمات أو تعديل البحث الحالي."
         emptyTitle="لا توجد طلبات مطابقة"
         loading={loading}
         mobileCard={(row) => (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold text-ink">{row.order_number}</p>
               <StatusBadge status={row.status} />
             </div>
             <p className="text-sm text-slate-600">{row.service?.name_ar || 'غير محددة'}</p>
-            <p className="text-sm text-slate-500">التسليم المتوقع: {formatDate(row.expected_delivery_date)}</p>
-            <Link className="btn-secondary w-full" to={`/customer/orders/${row.id}`}>
-              عرض التفاصيل
+            <div className="grid gap-2 text-sm text-slate-500">
+              <span>تاريخ الطلب: {formatDate(row.created_at)}</span>
+              <span>التسليم المتوقع: {formatDate(row.expected_delivery_date)}</span>
+            </div>
+            <Link className="btn-primary w-full" to={`/customer/orders/${row.id}`}>
+              فتح مساحة الطلب
             </Link>
           </div>
         )}
         pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
         rows={paginated}
-        toolbar={
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                className="field pr-9"
-                onChange={handleSearch}
-                placeholder="ابحث برقم الطلب أو اسم الخدمة"
-                value={query}
-              />
-            </div>
-            <div className="rounded-2xl border border-border bg-white px-4 py-3 text-sm text-slate-500">
-              {total} طلب {query.trim() ? 'مطابق للبحث' : 'في السجل'}
-            </div>
-          </div>
-        }
       />
     </div>
   )

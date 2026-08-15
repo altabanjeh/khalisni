@@ -1,9 +1,10 @@
 function PageHeader({ icon: Icon, eyebrow, title, description, badge, actions }) {
   return (
-    <header className="glass-panel flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-start lg:justify-between">
+    <header className="rounded-[2rem] border border-border bg-white p-5 shadow-soft sm:p-6">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
       <div className="flex items-start gap-4">
         {Icon ? (
-          <span className="icon-chip">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
             <Icon className="h-5 w-5" />
           </span>
         ) : null}
@@ -17,6 +18,7 @@ function PageHeader({ icon: Icon, eyebrow, title, description, badge, actions })
         </div>
       </div>
       {actions ? <div className="flex w-full flex-wrap items-center gap-3 self-start lg:w-auto lg:self-center">{actions}</div> : null}
+      </div>
     </header>
   )
 }

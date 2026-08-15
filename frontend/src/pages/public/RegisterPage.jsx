@@ -1,8 +1,16 @@
+import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { api } from '../../api/services'
+import {
+  PublicButton,
+  PublicHero,
+  PublicInput,
+  PublicPageShell,
+  PublicPanel,
+} from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
+import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 
 function getSafeNextPath(value) {
@@ -36,12 +44,8 @@ function RegisterPage() {
       const createdUser = await api.register(values)
       const loginParams = new URLSearchParams()
       loginParams.set('registered', '1')
-      if (nextPath) {
-        loginParams.set('next', nextPath)
-      }
-      if (createdUser?.email) {
-        loginParams.set('email', createdUser.email)
-      }
+      if (nextPath) loginParams.set('next', nextPath)
+      if (createdUser?.email) loginParams.set('email', createdUser.email)
       navigate(`/login?${loginParams.toString()}`, { replace: true })
     } catch (submitError) {
       const fieldErrors = submitError?.fieldErrors || {}
@@ -53,82 +57,84 @@ function RegisterPage() {
         setFieldError(fieldName, { type: 'server', message: messages[0] })
       })
 
-      if (!hasFieldErrors) {
-        setError(getDisplayError(submitError))
-      }
+      if (!hasFieldErrors) setError(getDisplayError(submitError))
     }
   }
 
+  function fieldError(name) {
+    return errors[name] ? <p className="mt-2 text-sm font-semibold text-red-200">{errors[name].message}</p> : null
+  }
+
   return (
-    <div className="mx-auto max-w-2xl glass-panel p-6">
-      <p className="text-sm font-bold text-brand-600">{isArabic ? 'إنشاء حساب عميل' : 'Create a customer account'}</p>
-      <h1 className="mt-2 text-3xl font-extrabold text-ink">{isArabic ? 'أنشئ حسابك قبل طلب الخدمة' : 'Create your account before requesting a service'}</h1>
-      <p className="mt-4 text-sm leading-7 text-slate-600">
-        {isArabic
-          ? 'يجب إنشاء حساب عميل أولاً، ثم تسجيل الدخول، وبعدها يمكنك إرسال الطلب ومتابعته من لوحة العميل.'
-          : 'Create a customer account first, then sign in to submit and track your request from the customer dashboard.'}
-      </p>
+    <PublicPageShell>
+      <PublicHero
+        eyebrow={isArabic ? 'إنشاء حساب عميل' : 'Create a customer account'}
+        icon={UserPlus}
+        title={isArabic ? 'أنشئ حسابك قبل طلب الخدمة' : 'Create your account before requesting a service'}
+        description={isArabic ? 'بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.' : 'After creating an account, you can submit requests, upload documents, and track progress from the customer portal.'}
+      />
 
-      <form className="mt-8 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
-        <div className="md:col-span-2">
-          <label htmlFor="reg-full-name" className="mb-2 block text-sm font-semibold">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
-          <input id="reg-full-name" className="field" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
-          {errors.full_name ? <p className="mt-2 text-sm text-danger">{errors.full_name.message}</p> : null}
-        </div>
+      <PublicPanel className="mx-auto max-w-4xl">
+        <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
+          <div className="md:col-span-2">
+            <label htmlFor="reg-full-name" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
+            <PublicInput id="reg-full-name" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
+            {fieldError('full_name')}
+          </div>
 
-        <div>
-          <label htmlFor="reg-phone" className="mb-2 block text-sm font-semibold">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
-          <input id="reg-phone" className="field" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
-          {errors.phone ? <p className="mt-2 text-sm text-danger">{errors.phone.message}</p> : null}
-        </div>
+          <div>
+            <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
+            <PublicInput id="reg-phone" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
+            {fieldError('phone')}
+          </div>
 
-        <div>
-          <label htmlFor="reg-email" className="mb-2 block text-sm font-semibold">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
-          <input id="reg-email" className="field" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
-          {errors.email ? <p className="mt-2 text-sm text-danger">{errors.email.message}</p> : null}
-        </div>
+          <div>
+            <label htmlFor="reg-email" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
+            <PublicInput id="reg-email" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
+            {fieldError('email')}
+          </div>
 
-        <div>
-          <label htmlFor="reg-national-id" className="mb-2 block text-sm font-semibold">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
-          <input id="reg-national-id" className="field" {...register('national_id')} />
-          {errors.national_id ? <p className="mt-2 text-sm text-danger">{errors.national_id.message}</p> : null}
-        </div>
+          <div>
+            <label htmlFor="reg-national-id" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
+            <PublicInput id="reg-national-id" {...register('national_id')} />
+            {fieldError('national_id')}
+          </div>
 
-        <div>
-          <label htmlFor="reg-password" className="mb-2 block text-sm font-semibold">{isArabic ? 'كلمة المرور' : 'Password'}</label>
-          <input
-            id="reg-password"
-            className="field"
-            type="password"
-            {...register('password', {
-              required: isArabic ? 'كلمة المرور مطلوبة' : 'Password is required',
-              minLength: {
-                value: 8,
-                message: isArabic ? 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' : 'Password must be at least 8 characters',
-              },
-            })}
-          />
-          {errors.password ? <p className="mt-2 text-sm text-danger">{errors.password.message}</p> : null}
-        </div>
+          <div>
+            <label htmlFor="reg-password" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'كلمة المرور' : 'Password'}</label>
+            <PublicInput
+              id="reg-password"
+              type="password"
+              {...register('password', {
+                required: isArabic ? 'كلمة المرور مطلوبة' : 'Password is required',
+                minLength: {
+                  value: 8,
+                  message: isArabic ? 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' : 'Password must be at least 8 characters',
+                },
+              })}
+            />
+            {fieldError('password')}
+          </div>
 
-        {error ? <p className="md:col-span-2 text-sm text-danger">{error}</p> : null}
+          {error ? <p className="text-sm font-semibold text-red-200 md:col-span-2">{error}</p> : null}
 
-        <div className="md:col-span-2 space-y-3">
-          <button className="btn-primary w-full" disabled={isSubmitting} type="submit">
-            {isSubmitting ? (isArabic ? 'جارٍ إنشاء الحساب...' : 'Creating account...') : isArabic ? 'إنشاء الحساب' : 'Create account'}
-          </button>
-          <p className="text-center text-sm text-slate-600">
-            {isArabic ? 'لديك حساب بالفعل؟' : 'Already have an account?'}{' '}
-            <Link
-              className="font-semibold text-brand-700 hover:text-brand-800"
-              to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login'}
-            >
-              {isArabic ? 'سجل الدخول' : 'Sign in'}
-            </Link>
-          </p>
-        </div>
-      </form>
-    </div>
+          <div className="md:col-span-2 space-y-3">
+            <PublicButton className="w-full" disabled={isSubmitting} type="submit">
+              {isSubmitting ? (isArabic ? 'جار إنشاء الحساب...' : 'Creating account...') : isArabic ? 'إنشاء الحساب' : 'Create account'}
+            </PublicButton>
+            <p className="text-center text-sm font-semibold text-white/50">
+              {isArabic ? 'لديك حساب بالفعل؟' : 'Already have an account?'}{' '}
+              <Link
+                className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"
+                to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login'}
+              >
+                {isArabic ? 'سجل الدخول' : 'Sign in'}
+              </Link>
+            </p>
+          </div>
+        </form>
+      </PublicPanel>
+    </PublicPageShell>
   )
 }
 

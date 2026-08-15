@@ -8,7 +8,6 @@ import FileUploader from '../../components/FileUploader'
 import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
-import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
@@ -28,7 +27,7 @@ import {
 
 function MetricCard({ label, value }) {
   return (
-    <div className="panel-muted p-4">
+    <div className="rounded-[var(--radius)] border border-border bg-slate-50 p-4">
       <p className="text-xs text-slate-500">{label}</p>
       <p className="mt-2 font-bold text-ink">{value}</p>
     </div>
@@ -37,15 +36,15 @@ function MetricCard({ label, value }) {
 
 function SectionCard({ icon: Icon, title, description, children }) {
   return (
-    <section className="glass-panel p-6">
+    <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
       <div className="flex items-start gap-3">
         {Icon ? (
           <span className="icon-chip">
             <Icon className="h-5 w-5" />
           </span>
         ) : null}
-        <div>
-          <h2 className="text-xl font-bold text-ink">{title}</h2>
+        <div className="min-w-0">
+          <h2 className="text-2xl font-extrabold text-ink">{title}</h2>
           {description ? <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p> : null}
         </div>
       </div>
@@ -125,13 +124,21 @@ function CustomerOrderDetailsPage() {
 
   return (
     <div className="page-section">
-      <PageHeader
-        badge={<StatusBadge status={order.status} />}
-        description="عرض واضح لحالة الطلب الحالية، الوثائق المرفوعة، والخطوات التي تحتاج إلى تنفيذها من جهتك."
-        eyebrow="تفاصيل الطلب"
-        icon={FileText}
-        title={order.order_number}
-      />
+      <section className="rounded-[2rem] bg-[#0A2A66] p-6 text-white shadow-panel sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-bold">مساحة الطلب</p>
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight">{order.order_number}</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
+              {order.service?.name_ar || 'خدمة غير محددة'} · {order.city || 'مدينة غير محددة'}
+            </p>
+          </div>
+          <div className="rounded-[var(--radius)] bg-white p-4 text-ink shadow-soft">
+            <p className="mb-3 text-xs font-bold text-slate-500">الحالة الحالية</p>
+            <StatusBadge status={order.status} />
+          </div>
+        </div>
+      </section>
 
       {allowedActions.can_view_missing_documents_form ? (
         <div className="glass-panel border-amber-200 bg-amber-50 p-5">
@@ -149,7 +156,7 @@ function CustomerOrderDetailsPage() {
         </div>
       ) : null}
 
-      <section className="glass-panel p-6">
+      <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard label="الخدمة" value={order.service?.name_ar || 'غير محددة'} />
           <MetricCard label="المدينة" value={order.city || 'غير محددة'} />
@@ -158,7 +165,7 @@ function CustomerOrderDetailsPage() {
         </div>
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.7fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
         <div className="space-y-6">
           <SectionCard
             icon={FileText}

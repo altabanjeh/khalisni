@@ -29,7 +29,7 @@ function DataTable({
   rowClassName,
   mobileCardClassName,
 }) {
-  const { t } = useLanguage()
+  const { direction, t } = useLanguage()
   const [isTableLayout, setIsTableLayout] = useState(() =>
     typeof window === 'undefined' || !window.matchMedia
       ? true
@@ -69,7 +69,7 @@ function DataTable({
   return (
     <div className="space-y-4">
       {toolbar ? (
-        <div className="glass-panel flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="rounded-[2rem] border border-border bg-white p-4 shadow-soft lg:flex lg:items-center lg:justify-between lg:gap-4">
           <div className="text-sm text-slate-500">
             {loading
               ? t('common.loadingData', 'جارٍ تحميل البيانات...')
@@ -109,13 +109,13 @@ function DataTable({
           ) : null}
 
           {isTableLayout ? (
-            <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-white shadow-soft" role="region">
+            <div className="overflow-hidden rounded-[2rem] border border-border bg-white shadow-soft" dir={direction} role="region">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border text-sm">
-                  <thead className="bg-brand-50">
+                  <thead className="bg-slate-50">
                     <tr>
                       {columns.map((column) => (
-                        <th key={column.key} className="px-4 py-3 text-right font-bold text-ink">
+                        <th key={column.key} className="px-4 py-3 text-start font-bold text-ink">
                           {column.label}
                         </th>
                       ))}

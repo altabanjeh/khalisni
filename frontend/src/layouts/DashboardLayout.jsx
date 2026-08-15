@@ -7,8 +7,9 @@ function DashboardLayout({ title, links }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   return (
-    <div className="container-shell py-3 sm:py-4 lg:py-6">
-      <div className="grid items-start gap-4 lg:gap-6 xl:grid-cols-[290px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[#F7F9FC]">
+      <div className="container-shell py-3 sm:py-4 lg:py-6">
+        <div className="grid items-start gap-4 lg:gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
         <Sidebar
           isOpen={mobileSidebarOpen}
           links={links}
@@ -20,6 +21,7 @@ function DashboardLayout({ title, links }) {
           <div className="min-w-0 space-y-4 lg:space-y-6">
             <Outlet />
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -423,7 +423,8 @@ export function secureAdminDelete(url, config = {}) {
     ...(config.data || {}),
     delete_password: deletePassword,
   }
-  const { deletePassword: _deletePassword, ...rest } = config
+  const rest = { ...config }
+  delete rest.deletePassword
   return request({ ...rest, method: 'delete', url, data })
 }
 

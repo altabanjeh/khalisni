@@ -1,29 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --khalsni-blue: #0b67b2;
-  --khalsni-navy: #0f3554;
-  --background: #f4faff;
-  --card: #ffffff;
-  --border: #d7e7f5;
-  --accent: #eaf6ff;
-  --muted: #64748b;
-  --success: #16a34a;
-  --warning: #f59e0b;
-  --danger: #dc2626;
-  --radius: 1rem;
-  --public-primary-color: #0b67b2;
-  --public-secondary-color: #147fd1;
-  --public-background-color: #f4faff;
-  --public-text-color: #0f3554;
+  --kh-bg: #fbfcfd;
+  --kh-surface: #ffffff;
+  --kh-surface-muted: #f5f7fa;
+  --kh-soft-blue: #eef4ff;
+  --kh-primary: #0f55da;
+  --kh-primary-hover: #093ca2;
+  --kh-navy: #021e52;
+  --kh-navy-soft: #0b2d6b;
+  --kh-text: #162033;
+  --kh-text-muted: #586d93;
+  --kh-border: #dfe3ec;
+  --kh-success: #16a34a;
+  --kh-warning: #d97706;
+  --kh-danger: #dc2626;
+  --radius: 0.875rem;
+  --khalsni-blue: var(--kh-primary);
+  --khalsni-navy: var(--kh-navy);
+  --background: var(--kh-bg);
+  --card: var(--kh-surface);
+  --border: var(--kh-border);
+  --accent: var(--kh-soft-blue);
+  --muted: var(--kh-text-muted);
+  --success: var(--kh-success);
+  --warning: var(--kh-warning);
+  --danger: var(--kh-danger);
+  --public-primary-color: var(--kh-primary);
+  --public-secondary-color: var(--kh-navy-soft);
+  --public-background-color: var(--kh-bg);
+  --public-text-color: var(--kh-text);
   --public-header-background-color: #ffffff;
-  --public-footer-background-color: #0f3554;
-  --public-header-text-color: #0f3554;
+  --public-footer-background-color: var(--kh-navy);
+  --public-header-text-color: var(--kh-text);
   --public-footer-text-color: #ffffff;
+  --khalsni-public-bg: #020a1b;
+  --khalsni-public-bg-secondary: #04142d;
+  --khalsni-public-surface: #071a39;
+  --khalsni-public-surface-elevated: #0a2248;
+  --khalsni-public-primary: #1478ff;
+  --khalsni-public-primary-hover: #3d91ff;
+  --khalsni-public-text: #ffffff;
+  --khalsni-public-text-secondary: #c1ccdc;
+  --khalsni-public-text-muted: #8798b2;
+  --khalsni-public-border: rgba(127, 166, 224, 0.4);
+  --khalsni-public-overlay: rgba(2, 10, 27, 0.7);
+  --khalsni-public-container: 1480px;
+  --khalsni-public-desktop-padding: 20px;
+  --khalsni-public-mobile-padding: 12px;
+  --khalsni-radius-small: 8px;
+  --khalsni-radius-medium: 12px;
+  --khalsni-radius-large: 16px;
 }
 
 @layer base {
@@ -37,10 +66,7 @@
 
   body {
     @apply min-h-screen overflow-x-hidden bg-background font-body text-ink antialiased;
-    background-image:
-      radial-gradient(circle at top right, rgba(20, 127, 209, 0.16), transparent 24%),
-      radial-gradient(circle at bottom left, rgba(11, 103, 178, 0.1), transparent 22%),
-      linear-gradient(180deg, #f7fbff 0%, #f4faff 100%);
+    background: var(--kh-bg);
   }
 
   #root {
@@ -84,23 +110,23 @@
   }
 
   .field {
-    @apply w-full rounded-2xl border border-border bg-card px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100;
+    @apply w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-5 py-3 text-sm font-semibold text-ink transition hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-ink transition hover:border-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-brand-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-brand-50 focus:outline-none focus:ring-4 focus:ring-brand-100;
   }
 
   .section-title {
-    @apply text-2xl font-extrabold text-ink md:text-3xl;
+    @apply text-xl font-extrabold text-ink sm:text-2xl md:text-3xl;
   }
 
   .page-section {
@@ -122,14 +148,29 @@
   .public-site-shell {
     @apply min-h-screen;
     color: var(--public-text-color);
-    background:
-      radial-gradient(circle at top right, color-mix(in srgb, var(--public-secondary-color) 14%, transparent), transparent 24%),
-      radial-gradient(circle at bottom left, color-mix(in srgb, var(--public-primary-color) 12%, transparent), transparent 22%),
-      linear-gradient(180deg, color-mix(in srgb, var(--public-background-color) 92%, white) 0%, var(--public-background-color) 100%);
+    background: var(--public-background-color);
+    overflow-x: clip;
+  }
+
+  .public-site-shell * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .kh-public-container {
+    width: min(100%, var(--khalsni-public-container));
+    margin-inline: auto;
+    padding-inline: var(--khalsni-public-desktop-padding);
+  }
+
+  @media (max-width: 640px) {
+    .kh-public-container {
+      padding-inline: var(--khalsni-public-mobile-padding);
+    }
   }
 
   .public-primary-button {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition focus:outline-none focus:ring-4 focus:ring-brand-100;
     background: linear-gradient(135deg, var(--public-primary-color), var(--public-secondary-color));
   }
 
@@ -138,7 +179,7 @@
   }
 
   .public-secondary-button {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl border px-5 py-3 text-sm font-semibold transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-brand-100;
     border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.1);
     color: white;
@@ -150,7 +191,7 @@
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-danger px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-danger px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-100 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .skeleton {

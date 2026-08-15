@@ -744,7 +744,7 @@ function PublicHomepageTemplate({
               <Link
                 key={category.slug}
                 className="rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
-                to={`/services?category=${encodeURIComponent(category.slug)}`}
+                to={`/services/category/${encodeURIComponent(category.slug)}`}
               >
                 {category.name}
               </Link>

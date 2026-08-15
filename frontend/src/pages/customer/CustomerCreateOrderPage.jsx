@@ -7,6 +7,7 @@ import FileUploader from '../../components/FileUploader'
 import DynamicServiceFields from '../../components/DynamicServiceFields'
 import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import PageHeader from '../../components/PageHeader'
+import ApplicationStepper from '../../components/ApplicationStepper'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
 import { useRegisterPageHelp } from '../../context/HelpGuideContext'
@@ -216,9 +217,14 @@ function CustomerCreateOrderPage() {
         title="طلب خدمة جديد"
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <form className="glass-panel space-y-6 p-6" id="client-create-order" onSubmit={handleSubmit(onSubmit)}>
-          <section className="panel-muted p-5">
+      <ApplicationStepper
+        currentIndex={submittedOrder ? 3 : requiredDocuments.length ? 1 : 0}
+        steps={['بيانات الطلب', 'المستندات', 'المراجعة', 'التأكيد']}
+      />
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <form className="space-y-6" id="client-create-order" onSubmit={handleSubmit(onSubmit)}>
+          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
             <p className="text-sm font-bold text-brand-600">الخطوة 1</p>
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار تصنيف الخدمة</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -239,7 +245,7 @@ function CustomerCreateOrderPage() {
             </div>
           </section>
 
-          <section className="panel-muted p-5">
+          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
             <p className="text-sm font-bold text-brand-600">الخطوة 2</p>
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار الخدمة والبيانات الأساسية</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -292,7 +298,7 @@ function CustomerCreateOrderPage() {
           </section>
 
           {schemaFields.length ? (
-            <section className="panel-muted p-5">
+            <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
               <p className="text-sm font-bold text-brand-600">الخطوة 3</p>
               <h2 className="mt-1 text-xl font-bold text-ink">البيانات الإضافية المطلوبة</h2>
               <div className="mt-5">
@@ -301,7 +307,7 @@ function CustomerCreateOrderPage() {
             </section>
           ) : null}
 
-          <section className="panel-muted p-5">
+          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
             <p className="text-sm font-bold text-brand-600">{schemaFields.length ? 'الخطوة 4' : 'الخطوة 3'}</p>
             <h2 className="mt-1 text-xl font-bold text-ink">الوثائق والملاحظات</h2>
             <div className="mt-5 space-y-4">
@@ -364,8 +370,8 @@ function CustomerCreateOrderPage() {
 
         </form>
 
-        <aside className="space-y-6">
-          <div className="glass-panel p-6">
+        <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <div className="rounded-[2rem] border border-border bg-white p-6 shadow-panel">
             <p className="text-sm font-bold text-brand-600">ملخص الخدمة</p>
             <h2 className="mt-2 text-xl font-bold text-ink">{selectedService?.name_ar || 'اختر خدمة لعرض ملخصها'}</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">{selectedService?.description_ar || 'سيظهر هنا وصف الخدمة المختارة.'}</p>

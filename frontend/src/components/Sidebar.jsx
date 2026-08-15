@@ -42,7 +42,7 @@ function Sidebar({ title, links, isOpen, onClose }) {
       />
       <aside
         className={clsx(
-          'fixed inset-y-3 left-3 right-3 z-50 overflow-y-auto rounded-[2rem] border border-border bg-white/95 p-5 shadow-panel backdrop-blur transition sm:left-auto sm:w-[340px] sm:max-w-[calc(100vw-1.5rem)] xl:sticky xl:top-4 xl:z-auto xl:block xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
+          'fixed inset-y-3 left-3 right-3 z-50 overflow-y-auto rounded-[2rem] border border-border bg-white p-5 shadow-panel transition sm:left-auto sm:w-[340px] sm:max-w-[calc(100vw-1.5rem)] xl:sticky xl:top-4 xl:z-auto xl:block xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
           isOpen ? 'translate-x-0' : 'translate-x-[120%] xl:translate-x-0',
         )}
       >
@@ -56,7 +56,7 @@ function Sidebar({ title, links, isOpen, onClose }) {
           </button>
         </div>
 
-        <div className="mt-5 rounded-3xl border border-brand-100 bg-brand-50/70 px-4 py-3 text-sm text-slate-600">
+        <div className="mt-5 rounded-[var(--radius)] border border-brand-100 bg-brand-50 px-4 py-3 text-sm leading-7 text-slate-600">
           {t('sidebar.quickNav', 'تنقل سريع بين أهم الشاشات المرتبطة بدورك الحالي.')}
         </div>
 
@@ -71,13 +71,13 @@ function Sidebar({ title, links, isOpen, onClose }) {
                 to={link.to}
                 className={({ isActive }) =>
                   clsx(
-                    'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition',
-                    isActive ? 'bg-brand-600 text-white shadow-soft' : 'text-slate-600 hover:bg-brand-50 hover:text-ink',
+                    'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition',
+                    isActive ? 'bg-[#0A2A66] text-white shadow-soft' : 'text-slate-600 hover:bg-brand-50 hover:text-ink',
                   )
                 }
               >
                 {Icon ? (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/15">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
                     <Icon className="h-4 w-4" />
                   </span>
                 ) : null}

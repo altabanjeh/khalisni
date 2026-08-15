@@ -230,36 +230,38 @@ function ServiceProviderAssignmentsPage() {
         </p>
       </section>
 
-      <DataTable
-        columns={columns}
-        emptyDescription={isArabic ? 'أضف أول ربط بين مزود وخدمة.' : 'Create the first provider-service assignment.'}
-        emptyTitle={isArabic ? 'لا توجد روابط خدمات' : 'No assignments found'}
-        loading={loading || servicesLoading || providersLoading}
-        mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
-        rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
-        mobileCard={(row) => (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">{row.provider_name}</p>
-              <span className="text-sm text-slate-500">
-                {row.is_deleted ? (isArabic ? 'محذوف' : 'Deleted') : row.is_active ? (isArabic ? 'نشط' : 'Active') : (isArabic ? 'موقوف' : 'Inactive')}
-              </span>
+      {!isFormOpen ? (
+        <DataTable
+          columns={columns}
+          emptyDescription={isArabic ? 'أضف أول ربط بين مزود وخدمة.' : 'Create the first provider-service assignment.'}
+          emptyTitle={isArabic ? 'لا توجد روابط خدمات' : 'No assignments found'}
+          loading={loading || servicesLoading || providersLoading}
+          mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+          rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
+          mobileCard={(row) => (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-bold text-ink">{row.provider_name}</p>
+                <span className="text-sm text-slate-500">
+                  {row.is_deleted ? (isArabic ? 'محذوف' : 'Deleted') : row.is_active ? (isArabic ? 'نشط' : 'Active') : (isArabic ? 'موقوف' : 'Inactive')}
+                </span>
+              </div>
+              <p className="text-sm text-slate-600">{row.service_name}</p>
+              <p className="text-sm text-slate-500">{row.provider_city || (isArabic ? 'بدون مدينة' : 'No city')}</p>
             </div>
-            <p className="text-sm text-slate-600">{row.service_name}</p>
-            <p className="text-sm text-slate-500">{row.provider_city || (isArabic ? 'بدون مدينة' : 'No city')}</p>
-          </div>
-        )}
-        rows={assignments}
-        toolbar={
-          <div className="grid gap-3 md:grid-cols-2">
-            <select className="field" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-              <option value="active">{isArabic ? 'النشطة' : 'Active'}</option>
-              <option value="deleted">{isArabic ? 'المحذوفة' : 'Deleted'}</option>
-              <option value="all">{isArabic ? 'الكل' : 'All'}</option>
-            </select>
-          </div>
-        }
-      />
+          )}
+          rows={assignments}
+          toolbar={
+            <div className="grid gap-3 md:grid-cols-2">
+              <select className="field" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <option value="active">{isArabic ? 'النشطة' : 'Active'}</option>
+                <option value="deleted">{isArabic ? 'المحذوفة' : 'Deleted'}</option>
+                <option value="all">{isArabic ? 'الكل' : 'All'}</option>
+              </select>
+            </div>
+          }
+        />
+      ) : null}
 
       <FormModal
         description={

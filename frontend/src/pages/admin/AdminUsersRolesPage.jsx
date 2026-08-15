@@ -1,7 +1,6 @@
 import { Search, Shield, TriangleAlert, UsersRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import AdminSoftDeleteModal from '../../components/AdminSoftDeleteModal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
@@ -307,9 +306,9 @@ function AdminUsersRolesPage() {
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
       {toolbar}
       <select className="field text-sm" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
-        <option value="active">Active</option>
-        <option value="deleted">Deleted</option>
-        <option value="all">All</option>
+        <option value="active">نشط</option>
+        <option value="deleted">محذوف</option>
+        <option value="all">الكل</option>
       </select>
     </div>
   )
@@ -357,13 +356,13 @@ function AdminUsersRolesPage() {
     ...columns.slice(0, 3),
     {
       key: 'role_display',
-      label: 'Role',
+      label: 'الدور',
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
           <span>{roleLabels[row.role] || row.role}</span>
           {row.is_deleted ? (
             <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
-              Deleted
+              محذوف
             </span>
           ) : null}
         </div>
@@ -371,12 +370,12 @@ function AdminUsersRolesPage() {
     },
     {
       key: 'status_display',
-      label: 'Status',
+      label: 'الحالة',
       render: (row) => <StatusBadge status={row.is_deleted ? 'REJECTED' : row.is_active ? 'VERIFIED' : 'PENDING_REVIEW'} />,
     },
     {
       key: 'actions_display',
-      label: 'Actions',
+      label: 'الإجراءات',
       render: (row) => {
         const canManageRecord = canManageUserRecord(row, canManageAdminUsers)
         return (
@@ -388,7 +387,7 @@ function AdminUsersRolesPage() {
                 onClick={() => setPendingRestore(row)}
                 type="button"
               >
-                Restore
+                استعادة
               </button>
             ) : (
               <>
@@ -398,7 +397,7 @@ function AdminUsersRolesPage() {
                   onClick={() => openEditForm(row.id)}
                   type="button"
                 >
-                  Edit
+                  تعديل
                 </button>
                 <button
                   className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
@@ -406,7 +405,7 @@ function AdminUsersRolesPage() {
                   onClick={() => setPendingDelete(row)}
                   type="button"
                 >
-                  Delete
+                  تعطيل
                 </button>
               </>
             )}
@@ -482,18 +481,20 @@ function AdminUsersRolesPage() {
         )}
       </section>
 
-      <DataTable
-        columns={tableColumns}
-        emptyDescription="أضف أول مستخدم تشغيلي من هذه الشاشة. حسابات العملاء تُنشأ تلقائياً."
-        emptyTitle="لا يوجد مستخدمون"
-        loading={loading}
-        mobileCard={renderMobileCard}
-        mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
-        pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
-        rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
-        rows={paginated}
-        toolbar={filtersToolbar}
-      />
+      {!isFormOpen ? (
+        <DataTable
+          columns={tableColumns}
+          emptyDescription="أضف أول مستخدم تشغيلي من هذه الشاشة. حسابات العملاء تُنشأ تلقائياً."
+          emptyTitle="لا يوجد مستخدمون"
+          loading={loading}
+          mobileCard={renderMobileCard}
+          mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+          pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
+          rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
+          rows={paginated}
+          toolbar={filtersToolbar}
+        />
+      ) : null}
 
       <FormModal
         description={selectedUser ? 'راجع بيانات الحساب أو افتح تبويب الصلاحيات لتوزيع الأذونات التفصيلية.' : 'أدخل بيانات حساب تشغيلي جديد، ويمكنك ضبط الصلاحيات الدقيقة لاحقاً بعد الإنشاء.'}
@@ -597,12 +598,12 @@ function AdminUsersRolesPage() {
       </FormModal>
 
       <ConfirmModal
-        confirmLabel="Restore"
-        description={`This will restore "${pendingRestore?.full_name || ''}" back to active admin lists.`}
+        confirmLabel="استعادة الحساب"
+        description={`سيتم استعادة حساب "${pendingRestore?.full_name || ''}" وإعادته إلى القوائم النشطة.`}
         onClose={() => setPendingRestore(null)}
         onConfirm={handleRestoreConfirm}
         open={!!pendingRestore}
-        title="Restore user"
+        title="استعادة المستخدم"
       />
 
       <ConfirmModal
