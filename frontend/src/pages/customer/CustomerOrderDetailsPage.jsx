@@ -1,4 +1,4 @@
-import { FileText, MessageSquare, Star, UploadCloud } from 'lucide-react'
+import { AlertTriangle, FileText, MessageSquare, Star, UploadCloud } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
@@ -78,6 +78,18 @@ function CustomerOrderDetailsPage() {
   const requiredDocuments = serviceDetails?.required_documents || []
   const selectedDocumentType = uploadForm.watch('document_type')
   const selectedRequirement = findRequiredDocument(requiredDocuments, selectedDocumentType)
+  const customerActionRequired = allowedActions.can_view_missing_documents_form || allowedActions.can_upload_customer_document
+  const isComplete = ['COMPLETED', 'DELIVERED', 'CLOSED'].includes(String(order.status || '').toUpperCase())
+  const responsibilityTitle = customerActionRequired
+    ? 'إجراء مطلوب منك'
+    : isComplete
+      ? 'الطلب مكتمل'
+      : 'خلصني تعمل على طلبك'
+  const responsibilityText = customerActionRequired
+    ? 'راجع بطاقة الإجراء المطلوبة وارفع الوثائق أو أكمل المعلومات المتاحة في النظام.'
+    : isComplete
+      ? 'تم إكمال مسار الطلب حسب الحالة الحالية في النظام.'
+      : 'الفريق يتابع الطلب الآن، ولا يوجد إجراء مطلوب منك حالياً.'
 
   async function handleUpload(values) {
     uploadForm.clearErrors('root.server')
@@ -124,19 +136,41 @@ function CustomerOrderDetailsPage() {
 
   return (
     <div className="page-section">
-      <section className="rounded-[2rem] bg-[#0A2A66] p-6 text-white shadow-panel sm:p-8">
+      <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-bold">مساحة الطلب</p>
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight">{order.order_number}</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
+            <p className="inline-flex rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">حالة طلبك الآن</p>
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight text-ink">{responsibilityTitle}</h1>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600">{responsibilityText}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500">
               {order.service?.name_ar || 'خدمة غير محددة'} · {order.city || 'مدينة غير محددة'}
             </p>
+            <p className="mt-2 text-xs font-bold text-slate-500">رقم الطلب: {order.order_number}</p>
           </div>
-          <div className="rounded-[var(--radius)] bg-white p-4 text-ink shadow-soft">
+          <div className="rounded-[var(--radius-lg)] border border-border bg-slate-50 p-4 text-ink">
             <p className="mb-3 text-xs font-bold text-slate-500">الحالة الحالية</p>
             <StatusBadge status={order.status} />
           </div>
+        </div>
+      </section>
+
+      <section className={`rounded-[var(--radius-xl)] border p-5 shadow-soft ${customerActionRequired ? 'border-amber-200 bg-amber-50' : 'border-brand-100 bg-brand-50'}`}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex gap-3">
+            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-md)] ${customerActionRequired ? 'bg-amber-100 text-amber-700' : 'bg-white text-brand-600'}`}>
+              {customerActionRequired ? <AlertTriangle className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+            </span>
+            <div>
+              <p className={`font-extrabold ${customerActionRequired ? 'text-amber-900' : 'text-ink'}`}>{responsibilityTitle}</p>
+              <p className={`mt-1 text-sm font-semibold leading-7 ${customerActionRequired ? 'text-amber-800' : 'text-slate-600'}`}>{responsibilityText}</p>
+            </div>
+          </div>
+          {allowedActions.can_view_missing_documents_form ? (
+            <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
+              <UploadCloud className="h-4 w-4" />
+              رفع الوثائق المطلوبة
+            </Link>
+          ) : null}
         </div>
       </section>
 

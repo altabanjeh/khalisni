@@ -36,14 +36,14 @@ function getServiceNameFromRelation(item, key, language) {
 function StatCard({ icon: Icon, label, value, note }) {
   return (
     <PublicCard className="min-h-32">
-      <div className="flex items-center gap-3 text-sm font-bold text-white/50">
-        <span className="grid h-9 w-9 place-items-center rounded-md bg-[var(--khalsni-public-primary)]/20 text-[var(--khalsni-public-primary)]">
+      <div className="flex items-center gap-3 text-sm font-bold text-slate-500">
+        <span className="grid h-9 w-9 place-items-center rounded-md bg-brand-50 text-[var(--khalsni-public-primary)]">
           <Icon className="h-4 w-4" />
         </span>
         {label}
       </div>
-      <p className="mt-4 text-lg font-extrabold leading-7 text-white">{value}</p>
-      {note ? <p className="mt-2 text-xs font-semibold leading-6 text-white/50">{note}</p> : null}
+      <p className="mt-4 text-lg font-extrabold leading-7 text-ink">{value}</p>
+      {note ? <p className="mt-2 text-xs font-semibold leading-6 text-slate-500">{note}</p> : null}
     </PublicCard>
   )
 }
@@ -56,7 +56,7 @@ function ServiceDetailsPage() {
   if (loading) {
     return (
       <PublicPageShell>
-        <PublicLoading />
+        <PublicLoading label={isArabic ? 'جاري تحميل الخدمة...' : 'Loading service...'} />
       </PublicPageShell>
     )
   }
@@ -91,14 +91,12 @@ function ServiceDetailsPage() {
   const prerequisiteServices = service.prerequisite_services || []
   const recommendedServices = service.recommended_services || []
   const relatedServices = service.related_services || recommendedServices.map((item) => item.target_service).filter(Boolean)
-  const steps = isArabic
-    ? service.steps || []
-    : service.steps_en || [
-        'Confirm request details',
-        'Upload required documents',
-        'Review and process the request',
-        'Deliver the final result',
-      ]
+  const configuredSteps = isArabic ? service.steps || service.steps_ar : service.steps_en
+  const steps = configuredSteps?.length
+    ? configuredSteps
+    : isArabic
+      ? ['تأكيد بيانات الطلب', 'رفع المستندات المطلوبة', 'مراجعة الطلب وتنفيذه', 'تسليم النتيجة النهائية']
+      : ['Confirm request details', 'Upload required documents', 'Review and process the request', 'Deliver the final result']
 
   return (
     <PublicPageShell>
@@ -106,33 +104,35 @@ function ServiceDetailsPage() {
         eyebrow={categoryName || (isArabic ? 'الخدمات' : 'Services')}
         icon={Layers3}
         title={serviceName}
-        description={serviceDescription}
-        action={<PublicLinkButton to={`/create-order?service=${service.id}`}>{isArabic ? 'طلب الخدمة' : 'Request service'}</PublicLinkButton>}
+        description={serviceDescription || (isArabic ? 'تفاصيل الخدمة والمتطلبات المتاحة قبل بدء الطلب.' : 'Available service details and requirements before starting.')}
+        action={<PublicLinkButton to={`/create-order?service=${service.id}`}>{isArabic ? 'ابدأ الطلب' : 'Start Request'}</PublicLinkButton>}
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <main className="space-y-6">
           <PublicPanel>
             <div className="flex items-start gap-4">
-              <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--khalsni-public-primary)]/20 text-[var(--khalsni-public-primary)]">
+              <span className="grid h-11 w-11 place-items-center rounded-md bg-brand-50 text-[var(--khalsni-public-primary)]">
                 <Info className="h-5 w-5" />
               </span>
               <div>
                 <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'نظرة عامة' : 'Overview'}</p>
-                <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'ماذا تشمل هذه الخدمة؟' : 'What this service includes'}</h2>
+                <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'معلومات الخدمة قبل البدء' : 'Service information before starting'}</h2>
               </div>
             </div>
-            <p className="mt-5 text-sm font-semibold leading-8 text-white/56">{serviceDescription}</p>
+            <p className="mt-5 text-sm font-semibold leading-8 text-slate-600">
+              {serviceDescription || (isArabic ? 'لا يوجد وصف منشور لهذه الخدمة حالياً.' : 'No public description is currently published for this service.')}
+            </p>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <StatCard icon={Clock3} label={isArabic ? 'مدة الإنجاز' : 'Duration'} value={duration.label} note={duration.note} />
               <StatCard icon={ReceiptText} label={isArabic ? 'السعر' : 'Price'} value={price.label} note={price.note} />
               <StatCard icon={ShieldCheck} label={isArabic ? 'التصنيف' : 'Category'} value={categoryName || (isArabic ? 'غير محدد' : 'Not set')} />
             </div>
             {pricing.government_fee != null || pricing.company_fee != null ? (
-              <div className="mt-5 rounded-lg border border-[var(--khalsni-public-primary)]/40 bg-[var(--khalsni-public-primary)]/10 p-4 text-sm font-semibold leading-7 text-white/75">
+              <div className="mt-5 rounded-[var(--radius-lg)] border border-brand-100 bg-brand-50 p-4 text-sm font-semibold leading-7 text-slate-700">
                 {[
-                  pricing.government_fee != null ? `${isArabic ? 'رسوم حكومية' : 'Government'}: ${formatCurrency(pricing.government_fee, language)}` : null,
-                  pricing.company_fee != null ? `${isArabic ? 'رسوم خدمة' : 'Service'}: ${formatCurrency(pricing.company_fee, language)}` : null,
+                  pricing.government_fee != null ? `${isArabic ? 'رسوم حكومية' : 'Government fee'}: ${formatCurrency(pricing.government_fee, language)}` : null,
+                  pricing.company_fee != null ? `${isArabic ? 'رسوم خدمة' : 'Service fee'}: ${formatCurrency(pricing.company_fee, language)}` : null,
                 ].filter(Boolean).join(' | ')}
               </div>
             ) : null}
@@ -140,28 +140,28 @@ function ServiceDetailsPage() {
 
           <PublicPanel>
             <div className="flex items-start gap-4">
-              <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--khalsni-public-primary)]/20 text-[var(--khalsni-public-primary)]">
+              <span className="grid h-11 w-11 place-items-center rounded-md bg-brand-50 text-[var(--khalsni-public-primary)]">
                 <FileText className="h-5 w-5" />
               </span>
               <div>
                 <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'المستندات المطلوبة' : 'Required documents'}</p>
-                <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'جهز ملفاتك قبل البدء' : 'Prepare files before starting'}</h2>
+                <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'جهز ملفاتك قبل بدء الطلب' : 'Prepare files before starting'}</h2>
               </div>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {requiredDocuments.length ? requiredDocuments.map((item) => (
                 <PublicCard key={item.id}>
                   <div className="flex items-start justify-between gap-3">
-                    <p className="font-extrabold text-white">{item.label}</p>
-                    <span className={item.required ? 'rounded-md bg-red-500/20 px-3 py-1 text-xs font-bold text-red-100' : 'rounded-md bg-white/10 px-3 py-1 text-xs font-bold text-white/50'}>
+                    <p className="font-extrabold text-ink">{item.label}</p>
+                    <span className={item.required ? 'rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700' : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600'}>
                       {item.required ? (isArabic ? 'مطلوب' : 'Required') : isArabic ? 'اختياري' : 'Optional'}
                     </span>
                   </div>
-                  {item.instructions ? <p className="mt-3 text-sm font-semibold leading-7 text-white/60">{item.instructions}</p> : null}
+                  {item.instructions ? <p className="mt-3 text-sm font-semibold leading-7 text-slate-600">{item.instructions}</p> : null}
                 </PublicCard>
               )) : (
-                <div className="rounded-lg border border-dashed border-[var(--khalsni-public-border)] bg-white/10 p-5 text-sm font-semibold text-white/50">
-                  {isArabic ? 'لا توجد مستندات إلزامية محددة حاليا.' : 'No required documents are listed for this service.'}
+                <div className="rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-slate-50 p-5 text-sm font-semibold text-slate-600">
+                  {isArabic ? 'لا توجد مستندات إلزامية محددة حالياً.' : 'No required documents are listed for this service.'}
                 </div>
               )}
             </div>
@@ -169,12 +169,12 @@ function ServiceDetailsPage() {
 
           <PublicPanel>
             <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'خطوات التنفيذ' : 'Process steps'}</p>
-            <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'مسار واضح من التقديم حتى الإنجاز' : 'Clear path from submission to completion'}</h2>
+            <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'مسار واضح من التقديم حتى الإنجاز' : 'Clear path from submission to completion'}</h2>
             <div className="mt-6 space-y-3">
               {steps.map((item, index) => (
-                <div key={`${item}-${index}`} className="flex gap-4 rounded-lg border border-white/10 bg-white/10 p-4">
+                <div key={`${item}-${index}`} className="flex gap-4 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-slate-50 p-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--khalsni-public-primary)] text-sm font-extrabold text-white">{index + 1}</span>
-                  <p className="text-sm font-semibold leading-7 text-white/80">{item}</p>
+                  <p className="text-sm font-semibold leading-7 text-slate-700">{item}</p>
                 </div>
               ))}
             </div>
@@ -187,12 +187,12 @@ function ServiceDetailsPage() {
                 {prerequisiteServices.map((item) => (
                   <PublicCard key={item.id}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="font-bold text-white">{getServiceNameFromRelation(item, 'source_service', language)}</p>
-                      <span className={item.is_completed ? 'rounded-md bg-green-500/20 px-3 py-1 text-xs font-bold text-green-100' : 'rounded-md bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-100'}>
+                      <p className="font-bold text-ink">{getServiceNameFromRelation(item, 'source_service', language)}</p>
+                      <span className={item.is_completed ? 'rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700' : 'rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700'}>
                         {item.is_completed ? (isArabic ? 'مكتملة' : 'Completed') : isArabic ? 'غير مكتملة' : 'Incomplete'}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm font-semibold leading-7 text-white/50">{item.message_to_customer || (isArabic ? 'هذه الخدمة مطلوبة قبل متابعة الطلب.' : 'This service is required before the request can continue.')}</p>
+                    <p className="mt-3 text-sm font-semibold leading-7 text-slate-600">{item.message_to_customer || (isArabic ? 'هذه الخدمة مطلوبة قبل متابعة الطلب.' : 'This service is required before the request can continue.')}</p>
                   </PublicCard>
                 ))}
               </div>
@@ -203,17 +203,17 @@ function ServiceDetailsPage() {
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
           <PublicPanel>
             <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'ملخص الخدمة' : 'Service summary'}</p>
-            <h2 className="mt-2 text-2xl font-extrabold leading-8 text-white">
+            <h2 className="mt-2 text-2xl font-extrabold leading-8 text-ink">
               {isArabic ? 'ابدأ طلبك بثقة' : 'Start with confidence'}
             </h2>
             <div className="mt-5 space-y-3">
-              <div className="rounded-lg border border-white/10 bg-white/10 p-4">
-                <p className="text-xs font-bold text-white/50">{isArabic ? 'مدة الإنجاز' : 'Duration'}</p>
-                <p className="mt-2 font-extrabold text-white">{isArabic ? 'موضحة في نظرة عامة' : 'Shown in overview'}</p>
+              <div className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-slate-50 p-4">
+                <p className="text-xs font-bold text-slate-500">{isArabic ? 'مدة الإنجاز' : 'Duration'}</p>
+                <p className="mt-2 font-extrabold text-ink">{isArabic ? 'موضحة في نظرة عامة' : 'Shown in overview'}</p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/10 p-4">
-                <p className="text-xs font-bold text-white/50">{isArabic ? 'السعر' : 'Price'}</p>
-                <p className="mt-2 font-extrabold text-white">{isArabic ? 'حسب تفاصيل الخدمة' : 'Based on service details'}</p>
+              <div className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-slate-50 p-4">
+                <p className="text-xs font-bold text-slate-500">{isArabic ? 'السعر' : 'Price'}</p>
+                <p className="mt-2 font-extrabold text-ink">{isArabic ? 'موضح في نظرة عامة' : 'Shown in overview'}</p>
               </div>
             </div>
             <PublicLinkButton className="mt-5 w-full" to={`/create-order?service=${service.id}`}>
@@ -226,9 +226,9 @@ function ServiceDetailsPage() {
 
           <PublicCard>
             <CheckCircle2 className="h-8 w-8 text-[var(--khalsni-public-primary)]" />
-            <p className="mt-3 font-extrabold text-white">{isArabic ? 'بياناتك محمية' : 'Your data is protected'}</p>
-            <p className="mt-2 text-sm font-semibold leading-7 text-white/60">
-              {isArabic ? 'روابط المستندات وصلاحيات الوصول تبقى محكومة بسياسات خالصني الحالية.' : 'Document links and access remain governed by current Khalsni policies.'}
+            <p className="mt-3 font-extrabold text-ink">{isArabic ? 'بياناتك محمية' : 'Your data is protected'}</p>
+            <p className="mt-2 text-sm font-semibold leading-7 text-slate-600">
+              {isArabic ? 'روابط المستندات وصلاحيات الوصول تبقى محكومة بسياسات خلصني الحالية.' : 'Document links and access remain governed by current Khalsni policies.'}
             </p>
           </PublicCard>
         </aside>
@@ -239,9 +239,9 @@ function ServiceDetailsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'خدمات مرتبطة' : 'Related services'}</p>
-              <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'قد تحتاج أيضا' : 'You may also need'}</h2>
+              <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'قد تحتاج أيضاً' : 'You may also need'}</h2>
             </div>
-            <Link className="inline-flex items-center gap-2 text-sm font-bold text-white/70 hover:text-white" to="/services">
+            <Link className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-[var(--khalsni-public-primary)]" to="/services">
               <ArrowRight className="h-4 w-4" />
               {isArabic ? 'كل الخدمات' : 'All services'}
             </Link>

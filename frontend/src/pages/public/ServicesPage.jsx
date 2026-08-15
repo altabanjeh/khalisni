@@ -117,15 +117,15 @@ function ServicesPage() {
         title={isArabic ? 'تصفح خدمات خلصني بنفس تجربة الصفحة الرئيسية' : 'Browse Khalsni services'}
         description={isArabic ? 'ابحث حسب الخدمة أو التصنيف، ثم انتقل إلى تفاصيل الخدمة أو ابدأ الطلب من المسار الرسمي.' : 'Search by service or category, then open details or start the official request flow.'}
         action={(
-          <div className="grid min-w-[16rem] gap-3 rounded-lg border border-white/10 bg-white/10 p-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-white/75">
+          <div className="grid min-w-[16rem] gap-3 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
               <Sparkles className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
               {isArabic ? 'ملخص سريع' : 'Quick overview'}
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
-              <PublicCard><p className="text-2xl font-extrabold">{featuredCategories.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'تصنيف' : 'Categories'}</p></PublicCard>
-              <PublicCard><p className="text-2xl font-extrabold">{publicServices.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'خدمة' : 'Services'}</p></PublicCard>
-              <PublicCard><p className="text-2xl font-extrabold">{filteredServices.length}</p><p className="mt-1 text-[0.65rem] text-white/60">{isArabic ? 'نتيجة' : 'Results'}</p></PublicCard>
+              <PublicCard><p className="text-2xl font-extrabold text-ink">{featuredCategories.length}</p><p className="mt-1 text-[0.65rem] text-slate-500">{isArabic ? 'تصنيف' : 'Categories'}</p></PublicCard>
+              <PublicCard><p className="text-2xl font-extrabold text-ink">{publicServices.length}</p><p className="mt-1 text-[0.65rem] text-slate-500">{isArabic ? 'خدمة' : 'Services'}</p></PublicCard>
+              <PublicCard><p className="text-2xl font-extrabold text-ink">{filteredServices.length}</p><p className="mt-1 text-[0.65rem] text-slate-500">{isArabic ? 'نتيجة' : 'Results'}</p></PublicCard>
             </div>
           </div>
         )}
@@ -149,7 +149,7 @@ function ServicesPage() {
         {featuredCategories.length ? (
           <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
             <button
-              className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${!activeCategory ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-white/15 bg-white/10 text-white/75 hover:bg-white/15'}`}
+              className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${!activeCategory ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-slate-700 hover:bg-slate-50'}`}
               onClick={() => handleCategorySelect('')}
               type="button"
             >
@@ -161,7 +161,7 @@ function ServicesPage() {
               return (
                 <button
                   key={category.id || category.slug}
-                  className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${isActive ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-white/15 bg-white/10 text-white/75 hover:bg-white/15'}`}
+                  className={`h-10 shrink-0 rounded-md border px-4 text-sm font-extrabold transition ${isActive ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-slate-700 hover:bg-slate-50'}`}
                   onClick={() => handleCategorySelect(category.slug)}
                   type="button"
                 >
@@ -191,13 +191,13 @@ function ServicesPage() {
 
             return (
               <PublicPanel key={section.slug}>
-                <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-3 border-b border-[var(--khalsni-public-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'تصنيف الخدمات' : 'Service category'}</p>
-                    <h2 className="mt-1 text-2xl font-extrabold text-white">{categoryName}</h2>
-                    <p className="mt-2 max-w-3xl text-sm font-semibold leading-7 text-white/50">{categoryDescription}</p>
+                    <h2 className="mt-1 text-2xl font-extrabold text-ink">{categoryName}</h2>
+                    <p className="mt-2 max-w-3xl text-sm font-semibold leading-7 text-slate-600">{categoryDescription}</p>
                   </div>
-                  <span className="w-fit rounded-md border border-white/10 bg-white/10 px-4 py-2 text-sm font-bold text-white/75">
+                  <span className="w-fit rounded-md border border-[var(--khalsni-public-border)] bg-slate-50 px-4 py-2 text-sm font-bold text-slate-600">
                     {section.services.length} {isArabic ? 'خدمة' : 'services'}
                   </span>
                 </div>

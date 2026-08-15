@@ -1,4 +1,4 @@
-import { CheckCircle2, FilePlus2, Save } from 'lucide-react'
+import { CheckCircle2, Edit3, FilePlus2, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
@@ -73,6 +73,7 @@ function CustomerCreateOrderPage() {
   )
   const requiredDocuments = selectedServiceDetails?.required_documents || []
   const schemaFields = getServiceSchemaFields(selectedServiceDetails)
+  const startedFromService = Boolean(requestedServiceId && selectedService)
   useRegisterPageHelp({ serviceId: selectedService?.id || '' })
 
   useEffect(() => {
@@ -192,6 +193,25 @@ function CustomerCreateOrderPage() {
   }
 
   const requiredDocumentLabels = requiredDocuments.map((document) => getRequiredDocumentLabel(document)).filter(Boolean)
+  const currentValues = watch()
+  const uploadedRequiredCount = requiredDocuments.filter((document, index) => currentValues[getDocumentFieldName(document, index)]?.length).length
+  const reviewRows = [
+    { label: 'الخدمة', value: selectedService?.name_ar || selectedService?.name_en || 'غير محددة', target: 'request-service-section' },
+    { label: 'اسم العميل', value: currentValues.full_name || 'غير مكتمل', target: 'request-customer-section' },
+    { label: 'الهاتف', value: currentValues.phone || 'غير مكتمل', target: 'request-customer-section' },
+    { label: 'المدينة', value: currentValues.city || 'غير مكتملة', target: 'request-customer-section' },
+    { label: 'الوثائق', value: requiredDocuments.length ? `${uploadedRequiredCount} / ${requiredDocuments.length}` : 'رفع عام متاح', target: 'request-documents-section' },
+    { label: 'السعر', value: selectedService ? formatCurrency(selectedService.total_fee) : 'غير محدد', target: 'request-service-section' },
+    {
+      label: 'المدة المتوقعة',
+      value: selectedService ? selectedService.delivery_time?.label_ar || selectedService.delivery_time?.label || 'غير محددة' : 'غير محددة',
+      target: 'request-service-section',
+    },
+  ]
+
+  function scrollToSection(sectionId) {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div className="page-section">
@@ -218,17 +238,27 @@ function CustomerCreateOrderPage() {
       />
 
       <ApplicationStepper
-        currentIndex={submittedOrder ? 3 : requiredDocuments.length ? 1 : 0}
-        steps={['بيانات الطلب', 'المستندات', 'المراجعة', 'التأكيد']}
+        currentIndex={submittedOrder ? 4 : requiredDocuments.length ? 2 : selectedService ? 1 : 0}
+        steps={['الخدمة', 'بيانات العميل', 'المستندات', 'المراجعة', 'الإرسال']}
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <form className="space-y-6" id="client-create-order" onSubmit={handleSubmit(onSubmit)}>
-          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+          <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft" id="request-service-section">
             <p className="text-sm font-bold text-brand-600">الخطوة 1</p>
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار تصنيف الخدمة</h2>
+            {startedFromService ? (
+              <div className="mt-5 rounded-[var(--radius-lg)] border border-brand-100 bg-brand-50 p-5">
+                <input type="hidden" {...register('category_slug', { required: 'اختر تصنيف الخدمة' })} />
+                <input type="hidden" {...register('service', { required: 'اختر الخدمة المطلوبة' })} />
+                <p className="text-xs font-bold text-brand-700">تم اختيار الخدمة من صفحة المعلومات</p>
+                <h3 className="mt-2 text-xl font-extrabold text-ink">{selectedService.name_ar || selectedService.name_en}</h3>
+                <p className="mt-2 text-sm font-semibold text-slate-600">{selectedService.category?.full_path_name || selectedService.category?.name_ar || 'تصنيف الخدمة محفوظ مع الطلب'}</p>
+              </div>
+            ) : (
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="md:col-span-2">
+              {!startedFromService ? (
+              <div className={`md:col-span-2 ${startedFromService ? 'hidden' : ''}`}>
                 <label className="mb-2 block text-sm font-semibold text-ink">
                   <HelpLabel fieldKey="category_slug">تصنيف الخدمة</HelpLabel>
                 </label>
@@ -242,14 +272,16 @@ function CustomerCreateOrderPage() {
                 </select>
                 {errors.category_slug ? <p className="mt-2 text-sm text-danger">{errors.category_slug.message}</p> : null}
               </div>
+              ) : null}
             </div>
+            )}
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+          <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft" id="request-customer-section">
             <p className="text-sm font-bold text-brand-600">الخطوة 2</p>
             <h2 className="mt-1 text-xl font-bold text-ink">اختيار الخدمة والبيانات الأساسية</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="md:col-span-2">
+              <div className={`md:col-span-2 ${startedFromService ? 'hidden' : ''}`}>
                 <label className="mb-2 block text-sm font-semibold text-ink">
                   <HelpLabel fieldKey="service">الخدمة</HelpLabel>
                 </label>
@@ -298,7 +330,7 @@ function CustomerCreateOrderPage() {
           </section>
 
           {schemaFields.length ? (
-            <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+            <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft">
               <p className="text-sm font-bold text-brand-600">الخطوة 3</p>
               <h2 className="mt-1 text-xl font-bold text-ink">البيانات الإضافية المطلوبة</h2>
               <div className="mt-5">
@@ -307,7 +339,7 @@ function CustomerCreateOrderPage() {
             </section>
           ) : null}
 
-          <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+          <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft" id="request-documents-section">
             <p className="text-sm font-bold text-brand-600">{schemaFields.length ? 'الخطوة 4' : 'الخطوة 3'}</p>
             <h2 className="mt-1 text-xl font-bold text-ink">الوثائق والملاحظات</h2>
             <div className="mt-5 space-y-4">
@@ -365,6 +397,36 @@ function CustomerCreateOrderPage() {
               </label>
               {errors.consent ? <p className="text-sm text-danger">{errors.consent.message}</p> : null}
               {errors.root?.server ? <p className="text-sm text-danger">{errors.root.server.message}</p> : null}
+            </div>
+          </section>
+
+          <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft" id="request-review-section">
+            <p className="text-sm font-bold text-brand-600">المراجعة قبل الإرسال</p>
+            <h2 className="mt-1 text-xl font-bold text-ink">راجع الطلب بدون مغادرة الصفحة</h2>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {reviewRows.map((row) => (
+                <div className="rounded-[var(--radius-lg)] border border-border bg-slate-50 p-4" key={row.label}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold text-slate-500">{row.label}</p>
+                      <p className="mt-1 text-sm font-extrabold text-ink">{row.value}</p>
+                    </div>
+                    <button className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-white text-slate-600 hover:text-brand-600" onClick={() => scrollToSection(row.target)} type="button" aria-label={`تعديل ${row.label}`}>
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button className="btn-secondary" onClick={saveDraft} type="button">
+                <Save className="h-4 w-4" />
+                حفظ كمسودة
+              </button>
+              <button className="btn-primary" type="submit">
+                <CheckCircle2 className="h-4 w-4" />
+                إرسال الطلب
+              </button>
             </div>
           </section>
 

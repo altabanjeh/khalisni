@@ -24,6 +24,17 @@ function SummaryCard({ icon: Icon, label, value }) {
   )
 }
 
+function getResponsibility(order) {
+  const status = String(order.status || '').toUpperCase()
+  if (status === 'WAITING_CUSTOMER' || order.missing_document_types?.length) {
+    return { label: 'إجراء مطلوب منك', className: 'bg-amber-50 text-amber-800 border-amber-200' }
+  }
+  if (['COMPLETED', 'DELIVERED', 'CLOSED'].includes(status)) {
+    return { label: 'مكتمل', className: 'bg-green-50 text-green-700 border-green-200' }
+  }
+  return { label: 'خلصني تتابع الطلب', className: 'bg-brand-50 text-brand-700 border-brand-100' }
+}
+
 function MyOrdersPage() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -59,6 +70,14 @@ function MyOrdersPage() {
     { key: 'order_number', label: 'رقم الطلب' },
     { key: 'service', label: 'الخدمة', render: (row) => row.service?.name_ar || 'غير محددة' },
     { key: 'status', label: 'الحالة', render: (row) => <StatusBadge status={row.status} /> },
+    {
+      key: 'responsibility',
+      label: 'المسؤول الآن',
+      render: (row) => {
+        const responsibility = getResponsibility(row)
+        return <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold ${responsibility.className}`}>{responsibility.label}</span>
+      },
+    },
     { key: 'created_at', label: 'تاريخ الإنشاء', render: (row) => formatDate(row.created_at) },
     { key: 'expected_delivery_date', label: 'التسليم المتوقع', render: (row) => formatDate(row.expected_delivery_date) },
     {
@@ -122,6 +141,9 @@ function MyOrdersPage() {
               <span>تاريخ الطلب: {formatDate(row.created_at)}</span>
               <span>التسليم المتوقع: {formatDate(row.expected_delivery_date)}</span>
             </div>
+            <span className={`inline-flex w-fit rounded-full border px-3 py-1 text-xs font-bold ${getResponsibility(row).className}`}>
+              {getResponsibility(row).label}
+            </span>
             <Link className="btn-primary w-full" to={`/customer/orders/${row.id}`}>
               فتح مساحة الطلب
             </Link>

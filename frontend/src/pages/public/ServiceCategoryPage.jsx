@@ -43,12 +43,12 @@ function ServiceCategoryPage() {
 
       {!loading && !error && services.length ? (
         <PublicPanel>
-          <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-[var(--khalsni-public-border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'كل خدمات التصنيف' : 'All category services'}</p>
-              <h2 className="mt-1 text-2xl font-extrabold text-white">{title}</h2>
+              <h2 className="mt-1 text-2xl font-extrabold text-ink">{title}</h2>
             </div>
-            <span className="w-fit rounded-md border border-white/10 bg-white/10 px-4 py-2 text-sm font-bold text-white/75">
+            <span className="w-fit rounded-md border border-[var(--khalsni-public-border)] bg-slate-50 px-4 py-2 text-sm font-bold text-slate-600">
               {services.length} {isArabic ? 'خدمة متاحة' : 'available services'}
             </span>
           </div>
@@ -71,7 +71,7 @@ function ServiceCategoryPage() {
         <section className="space-y-4">
           <div className="text-right">
             <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'تصنيفات أخرى' : 'Other categories'}</p>
-            <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'قد تحتاج أيضاً' : 'You may also need'}</h2>
+            <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'قد تحتاج أيضاً' : 'You may also need'}</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {relatedCategories.map((item) => <CategoryCard key={item.id || item.slug} category={item} />)}
