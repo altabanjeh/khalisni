@@ -8,7 +8,7 @@ function CategoryCard({ category, count }) {
   const name = getCategoryName(category, language, isArabic ? 'تصنيف خدمات' : 'Service category')
   const description = getCategoryDescription(category, language, isArabic ? 'خدمات مرتبطة بهذا التصنيف.' : 'Services grouped under this category.')
   const href = category?.slug ? `/services/category/${category.slug}` : '/services'
-  const color = category?.color || '#1252f7'
+  const color = category?.color || 'var(--khalsni-public-primary)'
   const imageUrl = category?.image_url || category?.image
 
   return (
@@ -22,7 +22,7 @@ function CategoryCard({ category, count }) {
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(135deg, color-mix(in srgb, ${color} 12%, #ffffff) 0%, #f7faff 100%)`,
+            background: `linear-gradient(135deg, color-mix(in srgb, ${color} 12%, var(--khalsni-public-surface)) 0%, var(--khalsni-public-bg-secondary) 100%)`,
           }}
         />
       )}

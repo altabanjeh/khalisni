@@ -28,9 +28,9 @@ function PrivacyPolicyPage() {
       />
 
       <PublicPanel>
-        <div className="space-y-4 text-sm font-semibold leading-8 text-white/60">
+        <div className="space-y-4 text-sm font-semibold leading-8 text-slate-600">
           {paragraphs.map((paragraph, index) => (
-            <div key={paragraph} className="flex gap-4 rounded-lg border border-white/10 bg-white/10 p-4">
+            <div key={paragraph} className="flex gap-4 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-slate-50 p-4">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--khalsni-public-primary)] text-sm font-extrabold text-white">{index + 1}</span>
               <p>{paragraph}</p>
             </div>

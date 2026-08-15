@@ -62,7 +62,7 @@ function RegisterPage() {
   }
 
   function fieldError(name) {
-    return errors[name] ? <p className="mt-2 text-sm font-semibold text-red-200">{errors[name].message}</p> : null
+    return errors[name] ? <p className="mt-2 text-sm font-semibold text-danger">{errors[name].message}</p> : null
   }
 
   return (
@@ -77,31 +77,31 @@ function RegisterPage() {
       <PublicPanel className="mx-auto max-w-4xl">
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
           <div className="md:col-span-2">
-            <label htmlFor="reg-full-name" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
+            <label htmlFor="reg-full-name" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
             <PublicInput id="reg-full-name" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
             {fieldError('full_name')}
           </div>
 
           <div>
-            <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
+            <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
             <PublicInput id="reg-phone" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
             {fieldError('phone')}
           </div>
 
           <div>
-            <label htmlFor="reg-email" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
+            <label htmlFor="reg-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
             <PublicInput id="reg-email" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
             {fieldError('email')}
           </div>
 
           <div>
-            <label htmlFor="reg-national-id" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
+            <label htmlFor="reg-national-id" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
             <PublicInput id="reg-national-id" {...register('national_id')} />
             {fieldError('national_id')}
           </div>
 
           <div>
-            <label htmlFor="reg-password" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'كلمة المرور' : 'Password'}</label>
+            <label htmlFor="reg-password" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'كلمة المرور' : 'Password'}</label>
             <PublicInput
               id="reg-password"
               type="password"
@@ -116,13 +116,13 @@ function RegisterPage() {
             {fieldError('password')}
           </div>
 
-          {error ? <p className="text-sm font-semibold text-red-200 md:col-span-2">{error}</p> : null}
+          {error ? <p className="text-sm font-semibold text-danger md:col-span-2">{error}</p> : null}
 
           <div className="md:col-span-2 space-y-3">
             <PublicButton className="w-full" disabled={isSubmitting} type="submit">
               {isSubmitting ? (isArabic ? 'جار إنشاء الحساب...' : 'Creating account...') : isArabic ? 'إنشاء الحساب' : 'Create account'}
             </PublicButton>
-            <p className="text-center text-sm font-semibold text-white/50">
+            <p className="text-center text-sm font-semibold text-slate-600">
               {isArabic ? 'لديك حساب بالفعل؟' : 'Already have an account?'}{' '}
               <Link
                 className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"

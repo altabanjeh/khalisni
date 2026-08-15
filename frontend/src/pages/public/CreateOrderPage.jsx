@@ -40,7 +40,7 @@ function CreateOrderPage() {
     <PublicPageShell>
       <PublicPanel className="mx-auto max-w-xl text-center">
         <PublicLoading label={isArabic ? 'جار تحويلك إلى مسار الطلب الصحيح...' : 'Redirecting you to the correct order flow...'} />
-        <p className="mt-4 text-sm font-semibold leading-7 text-white/50">
+        <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">
           {isArabic
             ? 'يجب إنشاء حساب عميل وتسجيل الدخول قبل إرسال أي طلب خدمة.'
             : 'You need a customer account and an active sign-in session before submitting a service request.'}

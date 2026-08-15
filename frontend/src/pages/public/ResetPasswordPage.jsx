@@ -50,7 +50,7 @@ function ResetPasswordPage() {
   }
 
   function fieldError(name) {
-    return errors[name] ? <p className="mt-2 text-sm font-semibold text-red-200">{errors[name].message}</p> : null
+    return errors[name] ? <p className="mt-2 text-sm font-semibold text-danger">{errors[name].message}</p> : null
   }
 
   return (
@@ -65,7 +65,7 @@ function ResetPasswordPage() {
       <PublicPanel className="mx-auto max-w-xl">
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label htmlFor="reset-new-password" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'كلمة المرور الجديدة' : 'New password'}</label>
+            <label htmlFor="reset-new-password" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'كلمة المرور الجديدة' : 'New password'}</label>
             <PublicInput
               id="reset-new-password"
               autoComplete="new-password"
@@ -77,7 +77,7 @@ function ResetPasswordPage() {
             {fieldError('new_password')}
           </div>
           <div>
-            <label htmlFor="reset-confirm-password" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'تأكيد كلمة المرور الجديدة' : 'Confirm new password'}</label>
+            <label htmlFor="reset-confirm-password" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'تأكيد كلمة المرور الجديدة' : 'Confirm new password'}</label>
             <PublicInput
               id="reset-confirm-password"
               autoComplete="new-password"
@@ -88,11 +88,11 @@ function ResetPasswordPage() {
             />
             {fieldError('confirm_new_password')}
           </div>
-          {error ? <p className="text-sm font-semibold text-red-200">{error}</p> : null}
+          {error ? <p className="text-sm font-semibold text-danger">{error}</p> : null}
           <PublicButton className="w-full" disabled={isSubmitting} type="submit">
             {isSubmitting ? (isArabic ? 'جار إعادة التعيين...' : 'Resetting...') : isArabic ? 'إعادة تعيين كلمة المرور' : 'Reset password'}
           </PublicButton>
-          <p className="text-center text-sm font-semibold text-white/50">
+          <p className="text-center text-sm font-semibold text-slate-600">
             <Link className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]" to="/login">
               {isArabic ? 'العودة إلى تسجيل الدخول' : 'Back to sign in'}
             </Link>

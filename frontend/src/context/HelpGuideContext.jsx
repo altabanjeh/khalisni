@@ -32,11 +32,18 @@ export function HelpGuideProvider({ children }) {
   const activeScreen = useMemo(() => matchHelpScreen(location.pathname), [location.pathname])
 
   const setPageHelp = useCallback((nextValue) => {
-    setPageHelpState((current) => ({ ...current, ...nextValue }))
+    setPageHelpState((current) => {
+      const next = { ...current, ...nextValue }
+      return current.workflowStatus === next.workflowStatus && current.serviceId === next.serviceId ? current : next
+    })
   }, [])
 
   const clearPageHelp = useCallback(() => {
-    setPageHelpState(defaultPageHelp)
+    setPageHelpState((current) =>
+      current.workflowStatus === defaultPageHelp.workflowStatus && current.serviceId === defaultPageHelp.serviceId
+        ? current
+        : defaultPageHelp,
+    )
   }, [])
 
   const reloadCurrentHelp = useCallback(async () => {
@@ -105,14 +112,15 @@ export function useHelpGuideContext() {
 
 export function useRegisterPageHelp({ workflowStatus = '', serviceId = '' } = {}) {
   const context = useContext(HelpGuideContext)
+  const setPageHelp = context?.setPageHelp
+  const clearPageHelp = context?.clearPageHelp
 
   useEffect(() => {
-    if (!context) return undefined
-    const { clearPageHelp, setPageHelp } = context
+    if (!setPageHelp || !clearPageHelp) return undefined
     setPageHelp({ workflowStatus: workflowStatus || '', serviceId: serviceId || '' })
 
     return () => {
       clearPageHelp()
     }
-  }, [context, serviceId, workflowStatus])
+  }, [clearPageHelp, serviceId, setPageHelp, workflowStatus])
 }

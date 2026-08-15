@@ -36,8 +36,8 @@ function FaqPage() {
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[var(--khalsni-public-primary)] text-sm font-extrabold text-white">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <h2 className="mt-4 text-lg font-extrabold leading-7 text-white">{item.q}</h2>
-            <p className="mt-3 text-sm font-semibold leading-7 text-white/60">{item.a}</p>
+            <h2 className="mt-4 text-lg font-extrabold leading-7 text-ink">{item.q}</h2>
+            <p className="mt-3 text-sm font-semibold leading-7 text-slate-600">{item.a}</p>
           </PublicCard>
         ))}
       </div>

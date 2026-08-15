@@ -42,18 +42,18 @@ function CustomerDashboardHome() {
 
   return (
     <div className="page-section">
-      <section className="rounded-[2rem] bg-[#0A2A66] p-6 text-white shadow-panel sm:p-8">
+      <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-bold">بوابة العميل</p>
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight">مرحبا {user?.full_name || ''}</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">ملخص عملي لطلباتك الحالية، المستندات المطلوبة منك، وآخر التحديثات المرتبطة بحسابك.</p>
+            <p className="inline-flex rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">بوابة العميل</p>
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight text-ink">مرحبا {user?.full_name || ''}</h1>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600">ملخص عملي لطلباتك الحالية، المستندات المطلوبة منك، وآخر التحديثات المرتبطة بحسابك.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link className="rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-brand-800" to="/customer/orders/new">
+            <Link className="btn-primary" to="/customer/orders/new">
               <FilePlus2 className="inline h-4 w-4" /> طلب جديد
             </Link>
-            <Link className="public-secondary-button" to="/customer/orders">طلباتي</Link>
+            <Link className="btn-secondary" to="/customer/orders">طلباتي</Link>
           </div>
         </div>
       </section>

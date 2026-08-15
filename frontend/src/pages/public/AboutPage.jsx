@@ -33,7 +33,7 @@ function AboutPage() {
       />
 
       <PublicPanel>
-        <p className="max-w-5xl text-base font-semibold leading-8 text-white/60">
+        <p className="max-w-5xl text-base font-semibold leading-8 text-slate-600">
           {isArabic
             ? 'هدفنا هو أن تصبح رحلة الطلب واضحة من البداية إلى النهاية: اختيار الخدمة، فهم المتطلبات، رفع المستندات، متابعة الحالة، واستلام النتيجة من دون الحاجة للتنقل بين أكثر من قناة.'
             : 'Our goal is to make the request journey clear from start to finish: choosing the service, understanding requirements, uploading documents, tracking status, and receiving the final result without moving across disconnected channels.'}
@@ -42,8 +42,8 @@ function AboutPage() {
           {cards.map(({ icon: Icon, title, text }) => (
             <PublicCard key={title}>
               <Icon className="h-8 w-8 text-[var(--khalsni-public-primary)]" />
-              <h2 className="mt-4 text-lg font-extrabold text-white">{title}</h2>
-              <p className="mt-3 text-sm font-semibold leading-7 text-white/60">{text}</p>
+              <h2 className="mt-4 text-lg font-extrabold text-ink">{title}</h2>
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600">{text}</p>
             </PublicCard>
           ))}
         </div>

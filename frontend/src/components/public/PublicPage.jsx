@@ -49,7 +49,7 @@ export function PublicCard({ children, className = '' }) {
 export function PublicInput({ className = '', ...props }) {
   return (
     <input
-      className={`h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-[#071634] outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20 ${className}`}
+      className={`h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20 ${className}`}
       {...props}
     />
   )
@@ -58,7 +58,7 @@ export function PublicInput({ className = '', ...props }) {
 export function PublicTextarea({ className = '', ...props }) {
   return (
     <textarea
-      className={`min-h-32 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 py-3 text-sm font-semibold text-[#071634] outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20 ${className}`}
+      className={`min-h-32 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20 ${className}`}
       {...props}
     />
   )

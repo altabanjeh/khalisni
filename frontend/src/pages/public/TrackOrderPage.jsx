@@ -19,11 +19,11 @@ import { useLanguage } from '../../context/LanguageContext'
 import { formatDateTime } from '../../utils/format'
 
 function labelClass() {
-  return 'mb-2 block text-sm font-bold text-white/80'
+  return 'mb-2 block text-sm font-bold text-ink'
 }
 
 function errorClass() {
-  return 'mt-2 text-sm font-semibold text-red-200'
+  return 'mt-2 text-sm font-semibold text-danger'
 }
 
 function TrackOrderPage() {
@@ -76,7 +76,7 @@ function TrackOrderPage() {
             <Search className="h-4 w-4" />
             {isSubmitting ? (isArabic ? 'جار البحث...' : 'Searching...') : isArabic ? 'عرض الحالة' : 'Show status'}
           </PublicButton>
-          {submitError ? <p className="text-sm font-semibold text-red-200 md:col-span-3">{submitError}</p> : null}
+          {submitError ? <p className="text-sm font-semibold text-danger md:col-span-3">{submitError}</p> : null}
         </form>
       </PublicPanel>
 
@@ -87,32 +87,32 @@ function TrackOrderPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'ملخص الطلب' : 'Request summary'}</p>
-                  <h2 className="mt-2 text-3xl font-extrabold text-white">{result.order_number}</h2>
+                  <h2 className="mt-2 text-3xl font-extrabold text-ink">{result.order_number}</h2>
                 </div>
                 <StatusBadge status={result.status} />
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-3">
                 <PublicCard>
                   <CalendarClock className="h-5 w-5 text-[var(--khalsni-public-primary)]" />
-                  <p className="mt-3 text-xs font-bold text-white/50">{isArabic ? 'آخر تحديث' : 'Last update'}</p>
-                  <p className="mt-1 text-sm font-bold text-white">{formatDateTime(result.updated_at || result.timeline?.at?.(-1)?.created_at, language)}</p>
+                  <p className="mt-3 text-xs font-bold text-slate-500">{isArabic ? 'آخر تحديث' : 'Last update'}</p>
+                  <p className="mt-1 text-sm font-bold text-ink">{formatDateTime(result.updated_at || result.timeline?.at?.(-1)?.created_at, language)}</p>
                 </PublicCard>
                 <PublicCard>
                   <Phone className="h-5 w-5 text-[var(--khalsni-public-primary)]" />
-                  <p className="mt-3 text-xs font-bold text-white/50">{isArabic ? 'التحقق' : 'Verification'}</p>
-                  <p className="mt-1 text-sm font-bold text-white">{isArabic ? 'رقم الطلب + الهاتف' : 'Order number + phone'}</p>
+                  <p className="mt-3 text-xs font-bold text-slate-500">{isArabic ? 'التحقق' : 'Verification'}</p>
+                  <p className="mt-1 text-sm font-bold text-ink">{isArabic ? 'رقم الطلب + الهاتف' : 'Order number + phone'}</p>
                 </PublicCard>
                 <PublicCard>
                   <HelpCircle className="h-5 w-5 text-[var(--khalsni-public-primary)]" />
-                  <p className="mt-3 text-xs font-bold text-white/50">{isArabic ? 'الدعم' : 'Support'}</p>
-                  <p className="mt-1 text-sm font-bold text-white">{isArabic ? 'متاح عند الحاجة' : 'Available if needed'}</p>
+                  <p className="mt-3 text-xs font-bold text-slate-500">{isArabic ? 'الدعم' : 'Support'}</p>
+                  <p className="mt-1 text-sm font-bold text-ink">{isArabic ? 'متاح عند الحاجة' : 'Available if needed'}</p>
                 </PublicCard>
               </div>
             </PublicPanel>
 
             <PublicPanel>
               <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'خط سير الطلب' : 'Request timeline'}</p>
-              <h2 className="mt-1 text-2xl font-extrabold text-white">{isArabic ? 'تحديثات فعلية من النظام' : 'Actual system updates'}</h2>
+              <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'تحديثات فعلية من النظام' : 'Actual system updates'}</h2>
               <div className="mt-5">
                 <OrderTimeline items={result.timeline || []} variant="public" />
               </div>
@@ -120,7 +120,7 @@ function TrackOrderPage() {
 
             {result.final_documents?.length ? (
               <PublicPanel>
-                <h3 className="mb-3 text-lg font-bold text-white">{isArabic ? 'النتيجة النهائية' : 'Final documents'}</h3>
+                <h3 className="mb-3 text-lg font-bold text-ink">{isArabic ? 'النتيجة النهائية' : 'Final documents'}</h3>
                 <DocumentList documents={result.final_documents} orderNumber={orderNumber} phone={phone} variant="public" />
               </PublicPanel>
             ) : null}
@@ -130,16 +130,16 @@ function TrackOrderPage() {
             <PublicPanel>
               <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'الحالة الحالية' : 'Current status'}</p>
               <div className="mt-4"><StatusBadge status={result.status} /></div>
-              <p className="mt-4 text-sm font-semibold leading-7 text-white/50">
+              <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">
                 {isArabic ? 'لا نعرض أي ملاحظات داخلية أو مستندات خاصة من صفحة التتبع العامة.' : 'Internal notes and private documents are not exposed on public tracking.'}
               </p>
             </PublicPanel>
             {result.missing_documents?.length ? (
-              <PublicPanel className="border-amber-300/40 bg-amber-400/10">
-                <p className="font-bold text-amber-100">{isArabic ? 'مطلوب منك' : 'Required from you'}</p>
+              <PublicPanel className="border-amber-200 bg-amber-50">
+                <p className="font-bold text-amber-900">{isArabic ? 'مطلوب منك' : 'Required from you'}</p>
                 <div className="mt-4 space-y-3">
                   {result.missing_documents.map((item) => (
-                    <div key={item} className="rounded-md border border-amber-200/20 bg-black/10 px-4 py-3 text-sm font-semibold text-amber-50">{item}</div>
+                    <div key={item} className="rounded-md border border-amber-200 bg-white px-4 py-3 text-sm font-semibold text-amber-800">{item}</div>
                   ))}
                 </div>
               </PublicPanel>

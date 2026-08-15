@@ -72,7 +72,7 @@ function Sidebar({ title, links, isOpen, onClose }) {
                 className={({ isActive }) =>
                   clsx(
                     'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition',
-                    isActive ? 'bg-[#0A2A66] text-white shadow-soft' : 'text-slate-600 hover:bg-brand-50 hover:text-ink',
+                    isActive ? 'bg-brand-600 text-white shadow-soft' : 'text-slate-600 hover:bg-brand-50 hover:text-ink',
                   )
                 }
               >

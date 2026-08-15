@@ -55,25 +55,25 @@ function ForgotPasswordPage() {
 
       <PublicPanel className="mx-auto max-w-xl">
         {successMessage ? (
-          <div className="mb-4 rounded-lg border border-green-300/25 bg-green-500/15 px-4 py-3 text-sm font-semibold text-green-100">{successMessage}</div>
+          <div className="mb-4 rounded-[var(--radius-lg)] border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">{successMessage}</div>
         ) : null}
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label htmlFor="forgot-email" className="mb-2 block text-sm font-bold text-white/80">{isArabic ? 'البريد الإلكتروني' : 'Email address'}</label>
+            <label htmlFor="forgot-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email address'}</label>
             <PublicInput
               id="forgot-email"
               autoComplete="email"
               type="email"
               {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })}
             />
-            {errors.email ? <p className="mt-2 text-sm font-semibold text-red-200">{errors.email.message}</p> : null}
+            {errors.email ? <p className="mt-2 text-sm font-semibold text-danger">{errors.email.message}</p> : null}
           </div>
-          {error ? <p className="text-sm font-semibold text-red-200">{error}</p> : null}
+          {error ? <p className="text-sm font-semibold text-danger">{error}</p> : null}
           <PublicButton className="w-full" disabled={isSubmitting} type="submit">
             {isSubmitting ? (isArabic ? 'جار الإرسال...' : 'Sending...') : isArabic ? 'إرسال رابط إعادة التعيين' : 'Send reset link'}
           </PublicButton>
-          <p className="text-center text-sm font-semibold text-white/50">
+          <p className="text-center text-sm font-semibold text-slate-600">
             <Link
               className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"
               to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login'}
