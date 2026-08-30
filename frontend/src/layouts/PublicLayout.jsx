@@ -58,13 +58,10 @@ function KhalsniLogo({ logoUrl }) {
   }
 
   return (
-    <span className="flex items-center gap-2 text-[var(--khalsni-public-text)]">
-      <span className="text-right leading-none">
-        <span className="block text-[1.16rem] font-extrabold">خلصني</span>
-        <span className="block text-[0.56rem] font-bold tracking-wide text-slate-500">Khalsni</span>
-      </span>
-      <span className="relative grid h-8 w-8 place-items-center rounded-full border-2 border-[var(--khalsni-public-primary)]">
-        <span className="h-3 w-[1.125rem] rotate-[-35deg] border-b-[3px] border-r-[3px] border-[var(--khalsni-public-primary)]" />
+    <span className="flex items-center gap-2 text-[var(--khalsni-public-navy)]">
+      <span className="text-start leading-none">
+        <span className="block text-[1.18rem] font-extrabold">خلصني</span>
+        <span className="block text-[0.58rem] font-bold text-[var(--khalsni-public-text-secondary)]">Khalsni</span>
       </span>
     </span>
   )
@@ -107,7 +104,7 @@ function PublicLayoutContent() {
       <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
-            <Link className="shrink-0" to="/" aria-label="Khalsni home">
+            <Link className="kh-focusable shrink-0 rounded-[var(--radius-sm)]" to="/" aria-label="Khalsni home">
               <KhalsniLogo logoUrl={theme.logo_url} />
             </Link>
 
@@ -118,7 +115,7 @@ function PublicLayoutContent() {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `relative whitespace-nowrap px-1.5 py-5 text-slate-600 transition hover:text-[var(--khalsni-public-primary)] lg:px-4 ${
+                    `kh-focusable relative rounded-[var(--radius-sm)] px-1.5 py-5 text-[var(--khalsni-public-text-secondary)] transition hover:text-[var(--khalsni-public-primary)] lg:px-4 ${
                       isActive
                         ? 'text-[var(--khalsni-public-primary)] after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--khalsni-public-primary)]'
                         : ''
@@ -132,17 +129,17 @@ function PublicLayoutContent() {
 
             <div className="hidden shrink-0 items-center gap-2 min-[700px]:flex">
               {user ? (
-                <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
+                <Link className="kh-focusable inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
                   <UserRound className="h-4 w-4" />
                   {dictionary.portal}
                 </Link>
               ) : (
                 <>
-                  <Link className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/login">
+                  <Link className="kh-focusable inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/login">
                     <LogIn className="h-4 w-4" />
                     {dictionary.login}
                   </Link>
-                  <Link className="inline-flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-3 text-[0.7rem] font-extrabold text-[var(--khalsni-public-text)] transition hover:bg-[var(--khalsni-public-bg-secondary)]" to="/register">
+                  <Link className="kh-focusable inline-flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-3 text-[0.7rem] font-extrabold text-[var(--khalsni-public-text)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/register">
                     {dictionary.register}
                   </Link>
                 </>
@@ -152,7 +149,7 @@ function PublicLayoutContent() {
             <button
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? dictionary.closeMenu : dictionary.openMenu}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] min-[700px]:hidden"
+              className="kh-focusable inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] min-[700px]:hidden"
               onClick={() => setMobileMenuOpen((current) => !current)}
               type="button"
             >
@@ -164,14 +161,14 @@ function PublicLayoutContent() {
         {mobileMenuOpen ? (
           <div className="border-t border-[var(--khalsni-public-border)] bg-white min-[700px]:hidden">
             <div className="kh-public-container py-4">
-              <nav className="grid gap-1 text-right text-sm font-bold">
+              <nav className="grid gap-1 text-start text-sm font-bold">
                 {links.map((link) => (
                   <NavLink
                     end={link.end}
                     key={link.to}
                     to={link.to}
                     className={({ isActive }) =>
-                      `rounded-[var(--radius-md)] px-4 py-3 ${isActive ? 'bg-[var(--khalsni-public-primary)] text-white' : 'text-slate-700 hover:bg-[var(--khalsni-public-bg-secondary)] hover:text-[var(--khalsni-public-primary)]'}`
+                      `kh-focusable rounded-[var(--radius-md)] px-4 py-3 ${isActive ? 'bg-[var(--khalsni-public-primary)] text-white' : 'text-[var(--khalsni-public-text)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]'}`
                     }
                   >
                     {link.label}
@@ -180,17 +177,17 @@ function PublicLayoutContent() {
               </nav>
               <div className="mt-4 grid gap-3">
                 {user ? (
-                  <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to={portalPath}>
+                  <Link className="kh-focusable inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to={portalPath}>
                     <UserRound className="h-4 w-4" />
                     {dictionary.portal}
                   </Link>
                 ) : (
                   <>
-                    <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to="/login">
+                    <Link className="kh-focusable inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to="/login">
                       <LogIn className="h-4 w-4" />
                       {dictionary.login}
                     </Link>
-                    <Link className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-bold text-[var(--khalsni-public-text)]" to="/register">
+                    <Link className="kh-focusable inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-bold text-[var(--khalsni-public-text)]" to="/register">
                       {dictionary.register}
                     </Link>
                   </>
@@ -205,27 +202,27 @@ function PublicLayoutContent() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-bg-secondary)]">
+      <footer className="border-t border-[var(--khalsni-public-border)] bg-[var(--public-footer-background-color)] text-[var(--public-footer-text-color)]">
         <div className="kh-public-container py-7">
-          <div className="grid gap-8 text-right md:grid-cols-[1.2fr_0.75fr_0.75fr_1fr]">
+          <div className="grid gap-8 text-start md:grid-cols-[1.2fr_0.75fr_0.75fr_1fr]">
             <div>
               <KhalsniLogo logoUrl={theme.logo_url} />
-              <p className="mt-4 max-w-sm text-sm leading-7 text-slate-600">
+              <p className="mt-4 max-w-sm text-sm leading-7 text-[var(--khalsni-public-text-secondary)]">
                 {footerText || dictionary.footerDescription}
               </p>
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-ink">{dictionary.serviceLinks}</h2>
-              <div className="mt-4 grid gap-2 text-sm text-slate-600">
+              <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.serviceLinks}</h2>
+              <div className="mt-4 grid gap-2 text-sm text-[var(--khalsni-public-text-secondary)]">
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.services}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/contact">{dictionary.specialRequest}</Link>
               </div>
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-ink">{dictionary.quickLinks}</h2>
-              <div className="mt-4 grid gap-2 text-sm text-slate-600">
+              <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.quickLinks}</h2>
+              <div className="mt-4 grid gap-2 text-sm text-[var(--khalsni-public-text-secondary)]">
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/">{dictionary.home}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.services}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/track-order">{dictionary.track}</Link>
@@ -235,33 +232,33 @@ function PublicLayoutContent() {
             </div>
 
             <div>
-              <h2 className="text-sm font-extrabold text-ink">{dictionary.contactTitle}</h2>
-              <div className="mt-4 grid gap-3 text-sm text-slate-600">
+              <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.contactTitle}</h2>
+              <div className="mt-4 grid gap-3 text-sm text-[var(--khalsni-public-text-secondary)]">
                 {content.contact_phone ? (
-                  <a className="flex items-center justify-end gap-2 hover:text-[var(--khalsni-public-primary)]" href={`tel:${content.contact_phone}`}>
-                    <span>{content.contact_phone}</span>
+                  <a className="flex items-center gap-2 hover:text-[var(--khalsni-public-primary)]" href={`tel:${content.contact_phone}`}>
                     <Phone className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
+                    <span>{content.contact_phone}</span>
                   </a>
                 ) : null}
                 {content.email ? (
-                  <a className="flex items-center justify-end gap-2 hover:text-[var(--khalsni-public-primary)]" href={`mailto:${content.email}`}>
-                    <span>{content.email}</span>
+                  <a className="flex items-center gap-2 hover:text-[var(--khalsni-public-primary)]" href={`mailto:${content.email}`}>
                     <Mail className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
+                    <span>{content.email}</span>
                   </a>
                 ) : null}
                 {officeAddress ? (
-                  <p className="flex items-center justify-end gap-2">
-                    <span>{officeAddress}</span>
+                  <p className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
+                    <span>{officeAddress}</span>
                   </p>
                 ) : null}
                 {!content.contact_phone && !content.email && !officeAddress ? (
-                  <p className="text-sm leading-7 text-slate-500">{dictionary.noContact}</p>
+                  <p className="text-sm leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.noContact}</p>
                 ) : null}
               </div>
             </div>
           </div>
-          <p className="mt-7 border-t border-[var(--khalsni-public-border)] pt-5 text-center text-xs text-slate-500">
+          <p className="mt-7 border-t border-[var(--khalsni-public-border)] pt-5 text-center text-xs text-[var(--khalsni-public-text-secondary)]">
             {dictionary.copyright}
           </p>
         </div>
@@ -269,7 +266,7 @@ function PublicLayoutContent() {
 
       <Link
         aria-label={dictionary.contact}
-        className="fixed bottom-5 left-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-lg transition hover:bg-[var(--khalsni-public-primary-hover)]"
+        className="kh-focusable fixed bottom-5 start-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-lg transition hover:bg-[var(--khalsni-public-primary-hover)]"
         to="/contact"
       >
         <MessageCircle className="h-7 w-7" />

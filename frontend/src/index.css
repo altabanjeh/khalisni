@@ -3,34 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --kh-bg: #ffffff;
+  --kh-bg: #fbfcff;
   --kh-surface: #ffffff;
-  --kh-surface-muted: #f7faff;
-  --kh-soft-blue: #eef4ff;
-  --kh-soft-blue-strong: #e4eeff;
-  --kh-primary: #1252f7;
-  --kh-primary-hover: #0e47da;
-  --kh-primary-active: #0b3bc0;
+  --kh-surface-muted: #f6f9ff;
+  --kh-soft-blue: #eff6ff;
+  --kh-soft-blue-strong: #dbeafe;
+  --kh-primary: #146ef0;
+  --kh-primary-hover: #0f5dd8;
+  --kh-primary-active: #0b49b5;
   --kh-navy: #0b1533;
   --kh-navy-soft: #17213a;
   --kh-text: #17213a;
+  --kh-text-secondary: #475467;
   --kh-text-muted: #667085;
   --kh-text-subtle: #98a2b3;
-  --kh-border: #e4eaf2;
-  --kh-border-strong: #d7e0ec;
+  --kh-border: #dbe5f0;
+  --kh-border-strong: #c9d6e5;
   --kh-success: #12b76a;
   --kh-warning: #f79009;
   --kh-danger: #f04438;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  --kh-space-1: 4px;
+  --kh-space-2: 8px;
+  --kh-space-3: 12px;
+  --kh-space-4: 16px;
+  --kh-space-5: 20px;
+  --kh-space-6: 24px;
+  --kh-space-8: 32px;
+  --kh-space-10: 40px;
+  --kh-space-12: 48px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
   --radius-pill: 999px;
   --radius: var(--radius-lg);
   --shadow-sm: 0 1px 2px rgba(11, 21, 51, 0.06);
-  --shadow-md: 0 10px 28px rgba(11, 21, 51, 0.08);
-  --shadow-lg: 0 18px 48px rgba(11, 21, 51, 0.1);
+  --shadow-md: 0 8px 22px rgba(11, 21, 51, 0.07);
+  --shadow-lg: 0 16px 40px rgba(11, 21, 51, 0.08);
+  --shadow-lift: 0 18px 44px rgba(11, 21, 51, 0.12);
+  --kh-container-public: 1200px;
+  --kh-container-wide: 1480px;
+  --kh-breakpoint-xs: 390px;
+  --kh-breakpoint-sm: 640px;
+  --kh-breakpoint-md: 768px;
+  --kh-breakpoint-lg: 1024px;
+  --kh-breakpoint-xl: 1280px;
+  --kh-transition-fast: 160ms;
+  --kh-transition-base: 220ms;
+  --kh-ease: cubic-bezier(0.2, 0, 0, 1);
+  --kh-focus-ring: 0 0 0 4px rgba(20, 110, 240, 0.16);
   --khalsni-blue: var(--kh-primary);
   --khalsni-navy: var(--kh-navy);
   --background: var(--kh-bg);
@@ -42,25 +64,30 @@
   --warning: var(--kh-warning);
   --danger: var(--kh-danger);
   --public-primary-color: var(--kh-primary);
-  --public-secondary-color: var(--kh-navy-soft);
+  --public-secondary-color: var(--kh-primary-hover);
   --public-background-color: var(--kh-bg);
   --public-text-color: var(--kh-text);
   --public-header-background-color: #ffffff;
-  --public-footer-background-color: var(--kh-navy);
+  --public-footer-background-color: var(--kh-surface-muted);
   --public-header-text-color: var(--kh-text);
-  --public-footer-text-color: #ffffff;
-  --khalsni-public-bg: #ffffff;
-  --khalsni-public-bg-secondary: #f7faff;
+  --public-footer-text-color: var(--kh-text);
+  --khalsni-public-bg: var(--kh-bg);
+  --khalsni-public-bg-secondary: var(--kh-surface-muted);
   --khalsni-public-surface: #ffffff;
   --khalsni-public-surface-elevated: #ffffff;
   --khalsni-public-primary: var(--kh-primary);
   --khalsni-public-primary-hover: var(--kh-primary-hover);
+  --khalsni-public-primary-active: var(--kh-primary-active);
+  --khalsni-public-primary-soft: var(--kh-soft-blue);
+  --khalsni-public-navy: var(--kh-navy);
   --khalsni-public-text: var(--kh-text);
-  --khalsni-public-text-secondary: var(--kh-text-muted);
+  --khalsni-public-text-main: var(--kh-text);
+  --khalsni-public-text-secondary: var(--kh-text-secondary);
   --khalsni-public-text-muted: var(--kh-text-subtle);
   --khalsni-public-border: var(--kh-border);
   --khalsni-public-overlay: rgba(11, 21, 51, 0.52);
-  --khalsni-public-container: 1480px;
+  --khalsni-public-container: var(--kh-container-wide);
+  --khalsni-public-readable-container: var(--kh-container-public);
   --khalsni-public-desktop-padding: 20px;
   --khalsni-public-mobile-padding: 12px;
   --khalsni-radius-small: var(--radius-sm);
@@ -205,9 +232,82 @@
     padding-inline: var(--khalsni-public-desktop-padding);
   }
 
+  .kh-public-readable {
+    width: min(100%, var(--khalsni-public-readable-container));
+    margin-inline: auto;
+    padding-inline: var(--khalsni-public-desktop-padding);
+  }
+
   @media (max-width: 640px) {
-    .kh-public-container {
+    .kh-public-container,
+    .kh-public-readable {
       padding-inline: var(--khalsni-public-mobile-padding);
+    }
+  }
+
+  .kh-focusable {
+    @apply outline-none;
+  }
+
+  .kh-focusable:focus-visible {
+    box-shadow: var(--kh-focus-ring);
+  }
+
+  .kh-public-card {
+    @apply overflow-hidden border bg-white text-[var(--khalsni-public-text)];
+    border-color: var(--khalsni-public-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .kh-public-card-elevated {
+    box-shadow: var(--shadow-md);
+  }
+
+  .kh-public-image {
+    @apply h-full w-full object-cover;
+    background: var(--khalsni-public-primary-soft);
+  }
+
+  .kh-public-image-fallback {
+    background:
+      radial-gradient(circle at 18% 18%, rgba(20, 110, 240, 0.16), transparent 34%),
+      linear-gradient(135deg, #ffffff 0%, var(--khalsni-public-primary-soft) 100%);
+  }
+
+  .kh-interactive-card {
+    transition:
+      transform var(--kh-transition-base) var(--kh-ease),
+      border-color var(--kh-transition-base) var(--kh-ease),
+      box-shadow var(--kh-transition-base) var(--kh-ease),
+      background-color var(--kh-transition-base) var(--kh-ease);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kh-interactive-card:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--khalsni-public-primary) 42%, var(--khalsni-public-border));
+      box-shadow: var(--shadow-lift);
+    }
+
+    .kh-interactive-card:hover .kh-card-image-zoom {
+      transform: scale(1.035);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
+    .kh-interactive-card:hover,
+    .kh-interactive-card:hover .kh-card-image-zoom {
+      transform: none;
     }
   }
 
