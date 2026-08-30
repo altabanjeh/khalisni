@@ -57,7 +57,7 @@ export function ColorPickerField({ label, hint, name, register, value, setValue,
   )
 }
 
-export function ImageUploadField({ label, hint, accept, registration, fileUrl, fileList, error }) {
+export function ImageUploadField({ label, hint, accept, registration, fileUrl, fileList, error, onClear, clearLabel = 'Remove image' }) {
   const [previewUrl, setPreviewUrl] = useState(fileUrl || '')
 
   useEffect(() => {
@@ -77,6 +77,11 @@ export function ImageUploadField({ label, hint, accept, registration, fileUrl, f
         {previewUrl ? (
           <div className="mt-4 overflow-hidden rounded-3xl border border-border bg-white p-3">
             <img alt={label} className="max-h-56 w-full rounded-2xl object-cover" src={previewUrl} />
+            {onClear ? (
+              <button className="btn-secondary mt-3 w-full text-xs" onClick={onClear} type="button">
+                {clearLabel}
+              </button>
+            ) : null}
           </div>
         ) : (
           <p className="mt-3 text-xs text-slate-500">No image selected.</p>

@@ -2,7 +2,7 @@ import { ArrowRight, Layers3, Search } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import CategoryCard from '../../components/CategoryCard'
 import ServiceCard from '../../components/ServiceCard'
-import { PublicEmptyState, PublicHero, PublicLinkButton, PublicLoading, PublicPageShell, PublicPanel } from '../../components/public/PublicPage'
+import { ImageFallback, PublicEmptyState, PublicHero, PublicLinkButton, PublicLoading, PublicPageShell, PublicPanel } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
@@ -20,6 +20,8 @@ function ServiceCategoryPage() {
   const title = getCategoryName(category, language, isArabic ? 'تصنيف الخدمات' : 'Service category')
   const description = getCategoryDescription(category, language, isArabic ? 'كل الخدمات المتاحة ضمن هذا التصنيف.' : 'All available services in this category.')
 
+  const categoryImageUrl = category.image_url || category.image
+
   return (
     <PublicPageShell>
       <PublicHero
@@ -28,6 +30,13 @@ function ServiceCategoryPage() {
         title={title}
         description={description}
         action={<PublicLinkButton to="/services" variant="secondary"><ArrowRight className="h-4 w-4" />{isArabic ? 'كل الخدمات' : 'All services'}</PublicLinkButton>}
+      />
+
+      <ImageFallback
+        alt={title}
+        className="aspect-[16/6] min-h-48 rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] shadow-soft"
+        icon={Layers3}
+        src={categoryImageUrl}
       />
 
       {loading ? <PublicLoading /> : null}

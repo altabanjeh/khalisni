@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from core.serializer_mixins import PkAsIdMixin
+from public_site.validators import PublicSiteImageValidator
 from providers.models import ProviderProfile
 from services.models import (
     Address,
@@ -55,6 +56,24 @@ def _public_pricing_payload(service):
     }
 
 
+def _media_url(request, file_field):
+    if not file_field:
+        return ""
+    url = getattr(file_field, "url", "")
+    if not url:
+        return ""
+    if request is None:
+        return url
+    return request.build_absolute_uri(url)
+
+
+def _clear_file_field(instance, field_name):
+    file_field = getattr(instance, field_name, None)
+    if file_field:
+        file_field.delete(save=False)
+    setattr(instance, field_name, None)
+
+
 class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     name = serializers.CharField(source="name_ar", read_only=True)
     description = serializers.CharField(source="description_ar", read_only=True)
@@ -64,6 +83,7 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
     service_count = serializers.SerializerMethodField()
     image = serializers.ImageField(read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceCategory
@@ -81,6 +101,7 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
             "icon",
             "color",
             "image",
+            "image_url",
             "display_order",
             "sort_order",
             "is_active",
@@ -101,11 +122,17 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
     def get_service_count(self, obj):
         return getattr(obj, "service_count", getattr(obj, "active_services_count", 0))
 
+    def get_image_url(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
+
 
 class AdminCategoryRuleSerializer(serializers.ModelSerializer):
     slug = serializers.CharField(required=False, allow_blank=True)
     name = serializers.CharField(source="name_ar", read_only=True)
     description = serializers.CharField(source="description_ar", read_only=True)
+    image = serializers.ImageField(required=False, allow_null=True, validators=[PublicSiteImageValidator()])
+    image_url = serializers.SerializerMethodField()
+    clear_image = serializers.BooleanField(write_only=True, required=False, default=False)
     parent_id = serializers.PrimaryKeyRelatedField(
         source="parent",
         queryset=ServiceCategory.objects.all(),
@@ -134,6 +161,9 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
             "description_en",
             "icon",
             "color",
+            "image",
+            "image_url",
+            "clear_image",
             "display_order",
             "sort_order",
             "is_active",
@@ -143,7 +173,7 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
             "services_preview",
             "help_text",
         )
-        read_only_fields = ("help_text",)
+        read_only_fields = ("help_text", "image_url")
 
     def get_help_text(self, obj):
         return "Use categories to group services for the public catalog and internal operations."
@@ -154,7 +184,11 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
             services = obj.services.filter(is_active=True).order_by("name_ar")[:5]
         return [{"id": service.id, "name_ar": service.name_ar, "slug": service.slug} for service in services]
 
+    def get_image_url(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
+
     def create(self, validated_data):
+        validated_data.pop("clear_image", None)
         if "sort_order" in validated_data and "display_order" not in validated_data:
             validated_data["display_order"] = validated_data["sort_order"]
         validated_data["slug"] = validated_data.get("slug") or fallback_slug(
@@ -170,6 +204,9 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        clear_image = validated_data.pop("clear_image", False)
+        if clear_image and "image" not in validated_data:
+            _clear_file_field(instance, "image")
         if "sort_order" in validated_data and "display_order" not in validated_data:
             validated_data["display_order"] = validated_data["sort_order"]
         if "slug" in validated_data:
@@ -201,9 +238,15 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
 
 
 class RelatedServiceSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(read_only=True)
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Service
-        fields = ("id", "name_ar", "name_en", "slug", "description_ar", "description_en", "estimated_duration", "service_fee", "government_fee")
+        fields = ("id", "name_ar", "name_en", "slug", "description_ar", "description_en", "image", "image_url", "estimated_duration", "service_fee", "government_fee")
+
+    def get_image_url(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
 
 
 class ServiceRelationServiceSerializer(serializers.ModelSerializer):
@@ -326,6 +369,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
     effective_total_fee = serializers.SerializerMethodField()
     pricing = serializers.SerializerMethodField()
     delivery_time = serializers.SerializerMethodField()
+    image = serializers.ImageField(read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -338,6 +383,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "name_en",
             "display_name",
             "slug",
+            "image",
+            "image_url",
             "description_ar",
             "description_en",
             "estimated_duration",
@@ -379,12 +426,18 @@ class ServiceListSerializer(serializers.ModelSerializer):
     def get_delivery_time(self, obj):
         return obj.delivery_time_payload()
 
+    def get_image_url(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
+
 
 class AdminServiceRuleSerializer(serializers.ModelSerializer):
     slug = serializers.CharField(required=False, allow_blank=True)
     category = ServiceCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(source="category", queryset=ServiceCategory.objects.all(), write_only=True)
     category_name = serializers.CharField(source="category.name_ar", read_only=True)
+    image = serializers.ImageField(required=False, allow_null=True, validators=[PublicSiteImageValidator()])
+    image_url = serializers.SerializerMethodField()
+    clear_image = serializers.BooleanField(write_only=True, required=False, default=False)
     organization_id = serializers.PrimaryKeyRelatedField(source="organization", queryset=ServiceCategory.objects.none(), write_only=True, required=False, allow_null=True)
     organization_name = serializers.CharField(source="organization.name", read_only=True)
     duration_display = serializers.SerializerMethodField()
@@ -416,6 +469,9 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
             "name_ar",
             "name_en",
             "slug",
+            "image",
+            "image_url",
+            "clear_image",
             "short_description_ar",
             "short_description_en",
             "description_ar",
@@ -454,16 +510,20 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
             "required_document_ids",
             "required_documents",
         )
-        read_only_fields = ("duration_display",)
+        read_only_fields = ("duration_display", "image_url")
 
     def get_duration_display(self, obj):
         return obj.delivery_time_payload().get("label_en")
+
+    def get_image_url(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
 
     def get_required_documents(self, obj):
         requirements = obj.document_requirements.filter(is_deleted=False).select_related("document_definition").order_by("display_order", "name_ar")
         return AdminRequiredDocumentRuleSerializer(requirements, many=True, context=self.context).data
 
     def create(self, validated_data):
+        validated_data.pop("clear_image", None)
         required_document_definitions = validated_data.pop("required_document_definitions", [])
         validated_data["slug"] = validated_data.get("slug") or fallback_slug(
             validated_data.get("name_en"),
@@ -475,6 +535,9 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
+        clear_image = validated_data.pop("clear_image", False)
+        if clear_image and "image" not in validated_data:
+            _clear_file_field(instance, "image")
         required_document_definitions = validated_data.pop("required_document_definitions", None)
         if "slug" in validated_data:
             instance.slug = validated_data["slug"] or fallback_slug(

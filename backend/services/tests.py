@@ -1,4 +1,9 @@
+import shutil
+import tempfile
+
 from django.contrib.auth.models import Permission
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -306,6 +311,201 @@ class ServiceManagementPermissionTests(APITestCase):
         )
         self.assertEqual(service_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(service_response.data["slug"], "passport-service")
+
+
+class CatalogImageManagementTests(APITestCase):
+    @staticmethod
+    def _image(name="catalog.gif"):
+        return SimpleUploadedFile(
+            name,
+            b"GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;",
+            content_type="image/gif",
+        )
+
+    @staticmethod
+    def _invalid_file():
+        return SimpleUploadedFile("catalog.txt", b"not an image", content_type="text/plain")
+
+    def setUp(self):
+        self.client = APIClient()
+        self.media_root = tempfile.mkdtemp()
+        self.settings_override = override_settings(MEDIA_ROOT=self.media_root)
+        self.settings_override.enable()
+        self.admin = CustomUser.objects.create_user(
+            email="catalog-image-admin@example.com",
+            password="Password@123",
+            full_name="Catalog Image Admin",
+            phone="0794030001",
+            role=CustomUser.Role.ADMIN,
+            is_staff=True,
+        )
+        self.category = ServiceCategory.objects.create(
+            name_ar="Image Category",
+            name_en="Image Category",
+            slug="image-category",
+            show_on_public_site=True,
+            is_active=True,
+        )
+        self.service = Service.objects.create(
+            category=self.category,
+            name_ar="Image Service",
+            name_en="Image Service",
+            slug="image-service",
+            description_ar="Details",
+            estimated_duration=1,
+            base_price=1,
+            government_fee=1,
+            service_fee=1,
+            show_on_public_site=True,
+            is_active=True,
+        )
+        self.client.force_authenticate(self.admin)
+
+    def tearDown(self):
+        self.settings_override.disable()
+        shutil.rmtree(self.media_root, ignore_errors=True)
+
+    def test_category_can_be_created_without_image(self):
+        response = self.client.post(
+            "/api/admin/categories/",
+            {
+                "name_ar": "No Image Category",
+                "name_en": "No Image Category",
+                "slug": "no-image-category",
+                "sort_order": 1,
+                "show_on_public_site": True,
+                "is_active": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["image_url"], "")
+
+    def test_category_image_upload_replace_remove_and_public_api_return(self):
+        upload_response = self.client.patch(
+            f"/api/admin/categories/{self.category.id}/",
+            {"image": self._image("category-one.gif")},
+            format="multipart",
+        )
+        self.assertEqual(upload_response.status_code, status.HTTP_200_OK)
+        self.assertIn("/media/service_categories/images/", upload_response.data["image_url"])
+        first_name = ServiceCategory.objects.get(pk=self.category.id).image.name
+
+        public_response = self.client.get("/api/public-site/service-categories/")
+        self.assertEqual(public_response.status_code, status.HTTP_200_OK)
+        public_category = next(item for item in public_response.data if item["id"] == self.category.id)
+        self.assertIn("/media/service_categories/images/", public_category["image_url"])
+
+        replace_response = self.client.patch(
+            f"/api/admin/categories/{self.category.id}/",
+            {"image": self._image("category-two.gif")},
+            format="multipart",
+        )
+        self.assertEqual(replace_response.status_code, status.HTTP_200_OK)
+        self.category.refresh_from_db()
+        self.assertNotEqual(self.category.image.name, first_name)
+
+        remove_response = self.client.patch(
+            f"/api/admin/categories/{self.category.id}/",
+            {"clear_image": True},
+            format="json",
+        )
+        self.assertEqual(remove_response.status_code, status.HTTP_200_OK)
+        self.category.refresh_from_db()
+        self.assertFalse(self.category.image)
+        self.assertEqual(remove_response.data["image_url"], "")
+
+    def test_category_rejects_unsupported_image_type(self):
+        response = self.client.patch(
+            f"/api/admin/categories/{self.category.id}/",
+            {"image": self._invalid_file()},
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("image", response.data)
+
+    def test_service_can_be_created_without_image(self):
+        response = self.client.post(
+            "/api/admin/services/",
+            {
+                "category_id": self.category.id,
+                "name_ar": "No Image Service",
+                "name_en": "No Image Service",
+                "slug": "no-image-service",
+                "description_ar": "Details",
+                "description_en": "Details",
+                "required_information_schema": [],
+                "terms_ar": "",
+                "terms_en": "",
+                "base_price": "1.00",
+                "government_fee": "1.00",
+                "service_fee": "1.00",
+                "estimated_duration": 1,
+                "estimated_duration_unit": "days",
+                "price_type": "fixed",
+                "is_online": True,
+                "provider_required": True,
+                "requires_manual_review": True,
+                "requires_appointment": False,
+                "is_featured": False,
+                "is_active": True,
+                "show_on_public_site": True,
+                "display_order": 0,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["image_url"], "")
+
+    def test_service_image_upload_replace_remove_and_public_api_return(self):
+        upload_response = self.client.patch(
+            f"/api/admin/services/{self.service.id}/",
+            {"image": self._image("service-one.gif")},
+            format="multipart",
+        )
+        self.assertEqual(upload_response.status_code, status.HTTP_200_OK)
+        self.assertIn("/media/services/images/", upload_response.data["image_url"])
+        first_name = Service.objects.get(pk=self.service.id).image.name
+
+        list_response = self.client.get("/api/services/")
+        detail_response = self.client.get(f"/api/services/{self.service.slug}/")
+        self.assertEqual(list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail_response.status_code, status.HTTP_200_OK)
+        public_service = next(item for item in list_response.data if item["id"] == self.service.id)
+        self.assertIn("/media/services/images/", public_service["image_url"])
+        self.assertIn("/media/services/images/", detail_response.data["image_url"])
+
+        replace_response = self.client.patch(
+            f"/api/admin/services/{self.service.id}/",
+            {"image": self._image("service-two.gif")},
+            format="multipart",
+        )
+        self.assertEqual(replace_response.status_code, status.HTTP_200_OK)
+        self.service.refresh_from_db()
+        self.assertNotEqual(self.service.image.name, first_name)
+
+        remove_response = self.client.patch(
+            f"/api/admin/services/{self.service.id}/",
+            {"clear_image": True},
+            format="json",
+        )
+        self.assertEqual(remove_response.status_code, status.HTTP_200_OK)
+        self.service.refresh_from_db()
+        self.assertFalse(self.service.image)
+        self.assertEqual(remove_response.data["image_url"], "")
+
+    def test_service_rejects_unsupported_image_type(self):
+        response = self.client.patch(
+            f"/api/admin/services/{self.service.id}/",
+            {"image": self._invalid_file()},
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("image", response.data)
 
 
 class ServiceRelationManagementTests(APITestCase):

@@ -6,6 +6,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
+import { ImageUploadField } from '../../components/publicSite/PublicSiteFormFields'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
@@ -24,6 +25,8 @@ const defaultValues = {
   description_en: '',
   icon: '',
   color: '',
+  image: undefined,
+  clear_image: false,
   sort_order: 0,
   is_active: true,
   show_on_public_site: true,
@@ -48,6 +51,10 @@ function CheckboxField({ label, registration }) {
       <input className="h-4 w-4 accent-brand-600" type="checkbox" {...registration} />
     </label>
   )
+}
+
+function isClearImageValue(value) {
+  return value === true || value === 'true' || value === 'on'
 }
 
 function ServiceCategoryManagementPage() {
@@ -81,6 +88,8 @@ function ServiceCategoryManagementPage() {
   )
   const categoryNameAr = form.watch('name_ar')
   const categoryNameEn = form.watch('name_en')
+  const categoryImageFile = form.watch('image')
+  const categoryClearImage = form.watch('clear_image')
   const generatedSlug = selectedCategory?.slug || form.watch('slug') || generateCatalogSlug([categoryNameEn, categoryNameAr], 'category')
   const generatedIcon = selectedCategory?.icon || form.watch('icon') || suggestCategoryIcon(categoryNameEn, categoryNameAr)
   const parentOptions = useMemo(
@@ -100,6 +109,8 @@ function ServiceCategoryManagementPage() {
             description_en: selectedCategory.description_en || '',
             icon: selectedCategory.icon || '',
             color: selectedCategory.color || '',
+            image: undefined,
+            clear_image: false,
             sort_order: selectedCategory.sort_order ?? selectedCategory.display_order ?? 0,
             is_active: Boolean(selectedCategory.is_active),
             show_on_public_site: Boolean(selectedCategory.show_on_public_site),
@@ -147,6 +158,8 @@ function ServiceCategoryManagementPage() {
         description_en: values.description_en.trim(),
         icon: (values.icon || generatedIcon || '').trim(),
         color: values.color.trim(),
+        image: values.image,
+        clear_image: isClearImageValue(values.clear_image),
         sort_order: Number(values.sort_order || 0),
         is_active: Boolean(values.is_active),
         show_on_public_site: Boolean(values.show_on_public_site),
@@ -458,6 +471,25 @@ function ServiceCategoryManagementPage() {
           <Field label={isArabic ? 'الوصف' : 'Description'}>
             <textarea className="field min-h-24" {...form.register('description_ar')} />
           </Field>
+          <input type="hidden" {...form.register('clear_image')} />
+          <ImageUploadField
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            clearLabel={isArabic ? 'إزالة صورة التصنيف' : 'Remove category image'}
+            error={form.formState.errors.image}
+            fileList={categoryImageFile}
+            fileUrl={categoryClearImage ? '' : selectedCategory?.image_url || selectedCategory?.image || ''}
+            hint={isArabic ? 'اختياري. تظهر في بطاقات التصنيف العامة.' : 'Optional. Used on public category cards.'}
+            label={isArabic ? 'صورة التصنيف' : 'Category image'}
+            onClear={
+              selectedCategory?.image_url || selectedCategory?.image
+                ? () => {
+                    form.setValue('clear_image', true, { shouldDirty: true })
+                    form.setValue('image', undefined, { shouldDirty: true })
+                  }
+                : undefined
+            }
+            registration={form.register('image')}
+          />
           <Field label={isArabic ? 'ترتيب العرض' : 'Sort order'}>
             <input className="field" type="number" {...form.register('sort_order')} />
           </Field>

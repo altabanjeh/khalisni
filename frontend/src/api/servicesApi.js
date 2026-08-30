@@ -8,6 +8,54 @@ function normalizeService(record) {
   return withId(record, 'service_id')
 }
 
+function isFileLike(value) {
+  return typeof File !== 'undefined' && value instanceof File
+}
+
+function getFirstFile(value) {
+  if (isFileLike(value)) return value
+  if (typeof FileList !== 'undefined' && value instanceof FileList) return value[0] || null
+  if (Array.isArray(value) && isFileLike(value[0])) return value[0]
+  return null
+}
+
+function hasUpload(payload) {
+  return Boolean(getFirstFile(payload?.image))
+}
+
+function toAdminCatalogFormData(payload) {
+  const formData = new FormData()
+  Object.entries(payload || {}).forEach(([key, value]) => {
+    if (value == null) return
+
+    if (key === 'image') {
+      const file = getFirstFile(value)
+      if (file) formData.append(key, file)
+      return
+    }
+
+    if (key === 'required_information_schema') {
+      formData.append(key, JSON.stringify(value || []))
+      return
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => formData.append(key, item))
+      return
+    }
+
+    formData.append(key, value)
+  })
+  return formData
+}
+
+function withCatalogUpload(payload) {
+  if (hasUpload(payload)) return toAdminCatalogFormData(payload)
+  const rest = { ...(payload || {}) }
+  delete rest.image
+  return rest
+}
+
 function normalizeServiceRelation(record) {
   return withId(record, 'relation_id')
 }
@@ -169,11 +217,11 @@ export const servicesApi = {
   },
 
   async createAdminCategory(payload) {
-    return normalizeCategory(await http.post('/admin/categories/', payload))
+    return normalizeCategory(await http.post('/admin/categories/', withCatalogUpload(payload)))
   },
 
   async updateAdminCategory(id, payload) {
-    return normalizeCategory(await http.patch(`/admin/categories/${id}/`, payload))
+    return normalizeCategory(await http.patch(`/admin/categories/${id}/`, withCatalogUpload(payload)))
   },
 
   deleteAdminCategory(id, payload = {}) {
@@ -185,11 +233,11 @@ export const servicesApi = {
   },
 
   async createAdminService(payload) {
-    return normalizeService(await http.post('/admin/services/', payload))
+    return normalizeService(await http.post('/admin/services/', withCatalogUpload(payload)))
   },
 
   async updateAdminService(id, payload) {
-    return normalizeService(await http.patch(`/admin/services/${id}/`, payload))
+    return normalizeService(await http.patch(`/admin/services/${id}/`, withCatalogUpload(payload)))
   },
 
   deleteAdminService(id, payload = {}) {

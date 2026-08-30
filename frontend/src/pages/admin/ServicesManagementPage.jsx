@@ -6,6 +6,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
+import { ImageUploadField } from '../../components/publicSite/PublicSiteFormFields'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
@@ -20,6 +21,8 @@ const defaultCategoryValues = {
   description_ar: '',
   description_en: '',
   icon: '',
+  image: undefined,
+  clear_image: false,
   display_order: 0,
   is_active: true,
 }
@@ -33,6 +36,8 @@ const defaultServiceValues = {
   short_description_en: '',
   description_ar: '',
   description_en: '',
+  image: undefined,
+  clear_image: false,
   required_information_schema_text: '[]',
   required_document_ids: [],
   terms_ar: '',
@@ -410,6 +415,10 @@ function normalizeSelectedIds(value) {
   return [String(value)]
 }
 
+function isClearImageValue(value) {
+  return value === true || value === 'true' || value === 'on'
+}
+
 function formatDefinitionSummary(definition) {
   const extensions = formatExtensionList(definition.allowed_extensions)
   if (!extensions) return 'بدون امتدادات مخصصة'
@@ -460,6 +469,10 @@ function ServicesManagementPage() {
   const categoryNameEn = categoryForm.watch('name_en')
   const serviceNameAr = serviceForm.watch('name_ar')
   const serviceNameEn = serviceForm.watch('name_en')
+  const categoryImageFile = categoryForm.watch('image')
+  const categoryClearImage = categoryForm.watch('clear_image')
+  const serviceImageFile = serviceForm.watch('image')
+  const serviceClearImage = serviceForm.watch('clear_image')
   const deliveryTimeMode = serviceForm.watch('delivery_time_mode')
   const selectedDefinitionExtensions = definitionForm.watch('allowed_extensions') || []
   const selectedRequiredDocumentIds = normalizeSelectedIds(serviceForm.watch('required_document_ids'))
@@ -488,6 +501,8 @@ function ServicesManagementPage() {
             description_ar: selectedCategory.description_ar || '',
             description_en: selectedCategory.description_en || '',
             icon: selectedCategory.icon || '',
+            image: undefined,
+            clear_image: false,
             display_order: selectedCategory.display_order ?? 0,
             is_active: Boolean(selectedCategory.is_active),
           }
@@ -509,6 +524,8 @@ function ServicesManagementPage() {
             short_description_en: selectedService.short_description_en || '',
             description_ar: selectedService.description_ar || '',
             description_en: selectedService.description_en || '',
+            image: undefined,
+            clear_image: false,
             required_information_schema_text: JSON.stringify(selectedService.required_information_schema ?? [], null, 2),
             required_document_ids: (selectedService.required_documents || []).map(
               (item) => item.document_definition?.id || item.document_definition_id || item.definition_id,
@@ -631,6 +648,7 @@ function ServicesManagementPage() {
         ...values,
         slug: (values.slug || '').trim(),
         icon: (values.icon || '').trim(),
+        clear_image: isClearImageValue(values.clear_image),
         display_order: Number(values.display_order || 0),
       }
 
@@ -696,6 +714,8 @@ function ServicesManagementPage() {
         short_description_en: values.short_description_en.trim(),
         description_ar: values.description_ar.trim(),
         description_en: values.description_en.trim(),
+        image: values.image,
+        clear_image: isClearImageValue(values.clear_image),
         required_information_schema: requiredInformationSchema,
         required_document_ids: requiredDocumentIds,
         terms_ar: values.terms_ar.trim(),
@@ -1211,6 +1231,25 @@ function ServicesManagementPage() {
           <Field label="الوصف بالإنجليزية">
             <textarea className="field min-h-24" {...categoryForm.register('description_en')} />
           </Field>
+          <input type="hidden" {...categoryForm.register('clear_image')} />
+          <ImageUploadField
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            clearLabel="Remove category image"
+            error={categoryForm.formState.errors.image}
+            fileList={categoryImageFile}
+            fileUrl={categoryClearImage ? '' : selectedCategory?.image_url || selectedCategory?.image || ''}
+            hint="Optional image used by public category cards."
+            label="Category image"
+            onClear={
+              selectedCategory?.image_url || selectedCategory?.image
+                ? () => {
+                    categoryForm.setValue('clear_image', true, { shouldDirty: true })
+                    categoryForm.setValue('image', undefined, { shouldDirty: true })
+                  }
+                : undefined
+            }
+            registration={categoryForm.register('image')}
+          />
           <Field label="ترتيب العرض">
             <input className="field" type="number" {...categoryForm.register('display_order')} />
           </Field>
@@ -1285,6 +1324,26 @@ function ServicesManagementPage() {
           <Field label="الوصف بالإنجليزية">
             <textarea className="field min-h-28" {...serviceForm.register('description_en')} />
           </Field>
+
+          <input type="hidden" {...serviceForm.register('clear_image')} />
+          <ImageUploadField
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            clearLabel="Remove service image"
+            error={serviceForm.formState.errors.image}
+            fileList={serviceImageFile}
+            fileUrl={serviceClearImage ? '' : selectedService?.image_url || selectedService?.image || ''}
+            hint="Optional image used independently from the category image on public service cards."
+            label="Service image"
+            onClear={
+              selectedService?.image_url || selectedService?.image
+                ? () => {
+                    serviceForm.setValue('clear_image', true, { shouldDirty: true })
+                    serviceForm.setValue('image', undefined, { shouldDirty: true })
+                  }
+                : undefined
+            }
+            registration={serviceForm.register('image')}
+          />
 
           <ServiceSchemaBuilder
             errorMessages={serviceSchemaErrors}

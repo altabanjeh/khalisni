@@ -1,5 +1,6 @@
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from django.db.models import Count, Q
 from django.db import transaction
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -182,6 +183,7 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["name_ar", "name_en", "slug"]
     ordering_fields = ["created_at", "service_fee", "government_fee"]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     serializer_class = AdminServiceRuleSerializer
     audit_entity_type = "Service"
     audit_fields = (
@@ -246,6 +248,7 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
 
 class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminCategoryRuleSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = ServiceCategory.objects.all().select_related("parent").prefetch_related("services")
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
     search_fields = ["name_ar", "name_en", "slug"]

@@ -5,6 +5,7 @@ import {
   PublicCard,
   PublicEmptyState,
   PublicHero,
+  ImageFallback,
   PublicLinkButton,
   PublicLoading,
   PublicPageShell,
@@ -77,6 +78,7 @@ function ServiceDetailsPage() {
   const serviceName = getServiceName(service, language)
   const serviceDescription = getServiceDescription(service, language)
   const categoryName = getCategoryName(service.category, language)
+  const serviceImageUrl = service.image_url || service.image || service.category?.image_url || service.category?.image
   const duration = getServiceDuration(service, language)
   const price = getServicePublicPrice(service, language)
   const pricing = service.pricing || {}
@@ -110,6 +112,13 @@ function ServiceDetailsPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <main className="space-y-6">
+          <ImageFallback
+            alt={serviceName}
+            className="aspect-[16/7] min-h-56 rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] shadow-soft"
+            icon={Layers3}
+            src={serviceImageUrl}
+          />
+
           <PublicPanel>
             <div className="flex items-start gap-4">
               <span className="grid h-11 w-11 place-items-center rounded-md bg-brand-50 text-[var(--khalsni-public-primary)]">
