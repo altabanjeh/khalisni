@@ -98,7 +98,7 @@ function MissingDocumentsResponsePage() {
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         {customerNotes.length ? (
-          <section className="glass-panel border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+          <section className="rounded-[var(--radius-xl)] border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900 shadow-soft">
             {customerNotes.map((note) => (
               <p key={note.id} className="leading-7">
                 {note.note}

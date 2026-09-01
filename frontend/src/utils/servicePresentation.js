@@ -39,6 +39,7 @@ export function getCategoryDescription(category, language, fallback = '') {
 export function getServicePublicPrice(service, language) {
   const normalizedLanguage = normalizeLanguage(language)
   const pricing = service?.pricing || {}
+  const hasStructuredPricing = Boolean(service?.pricing)
   const note = normalizedLanguage === 'en' ? pricing.public_note_en : pricing.public_note_ar
 
   if (pricing.total_price != null) {
@@ -50,7 +51,7 @@ export function getServicePublicPrice(service, language) {
     }
   }
 
-  if (service?.total_fee != null) {
+  if (!hasStructuredPricing && service?.total_fee != null) {
     return {
       label: formatCurrency(service.total_fee, language),
       amount: Number(service.total_fee),

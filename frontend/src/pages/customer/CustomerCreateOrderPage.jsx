@@ -388,7 +388,7 @@ function CustomerCreateOrderPage() {
                 </label>
                 <textarea className="field min-h-28" {...register('notes')} />
               </div>
-              <label className="flex items-start gap-3 rounded-3xl border border-border bg-white px-4 py-4 text-sm">
+              <label className="flex items-start gap-3 rounded-[var(--radius-md)] border border-border bg-white px-4 py-4 text-sm">
                 <input className="mt-1" type="checkbox" {...register('consent', { required: 'يجب الموافقة على الشروط' })} />
                 <span className="inline-flex items-center gap-2">
                   <span>أوافق على استخدام الوثائق والبيانات لإتمام الخدمة فقط وإشعاري بأي نواقص مطلوبة.</span>
@@ -405,7 +405,7 @@ function CustomerCreateOrderPage() {
             <h2 className="mt-1 text-xl font-bold text-ink">راجع الطلب بدون مغادرة الصفحة</h2>
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               {reviewRows.map((row) => (
-                <div className="rounded-[var(--radius-lg)] border border-border bg-slate-50 p-4" key={row.label}>
+                <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4" key={row.label}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-bold text-slate-500">{row.label}</p>
@@ -433,7 +433,7 @@ function CustomerCreateOrderPage() {
         </form>
 
         <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-          <div className="rounded-[2rem] border border-border bg-white p-6 shadow-panel">
+          <div className="glass-panel p-6">
             <p className="text-sm font-bold text-brand-600">ملخص الخدمة</p>
             <h2 className="mt-2 text-xl font-bold text-ink">{selectedService?.name_ar || 'اختر خدمة لعرض ملخصها'}</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">{selectedService?.description_ar || 'سيظهر هنا وصف الخدمة المختارة.'}</p>

@@ -22,7 +22,7 @@ function LanguageSwitcher({ className = '', light = false }) {
           <button
             key={option.value}
             className={clsx(
-              'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+              'min-h-10 rounded-full px-3 py-1.5 text-xs font-semibold transition',
               active
                 ? light
                   ? 'bg-white text-ink'

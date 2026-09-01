@@ -51,7 +51,7 @@ function Sidebar({ title, links, isOpen, onClose }) {
             <p className="text-sm font-semibold text-brand-600">{t('sidebar.workPortal', 'بوابة العمل')}</p>
             <p className="mt-1 text-2xl font-extrabold text-ink">{title}</p>
           </div>
-          <button aria-label={t('sidebar.closeMenu', 'إغلاق القائمة')} className="btn-ghost p-2 xl:hidden" onClick={onClose} type="button">
+          <button aria-label={t('sidebar.closeMenu', 'إغلاق القائمة')} className="btn-ghost min-h-10 min-w-10 p-2 xl:hidden" onClick={onClose} type="button">
             <X className="h-5 w-5" />
           </button>
         </div>

@@ -32,7 +32,7 @@ function AboutPage() {
         description={isArabic ? 'خالصني منصة أردنية تبسط المعاملات الحكومية والإدارية وتقلل الوقت والاحتكاك والتشتت بين القنوات المختلفة.' : 'Khalsni is a Jordanian platform that simplifies government and administrative requests while reducing time, friction, and fragmented channels.'}
       />
 
-      <PublicPanel>
+      <PublicPanel className="scroll-mt-24" id="business">
         <p className="max-w-5xl text-base font-semibold leading-8 text-slate-600">
           {isArabic
             ? 'هدفنا هو أن تصبح رحلة الطلب واضحة من البداية إلى النهاية: اختيار الخدمة، فهم المتطلبات، رفع المستندات، متابعة الحالة، واستلام النتيجة من دون الحاجة للتنقل بين أكثر من قناة.'

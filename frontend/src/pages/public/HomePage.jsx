@@ -1,26 +1,23 @@
 import {
   ArrowLeft,
   ArrowRight,
-  BriefcaseBusiness,
-  Building2,
-  Car,
   CheckCircle2,
   ChevronDown,
+  Clock3,
   FileText,
-  Globe2,
-  Landmark,
   Loader2,
   Search,
   SendHorizontal,
   ShieldCheck,
   Sparkles,
-  Stamp,
-  TimerReset,
   UploadCloud,
-  UsersRound,
+  WalletCards,
 } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import CategoryCard from '../../components/CategoryCard'
+import ServiceCard from '../../components/ServiceCard'
+import { ImageFallback } from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
@@ -31,146 +28,119 @@ import {
   getCategoryDescription,
   getCategoryName,
   getServiceDescription,
+  getServiceDuration,
   getServiceName,
+  getServicePublicPrice,
 } from '../../utils/servicePresentation'
 
 const heroImage = '/images/homepage/hero-property.jpg'
 
-const categoryVisuals = [
-  {
-    icon: Building2,
-    image: '/images/homepage/category-real-estate.jpg',
-    match: ['real', 'estate', 'land', 'property', 'عقار', 'أراضي', 'اراضي'],
-  },
-  {
-    icon: BriefcaseBusiness,
-    image: '/images/homepage/category-business.jpg',
-    match: ['business', 'company', 'companies', 'commercial', 'شركة', 'شركات', 'أعمال', 'اعمال'],
-  },
-  {
-    icon: Landmark,
-    image: '/images/homepage/category-tax.jpg',
-    match: ['tax', 'fee', 'municipal', 'ضريبة', 'ضرائب', 'رسوم', 'بلدية'],
-  },
-  {
-    icon: Car,
-    image: '/images/homepage/category-transport.jpg',
-    match: ['vehicle', 'transport', 'car', 'license', 'مركبة', 'مركبات', 'نقل', 'ترخيص'],
-  },
-  {
-    icon: UsersRound,
-    image: '/images/homepage/category-labor.jpg',
-    match: ['labor', 'residency', 'work', 'worker', 'إقامة', 'اقامة', 'عمالة', 'عمل'],
-  },
-  {
-    icon: Stamp,
-    image: '/images/homepage/category-documents.jpg',
-    match: ['document', 'attestation', 'certificate', 'translation', 'وثائق', 'تصديق', 'تصديقات', 'ترجمة'],
-  },
-  {
-    icon: Globe2,
-    image: '/images/homepage/category-international.jpg',
-    match: ['international', 'embassy', 'visa', 'global', 'دولي', 'دولية', 'سفارة', 'فيزا'],
-  },
-]
-
-const fallbackVisual = {
-  icon: FileText,
-  image: '/images/homepage/category-documents.jpg',
-}
-
 const copy = {
   ar: {
     heroEyebrow: 'منصة خدمات حكومية وإدارية',
-    headline: 'ركّز على حياتك',
-    headlineAccent: 'وخلّي المعاملات علينا',
-    heroText: 'ابحث عن الخدمة، اعرف المتطلبات، وابدأ طلبك من مسار واضح يحافظ على نفس سير العمل الرسمي.',
-    startCta: 'ابدأ طلبك',
-    browseCta: 'تصفح الخدمات',
-    trackCta: 'تتبع طلب',
-    searchPlaceholder: 'ابحث عن خدمة أو تصنيف',
+    headline: 'ركّز على اللي بهمّك...',
+    headlineAccent: 'وإحنا بنخلّص الباقي.',
+    heroText: 'ابحث عن الخدمة، اعرف المتطلبات، وابدأ طلبك من مسار واضح.',
+    searchPlaceholder: 'ابحث عن خدمة أو تصنيف...',
+    searchLabel: 'البحث في خدمات خلصني',
     loading: 'جاري تحميل الخدمات...',
-    servicesLabel: 'خدمات',
-    categoriesLabel: 'تصنيفات',
     suggestionLabel: 'اقتراحات مباشرة',
-    noResults: 'طلب خدمة غير موجودة / طلب خاص',
+    noResults: 'طلب خدمة غير موجودة',
     noResultsHint: 'لم نجد خدمة مطابقة. أرسل طلباً خاصاً وسيتابع الفريق احتياجك.',
     categoryType: 'تصنيف',
     serviceType: 'خدمة',
-    benefitsTitle: 'تجربة واحدة للمعاملات اليومية',
-    benefits: [
-      ['اختيار واضح للخدمة', 'كل خدمة تعرض متطلباتها قبل بدء الطلب.'],
-      ['متابعة دقيقة', 'حالة الطلب والمسؤول الحالي ظاهران للعميل.'],
-      ['وثائق منظمة', 'تحميل ومراجعة المستندات داخل نفس المسار.'],
+    browseServices: 'تصفح الخدمات',
+    trackRequest: 'تتبع طلبك',
+    servicesLabel: 'خدمة',
+    categoriesLabel: 'تصنيف',
+    heroCardTitle: 'متابعة واضحة من البداية للنهاية',
+    heroCardText: 'الخدمات، المستندات، السعر المتاح، وحالة الطلب في تجربة واحدة.',
+    trustItems: [
+      ['متابعة لحظية', 'اعرف حالة طلبك من صفحة التتبع.'],
+      ['أسعار شفافة', 'تظهر الأسعار عندما تكون متاحة للنشر.'],
+      ['مستندات منظمة', 'المتطلبات واضحة قبل بدء الطلب.'],
+      ['دعم للطلبات الخاصة', 'أرسل الخدمة غير الموجودة ليتابعها الفريق.'],
     ],
-    categoriesTitle: 'خدمات حسب المجال',
-    categoriesText: 'تصفح المجالات الرئيسية كما هي معرفة في نظام إدارة الخدمات، مع عرض عينة من الخدمات الفعلية داخل كل مجال.',
-    browseAll: 'عرض جميع الخدمات',
+    latestTitle: 'أحدث الخدمات',
+    latestText: 'خدمات فعلية من كتالوج خلصني، مرتبة حسب البيانات المتاحة.',
+    categoriesTitle: 'التصنيفات الرئيسية',
+    categoriesText: 'تصفح التصنيفات المنشورة واكتشف الخدمات المرتبطة بها.',
+    viewAll: 'عرض الكل',
+    categoryRowsTitle: 'خدمات حسب التصنيف',
+    categoryRowsText: 'مجموعات مختصرة من التصنيفات التي تحتوي على خدمات منشورة.',
     serviceCount: 'خدمة متاحة',
-    emptyCategory: 'لا توجد خدمات ظاهرة حالياً داخل هذا التصنيف.',
-    specialTitle: 'طلب خاص',
-    specialText: 'إذا لم تجد الخدمة المطلوبة، أرسل اسم الخدمة ووسيلة التواصل دون أن يطغى هذا المسار على كتالوج الخدمات الرئيسي.',
+    emptyCategories: 'لا توجد تصنيفات منشورة حالياً.',
+    emptyServices: 'لا توجد خدمات منشورة حالياً.',
+    howTitle: 'كيف تعمل خلصني؟',
+    howText: 'أربع خطوات بسيطة من اختيار الخدمة إلى متابعة الإنجاز.',
+    steps: [
+      ['اختر الخدمة', 'ابحث أو تصفح التصنيفات واختر الخدمة المناسبة.'],
+      ['راجع المتطلبات', 'اطلع على المستندات والمدة والسعر المتاح.'],
+      ['أرسل الطلب', 'أدخل بياناتك وارفع المستندات المطلوبة.'],
+      ['تابع الحالة', 'راقب التحديثات حتى اكتمال الطلب.'],
+    ],
+    specialTitle: 'لم تجد الخدمة؟',
+    specialText: 'أرسل اسم الخدمة أو الجهة المطلوبة وسيقوم الفريق بمراجعة الطلب الخاص.',
     specialService: 'اسم الخدمة أو الجهة',
     specialContact: 'هاتف أو بريد إلكتروني',
     specialSubmit: 'إرسال الطلب',
     sending: 'جاري الإرسال...',
     specialSuccess: 'تم إرسال طلبك الخاص بنجاح.',
-    howTitle: 'كيف تعمل خلصني؟',
-    howText: 'مسار مختصر وواضح من اختيار الخدمة إلى اكتمال الطلب.',
-    steps: [
-      ['اختر الخدمة', 'ابحث أو تصفح التصنيفات واختر الخدمة المناسبة.'],
-      ['راجع المتطلبات', 'اطلع على الوثائق، السعر، والمدة المتوقعة.'],
-      ['أرسل الطلب', 'أدخل بياناتك وارفع المستندات المطلوبة.'],
-      ['تابع الحالة', 'اعرف من يحتاج إلى التصرف حتى اكتمال الطلب.'],
-    ],
-    portalTitle: 'بوابة العميل تعمل بسلاسة على الهاتف',
-    portalText: 'تابع الطلبات، ارفع الوثائق المطلوبة، وراجع حالة المعاملة من نفس التجربة المتجاوبة.',
+    previous: 'السابق',
+    next: 'التالي',
   },
   en: {
     heroEyebrow: 'Government and administrative services platform',
-    headline: 'Focus on your life',
-    headlineAccent: 'and leave the paperwork to us',
-    heroText: 'Search for a service, understand the requirements, and start a request through the existing official workflow.',
-    startCta: 'Start Request',
-    browseCta: 'Browse services',
-    trackCta: 'Track request',
-    searchPlaceholder: 'Search services or categories',
+    headline: 'Focus on what matters...',
+    headlineAccent: 'and we will handle the rest.',
+    heroText: 'Search for a service, review the requirements, and start through a clear request flow.',
+    searchPlaceholder: 'Search for a service or category...',
+    searchLabel: 'Search Khalsni services',
     loading: 'Loading services...',
-    servicesLabel: 'Services',
-    categoriesLabel: 'Categories',
     suggestionLabel: 'Direct suggestions',
-    noResults: 'Request a service / Special request',
+    noResults: 'Request an unlisted service',
     noResultsHint: 'No matching service was found. Send a special request and the team will follow up.',
     categoryType: 'Category',
     serviceType: 'Service',
-    benefitsTitle: 'One experience for daily paperwork',
-    benefits: [
-      ['Clear service selection', 'Each service shows what is needed before you start.'],
-      ['Accurate tracking', 'Current request status and responsibility are visible.'],
-      ['Organized documents', 'Upload and review files inside the same request flow.'],
+    browseServices: 'Browse services',
+    trackRequest: 'Track request',
+    servicesLabel: 'Services',
+    categoriesLabel: 'Categories',
+    heroCardTitle: 'Clear tracking from start to finish',
+    heroCardText: 'Services, documents, available price, and request status in one experience.',
+    trustItems: [
+      ['Live tracking', 'Follow your request from the tracking page.'],
+      ['Transparent pricing', 'Prices appear when approved for public display.'],
+      ['Organized documents', 'Requirements are clear before you start.'],
+      ['Special-request support', 'Send unlisted services for team follow-up.'],
     ],
-    categoriesTitle: 'Services by domain',
-    categoriesText: 'Browse the main domains from the service management system, with real services shown inside each domain.',
-    browseAll: 'Browse all services',
+    latestTitle: 'Latest services',
+    latestText: 'Real services from the Khalsni catalog, ordered by available backend data.',
+    categoriesTitle: 'Main categories',
+    categoriesText: 'Browse published categories and discover the services inside them.',
+    viewAll: 'View all',
+    categoryRowsTitle: 'Services by category',
+    categoryRowsText: 'Short rows from categories that contain published services.',
     serviceCount: 'available services',
-    emptyCategory: 'No public services are currently visible in this category.',
-    specialTitle: 'Special request',
-    specialText: 'If the needed service is not listed, send the service name and contact method without replacing the main catalog path.',
+    emptyCategories: 'No public categories are published yet.',
+    emptyServices: 'No public services are published yet.',
+    howTitle: 'How Khalsni Works',
+    howText: 'Four simple steps from choosing a service to tracking completion.',
+    steps: [
+      ['Choose a service', 'Search or browse categories and select the right service.'],
+      ['Review requirements', 'Check documents, duration, and available price.'],
+      ['Submit request', 'Enter your details and upload the required documents.'],
+      ['Track status', 'Watch updates until the request is complete.'],
+    ],
+    specialTitle: 'Can not find the service?',
+    specialText: 'Send the service or authority name and the team will review the special request.',
     specialService: 'Service or authority name',
     specialContact: 'Phone or email',
     specialSubmit: 'Send request',
     sending: 'Sending...',
     specialSuccess: 'Your special request was sent.',
-    howTitle: 'How Khalsni Works',
-    howText: 'A simple path from service selection to completion.',
-    steps: [
-      ['Choose a service', 'Search or browse categories and select the right service.'],
-      ['Review requirements', 'Check documents, price, and expected duration.'],
-      ['Submit request', 'Enter your details and upload the required documents.'],
-      ['Track progress', 'See who needs to act until the request is complete.'],
-    ],
-    portalTitle: 'The customer portal works well on mobile',
-    portalText: 'Track requests, upload required documents, and review the transaction status from the same responsive experience.',
+    previous: 'Previous',
+    next: 'Next',
   },
 }
 
@@ -193,20 +163,18 @@ function categoryPath(category) {
   return '/services'
 }
 
-function getCategoryVisual(category, index) {
-  const haystack = normalize([
-    category?.slug,
-    category?.name_ar,
-    category?.name_en,
-    category?.description_ar,
-    category?.description_en,
-  ].filter(Boolean).join(' '))
-  const matched = categoryVisuals.find((visual) => visual.match.some((token) => haystack.includes(normalize(token))))
-  const visual = matched || categoryVisuals[index % categoryVisuals.length] || fallbackVisual
-  return {
-    Icon: visual.icon,
-    image: category?.image_url || category?.image || visual.image,
-  }
+function getRecordTime(record) {
+  return Date.parse(record?.created_at || record?.updated_at || '') || 0
+}
+
+function uniqueByServiceId(services) {
+  const seen = new Set()
+  return services.filter((service) => {
+    const key = service?.id || service?.service_id || service?.slug
+    if (!key || seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 function buildCategorySections(categories, services, language, isArabic) {
@@ -223,16 +191,14 @@ function buildCategorySections(categories, services, language, isArabic) {
 
   return categories.filter(isPublicRecord).map((category, index) => {
     const key = category.slug || category.id
-    const visual = getCategoryVisual(category, index)
     const categoryServices = (servicesByCategory[key] || []).filter(isPublicRecord)
     return {
       id: key || `category-${index}`,
       category,
       title: getCategoryName(category, language, isArabic ? 'تصنيف خدمات' : 'Service category'),
-      description: getCategoryDescription(category, language, isArabic ? 'خدمات مرتبة داخل هذا المجال.' : 'Services grouped in this domain.'),
+      description: getCategoryDescription(category, language, isArabic ? 'خدمات مرتبطة بهذا التصنيف.' : 'Services grouped under this category.'),
       count: category.service_count ?? categoryServices.length,
       services: categoryServices,
-      ...visual,
     }
   })
 }
@@ -279,10 +245,10 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
   const searchItems = useMemo(() => buildSearchItems(services, categories, language, isArabic), [categories, isArabic, language, services])
   const suggestions = useMemo(() => {
     const normalizedQuery = normalize(query)
-    if (!normalizedQuery) return searchItems.slice(0, 7)
+    if (!normalizedQuery) return searchItems.slice(0, 6)
     return searchItems
       .filter((item) => [item.label, item.description, ...(item.keywords || [])].some((value) => normalize(value).includes(normalizedQuery)))
-      .slice(0, 8)
+      .slice(0, 7)
   }, [query, searchItems])
 
   function selectSuggestion(item) {
@@ -293,11 +259,11 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
 
   function handleSubmit(event) {
     event.preventDefault()
-    if (suggestions[activeIndex]) {
+    const trimmed = query.trim()
+    if (open && suggestions[activeIndex]) {
       selectSuggestion(suggestions[activeIndex])
       return
     }
-    const trimmed = query.trim()
     navigate(trimmed ? `/services?search=${encodeURIComponent(trimmed)}` : '/services')
   }
 
@@ -321,14 +287,15 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
   return (
     <form className="relative" onSubmit={handleSubmit}>
       <label className="relative block">
-        <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--khalsni-public-primary)]" />
-        {loading ? <Loader2 className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-slate-400" /> : null}
+        <span className="sr-only">{dictionary.searchLabel}</span>
+        <Search aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--khalsni-public-primary)]" />
+        {loading ? <Loader2 aria-hidden="true" className="pointer-events-none absolute end-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-[var(--khalsni-public-text-muted)]" /> : null}
         <input
           aria-autocomplete="list"
           aria-controls="home-service-search-list"
           aria-expanded={open}
-          aria-label={dictionary.searchPlaceholder}
-          className="h-14 w-full rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white pl-12 pr-12 text-base font-bold text-ink shadow-soft outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20"
+          aria-label={dictionary.searchLabel}
+          className="kh-focusable h-14 w-full rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white px-12 text-base font-bold text-[var(--khalsni-public-navy)] shadow-md outline-none placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
           onBlur={() => window.setTimeout(() => setOpen(false), 140)}
           onChange={(event) => {
             setQuery(event.target.value)
@@ -346,11 +313,11 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
 
       {open ? (
         <div
-          className="absolute z-30 mt-2 w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white text-right shadow-2xl"
+          className="absolute z-30 mt-2 w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white text-start shadow-lift"
           id="home-service-search-list"
           role="listbox"
         >
-          <div className="border-b border-slate-100 px-4 py-3 text-xs font-extrabold text-slate-500">
+          <div className="border-b border-[var(--khalsni-public-border)] px-4 py-3 text-xs font-extrabold text-[var(--khalsni-public-text-secondary)]">
             {loading ? dictionary.loading : dictionary.suggestionLabel}
           </div>
           {suggestions.length ? (
@@ -358,19 +325,19 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
               {suggestions.map((item, index) => (
                 <button
                   aria-selected={index === activeIndex}
-                  className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-right transition ${index === activeIndex ? 'bg-brand-50' : 'hover:bg-slate-50'}`}
+                  className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-start transition ${index === activeIndex ? 'bg-[var(--khalsni-public-primary-soft)]' : 'hover:bg-[var(--khalsni-public-bg-secondary)]'}`}
                   key={item.id}
-                  onMouseEnter={() => setActiveIndex(index)}
                   onMouseDown={(event) => event.preventDefault()}
+                  onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => selectSuggestion(item)}
                   role="option"
                   type="button"
                 >
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-extrabold text-ink">{item.label}</span>
-                    {item.description ? <span className="mt-0.5 block line-clamp-1 text-xs font-semibold text-slate-500">{item.description}</span> : null}
+                    <span className="block truncate text-sm font-extrabold text-[var(--khalsni-public-navy)]">{item.label}</span>
+                    {item.description ? <span className="mt-0.5 block line-clamp-1 text-xs font-semibold text-[var(--khalsni-public-text-secondary)]">{item.description}</span> : null}
                   </span>
-                  <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-[0.68rem] font-extrabold text-slate-600">
+                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[0.68rem] font-extrabold text-[var(--khalsni-public-primary)] shadow-sm">
                     {item.type === 'category' ? dictionary.categoryType : dictionary.serviceType}
                   </span>
                 </button>
@@ -378,21 +345,121 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
             </div>
           ) : (
             <button
-              className="flex w-full items-center justify-between gap-4 px-4 py-4 text-right transition hover:bg-brand-50"
+              className="flex w-full items-center justify-between gap-4 px-4 py-4 text-start transition hover:bg-[var(--khalsni-public-primary-soft)]"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onSpecialRequest(query)}
               type="button"
             >
               <span>
-                <span className="block text-sm font-extrabold text-ink">{dictionary.noResults}</span>
-                <span className="mt-1 block text-xs font-semibold text-slate-500">{dictionary.noResultsHint}</span>
+                <span className="block text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.noResults}</span>
+                <span className="mt-1 block text-xs font-semibold text-[var(--khalsni-public-text-secondary)]">{dictionary.noResultsHint}</span>
               </span>
-              <SendHorizontal className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)]" />
+              <SendHorizontal aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)] rtl:-scale-x-100" />
             </button>
           )}
         </div>
       ) : null}
     </form>
+  )
+}
+
+function HomeRail({ title, description, action, children, itemCount = 0 }) {
+  const railRef = useRef(null)
+  const { isArabic } = useLanguage()
+  const dictionary = copy[isArabic ? 'ar' : 'en']
+  const PreviousIcon = isArabic ? ArrowRight : ArrowLeft
+  const NextIcon = isArabic ? ArrowLeft : ArrowRight
+
+  function scrollRail(direction) {
+    railRef.current?.scrollBy({
+      left: direction * 360 * (isArabic ? -1 : 1),
+      behavior: 'smooth',
+    })
+  }
+
+  return (
+    <section className="kh-public-container py-7 sm:py-9">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-3xl text-start">
+          <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{title}</h2>
+          {description ? <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{description}</p> : null}
+        </div>
+        <div className="flex items-center gap-2">
+          {action}
+          {itemCount > 3 ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                aria-label={dictionary.previous}
+                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary)]"
+                onClick={() => scrollRail(-1)}
+                type="button"
+              >
+                <PreviousIcon aria-hidden="true" className="h-4 w-4" />
+              </button>
+              <button
+                aria-label={dictionary.next}
+                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary)]"
+                onClick={() => scrollRail(1)}
+                type="button"
+              >
+                <NextIcon aria-hidden="true" className="h-4 w-4" />
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div ref={railRef} className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-3 scroll-smooth sm:mx-0 sm:px-0">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+function RailItem({ children, wide = false }) {
+  return <div className={`shrink-0 snap-start ${wide ? 'w-[86vw] sm:w-[22rem] lg:w-[21rem]' : 'w-[82vw] sm:w-[19rem] lg:w-[20rem]'}`}>{children}</div>
+}
+
+function HeroVisual({ content, services, categories, dictionary, isArabic, language }) {
+  const previewService = services[0]
+  const previewName = previewService ? getServiceName(previewService, language, isArabic ? 'خدمة' : 'Service') : dictionary.heroCardTitle
+  const previewDuration = previewService ? getServiceDuration(previewService, language).label : dictionary.servicesLabel
+  const previewPrice = previewService ? getServicePublicPrice(previewService, language).label : dictionary.categoriesLabel
+  const serviceImage = previewService?.image_url || previewService?.image || previewService?.category?.image_url || previewService?.category?.image
+
+  return (
+    <div className="relative mx-auto w-full max-w-xl lg:ms-auto">
+      <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--khalsni-public-border)] bg-white p-3 shadow-lg">
+        <ImageFallback
+          alt={isArabic ? 'تصفح خدمات خلصني' : 'Browsing Khalsni services'}
+          className="aspect-[4/3] rounded-[var(--radius-xl)]"
+          src={content.hero_image_url || heroImage}
+        />
+        <div className="absolute inset-x-6 bottom-6 rounded-[var(--radius-lg)] border border-white bg-white p-4 text-start shadow-lg">
+          <div className="flex items-start gap-3">
+            <ImageFallback alt={previewName} className="h-14 w-14 shrink-0 rounded-[var(--radius-md)]" icon={FileText} src={serviceImage} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-black text-[var(--khalsni-public-navy)]">{previewName}</p>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <Clock3 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-primary)]" />
+                  <span className="truncate">{previewDuration}</span>
+                </span>
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <WalletCards aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-primary)]" />
+                  <span className="truncate">{previewPrice}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute -top-3 start-3 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-primary)] shadow-md">
+        {services.length} {dictionary.servicesLabel}
+      </div>
+      <div className="absolute -bottom-3 end-5 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-navy)] shadow-md">
+        {categories.length} {dictionary.categoriesLabel}
+      </div>
+    </div>
   )
 }
 
@@ -408,10 +475,16 @@ function HomePage() {
   const [contact, setContact] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const categorySections = useMemo(() => buildCategorySections(categories, services, language, isArabic), [categories, isArabic, language, services])
   const publicServices = useMemo(() => services.filter(isPublicRecord), [services])
+  const publicCategories = useMemo(() => categories.filter(isPublicRecord), [categories])
+  const categorySections = useMemo(() => buildCategorySections(categories, services, language, isArabic), [categories, isArabic, language, services])
+  const latestServices = useMemo(() => {
+    const featured = publicServices.filter((service) => service.is_featured)
+    const ordered = [...publicServices].sort((a, b) => getRecordTime(b) - getRecordTime(a))
+    return uniqueByServiceId([...featured, ...ordered]).slice(0, 8)
+  }, [publicServices])
+  const categoryRows = useMemo(() => categorySections.filter((section) => section.services.length).slice(0, 2), [categorySections])
   const loadingCatalog = loadingServices || loadingCategories
-  const ArrowIcon = isArabic ? ArrowLeft : ArrowRight
 
   function openSpecialRequest(initialValue = '') {
     setCustomService(initialValue.trim())
@@ -449,202 +522,180 @@ function HomePage() {
 
   return (
     <div className="bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]">
-      <section className="border-b border-[var(--khalsni-public-border)] bg-white">
-        <div className="kh-public-container grid gap-8 py-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:py-10">
-          <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-extrabold text-brand-700">
-              <Sparkles className="h-4 w-4" />
+      <section className="overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,var(--khalsni-public-bg)_100%)]">
+        <div className="kh-public-container grid gap-8 pb-8 pt-7 sm:pb-10 sm:pt-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.82fr)] lg:items-center lg:gap-12">
+          <div className="max-w-3xl text-start">
+            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+              <Sparkles aria-hidden="true" className="h-4 w-4" />
               {dictionary.heroEyebrow}
             </p>
-            <h1 className="mt-5 text-4xl font-black leading-tight text-ink sm:text-5xl lg:text-[3.25rem]">
+            <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.16] text-[var(--khalsni-public-navy)] sm:text-5xl lg:text-[3.55rem]">
               {dictionary.headline}
               <span className="block text-[var(--khalsni-public-primary)]">{dictionary.headlineAccent}</span>
             </h1>
-            <p className="mt-4 max-w-xl text-base font-semibold leading-8 text-slate-600">{dictionary.heroText}</p>
-            <div className="mt-6 max-w-xl">
+            <p className="mt-4 max-w-2xl text-base font-semibold leading-8 text-[var(--khalsni-public-text-secondary)] sm:text-lg">
+              {dictionary.heroText}
+            </p>
+            <div className="mt-6 max-w-2xl">
               <ServiceSearch categories={categories} loading={loadingCatalog} onSpecialRequest={openSpecialRequest} services={services} />
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-5 text-sm font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/services">
-                {dictionary.startCta}
-                <ArrowIcon className="h-4 w-4" />
+              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-5 py-3 text-sm font-extrabold text-white shadow-md transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/services">
+                {dictionary.browseServices}
+                {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
               </Link>
-              <Link className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-5 text-sm font-extrabold text-ink transition hover:bg-slate-50" to="/track-order">
-                {dictionary.trackCta}
+              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-5 py-3 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/track-order">
+                {dictionary.trackRequest}
               </Link>
             </div>
           </div>
 
-          <div className="relative min-h-[270px] overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-slate-100 shadow-soft sm:min-h-[330px]">
-            <img
-              alt={isArabic ? 'عميل يتابع معاملة من منصة خلصني' : 'Customer following a service request through Khalsni'}
-              className="absolute inset-0 h-full w-full object-cover"
-              fetchPriority="high"
-              src={content.hero_image_url || heroImage}
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,22,52,0.08),rgba(7,22,52,0.68))]" />
-            <div className="absolute bottom-4 left-4 right-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[var(--radius-md)] bg-white/92 p-3 shadow-lg backdrop-blur">
-                <p className="text-2xl font-black text-ink">{publicServices.length}</p>
-                <p className="text-xs font-bold text-slate-500">{dictionary.servicesLabel}</p>
-              </div>
-              <div className="rounded-[var(--radius-md)] bg-white/92 p-3 shadow-lg backdrop-blur">
-                <p className="text-2xl font-black text-ink">{categorySections.length}</p>
-                <p className="text-xs font-bold text-slate-500">{dictionary.categoriesLabel}</p>
-              </div>
-              <div className="rounded-[var(--radius-md)] bg-white/92 p-3 shadow-lg backdrop-blur">
-                <p className="text-2xl font-black text-[var(--khalsni-public-primary)]">24/7</p>
-                <p className="text-xs font-bold text-slate-500">{isArabic ? 'متابعة رقمية' : 'Digital tracking'}</p>
-              </div>
-            </div>
-          </div>
+          <HeroVisual categories={publicCategories} content={content} dictionary={dictionary} isArabic={isArabic} language={language} services={latestServices} />
         </div>
       </section>
 
-      <section className="kh-public-container grid gap-3 py-5 md:grid-cols-3">
-        {dictionary.benefits.map(([title, text], index) => {
-          const BenefitIcon = [ShieldCheck, TimerReset, UploadCloud][index]
+      <section className="kh-public-container grid gap-3 py-4 sm:grid-cols-2 lg:grid-cols-4">
+        {dictionary.trustItems.map(([title, text], index) => {
+          const Icon = [ShieldCheck, WalletCards, FileText, UploadCloud][index]
           return (
-            <article className="flex gap-3 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4 shadow-sm" key={title}>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-md)] bg-brand-50 text-[var(--khalsni-public-primary)]">
-                <BenefitIcon className="h-5 w-5" />
+            <article className="flex items-start gap-3 rounded-[var(--radius-lg)] bg-white p-4 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
+                <Icon aria-hidden="true" className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="text-sm font-extrabold text-ink">{title}</h2>
-                <p className="mt-1 text-xs font-semibold leading-6 text-slate-600">{text}</p>
+                <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{title}</h2>
+                <p className="mt-1 text-xs font-semibold leading-6 text-[var(--khalsni-public-text-secondary)]">{text}</p>
               </div>
             </article>
           )
         })}
       </section>
 
-      <section className="kh-public-container py-6">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-extrabold text-[var(--khalsni-public-primary)]">{dictionary.benefitsTitle}</p>
-            <h2 className="mt-1 text-3xl font-black text-ink">{dictionary.categoriesTitle}</h2>
-            <p className="mt-2 max-w-3xl text-sm font-semibold leading-7 text-slate-600">{dictionary.categoriesText}</p>
+      <HomeRail
+        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.viewAll}</Link>}
+        description={dictionary.latestText}
+        itemCount={latestServices.length}
+        title={dictionary.latestTitle}
+      >
+        {loadingCatalog && !latestServices.length ? (
+          Array.from({ length: 4 }).map((_, index) => <RailItem key={index} wide><div className="h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft" /></RailItem>)
+        ) : latestServices.length ? (
+          latestServices.map((service) => (
+            <RailItem key={service.id || service.slug} wide>
+              <ServiceCard service={service} />
+            </RailItem>
+          ))
+        ) : (
+          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-white p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
+            {dictionary.emptyServices}
           </div>
-          <Link className="inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-ink transition hover:bg-slate-50" to="/services">
-            {dictionary.browseCta}
-          </Link>
-        </div>
+        )}
+      </HomeRail>
 
+      <HomeRail
+        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.viewAll}</Link>}
+        description={dictionary.categoriesText}
+        itemCount={categorySections.length}
+        title={dictionary.categoriesTitle}
+      >
         {loadingCatalog && !categorySections.length ? (
-          <div className="grid gap-4">
-            {Array.from({ length: 4 }).map((_, index) => <div className="h-44 animate-pulse rounded-[var(--radius-xl)] bg-white shadow-soft" key={index} />)}
-          </div>
+          Array.from({ length: 5 }).map((_, index) => <RailItem key={index}><div className="h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft" /></RailItem>)
         ) : categorySections.length ? (
-          <div className="grid gap-4">
-            {categorySections.slice(0, 8).map((section) => {
-              const Icon = section.Icon
-              return (
-                <article className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-white shadow-soft" key={section.id}>
-                  <div className="grid md:grid-cols-[minmax(15rem,0.78fr)_1fr]">
-                    <Link className="relative block min-h-48 overflow-hidden md:min-h-full" to={categoryPath(section.category)}>
-                      <img alt={section.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 hover:scale-[1.03]" loading="lazy" src={section.image} />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,22,52,0.08),rgba(7,22,52,0.74))]" />
-                      <span className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-[var(--radius-md)] bg-white text-[var(--khalsni-public-primary)] shadow-lg">
-                        <Icon className="h-6 w-6" />
-                      </span>
-                    </Link>
-                    <div className="p-5 sm:p-6">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <h3 className="text-2xl font-black text-ink">{section.title}</h3>
-                          <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-slate-600">{section.description}</p>
-                        </div>
-                        <span className="w-fit rounded-full bg-brand-50 px-4 py-2 text-xs font-extrabold text-brand-700">
-                          {section.count} {dictionary.serviceCount}
-                        </span>
-                      </div>
-                      <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
-                        {section.services.length ? (
-                          section.services.slice(0, 8).map((service) => (
-                            <Link
-                              className="inline-flex min-h-11 min-w-[11rem] max-w-[14rem] shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-slate-50 px-4 text-center text-xs font-extrabold leading-5 text-ink transition hover:border-[var(--khalsni-public-primary)] hover:bg-brand-50 hover:text-[var(--khalsni-public-primary)]"
-                              key={service.id || service.slug}
-                              to={serviceDetailsPath(service)}
-                            >
-                              {getServiceName(service, language, isArabic ? 'خدمة' : 'Service')}
-                            </Link>
-                          ))
-                        ) : (
-                          <p className="text-sm font-semibold text-slate-500">{dictionary.emptyCategory}</p>
-                        )}
-                      </div>
-                      <Link className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={categoryPath(section.category)}>
-                        {dictionary.browseAll}
-                        <ArrowIcon className="h-4 w-4" />
-                      </Link>
-                    </div>
+          categorySections.slice(0, 10).map((section) => (
+            <RailItem key={section.id}>
+              <CategoryCard category={section.category} count={section.count} />
+            </RailItem>
+          ))
+        ) : (
+          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-white p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
+            {dictionary.emptyCategories}
+          </div>
+        )}
+      </HomeRail>
+
+      {categoryRows.length ? (
+        <section className="kh-public-container py-7 sm:py-9">
+          <div className="mb-5 max-w-3xl text-start">
+            <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{dictionary.categoryRowsTitle}</h2>
+            <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.categoryRowsText}</p>
+          </div>
+          <div className="grid gap-6">
+            {categoryRows.map((section) => (
+              <article className="rounded-[var(--radius-xl)] bg-white p-4 shadow-soft ring-1 ring-[var(--khalsni-public-border)] sm:p-5" key={section.id}>
+                <div className="mb-4 flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h3 className="text-xl font-black text-[var(--khalsni-public-navy)]">{section.title}</h3>
+                    <p className="mt-1 text-sm font-semibold text-[var(--khalsni-public-text-secondary)]">
+                      {section.count} {dictionary.serviceCount}
+                    </p>
                   </div>
+                  <Link className="text-sm font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]" to={categoryPath(section.category)}>
+                    {dictionary.viewAll}
+                  </Link>
+                </div>
+                <div className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-2 sm:mx-0 sm:px-0">
+                  {section.services.slice(0, 4).map((service) => (
+                    <RailItem key={service.id || service.slug} wide>
+                      <ServiceCard service={service} />
+                    </RailItem>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="kh-public-container py-7 sm:py-9">
+        <div className="grid gap-6 lg:grid-cols-[0.72fr_1fr] lg:items-start">
+          <div className="text-start">
+            <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{dictionary.howTitle}</h2>
+            <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.howText}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dictionary.steps.map(([title, text], index) => {
+              const StepIcon = [Search, FileText, UploadCloud, CheckCircle2][index]
+              return (
+                <article className="relative rounded-[var(--radius-lg)] bg-white p-5 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
+                      <StepIcon aria-hidden="true" className="h-5 w-5" />
+                    </span>
+                    <span className="text-2xl font-black text-[var(--khalsni-public-primary-soft)]">{index + 1}</span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-black text-[var(--khalsni-public-navy)]">{title}</h3>
+                  <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{text}</p>
                 </article>
               )
             })}
           </div>
-        ) : (
-          <div className="rounded-[var(--radius-xl)] border border-dashed border-[var(--khalsni-public-border)] bg-white p-8 text-center shadow-soft">
-            <p className="text-lg font-extrabold text-ink">{isArabic ? 'لا توجد تصنيفات منشورة حالياً.' : 'No public categories are published yet.'}</p>
-          </div>
-        )}
+        </div>
       </section>
 
-      <section className="kh-public-container py-6" id="special-request">
-        <article className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-white shadow-soft">
-          <div className="grid gap-5 md:grid-cols-[0.82fr_1fr] md:items-stretch">
-            <div className="relative min-h-48 overflow-hidden">
-              <img alt={dictionary.specialTitle} className="absolute inset-0 h-full w-full object-cover" loading="lazy" src="/images/homepage/custom-request.jpg" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,22,52,0.08),rgba(7,22,52,0.62))]" />
-            </div>
-            <div className="p-5 sm:p-6">
-              <h2 className="text-2xl font-black text-ink">{dictionary.specialTitle}</h2>
-              <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-slate-600">{dictionary.specialText}</p>
-              <button className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-ink transition hover:bg-slate-50" onClick={() => setCustomOpen((current) => !current)} type="button">
-                <ChevronDown className={`h-4 w-4 transition ${customOpen ? 'rotate-180' : ''}`} />
+      <section className="kh-public-container pb-10 pt-6" id="special-request">
+        <article className="overflow-hidden rounded-[var(--radius-xl)] bg-white shadow-soft ring-1 ring-[var(--khalsni-public-border)]">
+          <div className="grid gap-0 md:grid-cols-[0.62fr_1fr]">
+            <ImageFallback alt={dictionary.specialTitle} className="aspect-[16/10] min-h-48 md:h-full" src="/images/homepage/custom-request.jpg" />
+            <div className="p-5 text-start sm:p-6">
+              <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)]">{dictionary.specialTitle}</h2>
+              <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.specialText}</p>
+              <button className="kh-focusable mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" onClick={() => setCustomOpen((current) => !current)} type="button">
+                <ChevronDown aria-hidden="true" className={`h-4 w-4 transition ${customOpen ? 'rotate-180' : ''}`} />
                 {dictionary.noResults}
               </button>
               {customOpen ? (
                 <form className="mt-4 grid gap-3 lg:grid-cols-[1fr_16rem_auto]" onSubmit={submitCustomRequest}>
-                  <input className="h-11 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-ink outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20" onChange={(event) => setCustomService(event.target.value)} placeholder={dictionary.specialService} required value={customService} />
-                  <input className="h-11 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-ink outline-none placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)] focus:ring-4 focus:ring-blue-500/20" onChange={(event) => setContact(event.target.value)} placeholder={dictionary.specialContact} required value={contact} />
-                  <button className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-5 text-sm font-extrabold text-white transition disabled:cursor-not-allowed disabled:opacity-60" disabled={submitting} type="submit">
+                  <input className="kh-focusable h-11 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-[var(--khalsni-public-navy)] outline-none placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]" onChange={(event) => setCustomService(event.target.value)} placeholder={dictionary.specialService} required value={customService} />
+                  <input className="kh-focusable h-11 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-[var(--khalsni-public-navy)] outline-none placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]" onChange={(event) => setContact(event.target.value)} placeholder={dictionary.specialContact} required value={contact} />
+                  <button className="kh-focusable inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-5 text-sm font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60" disabled={submitting} type="submit">
                     {submitting ? dictionary.sending : dictionary.specialSubmit}
-                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <SendHorizontal className="h-4 w-4" />}
+                    {submitting ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <SendHorizontal aria-hidden="true" className="h-4 w-4 rtl:-scale-x-100" />}
                   </button>
                 </form>
               ) : null}
             </div>
           </div>
         </article>
-      </section>
-
-      <section className="kh-public-container grid gap-4 py-6 lg:grid-cols-[0.72fr_1fr] lg:items-center">
-        <div>
-          <h2 className="text-3xl font-black text-ink">{dictionary.howTitle}</h2>
-          <p className="mt-2 text-sm font-semibold leading-7 text-slate-600">{dictionary.howText}</p>
-          <div className="mt-5 rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-white p-5 shadow-soft">
-            <h3 className="text-xl font-black text-ink">{dictionary.portalTitle}</h3>
-            <p className="mt-2 text-sm font-semibold leading-7 text-slate-600">{dictionary.portalText}</p>
-          </div>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {dictionary.steps.map(([title, text], index) => {
-            const StepIcon = [Search, FileText, UploadCloud, CheckCircle2][index]
-            return (
-              <article className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-5 shadow-sm" key={title}>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-brand-50 text-[var(--khalsni-public-primary)]">
-                    <StepIcon className="h-5 w-5" />
-                  </span>
-                  <span className="text-3xl font-black text-slate-200">{index + 1}</span>
-                </div>
-                <h3 className="mt-4 text-lg font-black text-ink">{title}</h3>
-                <p className="mt-2 text-sm font-semibold leading-7 text-slate-600">{text}</p>
-              </article>
-            )
-          })}
-        </div>
       </section>
     </div>
   )

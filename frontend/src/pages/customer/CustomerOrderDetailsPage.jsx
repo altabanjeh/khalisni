@@ -27,7 +27,7 @@ import {
 
 function MetricCard({ label, value }) {
   return (
-    <div className="rounded-[var(--radius)] border border-border bg-slate-50 p-4">
+    <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4">
       <p className="text-xs text-slate-500">{label}</p>
       <p className="mt-2 font-bold text-ink">{value}</p>
     </div>
@@ -36,7 +36,7 @@ function MetricCard({ label, value }) {
 
 function SectionCard({ icon: Icon, title, description, children }) {
   return (
-    <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+    <section className="glass-panel p-6">
       <div className="flex items-start gap-3">
         {Icon ? (
           <span className="icon-chip">
@@ -147,7 +147,7 @@ function CustomerOrderDetailsPage() {
             </p>
             <p className="mt-2 text-xs font-bold text-slate-500">رقم الطلب: {order.order_number}</p>
           </div>
-          <div className="rounded-[var(--radius-lg)] border border-border bg-slate-50 p-4 text-ink">
+          <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-ink">
             <p className="mb-3 text-xs font-bold text-slate-500">الحالة الحالية</p>
             <StatusBadge status={order.status} />
           </div>
@@ -190,7 +190,7 @@ function CustomerOrderDetailsPage() {
         </div>
       ) : null}
 
-      <section className="rounded-[2rem] border border-border bg-white p-6 shadow-soft">
+      <section className="glass-panel p-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard label="الخدمة" value={order.service?.name_ar || 'غير محددة'} />
           <MetricCard label="المدينة" value={order.city || 'غير محددة'} />
@@ -224,7 +224,7 @@ function CustomerOrderDetailsPage() {
             title="ملاحظاتك"
             description="أي ملاحظة أدخلتها عند إنشاء الطلب أو أثناء المتابعة تظهر هنا."
           >
-            <div className="rounded-3xl border border-border bg-white p-4 text-sm leading-7 text-slate-600">
+            <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-sm leading-7 text-slate-600">
               {order.customer_notes || 'لا توجد ملاحظات مسجلة على هذا الطلب.'}
             </div>
           </SectionCard>

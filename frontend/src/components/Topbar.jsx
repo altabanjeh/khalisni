@@ -37,7 +37,7 @@ function Topbar({ title, onMenuClick }) {
       <div className="flex min-w-0 items-center gap-3">
         <button
           aria-label={t('topbar.openSidebar', 'فتح القائمة الجانبية')}
-          className="btn-ghost p-2 xl:hidden"
+          className="btn-ghost min-h-10 min-w-10 p-2 xl:hidden"
           onClick={onMenuClick}
           type="button"
         >

@@ -12,7 +12,7 @@ const PAGE_SIZE = 15
 
 function SummaryCard({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-[2rem] border border-border bg-white p-5 shadow-soft">
+    <div className="glass-panel p-5">
       <div className="flex items-center gap-3">
         <span className="icon-chip"><Icon className="h-5 w-5" /></span>
         <div>
@@ -108,7 +108,7 @@ function MyOrdersPage() {
         <SummaryCard icon={Wallet} label="طلبات مكتملة" value={summary.completed} />
       </div>
 
-      <section className="rounded-[2rem] border border-border bg-white p-5 shadow-soft">
+      <section className="glass-panel p-5">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="relative">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -119,7 +119,7 @@ function MyOrdersPage() {
               value={query}
             />
           </div>
-          <div className="rounded-xl border border-border bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+          <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3 text-sm font-semibold text-slate-600">
             {total} طلب {query.trim() ? 'مطابق للبحث' : 'في السجل'}
           </div>
         </div>

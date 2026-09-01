@@ -1,0 +1,3664 @@
+[
+  {
+    "width": 360,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -275,
+        "right": 34,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -275,
+        "right": 34,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -601,
+        "right": -291,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -601,
+        "right": -291,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -926,
+        "right": -617,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -926,
+        "right": -617,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -246,
+        "right": 49,
+        "width": 295
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -246,
+        "right": 49,
+        "width": 295
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -275,
+        "right": 34,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -275,
+        "right": 34,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -601,
+        "right": -291,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -601,
+        "right": -291,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -926,
+        "right": -617,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -926,
+        "right": -617,
+        "width": 310
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -246,
+        "right": 49,
+        "width": 295
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -246,
+        "right": 49,
+        "width": 295
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 336,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 336,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 360,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 360,
+    "scrollWidth": 360,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -286,
+        "right": 37,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -286,
+        "right": 37,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -624,
+        "right": -302,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -624,
+        "right": -302,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -963,
+        "right": -640,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -963,
+        "right": -640,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -256,
+        "right": 52,
+        "width": 308
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -256,
+        "right": 52,
+        "width": 308
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -286,
+        "right": 37,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -286,
+        "right": 37,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -624,
+        "right": -302,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -624,
+        "right": -302,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -963,
+        "right": -640,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -963,
+        "right": -640,
+        "width": 323
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "تصنيف18 خدمةالعقارات والأراضيسندات تسجيل ومخططات واستعلامات الملكية.عرض التصنيف",
+        "left": -256,
+        "right": 52,
+        "width": 308
+      },
+      {
+        "tag": "a",
+        "className": "kh-public-card p-4 kh-interactive-card kh-focusable group flex h-full min-h-[18rem] snap-start flex-col p-0 focus:outlin",
+        "text": "تصنيف18 خدمةالعقارات والأراضيسندات تسجيل ومخططات واستعلامات الملكية.عرض التصنيف",
+        "left": -256,
+        "right": 52,
+        "width": 308
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "+962 6 560 9000",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 351,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 351,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 375,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 375,
+    "scrollWidth": 375,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -297,
+        "right": 39,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -297,
+        "right": 39,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -648,
+        "right": -313,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -648,
+        "right": -313,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -1000,
+        "right": -664,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -1000,
+        "right": -664,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -266,
+        "right": 54,
+        "width": 320
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -266,
+        "right": 54,
+        "width": 320
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -297,
+        "right": 39,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -297,
+        "right": 39,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -648,
+        "right": -313,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -648,
+        "right": -313,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -1000,
+        "right": -664,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -1000,
+        "right": -664,
+        "width": 335
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -266,
+        "right": 54,
+        "width": 320
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -266,
+        "right": 54,
+        "width": 320
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 366,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 366,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 390,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 390,
+    "scrollWidth": 390,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -313,
+        "right": 42,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -313,
+        "right": 42,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -683,
+        "right": -329,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -683,
+        "right": -329,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -1053,
+        "right": -699,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -1053,
+        "right": -699,
+        "width": 354
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -280,
+        "right": 58,
+        "width": 338
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -280,
+        "right": 58,
+        "width": 338
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 388,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 388,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 412,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 412,
+    "scrollWidth": 412,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -326,
+        "right": 44,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -326,
+        "right": 44,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -711,
+        "right": -342,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -711,
+        "right": -342,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -1097,
+        "right": -727,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -1097,
+        "right": -727,
+        "width": 370
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -291,
+        "right": 61,
+        "width": 353
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -291,
+        "right": 61,
+        "width": 353
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 406,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 406,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 430,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 430,
+    "scrollWidth": 430,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "home",
+    "path": "/",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -340,
+        "right": 12,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -340,
+        "right": 12,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -708,
+        "right": -356,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -708,
+        "right": -356,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -196,
+        "right": 108,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -196,
+        "right": 108,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -516,
+        "right": -212,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -516,
+        "right": -212,
+        "width": 304
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "menu",
+    "path": "/",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -340,
+        "right": 12,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -340,
+        "right": 12,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[86vw] sm:w-[22rem] lg:w-[21rem]",
+        "text": "",
+        "left": -708,
+        "right": -356,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -708,
+        "right": -356,
+        "width": 352
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -196,
+        "right": 108,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -196,
+        "right": 108,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "shrink-0 snap-start w-[82vw] sm:w-[19rem] lg:w-[20rem]",
+        "text": "",
+        "left": -516,
+        "right": -212,
+        "width": 304
+      },
+      {
+        "tag": "div",
+        "className": "h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft",
+        "text": "",
+        "left": -516,
+        "right": -212,
+        "width": 304
+      }
+    ],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "services",
+    "path": "/services",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 70,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "services-search",
+    "path": "/services?search=passport",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "عرض الكل",
+        "width": 70,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "category-detail",
+    "path": "/services/category/civil-status-and-passports",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "service-detail",
+    "path": "/services/passport-appointment-booking",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "faq",
+    "path": "/faq",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "about",
+    "path": "/about",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "contact",
+    "path": "/contact",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "login",
+    "path": "/login",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "input",
+        "text": "",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "a",
+        "text": "نسيت كلمة المرور؟",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "public",
+    "route": "register",
+    "path": "/register",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": [
+      {
+        "tag": "a",
+        "text": "سجل الدخول",
+        "width": 88,
+        "height": 17
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "طلب خاص",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الرئيسية",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الخدمات",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "تتبع الطلب",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "الأسئلة الشائعة",
+        "width": 128,
+        "height": 20
+      },
+      {
+        "tag": "a",
+        "text": "سياسة الخصوصية",
+        "width": 128,
+        "height": 20
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "group": "customer",
+    "route": "customer-dashboard",
+    "path": "/customer",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "customer",
+    "route": "customer-menu",
+    "path": "/customer",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "customer",
+    "route": "customer-orders",
+    "path": "/customer/orders",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "customer",
+    "route": "customer-new-order",
+    "path": "/customer/orders/new",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  },
+  {
+    "width": 768,
+    "group": "customer",
+    "route": "customer-profile",
+    "path": "/customer/profile",
+    "viewportWidth": 768,
+    "scrollWidth": 768,
+    "hasPageOverflow": false,
+    "overflowing": [],
+    "smallTargets": []
+  }
+]

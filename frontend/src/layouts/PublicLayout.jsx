@@ -12,8 +12,9 @@ const copy = {
     home: 'الرئيسية',
     services: 'الخدمات',
     track: 'تتبع الطلب',
-    help: 'المساعدة',
-    about: 'من نحن',
+    faq: 'الأسئلة الشائعة',
+    about: 'عن خلصني',
+    business: 'للأعمال',
     contact: 'تواصل معنا',
     portal: 'بوابتي',
     login: 'تسجيل الدخول',
@@ -33,8 +34,9 @@ const copy = {
     home: 'Home',
     services: 'Services',
     track: 'Track request',
-    help: 'Help',
+    faq: 'FAQ',
     about: 'About',
+    business: 'For business',
     contact: 'Contact',
     portal: 'My portal',
     login: 'Sign in',
@@ -79,11 +81,10 @@ function PublicLayoutContent() {
   const footerText = getLocalizedField(content, { ar: 'footer_text', en: 'footer_text_en' }, isArabic ? 'ar' : 'en')
 
   const links = [
-    { to: '/', label: dictionary.home, end: true },
     { to: '/services', label: dictionary.services },
-    { to: '/track-order', label: dictionary.track },
-    { to: '/faq', label: dictionary.help },
     { to: '/about', label: dictionary.about },
+    { to: '/about#business', label: dictionary.business },
+    { to: '/faq', label: dictionary.faq },
     { to: '/contact', label: dictionary.contact },
   ]
 
@@ -104,11 +105,11 @@ function PublicLayoutContent() {
       <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
-            <Link className="kh-focusable shrink-0 rounded-[var(--radius-sm)]" to="/" aria-label="Khalsni home">
+            <Link className="kh-focusable inline-flex min-h-11 shrink-0 items-center rounded-[var(--radius-sm)]" to="/" aria-label="Khalsni home">
               <KhalsniLogo logoUrl={theme.logo_url} />
             </Link>
 
-            <nav className="hidden flex-1 items-center justify-center gap-2 text-[0.72rem] font-extrabold min-[700px]:flex lg:text-[0.78rem]">
+            <nav className="hidden flex-1 items-center justify-center gap-2 text-[0.72rem] font-extrabold lg:flex lg:text-[0.78rem]">
               {links.map((link) => (
                 <NavLink
                   end={link.end}
@@ -127,7 +128,7 @@ function PublicLayoutContent() {
               ))}
             </nav>
 
-            <div className="hidden shrink-0 items-center gap-2 min-[700px]:flex">
+            <div className="hidden shrink-0 items-center gap-2 lg:flex">
               {user ? (
                 <Link className="kh-focusable inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
                   <UserRound className="h-4 w-4" />
@@ -149,7 +150,7 @@ function PublicLayoutContent() {
             <button
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? dictionary.closeMenu : dictionary.openMenu}
-              className="kh-focusable inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] min-[700px]:hidden"
+              className="kh-focusable inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] lg:hidden"
               onClick={() => setMobileMenuOpen((current) => !current)}
               type="button"
             >
@@ -159,7 +160,7 @@ function PublicLayoutContent() {
         </div>
 
         {mobileMenuOpen ? (
-          <div className="border-t border-[var(--khalsni-public-border)] bg-white min-[700px]:hidden">
+          <div className="border-t border-[var(--khalsni-public-border)] bg-white lg:hidden">
             <div className="kh-public-container py-4">
               <nav className="grid gap-1 text-start text-sm font-bold">
                 {links.map((link) => (
@@ -202,7 +203,7 @@ function PublicLayoutContent() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-[var(--khalsni-public-border)] bg-[var(--public-footer-background-color)] text-[var(--public-footer-text-color)]">
+      <footer className="border-t border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-bg-secondary)] text-[var(--khalsni-public-text)]">
         <div className="kh-public-container py-7">
           <div className="grid gap-8 text-start md:grid-cols-[1.2fr_0.75fr_0.75fr_1fr]">
             <div>
@@ -226,7 +227,7 @@ function PublicLayoutContent() {
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/">{dictionary.home}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.services}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/track-order">{dictionary.track}</Link>
-                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/faq">{dictionary.help}</Link>
+                <Link className="hover:text-[var(--khalsni-public-primary)]" to="/faq">{dictionary.faq}</Link>
                 <Link className="hover:text-[var(--khalsni-public-primary)]" to="/privacy">{dictionary.privacy}</Link>
               </div>
             </div>
@@ -266,7 +267,7 @@ function PublicLayoutContent() {
 
       <Link
         aria-label={dictionary.contact}
-        className="kh-focusable fixed bottom-5 start-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-lg transition hover:bg-[var(--khalsni-public-primary-hover)]"
+        className="kh-focusable fixed bottom-5 start-5 z-50 hidden h-14 w-14 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-white shadow-lg transition hover:bg-[var(--khalsni-public-primary-hover)] lg:grid"
         to="/contact"
       >
         <MessageCircle className="h-7 w-7" />

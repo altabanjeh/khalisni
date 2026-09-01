@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { clearStoredAuth, getStoredRefreshToken, storeAuthTokens } from '../api/client'
+import { clearStoredAuth, getStoredAccessToken, getStoredRefreshToken, storeAuthTokens } from '../api/client'
 import { api } from '../api/services'
 
 const AuthContext = createContext(null)
@@ -13,6 +13,11 @@ export function AuthProvider({ children }) {
     let mounted = true
 
     async function loadMe() {
+      if (!getStoredAccessToken() && !getStoredRefreshToken()) {
+        if (mounted) setLoading(false)
+        return
+      }
+
       try {
         const me = await api.me()
         if (mounted) setUser(me)

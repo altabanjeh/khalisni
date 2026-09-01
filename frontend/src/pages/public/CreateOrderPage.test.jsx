@@ -10,6 +10,8 @@ function LocationProbe() {
 }
 
 function renderCreateOrderPage(initialEntry = '/create-order') {
+  sessionStorage.setItem('khalisni_access', 'test-access-token')
+
   return render(
     <AuthProvider>
       <MemoryRouter initialEntries={[initialEntry]}>

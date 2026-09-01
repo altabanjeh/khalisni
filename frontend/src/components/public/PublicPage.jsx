@@ -68,9 +68,9 @@ export function PublicHero({ eyebrow, title, description, icon: Icon, action }) 
   )
 }
 
-export function PublicPanel({ children, className = '' }) {
+export function PublicPanel({ children, className = '', ...props }) {
   return (
-    <section className={clsx('rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6', className)}>
+    <section className={clsx('rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6', className)} {...props}>
       {children}
     </section>
   )

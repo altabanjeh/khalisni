@@ -1,4 +1,5 @@
-import { ArrowUpRight, Clock3, FileText, ShieldCheck, WalletCards } from 'lucide-react'
+import clsx from 'clsx'
+import { ArrowUpRight, Clock3, FileText, WalletCards } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import { ImageFallback, PublicCard } from './public/PublicPage'
@@ -10,7 +11,7 @@ import {
   getServicePublicPrice,
 } from '../utils/servicePresentation'
 
-function ServiceCard({ service }) {
+function ServiceCard({ service, className = '' }) {
   const { language, isArabic } = useLanguage()
   const categoryName = getCategoryName(service?.category, language, isArabic ? 'خدمة' : 'Service')
   const serviceName = getServiceName(service, language)
@@ -20,37 +21,36 @@ function ServiceCard({ service }) {
   const imageUrl = service?.image_url || service?.image || service?.category?.image_url || service?.category?.image
 
   return (
-    <PublicCard className="group flex h-full min-h-[24rem] snap-start flex-col p-0" interactive>
+    <PublicCard className={clsx('group flex h-full min-h-[23rem] snap-start flex-col p-0', className)} interactive>
       <ImageFallback
         alt={serviceName}
-        className="aspect-[16/9] w-full border-b border-[var(--khalsni-public-border)]"
+        className="aspect-[16/10] w-full border-b border-[var(--khalsni-public-border)]"
         icon={FileText}
         src={imageUrl}
       />
 
-      <div className="flex flex-1 flex-col p-5 text-start">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <span className="inline-flex max-w-[75%] items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--khalsni-public-primary)]">
-            <FileText aria-hidden="true" className="h-4 w-4 shrink-0" />
-            <span className="truncate">{categoryName}</span>
-          </span>
-          <ShieldCheck aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-[var(--khalsni-public-primary)]" />
+      <div className="flex flex-1 flex-col p-4 text-start sm:p-5">
+        <span className="inline-flex max-w-full items-center gap-2 self-start rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--khalsni-public-primary)]">
+          <FileText aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <span className="truncate">{categoryName}</span>
+        </span>
+
+        <div className="mt-4 flex-1">
+          <h3 className="line-clamp-2 text-lg font-extrabold leading-7 text-[var(--khalsni-public-navy)] sm:text-xl sm:leading-8">{serviceName}</h3>
+          {serviceDescription ? (
+            <p className="mt-2 line-clamp-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{serviceDescription}</p>
+          ) : null}
         </div>
 
-        <div className="flex-1">
-          <h3 className="text-xl font-extrabold leading-8 text-[var(--khalsni-public-navy)]">{serviceName}</h3>
-          <p className="mt-2 line-clamp-3 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{serviceDescription}</p>
-        </div>
-
-        <dl className="mt-5 grid gap-3 border-y border-[var(--khalsni-public-border)] py-4 text-sm sm:grid-cols-2">
-          <div className="min-w-0">
+        <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+          <div className="min-w-0 rounded-[var(--radius-md)] bg-[var(--khalsni-public-bg-secondary)] p-3">
             <dt className="flex items-center gap-2 text-xs font-bold text-[var(--khalsni-public-text-muted)]">
               <Clock3 aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)]" />
-              {isArabic ? 'المدة المتوقعة' : 'Expected time'}
+              {isArabic ? 'المدة' : 'Duration'}
             </dt>
             <dd className="mt-1 truncate font-extrabold text-[var(--khalsni-public-text)]">{duration.label}</dd>
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 rounded-[var(--radius-md)] bg-[var(--khalsni-public-bg-secondary)] p-3">
             <dt className="flex items-center gap-2 text-xs font-bold text-[var(--khalsni-public-text-muted)]">
               <WalletCards aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)]" />
               {isArabic ? 'السعر' : 'Price'}
