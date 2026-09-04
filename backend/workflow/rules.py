@@ -22,6 +22,13 @@ class TransitionRule:
 WORKFLOW_TRANSITIONS = (
     TransitionRule(
         from_status=OrderStatus.NEW,
+        to_status=OrderStatus.ARCHIVED,
+        action="archive_order",
+        allowed_roles=frozenset({UserRole.ADMIN}),
+        generic_status_update=True,
+    ),
+    TransitionRule(
+        from_status=OrderStatus.NEW,
         to_status=OrderStatus.UNDER_REVIEW,
         action="start_review",
         allowed_roles=INTERNAL_ROLES,

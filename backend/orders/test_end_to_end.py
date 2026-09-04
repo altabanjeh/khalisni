@@ -9,7 +9,13 @@ from documents.models import Document
 from notifications.models import Notification
 from orders.models import Order
 from providers.models import ProviderProfile
-from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRequiredDocument
+from services.models import (
+    RequiredDocumentDefinition,
+    Service,
+    ServiceCategory,
+    ServiceProviderAssignment,
+    ServiceRequiredDocument,
+)
 
 
 class OrderFlowEndToEndTests(APITestCase):
@@ -552,6 +558,13 @@ class OrderFlowEndToEndTests(APITestCase):
         self.assertEqual(generic_complete_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_scenario_5_admin_configuration_rule_change_affects_new_orders_only(self):
+        definition = RequiredDocumentDefinition.objects.create(
+            code="national_id",
+            name_ar="هوية",
+            name_en="National ID",
+            allowed_extensions=[".pdf"],
+            max_file_size=1024 * 1024,
+        )
         old_completed_order = Order.objects.create(
             customer=self.customer,
             service=self.config_service,
@@ -565,6 +578,7 @@ class OrderFlowEndToEndTests(APITestCase):
             "/api/admin/service-documents/",
             {
                 "service_id": self.config_service.id,
+                "document_definition_id": definition.id,
                 "document_type": "national_id",
                 "name_ar": "هوية",
                 "name_en": "National ID",

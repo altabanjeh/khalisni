@@ -628,6 +628,9 @@ class ServiceRequiredDocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceRequiredDocument
+        # The model permits legacy rules without an FK. Validation below resolves
+        # their stable document_type into the authoritative registry definition.
+        validators = []
         fields = (
             "id",
             "service",
@@ -658,6 +661,8 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
     document_definition_id = serializers.PrimaryKeyRelatedField(
         source="document_definition",
         queryset=RequiredDocumentDefinition.objects.filter(is_active=True, is_deleted=False),
+        required=False,
+        allow_null=True,
     )
     allowed_extension_options = serializers.SerializerMethodField()
     max_file_size_limit = serializers.SerializerMethodField()
@@ -724,8 +729,19 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         definition = attrs.get("document_definition") or getattr(self.instance, "document_definition", None)
+        if definition is None and attrs.get("document_type"):
+            definition = RequiredDocumentDefinition.objects.filter(
+                code=attrs["document_type"], is_active=True, is_deleted=False
+            ).first()
         if definition is None:
             raise serializers.ValidationError({"document_definition_id": "Document definition is required."})
+        service = attrs.get("service") or getattr(self.instance, "service", None)
+        if service and ServiceRequiredDocument.objects.filter(
+            service=service,
+            document_definition=definition,
+            is_deleted=False,
+        ).exclude(pk=getattr(self.instance, "pk", None)).exists():
+            raise serializers.ValidationError({"document_definition_id": "This document definition is already linked to the service."})
         attrs["document_type"] = definition.code
         attrs["name_ar"] = definition.name_ar
         attrs["name_en"] = definition.name_en

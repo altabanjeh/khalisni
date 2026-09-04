@@ -617,7 +617,9 @@ class OrderAPITests(APITestCase):
             format="json",
         )
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Order.objects.filter(pk=order.pk).exists())
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.ARCHIVED)
+        self.assertTrue(order.is_archived)
 
     def test_finalized_order_cannot_be_edited_normally(self):
         order = Order.objects.create(

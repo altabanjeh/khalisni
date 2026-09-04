@@ -146,7 +146,7 @@ class BranchViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             create_audit_log(
                 request=request,
                 user=request.user,
-                action="delete_branch",
+                action="deactivate_branch",
                 entity_type="Branch",
                 entity_id=branch.pk,
                 entity_name=branch.name,
