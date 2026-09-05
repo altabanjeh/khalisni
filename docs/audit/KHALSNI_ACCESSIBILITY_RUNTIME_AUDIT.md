@@ -2,7 +2,25 @@
 
 Baseline: WCAG 2.2 AA. **Automated:** `@axe-core/playwright` (tags `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa`) run against the live app via `frontend/e2e/run-matrix.mjs` + a focused `axe_detail` pass. **Manual:** structural review of the rendered DOM + component source. Runner is committed as `frontend/e2e/a11y.spec.js` (Playwright) and wired to the CI `e2e` job.
 
-## Automated result
+## Post-remediation result (Gate 2 round 2, 2026-09-05)
+
+**D-A11Y-1 FIXED and runtime-verified.** Root cause was `--khalsni-public-text-muted` being hard-coded to `#98a2b3` in `src/utils/publicSiteDefaults.js::getPublicSiteCssVariables` (an **inline** style map that overrides the `:root` token). Darkened to `#5b6470` there **and** in `src/index.css` (`--kh-text-subtle`), plus the one dashboard instance (`Topbar` role label `text-slate-500`→`text-slate-600` on the `brand-50` chip).
+
+Fresh axe run (WCAG 2.0/2.1/2.2 A + AA), 1440 viewport:
+
+| Route | serious/critical violations |
+|---|---|
+| `/` | **0** (was 10) |
+| `/services` | **0** (was 7) |
+| `/admin` | **0** (was 1) |
+| `/employee` | **0** (was 1) |
+| `/track-order`, `/login`, `/register`, `/faq`, `/about`, `/customer` | 0 (unchanged) |
+
+Still owed for a full AA sign-off (tracked, not blocking): a keyboard-only task walk on the primary journeys and modal focus-trap verification. axe now runs in CI (`frontend/e2e/a11y.spec.js`).
+
+---
+
+## Automated result (Gate 1R — pre-remediation, retained)
 
 | Route | Viewport | Serious/critical violations |
 |---|---|---|

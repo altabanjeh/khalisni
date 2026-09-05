@@ -2,6 +2,21 @@
 
 Gate 1 · 2026-09-05 · HEAD `574753e`
 
+## Gate 2 round 2 addendum (2026-09-05) — UI defects remediated & re-verified
+
+Route matrix re-run after the fixes: **73/73 checks pass, axe 10/10 routes clean, 0 overflow, 0 console errors.**
+
+| ID | Fix | Verification |
+|---|---|---|
+| **D-A11Y-1** | `--khalsni-public-text-muted` `#98a2b3`→`#5b6470` in `publicSiteDefaults.js` (the inline override) + `--kh-text-subtle` in `index.css` + `Topbar` role label `slate-500`→`slate-600` | axe: `/`, `/services`, `/admin`, `/employee` now **0 serious/critical** (was 10/7/1/1) |
+| **D-UX1** | `LanguageSwitcher` rendered in `PublicLayout` header + mobile drawer (reusable component, rule 15) | runtime: public "English" button visible; click → `<html dir>` flips to `ltr`; screenshot `public-home-ar-1440-r2.png` |
+| **D-UX2** | homepage "services by category": fixed-width scroll rail → `grid gap-4 sm:grid-cols-2` | cards fill the row (2-up), wrap, 0 overflow. *Residual (minor, inherent):* a category with a single service shows one empty grid cell — acceptable grid behaviour, not the original "rail with large gap" defect |
+| **U7 (partial)** | `.field` primitive → logical inline padding; shared search-input pattern (9 screens) + shared components → `text-start`/`start-*`/`border-e` | lint clean; RTL (`dir=rtl`) + LTR route matrix re-verified |
+
+Still open (design decision / subjective polish, deferred): U1–U6, U8–U13 (box-in-box density, radius-scale unification, plain-vs-photographic heroes, repeated info, gray-overuse) and **C-VIS1** (2026-08-05 dark reference vs light-direction chain — `BLOCKED_PRODUCT_DECISION`).
+
+---
+
 ## Gate 1R runtime addendum (2026-09-05) — this section supersedes the honesty caveat below
 
 A committed Playwright harness (`frontend/e2e/`, system Chrome) was executed against a live seeded stack. Results:

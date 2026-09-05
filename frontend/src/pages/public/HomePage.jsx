@@ -633,11 +633,13 @@ function HomePage() {
                     {dictionary.viewAll}
                   </Link>
                 </div>
-                <div className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-2 sm:mx-0 sm:px-0">
+                {/* D-UX2: a responsive 2-up grid fills the row and wraps, instead
+                    of a fixed-width scroll rail that left-flushed 1-2 cards with
+                    a large empty gap on desktop. Two columns keeps sparse
+                    categories (1 service) from leaving a wide empty band. */}
+                <div className="grid gap-4 sm:grid-cols-2">
                   {section.services.slice(0, 4).map((service) => (
-                    <RailItem key={service.id || service.slug} wide>
-                      <ServiceCard service={service} />
-                    </RailItem>
+                    <ServiceCard key={service.id || service.slug} service={service} />
                   ))}
                 </div>
               </article>

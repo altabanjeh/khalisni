@@ -6,6 +6,23 @@ This gate is discovery only. **No broad remediation was performed.** No reposito
 
 ---
 
+## GATE 2 ROUND 2 — Gate 1R backlog cleared (2026-09-05)
+
+| Item | Action | Result |
+|---|---|---|
+| D-DEP1 (HIGH) | bump `react-router-dom`→7.18.3, `axios`→1.20.0 | `npm audit --omit=dev` = **0 vulnerabilities**; build + 44 vitest + lint green |
+| D-A11Y-1 (MED) | darken `--kh-text-subtle` token `#98a2b3`→`#5b6470` | single design-token change; axe re-run |
+| D-UX1 (MED) | render `LanguageSwitcher` in `PublicLayout` (desktop + mobile drawer) | public visitor can switch AR↔EN |
+| D-UX2 (MED) | homepage "services by category" scroll-rail → responsive grid | cards fill row, wrap, 0 overflow |
+| D-DB1 (MED) | `SoftDeleteQuerySet.as_manager()` helpers on `SoftDeleteModel`, non-breaking | `.alive()/.active()/.deleted()/.with_deleted()`; no migration, no regression |
+| D6/CE10 (MED) | `ensure_document_definition()` on save + `services/0011` backfill migration | every rule resolves to a canonical definition; legacy columns kept (non-destructive) |
+| U7 (MED) | `.field` logical padding; shared search-input + shared components → logical props | RTL/LTR re-verified |
+| U1–U13, C-VIS1, D-DB3, U15 | deferred with documented reason (design decision / infra / cosmetic) | see defect register |
+
+**Full backend suite after round 2:** (see Gate 2 final response). **Runtime route matrix re-run** after the router bump + UI changes.
+
+---
+
 ## GATE 1R OUTCOME (updated 2026-09-05)
 
 Discovery is now backed by **executed runtime evidence** (not source inspection): a committed Playwright + axe harness (`frontend/e2e/`, system Chrome) drove a live seeded stack; 20 J01–J20 journeys + a 78-cell authorization matrix + a 7-case FE/BE contract suite run against the real API. Backend suite **249/249**; `pip-audit` clean; `check --deploy` clean (bar SECRET_KEY length under a test key).

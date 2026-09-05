@@ -8,6 +8,38 @@ Findings are from this session's own source review unless the "Source" note says
 
 ---
 
+## INDEPENDENT FINAL ACCEPTANCE GATE (2026-09-05) — see `KHALSNI_FINAL_ACCEPTANCE.md`
+
+Adversarial re-verification found **no new P0/P1/security/data-integrity/workflow defect**. Evidence: 283 backend tests OK (+26 new adversarial: negative-input, mass-assignment, IDOR, invalid-workflow, auth-edge, soft-delete-leakage, full-flow data-integrity — all pass), 20/20 journeys, 81 authz assertions, 73/73 route checks, 95 screenshots (0 overflow, 0 console errors, AR+EN, 5 viewports), axe 10/10 clean, `check --deploy` 0 warnings, `npm audit --omit=dev`=0, `pip-audit`=0, no secrets in bundle, live `/media/secure_orders|payments|..` → 404.
+
+New finding:
+
+| ID | Severity | Status | Detail |
+|---|---|---|---|
+| **F-1** | P2 | OPEN (non-blocking) | Admin management **tables** show untranslated English column headers ("Actions"/"Status"/"Slug"/…) and some cell values ("Active"/"Visible"/"Expected completion: N days"/English category names) on the Arabic-first UI. Page chrome, nav, buttons, empty states are localized. Consequence: internal-ops screens read inconsistently in Arabic; English is a valid fallback; all functionality works. Matches the pre-existing "untranslated dev text" note. **Not a release blocker.** Fix: wrap admin `DataTable` headers + status/delivery/label cell formatters in `t(...)` keys. |
+
+Re-verified FIXED (no regression): D1, D2, D3, D4, D5, D7, D8, D-DEP1, D-A11Y-1, D-UX1, D-UX2, D-DB1, D-DB2, U14, U7(partial), D6(advance). C-VIS1 remains `BLOCKED_PRODUCT_DECISION`.
+
+---
+
+## GATE 2 (round 2) — Gate 1R backlog remediation (2026-09-05)
+
+| ID | Status | Evidence |
+|---|---|---|
+| **D-DEP1** | **FIXED / VERIFIED** | `react-router-dom` 7.14.2→**7.18.3**, `axios` 1.9→**1.20.0** (pulls `form-data` 4.0.6). `npm audit --omit=dev` → **"found 0 vulnerabilities"** (was 4 high). FE vitest 44/44, lint clean, `npm run build` passes; runtime route matrix re-run (routing library changed). |
+| **D-A11Y-1** | **FIXED / VERIFIED** | Design-system token `--kh-text-subtle` `#98a2b3`→**`#5b6470`** (2.44:1 → ≈5.5:1 on the muted surface). Single token; propagates to every `ServiceCard`/small-label use. axe re-run (route matrix) — see runtime result below. |
+| **D-UX1** | **FIXED / VERIFIED** | `LanguageSwitcher` now rendered in `PublicLayout` — desktop actions cluster **and** mobile menu drawer. Public visitor can switch AR↔EN; `dir` flips. Uses the existing reusable component (rule 15). |
+| **D-UX2** | **FIXED / VERIFIED** | Homepage "services by category" section: fixed-width scroll rail → **responsive `grid gap-4 sm:grid-cols-2 xl:grid-cols-3`**. Cards fill the row and wrap; no left-flush empty space; 0 overflow (route matrix). |
+| **D-DB1** | **FIXED (non-breaking) / VERIFIED** | `core.models.SoftDeleteQuerySet` (`.alive()/.active()/.deleted()/.with_deleted()`) exposed via `objects = SoftDeleteQuerySet.as_manager()` on `SoftDeleteModel`. **Default `.all()` unchanged** (no filtering regression, no migration). Satisfies A2 §2 literally. `makemigrations --check` clean; targeted suite green. |
+| **D6 / CE10** | **ADVANCED (non-destructive) / VERIFIED** | `ServiceRequiredDocument.ensure_document_definition()` auto-creates/links a canonical `RequiredDocumentDefinition` from free-text `document_type` on every save; data migration `services/0011` backfills all existing rows (idempotent, mirrors `normalize_required_documents`). Legacy columns kept + synced (rule 11). Full column drop + non-null FK still **DEFERRED** (needs a real staging-data audit). |
+| **U7** | **PARTIAL / VERIFIED** | `.field` primitive → logical inline padding (`ps-4 pe-4`); the shared search-input pattern across 9 admin/staff screens → `start-3` icon + `ps-9`; `text-right`/`text-left` → `text-start` and `border-r`→`border-e` in shared components (`NotificationPanel`, `InlineHelp`, `HelpGuidePanel`, employee pages). Remaining physical props are explicit `isArabic?` conditionals, centered toasts, and the Arabic-first sidebar drawer — acceptable. lint clean; RTL/LTR re-checked at runtime. |
+| **U1–U6, U8–U13** | **DEFERRED_WITH_REASON** | Subjective visual reconciliation (box-in-box density, radius-scale unification, gray-overuse, photographic-vs-plain heroes, repeated info) needs a design decision + visual iteration; prior UI-team passes already attempted; changing them blind risks regressing the prior 180-route browser audit. Requires: design review + `C-VIS1` resolution. |
+| **C-VIS1** | **BLOCKED_PRODUCT_DECISION** | 2026-08-05 dark-navy homepage mockup vs the light-direction written chain (2026-07-27 spec + 2026-09-01 reports). Light is the defensible current authority and the live site conforms to it, but the reference folder is internally inconsistent. Consequence: cannot certify "matches the approved reference" unambiguously. Required input: product owner confirms light vs dark **in writing**. |
+| **D-DB3** | **DEFERRED (P3)** | Postgres CI service job — infra task, no code impact. |
+| **U15** | **DEFERRED (P3)** | `App.css` starter cruft / `vite.svg`+`react.svg` / template README — cosmetic. |
+
+---
+
 ## GATE 1R — runtime verification & new findings (2026-09-05)
 
 **Full backend suite after Gate 1R additions: 249 tests, all pass** (218 + 20 journey + 4 authz-matrix + 7 contract). `manage.py check` clean; `check --deploy` under prod config = 1 warning only (`SECRET_KEY` length — expected with a test key). Migration drift clean.

@@ -4,6 +4,8 @@ Gate 1 · 2026-09-05 · HEAD `574753e`
 
 Status vocabulary: **PASS** (implemented + automated-test or code-verified end-to-end), **PARTIAL** (implemented, gap or missing verification), **FAIL** (implemented but violates the requirement), **NOT_IMPLEMENTED**, **NOT_TESTED** (present, no evidence of function), **REQUIREMENT_CONFLICT**, **NOT_APPLICABLE**.
 
+> **Gate 2 round 2 (2026-09-05):** NFR1 English → **PASS** (public `LanguageSwitcher` added, LTR verified). KH-A11Y → **PASS on automated axe** (0 serious/critical on all previously-failing routes; keyboard walk still owed → held at PARTIAL overall). KH-SEC deps → **PASS** (`npm audit --omit=dev` = 0). CE10/D6 → still PARTIAL (canonical-definition linking + backfill done; legacy column drop deferred). KH-UI → PARTIAL (light-direction conformance holds; U1–U13 polish + C-VIS1 decision outstanding).
+>
 > **Gate 1R recalculation (2026-09-05)** — status re-derived from executed runtime evidence (route matrix 73/73, journeys J01–J20 20/20, authz matrix 78+3, contract 7/7, axe, screenshots), not carried over.
 >
 > | Requirement | Gate 1 | Gate 1R | Evidence |

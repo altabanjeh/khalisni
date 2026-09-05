@@ -502,7 +502,7 @@ function EmployeeOrderReviewPage() {
                             {provider.capability_summary || provider.service_categories?.join('، ') || 'لا توجد تخصصات مرتبطة'}
                           </p>
                         </div>
-                        <div className="text-left text-xs text-slate-500">
+                        <div className="text-start text-xs text-slate-500">
                           <p>{provider.is_available ? 'متاح الآن' : 'غير متاح حالياً'}</p>
                           <p className="mt-1">{provider.approval_status_label || (provider.is_approved ? 'معتمد' : 'قيد المراجعة')}</p>
                           {provider.rating != null ? <p className="mt-1">التقييم: {provider.rating}</p> : null}

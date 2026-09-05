@@ -80,7 +80,7 @@ function GuideTable({ columns, rows, emptyLabel }) {
         <thead className="bg-slate-50 text-slate-500">
           <tr>
             {columns.map((column) => (
-              <th key={column.key} className="px-4 py-3 text-right font-semibold">
+              <th key={column.key} className="px-4 py-3 text-start font-semibold">
                 {column.label}
               </th>
             ))}
@@ -478,7 +478,7 @@ function HelpGuidePanel({ onClose, open }) {
       <button aria-label={t('common.close', 'إغلاق')} className="absolute inset-0 bg-slate-900/45" onClick={onClose} type="button" />
 
       <aside className="absolute inset-y-0 left-0 flex w-full max-w-full justify-end">
-        <div className="flex h-full w-full max-w-[1080px] flex-col border-r border-border bg-[#f7f5ef] shadow-2xl">
+        <div className="flex h-full w-full max-w-[1080px] flex-col border-e border-border bg-[#f7f5ef] shadow-2xl">
           <header className="border-b border-border bg-white px-5 py-4 sm:px-6">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
@@ -517,9 +517,9 @@ function HelpGuidePanel({ onClose, open }) {
 
             <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px_220px]">
               <div className="relative">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
-                  className="field pr-9"
+                  className="field ps-9"
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={panelView === 'current' ? t('manual.searchCurrent', 'ابحث في الشاشات والأزرار والحقول ومسارات العمل') : t('manual.searchLibrary', 'ابحث في عناوين الأدلة وصفحات العمل')}
                   value={query}
@@ -649,7 +649,7 @@ function HelpGuidePanel({ onClose, open }) {
                           {(libraryData.guides || []).map((guide) => (
                             <button
                               key={guide.slug}
-                              className={`w-full rounded-2xl border px-4 py-3 text-right transition ${selectedGuideSlug === guide.slug ? 'border-brand-600 bg-brand-50 text-brand-900' : 'border-border bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50/70'}`}
+                              className={`w-full rounded-2xl border px-4 py-3 text-start transition ${selectedGuideSlug === guide.slug ? 'border-brand-600 bg-brand-50 text-brand-900' : 'border-border bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50/70'}`}
                               onClick={() => setSelectedGuideSlug(guide.slug)}
                               type="button"
                             >

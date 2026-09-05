@@ -47,7 +47,7 @@ function InlineHelp({ actionKey = '', fieldKey = '', fallbackText = '', title = 
         <CircleHelp className="h-4 w-4" />
       </button>
       {open ? (
-        <span className="absolute right-0 top-full z-30 mt-2 w-72 rounded-2xl border border-border bg-white p-3 text-right text-xs leading-6 text-slate-600 shadow-soft">
+        <span className="absolute end-0 top-full z-30 mt-2 w-72 rounded-2xl border border-border bg-white p-3 text-start text-xs leading-6 text-slate-600 shadow-soft">
           {title ? <span className="mb-1 block font-semibold text-ink">{title}</span> : null}
           {message}
         </span>

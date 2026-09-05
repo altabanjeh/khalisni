@@ -97,7 +97,7 @@ function EmployeeVerifyDocumentsPage() {
           {documents.map((document) => (
             <button
               key={document.id}
-              className={`w-full rounded-3xl border px-4 py-4 text-right transition ${
+              className={`w-full rounded-3xl border px-4 py-4 text-start transition ${
                 selectedDocument.id === document.id ? 'border-brand-400 bg-brand-50' : 'border-border bg-white hover:bg-brand-50'
               }`}
               onClick={() => setSelectedDocumentId(document.id)}

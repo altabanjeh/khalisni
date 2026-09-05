@@ -60,7 +60,7 @@ function NotificationPanel({ user, onNavigate }) {
         {notifications.slice(0, 5).map((notification) => (
           <button
             key={notification.id}
-            className="w-full rounded-2xl border border-border px-4 py-3 text-right transition hover:bg-brand-50"
+            className="w-full rounded-2xl border border-border px-4 py-3 text-start transition hover:bg-brand-50"
             onClick={() => onNavigate?.(notification)}
             type="button"
           >

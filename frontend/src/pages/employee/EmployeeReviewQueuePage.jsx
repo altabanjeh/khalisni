@@ -181,9 +181,9 @@ function EmployeeReviewQueuePage() {
               <label className="space-y-2">
                 <span className="text-xs font-semibold text-slate-500">بحث</span>
                 <div className="relative">
-                  <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
-                    className="field pr-9"
+                    className="field ps-9"
                     onChange={(event) => updateFilter('search', event.target.value)}
                     placeholder="رقم الطلب أو اسم العميل"
                     value={filters.search}

@@ -81,7 +81,8 @@ function Topbar({ title, onMenuClick }) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="font-bold text-ink">{user?.full_name || t('topbar.guest', 'زائر')}</p>
-            <p className="truncate text-xs text-slate-500">{user?.role || 'guest'}</p>
+            {/* D-A11Y-1: slate-600 (not 500) to clear 4.5:1 on the brand-50 chip. */}
+            <p className="truncate text-xs font-semibold text-slate-600">{user?.role || 'guest'}</p>
           </div>
           <ChevronDown className="h-4 w-4 text-slate-400" />
         </div>

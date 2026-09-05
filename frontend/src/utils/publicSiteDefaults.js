@@ -87,7 +87,10 @@ export function getPublicSiteCssVariables(theme) {
     '--khalsni-public-text': mergedTheme.text_color || '#17213a',
     '--khalsni-public-text-main': mergedTheme.text_color || '#17213a',
     '--khalsni-public-text-secondary': '#475467',
-    '--khalsni-public-text-muted': '#98a2b3',
+    /* D-A11Y-1: darkened from #98a2b3 (2.44:1 on the muted surface, fails
+       WCAG 2.2 AA) so ServiceCard / small labels reach >= 4.5:1. Kept in sync
+       with --kh-text-subtle in index.css. This inline value overrides :root. */
+    '--khalsni-public-text-muted': '#5b6470',
     '--khalsni-public-border': '#dbe5f0',
   }
 }

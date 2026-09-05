@@ -16,7 +16,9 @@
   --kh-text: #17213a;
   --kh-text-secondary: #475467;
   --kh-text-muted: #667085;
-  --kh-text-subtle: #98a2b3;
+  /* D-A11Y-1: was #98a2b3 (2.44:1 on the muted surface). Darkened to meet
+     WCAG 2.2 AA 4.5:1 for the card stat labels / small labels that use it. */
+  --kh-text-subtle: #5b6470;
   --kh-border: #dbe5f0;
   --kh-border-strong: #c9d6e5;
   --kh-success: #12b76a;
@@ -151,7 +153,9 @@
   }
 
   .field {
-    @apply w-full rounded-[var(--radius-md)] border border-border bg-card px-4 py-3 text-sm font-medium text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-brand-50/40 disabled:text-slate-400;
+    /* U7: logical inline padding so `ps-9` on a search input (icon at the
+       leading edge) overrides deterministically in both RTL and LTR. */
+    @apply w-full rounded-[var(--radius-md)] border border-border bg-card ps-4 pe-4 py-3 text-sm font-medium text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-brand-50/40 disabled:text-slate-400;
   }
 
   .btn-primary {

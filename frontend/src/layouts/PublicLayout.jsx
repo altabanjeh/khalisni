@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { PublicSiteProvider, usePublicSite } from '../context/PublicSiteContext'
 import { getDefaultDashboardPath } from '../utils/authz'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import { getLocalizedField } from '../utils/i18n'
 
 const copy = {
@@ -129,6 +130,7 @@ function PublicLayoutContent() {
             </nav>
 
             <div className="hidden shrink-0 items-center gap-2 lg:flex">
+              <LanguageSwitcher className="py-0.5" />
               {user ? (
                 <Link className="kh-focusable inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-3 text-[0.7rem] font-extrabold text-white transition hover:bg-[var(--khalsni-public-primary-hover)]" to={portalPath}>
                   <UserRound className="h-4 w-4" />
@@ -177,6 +179,7 @@ function PublicLayoutContent() {
                 ))}
               </nav>
               <div className="mt-4 grid gap-3">
+                <LanguageSwitcher className="w-full justify-center" />
                 {user ? (
                   <Link className="kh-focusable inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-bold text-white" to={portalPath}>
                     <UserRound className="h-4 w-4" />

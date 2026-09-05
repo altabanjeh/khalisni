@@ -859,6 +859,52 @@ class ServiceRequiredDocument(SoftDeleteModel):
         self.document_type = _normalize_code(self.document_type)
         self.allowed_extensions = _normalize_extension_list(self.allowed_extensions)
 
+    def ensure_document_definition(self, *, save=True):
+        """Defect D6 / CE10: resolve this rule to a canonical master definition.
+
+        Links — creating if needed — the ``RequiredDocumentDefinition`` matching
+        the free-text ``document_type`` so validation and the missing-document
+        workflow can key on a stable id/code rather than a translated name.
+        Skips silently if the service already has another active rule pointing at
+        that definition (the ``unique_service_required_document_definition``
+        constraint), leaving the legacy free-text path intact for that row.
+
+        Used by the ``normalize_required_documents`` command and migration
+        ``services/0011``. It is intentionally NOT called from ``save()`` so that
+        existing test/seed fixtures that create several free-text rules per
+        service are unaffected; the admin catalog UI already links definitions
+        when the admin picks from the master list (CE2).
+        """
+        if self.document_definition_id or not (self.document_type or "").strip():
+            return None
+        code = _normalize_code(self.document_type)
+        definition = (
+            RequiredDocumentDefinition.objects.filter(code=code, is_deleted=False)
+            .order_by("-is_active", "definition_id")
+            .first()
+        )
+        if definition is None:
+            definition = RequiredDocumentDefinition.objects.create(
+                code=code,
+                name_ar=self.name_ar or code,
+                name_en=self.name_en or "",
+                allowed_extensions=list(self.allowed_extensions or []),
+                max_file_size=self.max_file_size or (10 * 1024 * 1024),
+                is_active=True,
+            )
+        clash = (
+            type(self)
+            .objects.filter(service_id=self.service_id, document_definition=definition, is_deleted=False)
+            .exclude(pk=self.pk)
+            .exists()
+        )
+        if clash:
+            return None
+        self.document_definition = definition
+        if save and self.pk:
+            self.__class__.objects.filter(pk=self.pk).update(document_definition=definition)
+        return definition
+
     def save(self, *args, **kwargs):
         if self.is_deleted:
             self.is_active = False

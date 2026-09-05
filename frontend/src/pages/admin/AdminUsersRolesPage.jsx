@@ -279,9 +279,9 @@ function AdminUsersRolesPage() {
 
   const toolbar = (
     <div className="relative">
-      <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
       <input
-        className="field pr-9 text-sm"
+        className="field ps-9 text-sm"
         onChange={handleSearch}
         placeholder="بحث بالاسم أو البريد أو الهاتف..."
         value={search}

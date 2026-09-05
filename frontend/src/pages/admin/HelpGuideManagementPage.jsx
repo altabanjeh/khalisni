@@ -664,8 +664,8 @@ function HelpGuideManagementPage() {
       <section className="glass-panel space-y-4 p-6">
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_repeat(3,minmax(180px,220px))]">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input className="field pr-9" onChange={(event) => setSearch(event.target.value)} placeholder="Search help content" value={search} />
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input className="field ps-9" onChange={(event) => setSearch(event.target.value)} placeholder="Search help content" value={search} />
           </div>
           <select className="field" onChange={(event) => setRoleFilter(event.target.value)} value={roleFilter}>
             <option value="">All roles</option>
