@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from core.serializer_mixins import PkAsIdMixin
+from documents.file_validation import sniff_matches_extension
 from documents.models import Document
 
 
@@ -73,6 +74,9 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         content_type = getattr(value, "content_type", "")
         if content_type and content_type not in self.context["allowed_mime_types"]:
             raise serializers.ValidationError("Unsupported file type.")
+        # Defect D5: verify real content, not just the claimed extension / MIME.
+        if not sniff_matches_extension(value, extension):
+            raise serializers.ValidationError("File content does not match its extension.")
         return value
 
     def create(self, validated_data):

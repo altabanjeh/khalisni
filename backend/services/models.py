@@ -521,6 +521,13 @@ class RequiredDocumentDefinition(SoftDeleteModel):
                 condition=Q(is_deleted=False, is_active=True),
                 name="unique_active_required_document_definition_name_ar",
             ),
+            # Defect D7: a code must identify at most one non-deleted definition,
+            # active or not, so links never resolve ambiguously.
+            models.UniqueConstraint(
+                fields=["code"],
+                condition=Q(is_deleted=False),
+                name="unique_undeleted_required_document_definition_code",
+            ),
         ]
         indexes = [
             models.Index(fields=["code", "is_active"]),
@@ -581,15 +588,17 @@ class ServiceRelation(SoftDeleteModel):
 
     relation_id = models.BigAutoField(primary_key=True)
 
+    # Defect D-DB2: services are soft-deleted, never row-deleted, so a PROTECT
+    # here guards against an accidental hard delete silently erasing relations.
     source_service = models.ForeignKey(
         "services.Service",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="outgoing_relations"
     )
 
     target_service = models.ForeignKey(
         "services.Service",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="incoming_relations"
     )
 
@@ -688,15 +697,16 @@ class ServiceRelation(SoftDeleteModel):
 class ServiceProviderAssignment(SoftDeleteModel):
     assignment_id = models.BigAutoField(primary_key=True)
 
+    # Defect D-DB2: soft-deletable parents -> PROTECT, not CASCADE.
     service = models.ForeignKey(
         "services.Service",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="provider_assignments"
     )
 
     provider = models.ForeignKey(
         "providers.ProviderProfile",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="service_assignments"
     )
 

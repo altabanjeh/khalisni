@@ -85,6 +85,11 @@ class CustomUser(SoftDeleteModel, AbstractBaseUser, PermissionsMixin):
     is_email_verified = models.BooleanField(default=False)
     is_phone_verified = models.BooleanField(default=False)
 
+    # Defect D4: incremented on password reset and on "log out everywhere" so that
+    # every previously issued JWT (whose payload carries the old value) is
+    # rejected by accounts.authentication.VersionedJWTAuthentication.
+    token_version = models.PositiveIntegerField(default=1)
+
     is_verified = models.BooleanField(
         default=False,
         help_text="Business/identity verification status."

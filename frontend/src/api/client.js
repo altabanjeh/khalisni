@@ -98,6 +98,21 @@ export function updateStoredAccessToken(access) {
   storage.removeItem(ACCESS_TOKEN_KEY)
 }
 
+// Defect D4: the backend now rotates refresh tokens (ROTATE_REFRESH_TOKENS) and
+// blacklists the previous one, so a refresh response that carries a new
+// `refresh` value must replace the stored token or the *next* refresh will fail.
+export function updateStoredRefreshToken(refresh) {
+  if (!refresh) return
+  const mode = getStoredAuthMode()
+  const storage = getStorageForMode(mode)
+  const inactiveStorage = getStorageForMode(
+    mode === AUTH_STORAGE_MODE_LOCAL ? AUTH_STORAGE_MODE_SESSION : AUTH_STORAGE_MODE_LOCAL,
+  )
+  inactiveStorage.removeItem(REFRESH_TOKEN_KEY)
+  storage.setItem(AUTH_STORAGE_MODE_KEY, mode)
+  storage.setItem(REFRESH_TOKEN_KEY, refresh)
+}
+
 export function getStoredAccessToken() {
   return getActiveAuthStorage().getItem(ACCESS_TOKEN_KEY)
 }
@@ -341,6 +356,13 @@ apiClient.interceptors.response.use(
     const code = error?.response?.data?.code
     const message = typeof detail === 'string' ? detail : ''
 
+    // Defect D4: a revoked token (password reset / "log out everywhere") cannot
+    // be refreshed -- force a clean re-login instead of a silent retry loop.
+    if (status === 401 && code === 'token_revoked') {
+      clearStoredAuth()
+      return Promise.reject(createApiError(error))
+    }
+
     const isInvalidToken =
       status === 401 &&
       (code === 'token_not_valid' ||
@@ -375,6 +397,8 @@ apiClient.interceptors.response.use(
       const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, { refresh })
       const newAccess = response.data.access
       updateStoredAccessToken(newAccess)
+      // Persist the rotated refresh token when the backend returns one.
+      updateStoredRefreshToken(response.data.refresh)
       _processRefreshQueue(null, newAccess)
       const retryConfig = { ...error.config }
       retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccess}` }

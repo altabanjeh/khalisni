@@ -45,8 +45,21 @@ jobs:
           DJANGO_SECRET_KEY: ci-only-insecure-key
         run: python manage.py test --verbosity=2
 
+  backend-security:
+    name: Backend dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pip-audit
+        run: pip install pip-audit
+      - name: Audit backend dependencies
+        run: pip-audit -r backend/requirements.txt --strict
+
   frontend:
-    name: Frontend tests + lint
+    name: Frontend tests + lint + build
     runs-on: ubuntu-latest
 
     steps:
@@ -67,6 +80,65 @@ jobs:
         working-directory: frontend
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit tests
         working-directory: frontend
         run: npm test
+
+      - name: Production build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Audit frontend dependencies
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend deps
+        run: pip install -r backend/requirements.txt
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E + accessibility suite
+        working-directory: frontend
+        env:
+          DJANGO_DEBUG: "True"
+          DJANGO_SECRET_KEY: ci-only-insecure-key
+        run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  mobile:
+    name: Mobile type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm ci
+      - name: Type-check
+        working-directory: mobile
+        run: npm run typecheck

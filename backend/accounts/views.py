@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -36,10 +36,14 @@ from organizations.selectors import active_memberships_for_user, has_scoped_memb
 _PERMISSION_APPS = {"orders", "documents", "services", "payment", "accounts", "notifications", "providers", "audit", "organizations"}
 
 try:
+    from rest_framework_simplejwt.exceptions import TokenError
     from rest_framework_simplejwt.tokens import RefreshToken
     from rest_framework_simplejwt.views import TokenObtainPairView
 except ImportError:  # pragma: no cover - depends on optional dependency
     RefreshToken = None
+
+    class TokenError(Exception):
+        pass
 
     class TokenObtainPairView(APIView):
         permission_classes = [permissions.AllowAny]
@@ -84,13 +88,26 @@ class LogoutAPIView(APIView):
                     {"detail": "JWT authentication is unavailable because djangorestframework-simplejwt is not installed."},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
-            token = RefreshToken(refresh)
-            token.blacklist()
+            try:
+                token = RefreshToken(refresh)
+                token.blacklist()
+            except TokenError:
+                # An already-expired/blacklisted refresh token should still let
+                # the client complete a local logout without a 500.
+                pass
+
+        # Defect D4: "log out everywhere" bumps the user's token version, which
+        # immediately invalidates every outstanding access and refresh token.
+        all_devices = str(request.data.get("all_devices", "")).strip().lower() in {"1", "true", "yes", "on"}
+        if all_devices:
+            CustomUser.objects.filter(pk=request.user.pk).update(token_version=F("token_version") + 1)
+
         create_audit_log(
             request=request,
             action="logout",
             entity_type="CustomUser",
             entity_id=request.user.pk,
+            new_value={"all_devices": all_devices},
         )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 

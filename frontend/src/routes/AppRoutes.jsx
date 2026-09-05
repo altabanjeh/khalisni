@@ -25,7 +25,7 @@ import {
   UsersRound,
 } from 'lucide-react'
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import RouteErrorBoundary from '../components/RouteErrorBoundary'
 import { useLanguage } from '../context/LanguageContext'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -34,6 +34,7 @@ import ManualLaunchPage from '../pages/shared/ManualLaunchPage'
 import ProtectedRoute from './ProtectedRoute'
 
 import HomePage from '../pages/public/HomePage'
+import NotFoundPage from '../pages/public/NotFoundPage'
 import ServicesPage from '../pages/public/ServicesPage'
 import ServiceDetailsPage from '../pages/public/ServiceDetailsPage'
 import ForgotPasswordPage from '../pages/public/ForgotPasswordPage'
@@ -169,6 +170,7 @@ function AppRoutes() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           <Route element={<ProtectedRoute roles={['customer']} />}>
@@ -239,7 +241,7 @@ function AppRoutes() {
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </RouteErrorBoundary>

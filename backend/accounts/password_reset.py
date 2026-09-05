@@ -199,7 +199,9 @@ def reset_password_with_token(*, token_record: PasswordResetToken, raw_password:
             user = locked_token.user
             validate_password(raw_password, user=user)
             user.set_password(raw_password)
-            user.save(update_fields=["password", "updated_at"])
+            # Defect D4: invalidate every JWT issued before this reset.
+            user.token_version = (user.token_version or 1) + 1
+            user.save(update_fields=["password", "updated_at", "token_version"])
 
             locked_token.used_at = now
             locked_token.save(update_fields=["used_at"])

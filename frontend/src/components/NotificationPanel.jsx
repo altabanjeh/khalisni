@@ -9,9 +9,17 @@ import EmptyState from './EmptyState'
 
 function NotificationPanel({ user, onNavigate }) {
   const { t } = useLanguage()
-  const { data: notifications = [] } = useAsyncData(() => api.getNotificationCenter(), [], [])
+  const { data: notifications = [], reload } = useAsyncData(() => api.getNotificationCenter(), [], [])
   const unreadCount = notifications.filter((item) => !item.is_read).length
   const notificationPath = hasPermission(user, 'accounts.manage_user_roles') ? '/admin/notifications' : null
+
+  async function handleMarkAllRead() {
+    try {
+      await api.markAllNotificationsRead()
+    } finally {
+      reload()
+    }
+  }
 
   if (!notifications.length) {
     return (
@@ -32,9 +40,20 @@ function NotificationPanel({ user, onNavigate }) {
           <p className="text-sm font-bold text-ink">{t('notifications.center', 'مركز الإشعارات')}</p>
           <p className="text-xs text-slate-500">{t('notifications.unreadCount', 'غير المقروءة: {count}', { count: unreadCount })}</p>
         </div>
-        <span className="icon-chip h-10 w-10 rounded-xl">
-          <BellRing className="h-4 w-4" />
-        </span>
+        <div className="flex items-center gap-2">
+          {unreadCount > 0 ? (
+            <button
+              className="text-xs font-semibold text-brand-600 hover:text-brand-700"
+              onClick={handleMarkAllRead}
+              type="button"
+            >
+              {t('notifications.markAllRead', 'تعليم الكل كمقروء')}
+            </button>
+          ) : null}
+          <span className="icon-chip h-10 w-10 rounded-xl">
+            <BellRing className="h-4 w-4" />
+          </span>
+        </div>
       </div>
 
       <div className="mt-4 space-y-3">

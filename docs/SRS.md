@@ -15,7 +15,12 @@ Khalisni is an Arabic-first service request management platform for Jordanian go
 ## Functional Requirements
 
 1. Public users can browse active categories and services.
-2. Public users can create a service request with customer data and file uploads.
+2. A service request is created by an authenticated customer account with customer
+   data and file uploads. Public visitors reach this by registering (or via the
+   public request flow, which provisions a guest customer account). Rationale:
+   the 2026-06 auth-hardening pass tied `POST /api/orders/` to
+   `IsAuthenticated + IsCustomerRole`; this line supersedes the earlier
+   "public users can create a service request" wording (audit conflict C1).
 3. Public users can track an order by order number and phone number.
 4. Customers can authenticate, view their orders, upload missing documents, and rate completed services.
 5. Admins can manage services, categories, providers, orders, reports, notifications, and audit logs.

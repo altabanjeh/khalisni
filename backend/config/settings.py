@@ -46,7 +46,9 @@ def _host_from_origin(origin: str) -> str | None:
     return parsed.hostname
 
 _secret_key = os.getenv("DJANGO_SECRET_KEY")
-_debug = _get_bool_env("DJANGO_DEBUG", True)
+# SECURITY (defect D3): default to a hardened, non-debug posture. Local
+# development must opt in explicitly with DJANGO_DEBUG=True.
+_debug = _get_bool_env("DJANGO_DEBUG", False)
 if not _secret_key:
     if _debug:
         _secret_key = "dev-only-insecure-key-not-for-production"
@@ -167,10 +169,14 @@ if os.getenv("POSTGRES_DB"):
         }
     }
 else:
+    # DJANGO_SQLITE_NAME lets an isolated harness (e.g. Playwright E2E) point at
+    # a throwaway database file without touching the local dev db.sqlite3.
+    # Production always uses Postgres via the branch above, so this is inert there.
+    _sqlite_name = os.getenv("DJANGO_SQLITE_NAME", "").strip()
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": Path(_sqlite_name) if _sqlite_name else BASE_DIR / "db.sqlite3",
         }
     }
 
@@ -242,7 +248,9 @@ REST_FRAMEWORK = {}
 if HAS_DRF:
     authentication_classes = ["rest_framework.authentication.SessionAuthentication"]
     if HAS_SIMPLEJWT:
-        authentication_classes.insert(0, "rest_framework_simplejwt.authentication.JWTAuthentication")
+        # Defect D4: versioned JWT auth rejects access tokens whose embedded
+        # token_version no longer matches the user's current token_version.
+        authentication_classes.insert(0, "accounts.authentication.VersionedJWTAuthentication")
 
     filter_backends = [
         "rest_framework.filters.SearchFilter",
@@ -271,10 +279,19 @@ if HAS_DRF:
         },
     }
 
+# SECURITY (defect D4): short-lived access tokens, rotating refresh tokens with
+# blacklist, plus a per-user token version (see accounts.CustomUser.token_version
+# and accounts.authentication.VersionedJWTAuthentication) so that a password
+# reset or an explicit "log out everywhere" immediately invalidates every
+# outstanding access and refresh token for that user.
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": False,
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=int(os.getenv("JWT_ACCESS_TOKEN_MINUTES", "30"))
+    ),
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        days=int(os.getenv("JWT_REFRESH_TOKEN_DAYS", "7"))
+    ),
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "USER_ID_FIELD": "user_id",
 }

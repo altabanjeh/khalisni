@@ -240,13 +240,28 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
 class RelatedServiceSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(read_only=True)
     image_url = serializers.SerializerMethodField()
+    # Defect D2: related services are rendered on the public (AllowAny) service
+    # detail endpoint, so their fee breakdown must honour the same per-field
+    # public-visibility flags as the primary service instead of leaking raw
+    # government_fee / service_fee unconditionally.
+    pricing = serializers.SerializerMethodField()
+    delivery_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
-        fields = ("id", "name_ar", "name_en", "slug", "description_ar", "description_en", "image", "image_url", "estimated_duration", "service_fee", "government_fee")
+        fields = (
+            "id", "name_ar", "name_en", "slug", "description_ar", "description_en",
+            "image", "image_url", "estimated_duration", "pricing", "delivery_time",
+        )
 
     def get_image_url(self, obj):
         return _media_url(self.context.get("request"), obj.image)
+
+    def get_pricing(self, obj):
+        return _public_pricing_payload(obj)
+
+    def get_delivery_time(self, obj):
+        return obj.delivery_time_payload()
 
 
 class ServiceRelationServiceSerializer(serializers.ModelSerializer):

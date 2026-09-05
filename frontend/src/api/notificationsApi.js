@@ -44,6 +44,20 @@ export const notificationsApi = {
     return unwrapList(await http.get('/notifications/'))
   },
 
+  async getNotificationUnreadCount() {
+    const { data } = await http.get('/notifications/unread-count/')
+    return Number(data?.unread ?? 0)
+  },
+
+  markNotificationRead(id) {
+    return http.patch(`/notifications/${id}/read/`)
+  },
+
+  async markAllNotificationsRead() {
+    const { data } = await http.post('/notifications/mark-all-read/')
+    return Number(data?.updated ?? 0)
+  },
+
   async getAuditLogs(params = {}) {
     return unwrapList(await http.get(`/admin/audit-logs/${buildQuery(params)}`))
   },

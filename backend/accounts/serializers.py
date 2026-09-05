@@ -129,6 +129,14 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Defect D4: stamp the user's current token version so a later password
+        # reset or "log out everywhere" can invalidate this token immediately.
+        token["token_version"] = int(getattr(user, "token_version", 1) or 1)
+        return token
+
     def validate(self, attrs):
         if not SIMPLEJWT_AVAILABLE:
             raise serializers.ValidationError(

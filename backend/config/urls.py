@@ -1,12 +1,37 @@
 from django.conf import settings
 from django.contrib import admin
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.urls import include, path, re_path
 from django.views.static import serve
 
 
 def healthcheck(_request):
     return JsonResponse({"status": "ok"})
+
+
+# Defect D1: the previous blanket ``^media/(?P<path>.*)$`` route let anyone
+# fetch ANY file under MEDIA_ROOT -- including uploaded customer identity
+# documents (``secure_orders/...``) and payment receipts -- with no
+# authorization, bypassing DocumentDownloadAPIView / can_user_download_document.
+#
+# Only genuinely public catalog and CMS media may be served by Django. Every
+# other prefix (notably ``secure_orders/`` and ``payments/``) must go through an
+# authenticated API endpoint, an nginx ``internal`` location + X-Accel-Redirect,
+# or private object storage.
+PUBLIC_MEDIA_PREFIXES = (
+    "service_categories/",
+    "services/",
+    "public_site/",
+    "organizations/branding/",
+    "manual/",
+)
+
+
+def public_media_serve(request, path):
+    normalized = str(path or "").lstrip("/")
+    if ".." in normalized or not any(normalized.startswith(prefix) for prefix in PUBLIC_MEDIA_PREFIXES):
+        raise Http404("Not found.")
+    return serve(request, normalized, document_root=settings.MEDIA_ROOT)
 
 
 urlpatterns = [
@@ -24,7 +49,7 @@ urlpatterns = [
     path("api/", include("payment.urls")),
     path("api/", include("public_site.urls")),
     path("api/", include("help_guides.urls")),
-    # Serve uploaded media files for all environments.
-    # For high-traffic deployments replace this with nginx or object storage.
-    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    # Public catalog/CMS media only. Sensitive uploads are served exclusively
+    # through their authenticated API endpoints.
+    re_path(r"^media/(?P<path>.*)$", public_media_serve),
 ]

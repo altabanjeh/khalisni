@@ -7,6 +7,7 @@ from core.serializer_mixins import PkAsIdMixin
 
 from accounts.models import CustomUser
 from core.choices import DocumentType
+from documents.file_validation import sniff_matches_extension
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
 from documents.services import can_user_download_document
 from organizations.models import Branch
@@ -375,6 +376,11 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             max_file_size = requirement.max_file_size or 0
             if max_file_size and upload.size > max_file_size:
                 errors[f"documents[{index}]"] = "This document exceeds the allowed file size."
+                continue
+
+            # Defect D5: reject files whose real bytes contradict the extension.
+            if not sniff_matches_extension(upload, extension):
+                errors[f"documents[{index}]"] = "File content does not match its extension."
                 continue
 
             seen_types.add(document_type)

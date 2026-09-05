@@ -688,6 +688,17 @@ export const api = {
   updateProviderActivation: providersApi.updateProviderActivation,
   getNotifications: async () => withTestValue(() => notificationsApi.getNotifications(), mockNotifications),
   getNotificationCenter: async () => withTestValue(() => notificationsApi.getNotificationCenter(), mockNotificationCenter),
+  getNotificationUnreadCount: async () =>
+    withTestValue(
+      () => notificationsApi.getNotificationUnreadCount(),
+      (mockNotificationCenter || []).filter((item) => !item.is_read).length,
+    ),
+  markNotificationRead: async (id) => withTestValue(() => notificationsApi.markNotificationRead(id), { ok: true }),
+  markAllNotificationsRead: async () =>
+    withTestValue(
+      () => notificationsApi.markAllNotificationsRead(),
+      (mockNotificationCenter || []).filter((item) => !item.is_read).length,
+    ),
   getAuditLogs: async (params = {}) => withTestValue(() => notificationsApi.getAuditLogs(params), mockAuditLogs),
   getEmployeeNotificationTemplates: async () =>
     withTestValue(() => notificationsApi.getEmployeeNotificationTemplates(), mockNotificationTemplates.filter((item) => !item.is_deleted)),
