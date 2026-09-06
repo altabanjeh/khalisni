@@ -1,0 +1,301 @@
+{
+  "_note": "Initial representative service images. Downloaded from Unsplash, resized/recompressed, stored in Khalsni's own repo/media - never hot-linked. SEED/DEFAULT content: every image is replaceable by an administrator from the service edit screen without code changes.",
+  "license_summary": "All images: Unsplash License. https://unsplash.com/license",
+  "downloaded_on": "2026-09-06",
+  "images": {
+    "no-criminal-record-certificate.jpg": {
+      "unsplash_id": "photo-1667849921481-9e13c239ee3d",
+      "source_url": "https://unsplash.com/photos/1667849921481-9e13c239ee3d",
+      "image_url": "https://images.unsplash.com/photo-1667849921481-9e13c239ee3d",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "govt_columns_flag"
+    },
+    "passport-appointment-booking.jpg": {
+      "unsplash_id": "photo-1639034741369-1e0c771adaeb",
+      "source_url": "https://unsplash.com/photos/1639034741369-1e0c771adaeb",
+      "image_url": "https://images.unsplash.com/photo-1639034741369-1e0c771adaeb",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "passport_keyboard"
+    },
+    "passport-renewal.jpg": {
+      "unsplash_id": "photo-1654163600175-efc47ce20b29",
+      "source_url": "https://unsplash.com/photos/1654163600175-efc47ce20b29",
+      "image_url": "https://images.unsplash.com/photo-1654163600175-efc47ce20b29",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "passport_pages"
+    },
+    "traffic-fines-payment.jpg": {
+      "unsplash_id": "photo-1762846700374-f4aeb2f38e92",
+      "source_url": "https://unsplash.com/photos/1762846700374-f4aeb2f38e92",
+      "image_url": "https://images.unsplash.com/photo-1762846700374-f4aeb2f38e92",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_old_document"
+    },
+    "property-registration-deed.jpg": {
+      "unsplash_id": "photo-1589330694653-ded6df03f754",
+      "source_url": "https://unsplash.com/photos/1589330694653-ded6df03f754",
+      "image_url": "https://images.unsplash.com/photo-1589330694653-ded6df03f754",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_degree_cert"
+    },
+    "tax-clearance.jpg": {
+      "unsplash_id": "photo-1554224155-cfa08c2a758f",
+      "source_url": "https://unsplash.com/photos/1554224155-cfa08c2a758f",
+      "image_url": "https://images.unsplash.com/photo-1554224155-cfa08c2a758f",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_taxforms"
+    },
+    "business-license-renewal.jpg": {
+      "unsplash_id": "photo-1559631658-9705048d977e",
+      "source_url": "https://unsplash.com/photos/1559631658-9705048d977e",
+      "image_url": "https://images.unsplash.com/photo-1559631658-9705048d977e",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "shop_open_sign"
+    },
+    "business_company_registration.jpg": {
+      "unsplash_id": "photo-1664463760781-f159dfe3af30",
+      "source_url": "https://unsplash.com/photos/1664463760781-f159dfe3af30",
+      "image_url": "https://images.unsplash.com/photo-1664463760781-f159dfe3af30",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_signing_desk"
+    },
+    "business_company_information_amendment.jpg": {
+      "unsplash_id": "photo-1681505504714-4ded1bc247e7",
+      "source_url": "https://unsplash.com/photos/1681505504714-4ded1bc247e7",
+      "image_url": "https://images.unsplash.com/photo-1681505504714-4ded1bc247e7",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_two_docs"
+    },
+    "business_company_add_activities.jpg": {
+      "unsplash_id": "photo-1551135049-8a33b5883817",
+      "source_url": "https://unsplash.com/photos/1551135049-8a33b5883817",
+      "image_url": "https://images.unsplash.com/photo-1551135049-8a33b5883817",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_team_review"
+    },
+    "business_commercial_registration_certificate.jpg": {
+      "unsplash_id": "photo-1768611873487-67930d5db1b8",
+      "source_url": "https://unsplash.com/photos/1768611873487-67930d5db1b8",
+      "image_url": "https://images.unsplash.com/photo-1768611873487-67930d5db1b8",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_marriage_cert"
+    },
+    "business_trade_name_certificate.jpg": {
+      "unsplash_id": "photo-1603474262906-10867fd56415",
+      "source_url": "https://unsplash.com/photos/1603474262906-10867fd56415",
+      "image_url": "https://images.unsplash.com/photo-1603474262906-10867fd56415",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_blue_book"
+    },
+    "business_trade_name_registration.jpg": {
+      "unsplash_id": "photo-1575663620136-5ebbfcc2c597",
+      "source_url": "https://unsplash.com/photos/1575663620136-5ebbfcc2c597",
+      "image_url": "https://images.unsplash.com/photo-1575663620136-5ebbfcc2c597",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "shop_open_signage"
+    },
+    "business_trademark_services.jpg": {
+      "unsplash_id": "photo-1672777368863-0d3946b57d95",
+      "source_url": "https://unsplash.com/photos/1672777368863-0d3946b57d95",
+      "image_url": "https://images.unsplash.com/photo-1672777368863-0d3946b57d95",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "shop_flower_exterior"
+    },
+    "business_license_services.jpg": {
+      "unsplash_id": "photo-1543892607-04657ef3a279",
+      "source_url": "https://unsplash.com/photos/1543892607-04657ef3a279",
+      "image_url": "https://images.unsplash.com/photo-1543892607-04657ef3a279",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "office_white_concrete"
+    },
+    "business_company_closure_liquidation.jpg": {
+      "unsplash_id": "photo-1558524845-736893ef7dd6",
+      "source_url": "https://unsplash.com/photos/1558524845-736893ef7dd6",
+      "image_url": "https://images.unsplash.com/photo-1558524845-736893ef7dd6",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "const_wreckingball"
+    },
+    "request-property-registration-certificate.jpg": {
+      "unsplash_id": "photo-1619418602850-35ad20aa1700",
+      "source_url": "https://unsplash.com/photos/1619418602850-35ad20aa1700",
+      "image_url": "https://images.unsplash.com/photo-1619418602850-35ad20aa1700",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_rubber_stamp"
+    },
+    "request-cadastral-map.jpg": {
+      "unsplash_id": "photo-1532154066703-3973764c81fe",
+      "source_url": "https://unsplash.com/photos/1532154066703-3973764c81fe",
+      "image_url": "https://images.unsplash.com/photo-1532154066703-3973764c81fe",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "map_on_table"
+    },
+    "request-property-ownership-transfer.jpg": {
+      "unsplash_id": "photo-1744782351841-9cc6b86a5add",
+      "source_url": "https://unsplash.com/photos/1744782351841-9cc6b86a5add",
+      "image_url": "https://images.unsplash.com/photo-1744782351841-9cc6b86a5add",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "keys_house_charm"
+    },
+    "request-inheritance-registration.jpg": {
+      "unsplash_id": "photo-1560242465-fcd630c5c382",
+      "source_url": "https://unsplash.com/photos/1560242465-fcd630c5c382",
+      "image_url": "https://images.unsplash.com/photo-1560242465-fcd630c5c382",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "will_paper_table"
+    },
+    "request-property-gift-transfer.jpg": {
+      "unsplash_id": "photo-1741156386380-0236c72eb6f9",
+      "source_url": "https://unsplash.com/photos/1741156386380-0236c72eb6f9",
+      "image_url": "https://images.unsplash.com/photo-1741156386380-0236c72eb6f9",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "keys_doorway"
+    },
+    "request-termination-of-co-ownership.jpg": {
+      "unsplash_id": "photo-1775119249927-b669c9470bc5",
+      "source_url": "https://unsplash.com/photos/1775119249927-b669c9470bc5",
+      "image_url": "https://images.unsplash.com/photo-1775119249927-b669c9470bc5",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_patchwork"
+    },
+    "request-property-subdivision.jpg": {
+      "unsplash_id": "photo-1781816928028-7c39befcf4c9",
+      "source_url": "https://unsplash.com/photos/1781816928028-7c39befcf4c9",
+      "image_url": "https://images.unsplash.com/photo-1781816928028-7c39befcf4c9",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_fields_road"
+    },
+    "request-property-consolidation.jpg": {
+      "unsplash_id": "photo-1784471967446-3a3194a84567",
+      "source_url": "https://unsplash.com/photos/1784471967446-3a3194a84567",
+      "image_url": "https://images.unsplash.com/photo-1784471967446-3a3194a84567",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_highway_fields"
+    },
+    "request-boundary-demarcation.jpg": {
+      "unsplash_id": "photo-1778090053743-2e0a4fda6364",
+      "source_url": "https://unsplash.com/photos/1778090053743-2e0a4fda6364",
+      "image_url": "https://images.unsplash.com/photo-1778090053743-2e0a4fda6364",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_winding_road"
+    },
+    "request-land-survey.jpg": {
+      "unsplash_id": "photo-1510330324285-abbdabff83af",
+      "source_url": "https://unsplash.com/photos/1510330324285-abbdabff83af",
+      "image_url": "https://images.unsplash.com/photo-1510330324285-abbdabff83af",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_aerial_trees"
+    },
+    "request-property-readjustment.jpg": {
+      "unsplash_id": "photo-1721244654394-36a7bc2da288",
+      "source_url": "https://unsplash.com/photos/1721244654394-36a7bc2da288",
+      "image_url": "https://images.unsplash.com/photo-1721244654394-36a7bc2da288",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "bp_multistory"
+    },
+    "request-zoning-certificate.jpg": {
+      "unsplash_id": "photo-1721244653721-bc681b2dfd27",
+      "source_url": "https://unsplash.com/photos/1721244653721-bc681b2dfd27",
+      "image_url": "https://images.unsplash.com/photo-1721244653721-bc681b2dfd27",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "bp_circular_floor"
+    },
+    "request-land-use-classification-change.jpg": {
+      "unsplash_id": "photo-1730314736953-f62ed0bc80e5",
+      "source_url": "https://unsplash.com/photos/1730314736953-f62ed0bc80e5",
+      "image_url": "https://images.unsplash.com/photo-1730314736953-f62ed0bc80e5",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "map_vintage_rivers"
+    },
+    "request-zoning-plan.jpg": {
+      "unsplash_id": "photo-1599420186985-5c3d1a038e84",
+      "source_url": "https://unsplash.com/photos/1599420186985-5c3d1a038e84",
+      "image_url": "https://images.unsplash.com/photo-1599420186985-5c3d1a038e84",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "bp_drafting"
+    },
+    "request-change-statement.jpg": {
+      "unsplash_id": "photo-1708793737579-3df8763a5119",
+      "source_url": "https://unsplash.com/photos/1708793737579-3df8763a5119",
+      "image_url": "https://images.unsplash.com/photo-1708793737579-3df8763a5119",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_papers_wood"
+    },
+    "request-property-mortgage-registration.jpg": {
+      "unsplash_id": "photo-1450101499163-c8848c66ca85",
+      "source_url": "https://unsplash.com/photos/1450101499163-c8848c66ca85",
+      "image_url": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_signing"
+    },
+    "request-mortgage-release.jpg": {
+      "unsplash_id": "photo-1759428679273-11d914866394",
+      "source_url": "https://unsplash.com/photos/1759428679273-11d914866394",
+      "image_url": "https://images.unsplash.com/photo-1759428679273-11d914866394",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "keys_model_houses"
+    },
+    "request-building-permit.jpg": {
+      "unsplash_id": "photo-1599707254554-027aeb4deacd",
+      "source_url": "https://unsplash.com/photos/1599707254554-027aeb4deacd",
+      "image_url": "https://images.unsplash.com/photo-1599707254554-027aeb4deacd",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "const_crane"
+    },
+    "_fallback_land-and-survey.jpg": {
+      "unsplash_id": "photo-1776717163971-f0bc24bc376c",
+      "source_url": "https://unsplash.com/photos/1776717163971-f0bc24bc376c",
+      "image_url": "https://images.unsplash.com/photo-1776717163971-f0bc24bc376c",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "land_fields_river"
+    },
+    "_fallback_business.jpg": {
+      "unsplash_id": "photo-1549923746-c502d488b3ea",
+      "source_url": "https://unsplash.com/photos/1549923746-c502d488b3ea",
+      "image_url": "https://images.unsplash.com/photo-1549923746-c502d488b3ea",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_handshake"
+    },
+    "_fallback_civil-status.jpg": {
+      "unsplash_id": "photo-1657358845938-2e96ebd29598",
+      "source_url": "https://unsplash.com/photos/1657358845938-2e96ebd29598",
+      "image_url": "https://images.unsplash.com/photo-1657358845938-2e96ebd29598",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "passport_book"
+    },
+    "_fallback_tax.jpg": {
+      "unsplash_id": "photo-1554224155-cfa08c2a758f",
+      "source_url": "https://unsplash.com/photos/1554224155-cfa08c2a758f",
+      "image_url": "https://images.unsplash.com/photo-1554224155-cfa08c2a758f",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_taxforms"
+    },
+    "_fallback_municipal.jpg": {
+      "unsplash_id": "photo-1559631658-9705048d977e",
+      "source_url": "https://unsplash.com/photos/1559631658-9705048d977e",
+      "image_url": "https://images.unsplash.com/photo-1559631658-9705048d977e",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "shop_open_sign"
+    },
+    "_fallback_labour.jpg": {
+      "unsplash_id": "photo-1549923746-c502d488b3ea",
+      "source_url": "https://unsplash.com/photos/1549923746-c502d488b3ea",
+      "image_url": "https://images.unsplash.com/photo-1549923746-c502d488b3ea",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "biz_handshake"
+    },
+    "_fallback_quick.jpg": {
+      "unsplash_id": "photo-1619418602850-35ad20aa1700",
+      "source_url": "https://unsplash.com/photos/1619418602850-35ad20aa1700",
+      "image_url": "https://images.unsplash.com/photo-1619418602850-35ad20aa1700",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_rubber_stamp"
+    },
+    "_fallback_default.jpg": {
+      "unsplash_id": "photo-1708793737579-3df8763a5119",
+      "source_url": "https://unsplash.com/photos/1708793737579-3df8763a5119",
+      "image_url": "https://images.unsplash.com/photo-1708793737579-3df8763a5119",
+      "license": "Unsplash License (https://unsplash.com/license) - free for commercial use, no attribution required.",
+      "pool_concept": "doc_papers_wood"
+    }
+  }
+}

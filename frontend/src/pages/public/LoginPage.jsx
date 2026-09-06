@@ -11,6 +11,7 @@ import {
   PublicPanel,
 } from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
+import { KhalsniLockup } from '../../components/brand/KhalsniLogo'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { getDefaultDashboardPath } from '../../utils/authz'
@@ -52,6 +53,9 @@ function LoginPage() {
 
   return (
     <PublicPageShell>
+      <div className="mb-6 flex justify-center">
+        <KhalsniLockup to="/" iconSize="md" wordmarkSize="md" />
+      </div>
       <PublicHero
         eyebrow={isArabic ? 'تسجيل الدخول' : 'Sign in'}
         icon={LogIn}

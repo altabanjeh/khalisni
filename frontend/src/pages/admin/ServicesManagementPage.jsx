@@ -1233,13 +1233,13 @@ function ServicesManagementPage() {
           </Field>
           <input type="hidden" {...categoryForm.register('clear_image')} />
           <ImageUploadField
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            clearLabel="Remove category image"
+            accept="image/jpeg,image/png,image/webp"
+            clearLabel={isArabic ? 'إزالة صورة الفئة' : 'Remove category image'}
             error={categoryForm.formState.errors.image}
             fileList={categoryImageFile}
             fileUrl={categoryClearImage ? '' : selectedCategory?.image_url || selectedCategory?.image || ''}
-            hint="Optional image used by public category cards."
-            label="Category image"
+            hint={isArabic ? 'اختياري. تُعرض على بطاقات الفئات في الموقع العام. JPEG أو PNG أو WebP، حتى 5 ميجابايت.' : 'Optional. Shown on public category cards. JPEG, PNG or WebP, up to 5 MB.'}
+            label={isArabic ? 'صورة الفئة' : 'Category Image'}
             onClear={
               selectedCategory?.image_url || selectedCategory?.image
                 ? () => {
@@ -1327,13 +1327,13 @@ function ServicesManagementPage() {
 
           <input type="hidden" {...serviceForm.register('clear_image')} />
           <ImageUploadField
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            clearLabel="Remove service image"
+            accept="image/jpeg,image/png,image/webp"
+            clearLabel={isArabic ? 'إزالة صورة الخدمة' : 'Remove / reset service image'}
             error={serviceForm.formState.errors.image}
             fileList={serviceImageFile}
             fileUrl={serviceClearImage ? '' : selectedService?.image_url || selectedService?.image || ''}
-            hint="Optional image used independently from the category image on public service cards."
-            label="Service image"
+            hint={isArabic ? 'اختياري. تظهر على بطاقات الخدمة وصفحة تفاصيل الخدمة في الموقع العام. JPEG أو PNG أو WebP، حتى 5 ميجابايت. عند عدم وجود صورة تُعرض صورة افتراضية بهوية خلصني.' : 'Optional. Appears on public service cards and the service detail page. JPEG, PNG or WebP, up to 5 MB. A Khalsni-branded placeholder is shown when no image is set.'}
+            label={isArabic ? 'صورة الخدمة' : 'Service Image'}
             onClear={
               selectedService?.image_url || selectedService?.image
                 ? () => {

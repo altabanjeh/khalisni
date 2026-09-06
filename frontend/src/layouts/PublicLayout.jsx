@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext'
 import { PublicSiteProvider, usePublicSite } from '../context/PublicSiteContext'
 import { getDefaultDashboardPath } from '../utils/authz'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import { KhalsniLogo } from '../components/brand/KhalsniLogo'
 import { getLocalizedField } from '../utils/i18n'
 
 const copy = {
@@ -55,21 +56,6 @@ const copy = {
   },
 }
 
-function KhalsniLogo({ logoUrl }) {
-  if (logoUrl) {
-    return <img alt="Khalsni" className="h-10 w-auto object-contain" src={logoUrl} />
-  }
-
-  return (
-    <span className="flex items-center gap-2 text-[var(--khalsni-public-navy)]">
-      <span className="text-start leading-none">
-        <span className="block text-[1.18rem] font-extrabold">خلصني</span>
-        <span className="block text-[0.58rem] font-bold text-[var(--khalsni-public-text-secondary)]">Khalsni</span>
-      </span>
-    </span>
-  )
-}
-
 function PublicLayoutContent() {
   const { direction, isArabic } = useLanguage()
   const dictionary = copy[isArabic ? 'ar' : 'en']
@@ -107,7 +93,7 @@ function PublicLayoutContent() {
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
             <Link className="kh-focusable inline-flex min-h-11 shrink-0 items-center rounded-[var(--radius-sm)]" to="/" aria-label="Khalsni home">
-              <KhalsniLogo logoUrl={theme.logo_url} />
+              <KhalsniLogo overrideSrc={theme.logo_url} size="md" />
             </Link>
 
             <nav className="hidden flex-1 items-center justify-center gap-2 text-[0.72rem] font-extrabold lg:flex lg:text-[0.78rem]">
@@ -210,7 +196,7 @@ function PublicLayoutContent() {
         <div className="kh-public-container py-7">
           <div className="grid gap-8 text-start md:grid-cols-[1.2fr_0.75fr_0.75fr_1fr]">
             <div>
-              <KhalsniLogo logoUrl={theme.logo_url} />
+              <KhalsniLogo overrideSrc={theme.logo_url} size="md" />
               <p className="mt-4 max-w-sm text-sm leading-7 text-[var(--khalsni-public-text-secondary)]">
                 {footerText || dictionary.footerDescription}
               </p>

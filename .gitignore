@@ -23,6 +23,7 @@ frontend/playwright-report/
 frontend/e2e-results/artifacts/
 frontend/e2e-results/*.json
 frontend/e2e-results/e2e_db.sqlite3
+frontend/e2e-results/brand-shots/
 
 # Secrets — never commit real credentials
 .env

@@ -11,6 +11,7 @@ import {
 } from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { KhalsniLockup } from '../../components/brand/KhalsniLogo'
 import { useLanguage } from '../../context/LanguageContext'
 
 function getSafeNextPath(value) {
@@ -67,6 +68,9 @@ function RegisterPage() {
 
   return (
     <PublicPageShell>
+      <div className="mb-6 flex justify-center">
+        <KhalsniLockup to="/" iconSize="md" wordmarkSize="md" />
+      </div>
       <PublicHero
         eyebrow={isArabic ? 'إنشاء حساب عميل' : 'Create a customer account'}
         icon={UserPlus}

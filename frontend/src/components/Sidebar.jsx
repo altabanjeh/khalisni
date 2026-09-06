@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { normalizeRole } from '../utils/format'
+import { KhalsniAppIcon, KhalsniLogo } from './brand/KhalsniLogo'
 
 function Sidebar({ title, links, isOpen, onClose }) {
   const { user } = useAuth()
@@ -46,6 +47,11 @@ function Sidebar({ title, links, isOpen, onClose }) {
           isOpen ? 'translate-x-0' : 'translate-x-[120%] xl:translate-x-0',
         )}
       >
+        <div className="mb-4 flex items-center gap-2.5 border-b border-border pb-4">
+          <KhalsniAppIcon size="sm" to="/" />
+          <KhalsniLogo size="sm" to="/" />
+        </div>
+
         <div className="flex items-start justify-between gap-4 xl:block">
           <div>
             <p className="text-sm font-semibold text-brand-600">{t('sidebar.workPortal', 'بوابة العمل')}</p>

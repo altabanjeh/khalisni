@@ -92,3 +92,31 @@ test('service card removes image element after load error', () => {
 
   expect(screen.queryByRole('img', { name: 'Service A' })).not.toBeInTheDocument()
 })
+
+test('service card shows the Khalsni-branded placeholder (never a broken image) when no image is set', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <ServiceCard
+        service={{ id: 9, slug: 'no-image', name_ar: 'بدون صورة', description_ar: 'تفاصيل', category: { id: 1, name_ar: 'فئة' } }}
+      />
+    </MemoryRouter>,
+  )
+
+  // no content image...
+  expect(screen.queryByRole('img', { name: 'بدون صورة' })).not.toBeInTheDocument()
+  // ...but a decorative Khalsni brand mark is rendered as the placeholder
+  const placeholder = container.querySelector('img[src="/brand/khalsni-app-icon.png"]')
+  expect(placeholder).toBeInTheDocument()
+  expect(placeholder).toHaveAttribute('alt', '')
+})
+
+test('service card alt text derives from the localized service name', () => {
+  render(
+    <MemoryRouter>
+      <ServiceCard
+        service={{ id: 10, slug: 's', name_ar: 'خدمة سند التسجيل', description_ar: 'x', image_url: '/media/s.jpg', category: { id: 1, name_ar: 'فئة' } }}
+      />
+    </MemoryRouter>,
+  )
+  expect(screen.getByRole('img', { name: 'خدمة سند التسجيل' })).toHaveAttribute('src', '/media/s.jpg')
+})

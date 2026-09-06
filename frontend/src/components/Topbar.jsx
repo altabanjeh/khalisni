@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext'
 import HelpGuidePanel from './HelpGuidePanel'
 import LanguageSwitcher from './LanguageSwitcher'
 import NotificationPanel from './NotificationPanel'
+import { KhalsniAppIcon, KhalsniLogo } from './brand/KhalsniLogo'
 
 function Topbar({ title, onMenuClick }) {
   const navigate = useNavigate()
@@ -43,8 +44,9 @@ function Topbar({ title, onMenuClick }) {
         >
           <Menu className="h-5 w-5" />
         </button>
+        <KhalsniAppIcon size="sm" to="/" className="hidden sm:inline-flex" />
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-brand-600">Khalisni / خلصني</p>
+          <KhalsniLogo size="xs" to="/" className="mb-0.5" />
           <h2 className="break-words text-xl font-extrabold text-ink sm:text-2xl">{title}</h2>
         </div>
       </div>

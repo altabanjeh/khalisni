@@ -84,6 +84,37 @@ export function PublicCard({ children, className = '', interactive = false, as: 
   )
 }
 
+/**
+ * Neutral Khalsni-branded placeholder. Shown whenever an image is missing or
+ * fails to load so the app never renders a broken-image icon, an empty box, or
+ * `undefined`. It uses the Khalsni visual language without standing in for any
+ * specific service.
+ */
+export function BrandImagePlaceholder({ icon: Icon, className = '' }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={clsx(
+        'flex h-full min-h-[inherit] w-full items-center justify-center bg-[var(--khalsni-public-primary-soft,#e8f1fb)]',
+        className,
+      )}
+    >
+      <span className="relative flex items-center justify-center">
+        <img
+          alt=""
+          className="h-14 w-14 rounded-[22%] opacity-90 sm:h-16 sm:w-16"
+          src="/brand/khalsni-app-icon.png"
+        />
+        {Icon ? (
+          <span className="absolute -bottom-1 -end-1 grid h-6 w-6 place-items-center rounded-full bg-white text-[var(--khalsni-public-primary)] shadow-sm ring-1 ring-[var(--khalsni-public-border,#dbe4ee)]">
+            <Icon aria-hidden="true" className="h-3.5 w-3.5" />
+          </span>
+        ) : null}
+      </span>
+    </div>
+  )
+}
+
 export function ImageFallback({ src, alt = '', className = '', icon: Icon = ImageIcon, imgClassName = '', children }) {
   const [hasError, setHasError] = useState(false)
   const canRenderImage = Boolean(src) && !hasError
@@ -93,9 +124,7 @@ export function ImageFallback({ src, alt = '', className = '', icon: Icon = Imag
       {canRenderImage ? (
         <img alt={alt} className={clsx('kh-public-image kh-card-image-zoom transition-transform duration-polish', imgClassName)} loading="lazy" onError={() => setHasError(true)} src={src} />
       ) : (
-        <div className="flex h-full min-h-[inherit] w-full items-center justify-center text-[var(--khalsni-public-primary)]">
-          {children || <Icon aria-hidden="true" className="h-8 w-8" />}
-        </div>
+        children || <BrandImagePlaceholder icon={Icon} />
       )}
     </div>
   )
