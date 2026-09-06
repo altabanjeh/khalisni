@@ -42,6 +42,18 @@ else
     echo "Skipping initial data seed."
 fi
 
+# Give services their initial representative images. Idempotent: only fills
+# services that have no image yet, so it is safe to run on every deploy.
+# Set DJANGO_SEED_SERVICE_IMAGES=False to skip, or run
+#   python manage.py seed_service_images --force
+# once to reset every image back to the shipped defaults.
+if [ "${DJANGO_SEED_SERVICE_IMAGES:-True}" = "True" ]; then
+    echo "Seeding service images..."
+    python manage.py seed_service_images --verbosity 0 || true
+else
+    echo "Skipping service image seed."
+fi
+
 GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}"
 GUNICORN_TIMEOUT="${GUNICORN_TIMEOUT:-120}"
 
