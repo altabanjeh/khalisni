@@ -252,7 +252,7 @@ function ServiceDetailsPage() {
                   <div key={item.id} className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-extrabold leading-7 text-[var(--khalsni-public-navy)]">{item.label}</p>
-                      <span className={item.required ? 'rounded-full bg-red-500/15 px-3 py-1 text-xs font-bold text-red-300' : 'rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[var(--khalsni-public-text-secondary)]'}>
+                      <span className={item.required ? 'rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700' : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600'}>
                         {item.required ? (isArabic ? 'مطلوب' : 'Required') : isArabic ? 'اختياري' : 'Optional'}
                       </span>
                     </div>
@@ -346,7 +346,7 @@ function ServiceDetailsPage() {
                   <div key={item.id} className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p className="font-extrabold text-[var(--khalsni-public-navy)]">{getServiceNameFromRelation(item, 'source_service', language)}</p>
-                      <span className={item.is_completed ? 'rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300' : 'rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300'}>
+                      <span className={item.is_completed ? 'rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700' : 'rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700'}>
                         {item.is_completed ? (isArabic ? 'مكتملة' : 'Completed') : isArabic ? 'غير مكتملة' : 'Incomplete'}
                       </span>
                     </div>

@@ -52,7 +52,7 @@ function AdminOverviewPage() {
                 <XAxis dataKey="status" stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
                 <YAxis stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: 'var(--kh-surface)', border: '1px solid var(--kh-border)', borderRadius: 12, color: 'var(--kh-text)' }} />
-                <Bar dataKey="total" fill="#2f7bf2" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="total" fill="#146ef0" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -62,7 +62,7 @@ function AdminOverviewPage() {
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
               <PieChart>
-                <Pie data={data.top_services} dataKey="total" fill="#2f7bf2" nameKey="service__name_ar" outerRadius={100} label />
+                <Pie data={data.top_services} dataKey="total" fill="#146ef0" nameKey="service__name_ar" outerRadius={100} label />
                 <Tooltip contentStyle={{ background: 'var(--kh-surface)', border: '1px solid var(--kh-border)', borderRadius: 12, color: 'var(--kh-text)' }} />
               </PieChart>
             </ResponsiveContainer>

@@ -88,7 +88,7 @@ function PublicLayoutContent() {
   }, [mobileMenuOpen])
 
   return (
-    <div className="kh-public-theme min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
+    <div className="min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
       <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
