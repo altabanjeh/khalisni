@@ -84,7 +84,7 @@ function DetailPill({ icon: Icon, label, value }) {
   return (
     <div className="min-w-0 rounded-[var(--radius-lg)] bg-[var(--khalsni-public-bg-secondary)] p-4">
       <p className="flex items-center gap-2 text-xs font-bold text-[var(--khalsni-public-text-muted)]">
-        <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)]" />
+        <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-accent-text)]" />
         {label}
       </p>
       <p className="mt-2 truncate text-sm font-extrabold text-[var(--khalsni-public-navy)] sm:text-base">{value}</p>
@@ -187,7 +187,7 @@ function ServiceDetailsPage() {
         <div className="min-w-0 space-y-5 lg:px-4">
           <div>
             <Link
-              className="kh-focusable inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-primary)] transition hover:bg-brand-100"
+              className="kh-focusable inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-accent-text)] transition hover:bg-[var(--khalsni-public-primary)] hover:text-white"
               to={service.category?.slug ? `/services/category/${service.category.slug}` : '/services'}
             >
               <Layers3 aria-hidden="true" className="h-4 w-4" />
@@ -252,7 +252,7 @@ function ServiceDetailsPage() {
                   <div key={item.id} className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-extrabold leading-7 text-[var(--khalsni-public-navy)]">{item.label}</p>
-                      <span className={item.required ? 'rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700' : 'rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600'}>
+                      <span className={item.required ? 'rounded-full bg-red-500/15 px-3 py-1 text-xs font-bold text-red-300' : 'rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[var(--khalsni-public-text-secondary)]'}>
                         {item.required ? (isArabic ? 'مطلوب' : 'Required') : isArabic ? 'اختياري' : 'Optional'}
                       </span>
                     </div>
@@ -284,7 +284,7 @@ function ServiceDetailsPage() {
                     <div key={field?.key || label || index} className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4">
                       <div className="flex items-start justify-between gap-3">
                         <p className="font-extrabold leading-7 text-[var(--khalsni-public-navy)]">{label}</p>
-                        {required ? <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'مطلوب' : 'Required'}</span> : null}
+                        {required ? <span className="rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'مطلوب' : 'Required'}</span> : null}
                       </div>
                       {type ? <p className="mt-2 text-xs font-bold uppercase text-[var(--khalsni-public-text-muted)]">{type}</p> : null}
                       {help ? <p className="mt-3 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{help}</p> : null}
@@ -346,7 +346,7 @@ function ServiceDetailsPage() {
                   <div key={item.id} className="rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-white p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p className="font-extrabold text-[var(--khalsni-public-navy)]">{getServiceNameFromRelation(item, 'source_service', language)}</p>
-                      <span className={item.is_completed ? 'rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700' : 'rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700'}>
+                      <span className={item.is_completed ? 'rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300' : 'rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300'}>
                         {item.is_completed ? (isArabic ? 'مكتملة' : 'Completed') : isArabic ? 'غير مكتملة' : 'Incomplete'}
                       </span>
                     </div>
@@ -362,7 +362,7 @@ function ServiceDetailsPage() {
 
         <aside className="space-y-5 xl:sticky xl:top-24 xl:self-start">
           <PublicPanel>
-            <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'ملخص الخدمة' : 'Service summary'}</p>
+            <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'ملخص الخدمة' : 'Service summary'}</p>
             <h2 className="mt-2 text-2xl font-extrabold leading-8 text-[var(--khalsni-public-navy)]">{serviceName}</h2>
             <div className="mt-5 space-y-3">
               <DetailPill icon={Clock3} label={isArabic ? 'المدة' : 'Duration'} value={duration.label} />
@@ -388,7 +388,7 @@ function ServiceDetailsPage() {
           </PublicPanel>
 
           <div className="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-white p-5 shadow-soft">
-            <CheckCircle2 className="h-8 w-8 text-[var(--khalsni-public-primary)]" />
+            <CheckCircle2 className="h-8 w-8 text-[var(--khalsni-public-accent-text)]" />
             <p className="mt-3 font-extrabold text-[var(--khalsni-public-navy)]">{isArabic ? 'بياناتك محمية' : 'Your data is protected'}</p>
             <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
               {isArabic ? 'روابط المستندات وصلاحيات الوصول تبقى محكومة بسياسات خلصني الحالية.' : 'Document links and access remain governed by current Khalsni policies.'}
@@ -401,10 +401,10 @@ function ServiceDetailsPage() {
         <section className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'خدمات مرتبطة' : 'Related services'}</p>
+              <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'خدمات مرتبطة' : 'Related services'}</p>
               <h2 className="mt-1 text-2xl font-extrabold text-[var(--khalsni-public-navy)]">{isArabic ? 'قد تحتاج أيضاً' : 'You may also need'}</h2>
             </div>
-            <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--khalsni-public-text-secondary)] hover:text-[var(--khalsni-public-primary)]" to="/services">
+            <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--khalsni-public-text-secondary)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">
               <ArrowIcon aria-hidden="true" className="h-4 w-4" />
               {isArabic ? 'كل الخدمات' : 'All services'}
             </Link>

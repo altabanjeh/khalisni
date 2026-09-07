@@ -17,6 +17,7 @@ import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import CategoryCard from '../../components/CategoryCard'
 import ServiceCard from '../../components/ServiceCard'
+import { ServiceRail, ServiceRailItem } from '../../components/ServiceRail'
 import { ImageFallback } from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
@@ -288,7 +289,7 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
     <form className="relative" onSubmit={handleSubmit}>
       <label className="relative block">
         <span className="sr-only">{dictionary.searchLabel}</span>
-        <Search aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--khalsni-public-primary)]" />
+        <Search aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--khalsni-public-accent-text)]" />
         {loading ? <Loader2 aria-hidden="true" className="pointer-events-none absolute end-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-[var(--khalsni-public-text-muted)]" /> : null}
         <input
           aria-autocomplete="list"
@@ -337,7 +338,7 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
                     <span className="block truncate text-sm font-extrabold text-[var(--khalsni-public-navy)]">{item.label}</span>
                     {item.description ? <span className="mt-0.5 block line-clamp-1 text-xs font-semibold text-[var(--khalsni-public-text-secondary)]">{item.description}</span> : null}
                   </span>
-                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[0.68rem] font-extrabold text-[var(--khalsni-public-primary)] shadow-sm">
+                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[0.68rem] font-extrabold text-[var(--khalsni-public-accent-text)] shadow-sm">
                     {item.type === 'category' ? dictionary.categoryType : dictionary.serviceType}
                   </span>
                 </button>
@@ -354,7 +355,7 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
                 <span className="block text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.noResults}</span>
                 <span className="mt-1 block text-xs font-semibold text-[var(--khalsni-public-text-secondary)]">{dictionary.noResultsHint}</span>
               </span>
-              <SendHorizontal aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-primary)] rtl:-scale-x-100" />
+              <SendHorizontal aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-accent-text)] rtl:-scale-x-100" />
             </button>
           )}
         </div>
@@ -363,61 +364,6 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
   )
 }
 
-function HomeRail({ title, description, action, children, itemCount = 0 }) {
-  const railRef = useRef(null)
-  const { isArabic } = useLanguage()
-  const dictionary = copy[isArabic ? 'ar' : 'en']
-  const PreviousIcon = isArabic ? ArrowRight : ArrowLeft
-  const NextIcon = isArabic ? ArrowLeft : ArrowRight
-
-  function scrollRail(direction) {
-    railRef.current?.scrollBy({
-      left: direction * 360 * (isArabic ? -1 : 1),
-      behavior: 'smooth',
-    })
-  }
-
-  return (
-    <section className="kh-public-container py-7 sm:py-9">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-3xl text-start">
-          <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{title}</h2>
-          {description ? <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{description}</p> : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {action}
-          {itemCount > 3 ? (
-            <div className="hidden items-center gap-2 md:flex">
-              <button
-                aria-label={dictionary.previous}
-                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary)]"
-                onClick={() => scrollRail(-1)}
-                type="button"
-              >
-                <PreviousIcon aria-hidden="true" className="h-4 w-4" />
-              </button>
-              <button
-                aria-label={dictionary.next}
-                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary)]"
-                onClick={() => scrollRail(1)}
-                type="button"
-              >
-                <NextIcon aria-hidden="true" className="h-4 w-4" />
-              </button>
-            </div>
-          ) : null}
-        </div>
-      </div>
-      <div ref={railRef} className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-3 scroll-smooth sm:mx-0 sm:px-0">
-        {children}
-      </div>
-    </section>
-  )
-}
-
-function RailItem({ children, wide = false }) {
-  return <div className={`shrink-0 snap-start ${wide ? 'w-[86vw] sm:w-[22rem] lg:w-[21rem]' : 'w-[82vw] sm:w-[19rem] lg:w-[20rem]'}`}>{children}</div>
-}
 
 function HeroVisual({ content, services, categories, dictionary, isArabic, language }) {
   const previewService = services[0]
@@ -434,18 +380,18 @@ function HeroVisual({ content, services, categories, dictionary, isArabic, langu
           className="aspect-[4/3] rounded-[var(--radius-xl)]"
           src={content.hero_image_url || heroImage}
         />
-        <div className="absolute inset-x-6 bottom-6 rounded-[var(--radius-lg)] border border-white bg-white p-4 text-start shadow-lg">
+        <div className="absolute inset-x-6 bottom-6 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface-elevated)] p-4 text-start shadow-lg">
           <div className="flex items-start gap-3">
             <ImageFallback alt={previewName} className="h-14 w-14 shrink-0 rounded-[var(--radius-md)]" icon={FileText} src={serviceImage} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-black text-[var(--khalsni-public-navy)]">{previewName}</p>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">
                 <span className="inline-flex min-w-0 items-center gap-1">
-                  <Clock3 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-primary)]" />
+                  <Clock3 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-accent-text)]" />
                   <span className="truncate">{previewDuration}</span>
                 </span>
                 <span className="inline-flex min-w-0 items-center gap-1">
-                  <WalletCards aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-primary)]" />
+                  <WalletCards aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-accent-text)]" />
                   <span className="truncate">{previewPrice}</span>
                 </span>
               </div>
@@ -453,7 +399,7 @@ function HeroVisual({ content, services, categories, dictionary, isArabic, langu
           </div>
         </div>
       </div>
-      <div className="absolute -top-3 start-3 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-primary)] shadow-md">
+      <div className="absolute -top-3 start-3 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-accent-text)] shadow-md">
         {services.length} {dictionary.servicesLabel}
       </div>
       <div className="absolute -bottom-3 end-5 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-navy)] shadow-md">
@@ -522,16 +468,16 @@ function HomePage() {
 
   return (
     <div className="bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]">
-      <section className="overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,var(--khalsni-public-bg)_100%)]">
+      <section className="overflow-hidden bg-[linear-gradient(180deg,var(--khalsni-public-bg-secondary)_0%,var(--khalsni-public-bg)_100%)]">
         <div className="kh-public-container grid gap-8 pb-8 pt-7 sm:pb-10 sm:pt-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.82fr)] lg:items-center lg:gap-12">
           <div className="max-w-3xl text-start">
-            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
               <Sparkles aria-hidden="true" className="h-4 w-4" />
               {dictionary.heroEyebrow}
             </p>
             <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.16] text-[var(--khalsni-public-navy)] sm:text-5xl lg:text-[3.55rem]">
               {dictionary.headline}
-              <span className="block text-[var(--khalsni-public-primary)]">{dictionary.headlineAccent}</span>
+              <span className="block text-[var(--khalsni-public-accent-text)]">{dictionary.headlineAccent}</span>
             </h1>
             <p className="mt-4 max-w-2xl text-base font-semibold leading-8 text-[var(--khalsni-public-text-secondary)] sm:text-lg">
               {dictionary.heroText}
@@ -544,7 +490,7 @@ function HomePage() {
                 {dictionary.browseServices}
                 {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
               </Link>
-              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-5 py-3 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/track-order">
+              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-5 py-3 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/track-order">
                 {dictionary.trackRequest}
               </Link>
             </div>
@@ -559,7 +505,7 @@ function HomePage() {
           const Icon = [ShieldCheck, WalletCards, FileText, UploadCloud][index]
           return (
             <article className="flex items-start gap-3 rounded-[var(--radius-lg)] bg-white p-4 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
                 <Icon aria-hidden="true" className="h-5 w-5" />
               </span>
               <div>
@@ -571,47 +517,49 @@ function HomePage() {
         })}
       </section>
 
-      <HomeRail
-        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.viewAll}</Link>}
+      <ServiceRail
+        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
         description={dictionary.latestText}
+        id="home-latest-services"
         itemCount={latestServices.length}
         title={dictionary.latestTitle}
       >
         {loadingCatalog && !latestServices.length ? (
-          Array.from({ length: 4 }).map((_, index) => <RailItem key={index} wide><div className="h-96 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft" /></RailItem>)
+          Array.from({ length: 4 }).map((_, index) => <ServiceRailItem key={index} size="featured"><div className="h-96 animate-pulse rounded-[var(--radius-lg)] bg-[var(--khalsni-public-surface)] shadow-soft" /></ServiceRailItem>)
         ) : latestServices.length ? (
           latestServices.map((service) => (
-            <RailItem key={service.id || service.slug} wide>
-              <ServiceCard service={service} />
-            </RailItem>
+            <ServiceRailItem key={service.id || service.slug} size="featured">
+              <ServiceCard service={service} variant="featured" />
+            </ServiceRailItem>
           ))
         ) : (
-          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-white p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
+          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
             {dictionary.emptyServices}
           </div>
         )}
-      </HomeRail>
+      </ServiceRail>
 
-      <HomeRail
-        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/services">{dictionary.viewAll}</Link>}
+      <ServiceRail
+        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
         description={dictionary.categoriesText}
+        id="home-categories"
         itemCount={categorySections.length}
         title={dictionary.categoriesTitle}
       >
         {loadingCatalog && !categorySections.length ? (
-          Array.from({ length: 5 }).map((_, index) => <RailItem key={index}><div className="h-80 animate-pulse rounded-[var(--radius-lg)] bg-white shadow-soft" /></RailItem>)
+          Array.from({ length: 5 }).map((_, index) => <ServiceRailItem key={index}><div className="h-80 animate-pulse rounded-[var(--radius-lg)] bg-[var(--khalsni-public-surface)] shadow-soft" /></ServiceRailItem>)
         ) : categorySections.length ? (
           categorySections.slice(0, 10).map((section) => (
-            <RailItem key={section.id}>
+            <ServiceRailItem key={section.id}>
               <CategoryCard category={section.category} count={section.count} />
-            </RailItem>
+            </ServiceRailItem>
           ))
         ) : (
-          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-white p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
+          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
             {dictionary.emptyCategories}
           </div>
         )}
-      </HomeRail>
+      </ServiceRail>
 
       {categoryRows.length ? (
         <section className="kh-public-container py-7 sm:py-9">
@@ -629,7 +577,7 @@ function HomePage() {
                       {section.count} {dictionary.serviceCount}
                     </p>
                   </div>
-                  <Link className="text-sm font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]" to={categoryPath(section.category)}>
+                  <Link className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]" to={categoryPath(section.category)}>
                     {dictionary.viewAll}
                   </Link>
                 </div>
@@ -660,7 +608,7 @@ function HomePage() {
               return (
                 <article className="relative rounded-[var(--radius-lg)] bg-white p-5 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
+                    <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
                       <StepIcon aria-hidden="true" className="h-5 w-5" />
                     </span>
                     <span className="text-2xl font-black text-[var(--khalsni-public-primary-soft)]">{index + 1}</span>
@@ -681,7 +629,7 @@ function HomePage() {
             <div className="p-5 text-start sm:p-6">
               <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)]">{dictionary.specialTitle}</h2>
               <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.specialText}</p>
-              <button className="kh-focusable mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" onClick={() => setCustomOpen((current) => !current)} type="button">
+              <button className="kh-focusable mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" onClick={() => setCustomOpen((current) => !current)} type="button">
                 <ChevronDown aria-hidden="true" className={`h-4 w-4 transition ${customOpen ? 'rotate-180' : ''}`} />
                 {dictionary.noResults}
               </button>

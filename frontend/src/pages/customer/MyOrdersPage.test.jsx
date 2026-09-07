@@ -10,6 +10,6 @@ test('dashboard tables load', async () => {
   )
 
   await waitFor(() => {
-    expect(screen.getByText('KH-2026-000001')).toBeInTheDocument()
+    expect(screen.getByText(/KH-2026-000001/)).toBeInTheDocument()
   })
 })

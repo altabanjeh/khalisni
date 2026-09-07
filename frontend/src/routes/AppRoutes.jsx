@@ -102,47 +102,56 @@ function AppRoutes() {
   const { t } = useLanguage()
 
   const customerLinks = [
-    { to: '/customer', label: t('public.home', 'الرئيسية'), icon: Home },
+    { to: '/customer', label: t('customer.dashboard', 'لوحتي'), icon: Home },
     { to: '/customer/orders/new', label: t('customer.newOrder', 'طلب جديد'), icon: FilePlus2 },
     { to: '/customer/orders', label: t('customer.myOrders', 'طلباتي'), icon: ClipboardList },
+    { to: '/services', label: t('customer.browseServices', 'تصفح الخدمات'), icon: Monitor },
     { to: '/customer/profile', label: t('customer.profile', 'الملف الشخصي'), icon: UserCog },
     { to: '/customer/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
   ]
 
   const employeeLinks = [
-    { to: '/employee', label: t('employee.dashboard', 'الرئيسية'), icon: LayoutDashboard },
-    { to: '/employee/orders', label: t('employee.reviewQueue', 'قائمة المراجعة'), icon: FileSearch },
-    { to: '/employee/missing-service-requests', label: t('employee.missingServices', 'طلبات خدمات جديدة'), icon: MessageSquareMore },
-    { to: '/employee/service-categories', label: t('employee.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree, roles: ['support'] },
-    { to: '/employee/service-relations', label: t('employee.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus, roles: ['support'] },
-    { to: '/employee/documents/verify', label: t('employee.verifyDocuments', 'التحقق من الوثائق'), icon: ShieldCheck },
-    { to: '/employee/reports', label: t('employee.reports', 'تقارير الموظف'), icon: LineChart },
-    { to: '/employee/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+    { to: '/employee', label: t('employee.dashboard', 'الرئيسية'), icon: LayoutDashboard, group: t('nav.group.overview', 'نظرة عامة') },
+    { to: '/employee/orders', label: t('employee.reviewQueue', 'قائمة المراجعة'), icon: FileSearch, group: t('nav.group.operations', 'العمليات') },
+    { to: '/employee/missing-service-requests', label: t('employee.missingServices', 'طلبات خدمات جديدة'), icon: MessageSquareMore, group: t('nav.group.operations', 'العمليات') },
+    { to: '/employee/documents/verify', label: t('employee.verifyDocuments', 'التحقق من الوثائق'), icon: ShieldCheck, group: t('nav.group.operations', 'العمليات') },
+    { to: '/employee/service-categories', label: t('employee.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree, roles: ['support'], group: t('nav.group.serviceManagement', 'إدارة الخدمات') },
+    { to: '/employee/service-relations', label: t('employee.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus, roles: ['support'], group: t('nav.group.serviceManagement', 'إدارة الخدمات') },
+    { to: '/employee/reports', label: t('employee.reports', 'تقارير الموظف'), icon: LineChart, group: t('nav.group.reporting', 'التقارير والتدقيق') },
+    { to: '/employee/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText, group: t('nav.group.config', 'الإعدادات') },
   ]
 
+  const gOverview = t('nav.group.overview', 'نظرة عامة')
+  const gServices = t('nav.group.serviceManagement', 'إدارة الخدمات')
+  const gOperations = t('nav.group.operations', 'العمليات')
+  const gPeople = t('nav.group.people', 'المستخدمون والمزوّدون')
+  const gContent = t('nav.group.content', 'المحتوى والموقع العام')
+  const gReporting = t('nav.group.reporting', 'التقارير والتدقيق')
+  const gConfig = t('nav.group.config', 'الإعدادات')
+
   const adminLinks = [
-    { to: '/admin', label: t('routes.adminPortal', 'لوحة الإدارة'), icon: LayoutDashboard },
-    { to: '/admin/orders', label: t('admin.orders', 'إدارة الطلبات'), icon: FolderKanban },
-    { to: '/admin/rules', label: t('admin.rules', 'قواعد التشغيل'), icon: Settings },
-    { to: '/admin/cms', label: t('admin.settings', 'إعدادات النظام'), icon: Database },
-    { to: '/admin/service-categories', label: t('admin.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree },
-    { to: '/admin/services', label: t('admin.services', 'الخدمات'), icon: Settings },
-    { to: '/admin/service-relations', label: t('admin.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus },
-    { to: '/admin/public-site', label: t('admin.publicSite', 'الموقع العام'), icon: Monitor },
-    { to: '/admin/public-site/content', label: t('admin.homepageContent', 'محتوى الرئيسية'), icon: FileText },
-    { to: '/admin/public-site/advertisements', label: t('admin.advertisements', 'الإعلانات'), icon: ImagePlus },
-    { to: '/admin/public-site/theme', label: t('admin.theme', 'المظهر العام'), icon: Palette },
-    { to: '/admin/public-site/preview', label: t('admin.preview', 'معاينة الواجهة'), icon: Eye },
-    { to: '/admin/missing-service-requests', label: t('admin.missingServices', 'طلبات الخدمات الجديدة'), icon: MessageSquareMore },
-    { to: '/admin/users', label: t('admin.usersRoles', 'المستخدمون والأدوار'), icon: UsersRound },
-    { to: '/admin/providers', label: t('admin.providers', 'المزوّدون'), icon: BriefcaseBusiness },
-    { to: '/admin/provider-services', label: t('admin.providerServices', 'خدمات المزوّدين'), icon: ClipboardList },
-    { to: '/admin/payments', label: t('admin.payments', 'المدفوعات'), icon: CreditCard },
-    { to: '/admin/reports', label: t('admin.reports', 'التقارير'), icon: LineChart },
-    { to: '/admin/notifications', label: t('admin.notifications', 'الإشعارات'), icon: Bell },
-    { to: '/admin/audit', label: t('admin.audit', 'سجل التدقيق'), icon: ShieldCheck },
-    { to: '/admin/help-guides', label: t('admin.helpGuides', 'إدارة الدليل'), icon: BookOpenText },
-    { to: '/admin/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText },
+    { to: '/admin', label: t('routes.adminPortal', 'لوحة الإدارة'), icon: LayoutDashboard, group: gOverview },
+    { to: '/admin/orders', label: t('admin.orders', 'إدارة الطلبات'), icon: FolderKanban, group: gOperations },
+    { to: '/admin/missing-service-requests', label: t('admin.missingServices', 'طلبات الخدمات الجديدة'), icon: MessageSquareMore, group: gOperations },
+    { to: '/admin/payments', label: t('admin.payments', 'المدفوعات'), icon: CreditCard, group: gOperations },
+    { to: '/admin/rules', label: t('admin.rules', 'قواعد التشغيل'), icon: Settings, group: gOperations },
+    { to: '/admin/notifications', label: t('admin.notifications', 'الإشعارات'), icon: Bell, group: gOperations },
+    { to: '/admin/service-categories', label: t('admin.serviceCategories', 'تصنيفات الخدمات'), icon: FolderTree, group: gServices },
+    { to: '/admin/services', label: t('admin.services', 'الخدمات'), icon: Settings, group: gServices },
+    { to: '/admin/service-relations', label: t('admin.serviceRelations', 'علاقات الخدمات'), icon: GitBranchPlus, group: gServices },
+    { to: '/admin/users', label: t('admin.usersRoles', 'المستخدمون والأدوار'), icon: UsersRound, group: gPeople },
+    { to: '/admin/providers', label: t('admin.providers', 'المزوّدون'), icon: BriefcaseBusiness, group: gPeople },
+    { to: '/admin/provider-services', label: t('admin.providerServices', 'خدمات المزوّدين'), icon: ClipboardList, group: gPeople },
+    { to: '/admin/public-site', label: t('admin.publicSite', 'الموقع العام'), icon: Monitor, group: gContent },
+    { to: '/admin/public-site/content', label: t('admin.homepageContent', 'محتوى الرئيسية'), icon: FileText, group: gContent },
+    { to: '/admin/public-site/advertisements', label: t('admin.advertisements', 'الإعلانات'), icon: ImagePlus, group: gContent },
+    { to: '/admin/public-site/theme', label: t('admin.theme', 'المظهر العام'), icon: Palette, group: gContent },
+    { to: '/admin/public-site/preview', label: t('admin.preview', 'معاينة الواجهة'), icon: Eye, group: gContent },
+    { to: '/admin/help-guides', label: t('admin.helpGuides', 'إدارة الدليل'), icon: BookOpenText, group: gContent },
+    { to: '/admin/reports', label: t('admin.reports', 'التقارير'), icon: LineChart, group: gReporting },
+    { to: '/admin/audit', label: t('admin.audit', 'سجل التدقيق'), icon: ShieldCheck, group: gReporting },
+    { to: '/admin/cms', label: t('admin.settings', 'إعدادات النظام'), icon: Database, group: gConfig },
+    { to: '/admin/manual', label: t('routes.manual', 'الدليل'), icon: BookOpenText, group: gConfig },
   ]
 
   const providerLinks = [

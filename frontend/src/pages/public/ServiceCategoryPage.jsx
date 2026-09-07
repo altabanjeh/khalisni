@@ -41,7 +41,7 @@ function ServiceCategoryPage() {
         />
 
         <div className="flex flex-col justify-center p-1 text-start sm:p-4">
-          <p className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+          <p className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
             <Grid2X2 aria-hidden="true" className="h-4 w-4" />
             {isArabic ? 'تصنيف خدمات' : 'Service category'}
           </p>
@@ -51,7 +51,7 @@ function ServiceCategoryPage() {
             <span className="inline-flex min-h-10 items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-bg-secondary)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)]">
               {serviceCount} {isArabic ? 'خدمة متاحة' : 'available services'}
             </span>
-            <Link className="kh-focusable inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]" to="/services">
+            <Link className="kh-focusable inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">
               {isArabic ? 'كل الخدمات' : 'All services'}
               <ArrowIcon aria-hidden="true" className="h-4 w-4" />
             </Link>
@@ -74,10 +74,10 @@ function ServiceCategoryPage() {
         <section className="space-y-5">
           <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-extrabold text-[var(--khalsni-public-primary)]">{isArabic ? 'خدمات التصنيف' : 'Category services'}</p>
+              <p className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'خدمات التصنيف' : 'Category services'}</p>
               <h2 className="mt-1 text-2xl font-black text-[var(--khalsni-public-navy)]">{title}</h2>
             </div>
-            <span className="w-fit rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+            <span className="w-fit rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
               {publicServices.length} {isArabic ? 'خدمة' : 'services'}
             </span>
           </div>
@@ -109,7 +109,7 @@ function ServiceCategoryPage() {
       {relatedCategories.length ? (
         <section className="space-y-4">
           <div className="text-start">
-            <p className="text-sm font-extrabold text-[var(--khalsni-public-primary)]">{isArabic ? 'تصنيفات أخرى' : 'Other categories'}</p>
+            <p className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'تصنيفات أخرى' : 'Other categories'}</p>
             <h2 className="mt-1 text-2xl font-black text-[var(--khalsni-public-navy)]">{isArabic ? 'قد تحتاج أيضاً' : 'You may also need'}</h2>
           </div>
           <div className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">

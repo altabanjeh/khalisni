@@ -90,7 +90,7 @@ function ServicesPage() {
     <PublicPageShell className="py-0 sm:py-0">
       <section className="grid gap-5 rounded-[var(--radius-xl)] bg-white p-5 text-start shadow-soft ring-1 ring-[var(--khalsni-public-border)] sm:p-7 lg:grid-cols-[1fr_20rem] lg:items-end">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+          <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
             <Grid2X2 aria-hidden="true" className="h-4 w-4" />
             {isArabic ? 'دليل التصنيفات' : 'Category directory'}
           </p>
@@ -107,7 +107,7 @@ function ServicesPage() {
             <p className="mt-1 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">{isArabic ? 'تصنيف' : 'Categories'}</p>
           </div>
           <div className="rounded-[var(--radius-lg)] bg-[var(--khalsni-public-primary-soft)] p-4">
-            <p className="text-2xl font-black text-[var(--khalsni-public-primary)]">{filteredServices.length}</p>
+            <p className="text-2xl font-black text-[var(--khalsni-public-accent-text)]">{filteredServices.length}</p>
             <p className="mt-1 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">{isArabic ? 'نتيجة' : 'Results'}</p>
           </div>
         </div>
@@ -133,7 +133,7 @@ function ServicesPage() {
         {publicCategories.length ? (
           <div className="-mx-3 flex snap-x gap-3 overflow-x-auto px-3 pb-2 sm:mx-0 sm:px-0">
             <button
-              className={`kh-focusable inline-flex h-10 shrink-0 snap-start items-center justify-center rounded-[var(--radius-md)] border px-4 text-sm font-extrabold transition ${!activeCategory ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]'}`}
+              className={`kh-focusable inline-flex h-10 shrink-0 snap-start items-center justify-center rounded-[var(--radius-md)] border px-4 text-sm font-extrabold transition ${!activeCategory ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]'}`}
               onClick={() => handleCategorySelect('')}
               type="button"
             >
@@ -147,7 +147,7 @@ function ServicesPage() {
               return (
                 <button
                   key={category.id || category.slug}
-                  className={`kh-focusable inline-flex h-10 shrink-0 snap-start items-center justify-center gap-2 rounded-[var(--radius-md)] border px-4 text-sm font-extrabold transition ${isActive ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]'}`}
+                  className={`kh-focusable inline-flex h-10 shrink-0 snap-start items-center justify-center gap-2 rounded-[var(--radius-md)] border px-4 text-sm font-extrabold transition ${isActive ? 'border-[var(--khalsni-public-primary)] bg-[var(--khalsni-public-primary)] text-white' : 'border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-navy)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]'}`}
                   onClick={() => handleCategorySelect(slug)}
                   type="button"
                 >
@@ -163,13 +163,13 @@ function ServicesPage() {
       <section className="space-y-4">
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="inline-flex items-center gap-2 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+            <p className="inline-flex items-center gap-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
               <SlidersHorizontal aria-hidden="true" className="h-4 w-4" />
               {isArabic ? 'التصنيفات الرئيسية' : 'Main categories'}
             </p>
             <h2 className="mt-1 text-2xl font-black text-[var(--khalsni-public-navy)]">{isArabic ? 'اختر التصنيف المناسب' : 'Choose the right category'}</h2>
           </div>
-          <Link className="text-sm font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]" to="/services">
+          <Link className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]" to="/services">
             {isArabic ? 'عرض الكل' : 'View all'}
           </Link>
         </div>
@@ -201,7 +201,7 @@ function ServicesPage() {
       <section className="space-y-5">
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-extrabold text-[var(--khalsni-public-primary)]">{isArabic ? 'الخدمات' : 'Services'}</p>
+            <p className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'الخدمات' : 'Services'}</p>
             <h2 className="mt-1 text-2xl font-black text-[var(--khalsni-public-navy)]">
               {activeCategoryRecord
                 ? getCategoryName(activeCategoryRecord, language, isArabic ? 'خدمات التصنيف' : 'Category services')
@@ -213,7 +213,7 @@ function ServicesPage() {
               </p>
             ) : null}
           </div>
-          <span className="inline-flex h-10 items-center justify-center self-start rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] px-4 text-sm font-extrabold text-[var(--khalsni-public-primary)] sm:self-auto">
+          <span className="inline-flex h-10 items-center justify-center self-start rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] px-4 text-sm font-extrabold text-[var(--khalsni-public-accent-text)] sm:self-auto">
             {filteredServices.length} {isArabic ? 'خدمة' : 'services'}
           </span>
         </div>

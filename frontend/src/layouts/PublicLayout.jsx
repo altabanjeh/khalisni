@@ -88,7 +88,7 @@ function PublicLayoutContent() {
   }, [mobileMenuOpen])
 
   return (
-    <div className="min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
+    <div className="kh-public-theme min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
       <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
@@ -103,9 +103,9 @@ function PublicLayoutContent() {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `kh-focusable relative rounded-[var(--radius-sm)] px-1.5 py-5 text-[var(--khalsni-public-text-secondary)] transition hover:text-[var(--khalsni-public-primary)] lg:px-4 ${
+                    `kh-focusable relative rounded-[var(--radius-sm)] px-1.5 py-5 text-[var(--khalsni-public-text-secondary)] transition hover:text-[var(--khalsni-public-accent-text)] lg:px-4 ${
                       isActive
-                        ? 'text-[var(--khalsni-public-primary)] after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--khalsni-public-primary)]'
+                        ? 'text-[var(--khalsni-public-accent-text)] after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--khalsni-public-accent-text)]'
                         : ''
                     }`
                   }

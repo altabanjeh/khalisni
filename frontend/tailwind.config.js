@@ -16,14 +16,19 @@ export default {
           800: '#0b49b5',
           900: '#0b1533',
         },
-        background: '#fbfcff',
-        card: '#ffffff',
-        border: '#dbe5f0',
-        accent: '#eff6ff',
-        ink: '#17213a',
-        success: '#12b76a',
-        warning: '#f79009',
-        danger: '#f04438',
+        /* Semantic aliases resolve through CSS variables so a scoped theme
+           (.kh-app-theme / .kh-public-theme) can retint every `bg-card`,
+           `text-ink`, `border-border` surface without per-component edits.
+           The :root fallbacks equal the historical light values, so the light
+           system renders byte-identical. */
+        background: 'var(--kh-bg, #fbfcff)',
+        card: 'var(--kh-surface, #ffffff)',
+        border: 'var(--kh-border, #dbe5f0)',
+        accent: 'var(--kh-soft-blue, #eff6ff)',
+        ink: 'var(--kh-text, #17213a)',
+        success: 'var(--kh-success, #12b76a)',
+        warning: 'var(--kh-warning, #f79009)',
+        danger: 'var(--kh-danger, #f04438)',
       },
       fontFamily: {
         display: ['"Noto Sans Arabic"', '"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'],

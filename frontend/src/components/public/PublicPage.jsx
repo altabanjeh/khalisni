@@ -9,8 +9,8 @@ const buttonBase =
 const buttonVariants = {
   primary: 'border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)]',
   secondary:
-    'border border-[var(--khalsni-public-border)] bg-white text-[var(--khalsni-public-text)] hover:border-brand-200 hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]',
-  ghost: 'border border-transparent bg-transparent text-[var(--khalsni-public-text)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-primary)]',
+    'border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] text-[var(--khalsni-public-text)] hover:border-[var(--khalsni-public-primary)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]',
+  ghost: 'border border-transparent bg-transparent text-[var(--khalsni-public-text)] hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]',
 }
 
 export function PublicContainer({ children, className = '', readable = false }) {
@@ -26,7 +26,7 @@ export function SectionHeader({ eyebrow, title, description, icon: Icon, action,
     <div className={clsx('flex flex-col gap-4 text-start md:flex-row md:items-end md:justify-between', className)}>
       <div className="max-w-3xl">
         {eyebrow ? (
-          <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+          <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
             {Icon ? <Icon aria-hidden="true" className="h-4 w-4" /> : null}
             {eyebrow}
           </p>
@@ -54,7 +54,7 @@ export function PublicHero({ eyebrow, title, description, icon: Icon, action }) 
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-4xl">
           {eyebrow ? (
-            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
               {Icon ? <Icon aria-hidden="true" className="h-4 w-4" /> : null}
               {eyebrow}
             </p>
@@ -133,7 +133,7 @@ export function ImageFallback({ src, alt = '', className = '', icon: Icon = Imag
 export function PublicInput({ className = '', ...props }) {
   return (
     <input
-      className={clsx('kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)]', className)}
+      className={clsx('kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]', className)}
       {...props}
     />
   )
@@ -142,7 +142,7 @@ export function PublicInput({ className = '', ...props }) {
 export function PublicTextarea({ className = '', ...props }) {
   return (
     <textarea
-      className={clsx('kh-focusable min-h-32 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-slate-400 focus:border-[var(--khalsni-public-primary)]', className)}
+      className={clsx('kh-focusable min-h-32 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 py-3 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]', className)}
       {...props}
     />
   )
@@ -208,8 +208,8 @@ export function LoadingSkeleton({ className = '' }) {
 
 export function PublicLoading({ label = 'Loading...' }) {
   return (
-    <div className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-white p-8 text-center shadow-soft">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-100 border-t-[var(--khalsni-public-primary)]" />
+    <div className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-8 text-center shadow-soft">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-[var(--khalsni-public-border)] border-t-[var(--khalsni-public-primary)]" />
       <p className="text-sm font-semibold text-[var(--khalsni-public-text-secondary)]">{label}</p>
     </div>
   )
@@ -217,7 +217,7 @@ export function PublicLoading({ label = 'Loading...' }) {
 
 export function EmptyState({ title, description, icon: Icon, action, className = '' }) {
   return (
-    <div className={clsx('flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--khalsni-public-border)] bg-white px-6 py-12 text-center shadow-soft', className)}>
+    <div className={clsx('flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-6 py-12 text-center shadow-soft', className)}>
       {Icon ? (
         <span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
           <Icon aria-hidden="true" className="h-5 w-5" />

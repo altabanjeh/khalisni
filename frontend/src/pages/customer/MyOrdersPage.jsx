@@ -1,157 +1,140 @@
-import { ClipboardList, Search, ShieldCheck, TimerReset, Wallet } from 'lucide-react'
+import { ClipboardList, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import DataTable from '../../components/DataTable'
 import PageHeader from '../../components/PageHeader'
-import StatusBadge from '../../components/StatusBadge'
+import RequestCard from '../../components/RequestCard'
+import { EmptyState, LoadingSkeleton } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { formatDate } from '../../utils/format'
 
-const PAGE_SIZE = 15
+const PAGE_SIZE = 12
+const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED', 'CANCELLED', 'REJECTED'])
 
-function SummaryCard({ icon: Icon, label, value }) {
-  return (
-    <div className="glass-panel p-5">
-      <div className="flex items-center gap-3">
-        <span className="icon-chip"><Icon className="h-5 w-5" /></span>
-        <div>
-          <p className="text-sm text-slate-500">{label}</p>
-          <p className="mt-1 text-2xl font-extrabold text-ink">{value}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function getResponsibility(order) {
-  const status = String(order.status || '').toUpperCase()
-  if (status === 'WAITING_CUSTOMER' || order.missing_document_types?.length) {
-    return { label: 'إجراء مطلوب منك', className: 'bg-amber-50 text-amber-800 border-amber-200' }
-  }
-  if (['COMPLETED', 'DELIVERED', 'CLOSED'].includes(status)) {
-    return { label: 'مكتمل', className: 'bg-green-50 text-green-700 border-green-200' }
-  }
-  return { label: 'خلصني تتابع الطلب', className: 'bg-brand-50 text-brand-700 border-brand-100' }
+function isActionRequired(order) {
+  return String(order.status).toUpperCase() === 'WAITING_CUSTOMER' || (order.missing_document_types?.length ?? 0) > 0
 }
 
 function MyOrdersPage() {
+  const { isArabic } = useLanguage()
   const [query, setQuery] = useState('')
-  const [page, setPage] = useState(1)
+  const [filter, setFilter] = useState('all')
+  const [visible, setVisible] = useState(PAGE_SIZE)
   const { data: orders = [], loading } = useAsyncData(() => api.getCustomerOrders(), [], [])
+
+  const filters = [
+    { key: 'all', label: isArabic ? 'الكل' : 'All' },
+    { key: 'action', label: isArabic ? 'مطلوب إجراء' : 'Action required' },
+    { key: 'active', label: isArabic ? 'قيد التنفيذ' : 'Active' },
+    { key: 'done', label: isArabic ? 'مكتملة' : 'Completed' },
+  ]
+
+  const counts = useMemo(() => {
+    const list = Array.isArray(orders) ? orders : []
+    return {
+      all: list.length,
+      action: list.filter(isActionRequired).length,
+      active: list.filter((o) => !TERMINAL.has(String(o.status).toUpperCase()) && !isActionRequired(o)).length,
+      done: list.filter((o) => ['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'].includes(String(o.status).toUpperCase())).length,
+    }
+  }, [orders])
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
-    return orders.filter((order) => {
-      if (!normalizedQuery) return true
-      return `${order.order_number} ${order.service?.name_ar || ''}`.toLowerCase().includes(normalizedQuery)
-    })
-  }, [orders, query])
-
-  const total = filtered.length
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-
-  const summary = useMemo(
-    () => ({
-      total: orders.length,
-      active: orders.filter((order) => !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(order.status)).length,
-      pendingDocs: orders.filter((order) => order.status === 'WAITING_CUSTOMER').length,
-      completed: orders.filter((order) => order.status === 'COMPLETED').length,
-    }),
-    [orders],
-  )
-
-  function handleSearch(event) {
-    setQuery(event.target.value)
-    setPage(1)
-  }
-
-  const columns = [
-    { key: 'order_number', label: 'رقم الطلب' },
-    { key: 'service', label: 'الخدمة', render: (row) => row.service?.name_ar || 'غير محددة' },
-    { key: 'status', label: 'الحالة', render: (row) => <StatusBadge status={row.status} /> },
-    {
-      key: 'responsibility',
-      label: 'المسؤول الآن',
-      render: (row) => {
-        const responsibility = getResponsibility(row)
-        return <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold ${responsibility.className}`}>{responsibility.label}</span>
-      },
-    },
-    { key: 'created_at', label: 'تاريخ الإنشاء', render: (row) => formatDate(row.created_at) },
-    { key: 'expected_delivery_date', label: 'التسليم المتوقع', render: (row) => formatDate(row.expected_delivery_date) },
-    {
-      key: 'action',
-      label: 'الإجراء',
-      render: (row) => (
-        <Link className="btn-secondary px-4 py-2 text-xs" to={`/customer/orders/${row.id}`}>
-          فتح مساحة الطلب
-        </Link>
-      ),
-    },
-  ]
+    return (Array.isArray(orders) ? orders : [])
+      .filter((order) => {
+        if (filter === 'action') return isActionRequired(order)
+        if (filter === 'active') return !TERMINAL.has(String(order.status).toUpperCase()) && !isActionRequired(order)
+        if (filter === 'done') return ['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'].includes(String(order.status).toUpperCase())
+        return true
+      })
+      .filter((order) => {
+        if (!normalizedQuery) return true
+        return `${order.order_number} ${order.service?.name_ar || ''} ${order.service?.name_en || ''}`
+          .toLowerCase()
+          .includes(normalizedQuery)
+      })
+      .sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0))
+  }, [orders, query, filter])
 
   return (
-    <div className="page-section">
+    <div className="space-y-6">
       <PageHeader
-        description="قائمة أوضح لكل طلباتك مع بحث سريع، حالة مرئية، وبطاقات مريحة على الهاتف."
-        eyebrow="العميل"
+        description={isArabic ? 'كل طلباتك مع بحث سريع وتصفية بالحالة وبطاقة واضحة لكل طلب.' : 'All your requests with quick search, status filters and a clear card per request.'}
+        eyebrow={isArabic ? 'العميل' : 'Customer'}
         icon={ClipboardList}
-        title="طلباتي"
-        actions={<Link className="btn-primary" to="/customer/orders/new">طلب جديد</Link>}
+        title={isArabic ? 'طلباتي' : 'My requests'}
+        actions={<Link className="btn-primary" to="/customer/orders/new">{isArabic ? 'طلب جديد' : 'New request'}</Link>}
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard icon={ClipboardList} label="كل الطلبات" value={summary.total} />
-        <SummaryCard icon={TimerReset} label="طلبات نشطة" value={summary.active} />
-        <SummaryCard icon={ShieldCheck} label="بانتظار مستندات" value={summary.pendingDocs} />
-        <SummaryCard icon={Wallet} label="طلبات مكتملة" value={summary.completed} />
-      </div>
-
-      <section className="glass-panel p-5">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="relative">
-            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              className="field ps-9"
-              onChange={handleSearch}
-              placeholder="ابحث برقم الطلب أو اسم الخدمة"
-              value={query}
-            />
-          </div>
-          <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3 text-sm font-semibold text-slate-600">
-            {total} طلب {query.trim() ? 'مطابق للبحث' : 'في السجل'}
-          </div>
+      <section className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft sm:p-5">
+        <div className="relative">
+          <Search className="pointer-events-none absolute inset-inline-start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            className="field ps-9"
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setVisible(PAGE_SIZE)
+            }}
+            placeholder={isArabic ? 'ابحث برقم الطلب أو اسم الخدمة' : 'Search by request number or service'}
+            value={query}
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2" role="tablist">
+          {filters.map((item) => (
+            <button
+              aria-selected={filter === item.key}
+              className={`kh-focusable inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${
+                filter === item.key
+                  ? 'border-transparent bg-brand-600 text-white'
+                  : 'border-border bg-card text-slate-600 hover:bg-brand-50'
+              }`}
+              key={item.key}
+              onClick={() => {
+                setFilter(item.key)
+                setVisible(PAGE_SIZE)
+              }}
+              role="tab"
+              type="button"
+            >
+              {item.label}
+              <span className={filter === item.key ? 'text-white/80' : 'text-slate-400'}>{counts[item.key] ?? 0}</span>
+            </button>
+          ))}
         </div>
       </section>
 
-      <DataTable
-        columns={columns}
-        emptyDescription="يمكنك إنشاء طلب جديد من شاشة الخدمات أو تعديل البحث الحالي."
-        emptyTitle="لا توجد طلبات مطابقة"
-        loading={loading}
-        mobileCard={(row) => (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">{row.order_number}</p>
-              <StatusBadge status={row.status} />
-            </div>
-            <p className="text-sm text-slate-600">{row.service?.name_ar || 'غير محددة'}</p>
-            <div className="grid gap-2 text-sm text-slate-500">
-              <span>تاريخ الطلب: {formatDate(row.created_at)}</span>
-              <span>التسليم المتوقع: {formatDate(row.expected_delivery_date)}</span>
-            </div>
-            <span className={`inline-flex w-fit rounded-full border px-3 py-1 text-xs font-bold ${getResponsibility(row).className}`}>
-              {getResponsibility(row).label}
-            </span>
-            <Link className="btn-primary w-full" to={`/customer/orders/${row.id}`}>
-              فتح مساحة الطلب
-            </Link>
+      {loading ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton className="h-64" key={index} />)}
+        </div>
+      ) : filtered.length ? (
+        <>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.slice(0, visible).map((order) => (
+              <RequestCard key={order.id} order={order} />
+            ))}
           </div>
-        )}
-        pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
-        rows={paginated}
-      />
+          {filtered.length > visible ? (
+            <div className="flex justify-center">
+              <button className="btn-secondary" onClick={() => setVisible((current) => current + PAGE_SIZE)} type="button">
+                {isArabic ? 'عرض المزيد' : 'Show more'} ({filtered.length - visible})
+              </button>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <EmptyState
+          icon={Search}
+          title={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
+          description={
+            isArabic
+              ? 'جرّب تصفية أخرى أو عدّل البحث، أو ابدأ طلباً جديداً من كتالوج الخدمات.'
+              : 'Try another filter or search term, or start a new request from the service catalog.'
+          }
+          action={<Link className="btn-primary" to="/customer/orders/new">{isArabic ? 'طلب جديد' : 'New request'}</Link>}
+        />
+      )}
     </div>
   )
 }

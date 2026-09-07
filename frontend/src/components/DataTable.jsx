@@ -69,7 +69,7 @@ function DataTable({
   return (
     <div className="space-y-4">
       {toolbar ? (
-        <div className="rounded-[2rem] border border-border bg-white p-4 shadow-soft lg:flex lg:items-center lg:justify-between lg:gap-4">
+        <div className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft lg:flex lg:items-center lg:justify-between lg:gap-4">
           <div className="text-sm text-slate-500">
             {loading
               ? t('common.loadingData', 'جارٍ تحميل البيانات...')
@@ -109,13 +109,16 @@ function DataTable({
           ) : null}
 
           {isTableLayout ? (
-            <div className="overflow-hidden rounded-[2rem] border border-border bg-white shadow-soft" dir={direction} role="region">
-              <div className="overflow-x-auto">
+            <div className="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft" dir={direction} role="region">
+              <div className="max-h-[70vh] overflow-auto">
                 <table className="min-w-full divide-y divide-border text-sm">
-                  <thead className="bg-slate-50">
+                  <thead className="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur">
                     <tr>
                       {columns.map((column) => (
-                        <th key={column.key} className="px-4 py-3 text-start font-bold text-ink">
+                        <th
+                          key={column.key}
+                          className="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+                        >
                           {column.label}
                         </th>
                       ))}
@@ -131,7 +134,7 @@ function DataTable({
                           className={`transition hover:bg-brand-50/40 ${rowClassName ? rowClassName(row) : ''}`.trim()}
                         >
                           {columns.map((column) => (
-                            <td key={column.key} className="px-4 py-4 align-top text-slate-700">
+                            <td key={column.key} className="px-4 py-3.5 align-middle text-slate-700">
                               {column.render ? column.render(row) : row[column.key]}
                             </td>
                           ))}

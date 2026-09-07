@@ -48,11 +48,11 @@ function AdminOverviewPage() {
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
               <BarChart data={data.orders_by_status}>
-                <CartesianGrid stroke="#d7e7f5" strokeDasharray="3 3" />
-                <XAxis dataKey="status" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="total" fill="#0b67b2" radius={[8, 8, 0, 0]} />
+                <CartesianGrid stroke="var(--kh-border)" strokeDasharray="3 3" />
+                <XAxis dataKey="status" stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
+                <YAxis stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: 'var(--kh-surface)', border: '1px solid var(--kh-border)', borderRadius: 12, color: 'var(--kh-text)' }} />
+                <Bar dataKey="total" fill="#2f7bf2" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -62,8 +62,8 @@ function AdminOverviewPage() {
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
               <PieChart>
-                <Pie data={data.top_services} dataKey="total" fill="#147fd1" nameKey="service__name_ar" outerRadius={100} label />
-                <Tooltip />
+                <Pie data={data.top_services} dataKey="total" fill="#2f7bf2" nameKey="service__name_ar" outerRadius={100} label />
+                <Tooltip contentStyle={{ background: 'var(--kh-surface)', border: '1px solid var(--kh-border)', borderRadius: 12, color: 'var(--kh-text)' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

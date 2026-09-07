@@ -37,10 +37,12 @@ test('unknown route renders the 404 page, not a redirect', async ({ page }) => {
 
 test('service discovery: homepage -> services -> service detail -> request CTA', async ({ page }) => {
   await page.goto('/services')
-  const firstService = page.locator('a[href^="/services/"]').first()
+  // Discovery is category-led; target an actual service detail link (not a
+  // /services/category/... link) so we land on a service page with the CTA.
+  const firstService = page.locator('a[href^="/services/"]:not([href*="/category/"])').first()
   await expect(firstService).toBeVisible()
   await firstService.click()
-  await expect(page).toHaveURL(/\/services\//)
+  await expect(page).toHaveURL(/\/services\/[^/]+$/)
   await expect(page.getByRole('link', { name: /ابدأ الطلب|start request|request/i }).first()).toBeVisible()
 })
 

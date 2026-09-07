@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext'
 import HelpGuidePanel from './HelpGuidePanel'
 import LanguageSwitcher from './LanguageSwitcher'
 import NotificationPanel from './NotificationPanel'
-import { KhalsniAppIcon, KhalsniLogo } from './brand/KhalsniLogo'
+import { KhalsniAppIcon } from './brand/KhalsniLogo'
 
 function Topbar({ title, onMenuClick }) {
   const navigate = useNavigate()
@@ -34,7 +34,7 @@ function Topbar({ title, onMenuClick }) {
   }, [])
 
   return (
-    <header className="relative flex flex-col gap-4 rounded-[2rem] border border-border bg-white p-4 shadow-soft sm:p-5 md:flex-row md:items-center md:justify-between">
+    <header className="sticky top-2 z-20 flex flex-col gap-3 rounded-[var(--radius-xl)] border border-border bg-card/95 p-3 shadow-soft backdrop-blur-xl sm:p-4 md:flex-row md:items-center md:justify-between">
       <div className="flex min-w-0 items-center gap-3">
         <button
           aria-label={t('topbar.openSidebar', 'فتح القائمة الجانبية')}
@@ -44,10 +44,9 @@ function Topbar({ title, onMenuClick }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <KhalsniAppIcon size="sm" to="/" className="hidden sm:inline-flex" />
+        <KhalsniAppIcon size="sm" to="/" className="hidden sm:inline-flex xl:hidden" />
         <div className="min-w-0">
-          <KhalsniLogo size="xs" to="/" className="mb-0.5" />
-          <h2 className="break-words text-xl font-extrabold text-ink sm:text-2xl">{title}</h2>
+          <h2 className="break-words text-lg font-extrabold text-ink sm:text-xl">{title}</h2>
         </div>
       </div>
 

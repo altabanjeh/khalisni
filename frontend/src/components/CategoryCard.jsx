@@ -29,7 +29,7 @@ function CategoryCard({ category, count }) {
 
       <div className="flex flex-1 flex-col p-4 text-start sm:p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--khalsni-public-primary)]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--khalsni-public-accent-text)]">
             <Boxes aria-hidden="true" className="h-4 w-4" />
             {isArabic ? 'تصنيف' : 'Category'}
           </span>
@@ -43,7 +43,7 @@ function CategoryCard({ category, count }) {
         <h3 className="text-lg font-extrabold leading-7 text-[var(--khalsni-public-navy)] sm:text-xl">{name}</h3>
         {description ? <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-[var(--khalsni-public-text-secondary)]">{description}</p> : null}
 
-        <span className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-extrabold text-[var(--khalsni-public-primary)]">
+        <span className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
           {isArabic ? 'عرض التصنيف' : 'Open category'}
           <ArrowUpRight aria-hidden="true" className="h-4 w-4 rtl:-scale-x-100" />
         </span>
