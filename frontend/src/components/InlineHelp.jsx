@@ -1,6 +1,7 @@
 import { CircleHelp } from 'lucide-react'
 import { useContext, useMemo, useState } from 'react'
 import { HelpGuideContext } from '../context/HelpGuideContext'
+import { useLanguage } from '../context/LanguageContext'
 
 function buildFieldMessage(guide) {
   if (!guide) return ''
@@ -21,6 +22,7 @@ function buildActionMessage(guide) {
 
 function InlineHelp({ actionKey = '', fieldKey = '', fallbackText = '', title = '', className = '' }) {
   const helpContext = useContext(HelpGuideContext)
+  const { isArabic } = useLanguage()
   const [open, setOpen] = useState(false)
 
   const guide = fieldKey
@@ -36,7 +38,7 @@ function InlineHelp({ actionKey = '', fieldKey = '', fallbackText = '', title = 
   return (
     <span className={`relative inline-flex ${className}`}>
       <button
-        aria-label={title || 'مساعدة إضافية'}
+        aria-label={title || (isArabic ? 'مساعدة إضافية' : 'More help')}
         className="inline-flex h-5 w-5 items-center justify-center rounded-full text-brand-600 transition hover:bg-brand-50"
         onBlur={() => setOpen(false)}
         onClick={() => setOpen((current) => !current)}

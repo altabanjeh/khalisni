@@ -1,4 +1,5 @@
 import { CheckCircle, Info, TriangleAlert, X, XCircle } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 import { useToast } from '../context/ToastContext'
 
 const VARIANTS = {
@@ -10,6 +11,7 @@ const VARIANTS = {
 
 export function ToastContainer() {
   const { toasts, dismiss } = useToast()
+  const { isArabic } = useLanguage()
 
   if (!toasts.length) return null
 
@@ -32,7 +34,7 @@ export function ToastContainer() {
             <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${variant.iconClass}`} />
             <p className="flex-1 text-sm font-medium leading-relaxed">{toast.message}</p>
             <button
-              aria-label="إغلاق الإشعار"
+              aria-label={isArabic ? 'إغلاق الإشعار' : 'Dismiss notification'}
               className="shrink-0 rounded-xl p-1 opacity-60 transition hover:opacity-100"
               onClick={() => dismiss(toast.id)}
               type="button"

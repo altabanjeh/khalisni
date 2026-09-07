@@ -9,6 +9,7 @@ import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
@@ -52,6 +53,8 @@ function Field({ label, children, hint }) {
 
 function ProvidersManagementPage() {
   const { toast } = useToast()
+  const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
   const [statusFilter, setStatusFilter] = useState('active')
   const { data: providers = [], loading, reload } = useAsyncData(() => api.getProviders({ status: statusFilter }), [statusFilter], [])
   const { data: assignments = [], loading: assignmentsLoading } = useAsyncData(() => api.getAdminServiceAssignments(), [], [])
@@ -124,10 +127,10 @@ function ProvidersManagementPage() {
 
       if (selectedProvider) {
         await api.updateProvider(selectedProvider.id, payload)
-        toast('تم تحديث المزود.', 'success')
+        toast(tr('تم تحديث المزود.', 'Provider updated.'), 'success')
       } else {
         await api.createProvider(payload)
-        toast('تم إنشاء المزود.', 'success')
+        toast(tr('تم إنشاء المزود.', 'Provider created.'), 'success')
       }
 
       reload()
@@ -145,7 +148,7 @@ function ProvidersManagementPage() {
         decision: nextDecision,
         reason: nextDecision === 'reject' ? 'تم إلغاء الاعتماد من شاشة الإدارة.' : '',
       })
-      toast(nextDecision === 'approve' ? 'تم اعتماد المزود.' : 'تم إلغاء اعتماد المزود.', 'success')
+      toast(nextDecision === 'approve' ? tr('تم اعتماد المزود.', 'Provider approved.') : tr('تم إلغاء اعتماد المزود.', 'Provider approval removed.'), 'success')
       reload()
     } catch (error) {
       toast(getDisplayError(error), 'error')
@@ -158,7 +161,7 @@ function ProvidersManagementPage() {
         is_active: isActive,
         reason: isActive ? '' : 'تم إيقاف الحساب من شاشة الإدارة.',
       })
-      toast(isActive ? 'تم تفعيل الحساب.' : 'تم إيقاف الحساب.', 'success')
+      toast(isActive ? tr('تم تفعيل الحساب.', 'Account activated.') : tr('تم إيقاف الحساب.', 'Account deactivated.'), 'success')
       reload()
     } catch (error) {
       toast(getDisplayError(error), 'error')
@@ -173,7 +176,7 @@ function ProvidersManagementPage() {
       await api.deleteProvider(provider.id)
       if (String(selectedProviderId) === String(provider.id)) closeForm()
       reload()
-      toast('تم تعطيل المزود.', 'success')
+      toast(tr('تم تعطيل المزود.', 'Provider deactivated.'), 'success')
     } catch (error) {
       toast(getDisplayError(error), 'error')
     }
@@ -186,7 +189,7 @@ function ProvidersManagementPage() {
     try {
       await api.restoreProvider(provider.id)
       reload()
-      toast('Provider restored.', 'success')
+      toast(tr('تم استعادة المزود.', 'Provider restored.'), 'success')
     } catch (error) {
       toast(getDisplayError(error), 'error')
     }
@@ -200,124 +203,77 @@ function ProvidersManagementPage() {
     return accumulator
   }, {})
 
-  const columns = [
-    { key: 'full_name', label: 'المزود' },
-    { key: 'provider_type', label: 'النوع' },
-    {
-      key: 'service_categories',
-      label: 'الفئات',
-      render: (row) => row.service_categories?.join('، ') || 'بدون فئات',
-    },
-    {
-      key: 'assigned_services',
-      label: 'الخدمات المسندة',
-      render: (row) => assignmentMap[String(row.id)]?.join('، ') || 'لم يتم ربط خدمات بعد',
-    },
-    { key: 'city', label: 'المدينة' },
-    {
-      key: 'is_approved',
-      label: 'الاعتماد',
-      render: (row) => <StatusBadge status={row.is_approved ? 'VERIFIED' : 'PENDING_REVIEW'} />,
-    },
-    {
-      key: 'account_active',
-      label: 'الحساب',
-      render: (row) => <StatusBadge status={row.account_active ? 'VERIFIED' : 'REJECTED'} />,
-    },
-    {
-      key: 'actions',
-      label: 'الإجراءات',
-      render: (row) => (
-        <div className="flex flex-wrap gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
-            تعديل
-          </button>
-          <button
-            className="btn-secondary px-3 py-2 text-xs"
-            onClick={() => handleApprovalChange(row, row.is_approved ? 'reject' : 'approve')}
-            type="button"
-          >
-            {row.is_approved ? 'إلغاء الاعتماد' : 'اعتماد'}
-          </button>
-          <button
-            className="btn-secondary px-3 py-2 text-xs"
-            onClick={() => handleActivationChange(row, !row.account_active)}
-            type="button"
-          >
-            {row.account_active ? 'إيقاف الحساب' : 'تفعيل الحساب'}
-          </button>
-          <Link className="btn-secondary px-3 py-2 text-xs" to={`/admin/provider-services?provider=${row.id}`}>
-            إدارة الخدمات
-          </Link>
-          <button
-            className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
-            onClick={() => setPendingDelete(row)}
-            type="button"
-          >
-            تعطيل
-          </button>
-        </div>
-      ),
-    },
-  ]
+  const noCategories = tr('بدون فئات', 'No categories')
 
   const tableColumns = [
     {
       key: 'provider_display',
-      label: 'Provider',
+      label: tr('المزود', 'Provider'),
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
           <span>{row.full_name}</span>
           {row.is_deleted ? (
             <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
-              Deleted
+              {tr('محذوف', 'Deleted')}
             </span>
           ) : null}
         </div>
       ),
     },
-    columns[1],
-    columns[2],
-    columns[3],
-    columns[4],
-    columns[5],
+    { key: 'provider_type', label: tr('النوع', 'Type') },
+    {
+      key: 'service_categories',
+      label: tr('الفئات', 'Categories'),
+      render: (row) => row.service_categories?.join('، ') || noCategories,
+    },
+    {
+      key: 'assigned_services',
+      label: tr('الخدمات المسندة', 'Assigned services'),
+      render: (row) => assignmentMap[String(row.id)]?.join('، ') || tr('لم يتم ربط خدمات بعد', 'No services linked yet'),
+    },
+    { key: 'city', label: tr('المدينة', 'City') },
+    {
+      key: 'is_approved',
+      label: tr('الاعتماد', 'Approval'),
+      render: (row) => <StatusBadge status={row.is_approved ? 'VERIFIED' : 'PENDING_REVIEW'} />,
+    },
     {
       key: 'actions_display',
-      label: 'Actions',
+      label: tr('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex flex-wrap gap-2">
           {row.is_deleted ? (
             <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore(row)} type="button">
-              Restore
+              {tr('استعادة', 'Restore')}
             </button>
           ) : (
             <>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
-                Edit
+                {tr('تعديل', 'Edit')}
               </button>
               <button
                 className="btn-secondary px-3 py-2 text-xs"
                 onClick={() => handleApprovalChange(row, row.is_approved ? 'reject' : 'approve')}
                 type="button"
               >
-                {row.is_approved ? 'Unapprove' : 'Approve'}
+                {row.is_approved ? tr('إلغاء الاعتماد', 'Unapprove') : tr('اعتماد', 'Approve')}
               </button>
               <button
                 className="btn-secondary px-3 py-2 text-xs"
                 onClick={() => handleActivationChange(row, !row.account_active)}
                 type="button"
               >
-                {row.account_active ? 'Deactivate' : 'Activate'}
+                {row.account_active ? tr('إيقاف الحساب', 'Deactivate') : tr('تفعيل الحساب', 'Activate')}
               </button>
               <Link className="btn-secondary px-3 py-2 text-xs" to={`/admin/provider-services?provider=${row.id}`}>
-                Manage services
+                {tr('إدارة الخدمات', 'Manage services')}
               </Link>
               <button
                 className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
                 onClick={() => setPendingDelete(row)}
                 type="button"
               >
-                Delete
+                {tr('تعطيل', 'Deactivate')}
               </button>
             </>
           )}
@@ -329,17 +285,20 @@ function ProvidersManagementPage() {
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        description="هذه الشاشة أصبحت مسؤولة عن CRUD الكامل للمزود نفسه: إنشاء، تعديل، اعتماد، تفعيل أو تعطيل، مع إبقاء ربط الخدمات في شاشته المتخصصة."
-        eyebrow="إدارة المزودين"
+        description={tr(
+          'هذه الشاشة مسؤولة عن الإدارة الكاملة للمزود نفسه: إنشاء، تعديل، اعتماد، تفعيل أو تعطيل، مع إبقاء ربط الخدمات في شاشته المتخصصة.',
+          'This screen owns full provider account management: create, edit, approve, activate or deactivate, while service assignment stays in its dedicated screen.',
+        )}
+        eyebrow={tr('إدارة المزودين', 'Provider management')}
         icon={BriefcaseBusiness}
-        title="المزودون"
+        title={tr('المزودون', 'Providers')}
         actions={
           <div className="flex flex-wrap gap-3">
             <Link className="btn-secondary" to="/admin/provider-services">
-              فتح شاشة خدمات المزودين
+              {tr('فتح شاشة خدمات المزودين', 'Open provider services')}
             </Link>
             <button className="btn-primary" onClick={openCreateForm} type="button">
-              + مزود جديد
+              {isArabic ? '+ مزود جديد' : '+ New provider'}
             </button>
           </div>
         }
@@ -347,9 +306,12 @@ function ProvidersManagementPage() {
 
       <section className="glass-panel grid gap-4 p-5 md:grid-cols-[1.05fr_0.95fr]">
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">CRUD واضح</p>
+          <p className="text-sm font-bold text-ink">{tr('إدارة واضحة', 'Clear management')}</p>
           <p className="mt-2 text-sm leading-7 text-slate-600">
-            كل ما يخص حساب المزود نفسه موجود هنا: البيانات الأساسية، التصنيف، الاعتماد، وتفعيل الحساب. لم يعد هناك تكرار لهذه الوظائف في شاشة أخرى.
+            {tr(
+              'كل ما يخص حساب المزود نفسه موجود هنا: البيانات الأساسية، التصنيف، الاعتماد، وتفعيل الحساب. لم يعد هناك تكرار لهذه الوظائف في شاشة أخرى.',
+              'Everything about the provider account lives here: core details, classification, approval and account activation. These functions are no longer duplicated elsewhere.',
+            )}
           </p>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
@@ -358,9 +320,12 @@ function ProvidersManagementPage() {
               <ShieldCheck className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm font-bold text-ink">فصل المسؤوليات</p>
+              <p className="text-sm font-bold text-ink">{tr('فصل المسؤوليات', 'Separation of concerns')}</p>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                ربط الخدمات بالمزود بقي في شاشة مستقلة حتى لا تختلط إدارة الحساب مع إدارة التوزيع التشغيلي.
+                {tr(
+                  'ربط الخدمات بالمزود بقي في شاشة مستقلة حتى لا تختلط إدارة الحساب مع إدارة التوزيع التشغيلي.',
+                  'Linking services to a provider stays in a separate screen so account management does not mix with operational assignment.',
+                )}
               </p>
             </div>
           </div>
@@ -369,8 +334,8 @@ function ProvidersManagementPage() {
 
       <DataTable
         columns={tableColumns}
-        emptyDescription="أضف مزود خدمة جديدا ليظهر في مسار التعيين والمراجعة."
-        emptyTitle="لا يوجد مزودون"
+        emptyDescription={tr('أضف مزود خدمة جديداً ليظهر في مسار التعيين والمراجعة.', 'Add a new service provider so it appears in the assignment and review flow.')}
+        emptyTitle={tr('لا يوجد مزودون', 'No providers')}
         loading={loading || assignmentsLoading || categoriesLoading}
         mobileCard={(row) => (
           <div className="space-y-3">
@@ -378,89 +343,92 @@ function ProvidersManagementPage() {
               <p className="font-bold text-ink">{row.full_name}</p>
               <StatusBadge status={row.is_deleted ? 'REJECTED' : row.account_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
             </div>
-            <p className="text-sm text-slate-600">{row.provider_type || 'مزود خدمة'}</p>
-            <p className="text-sm text-slate-500">{row.service_categories?.join('، ') || 'بدون فئات'}</p>
+            <p className="text-sm text-slate-600">{row.provider_type || tr('مزود خدمة', 'Service provider')}</p>
+            <p className="text-sm text-slate-500">{row.service_categories?.join('، ') || noCategories}</p>
           </div>
         )}
         mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
         rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
         rows={providers}
         toolbar={
-          <select aria-label="تصفية حسب الحالة" className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
-            <option value="active">Active</option>
-            <option value="deleted">Deleted</option>
-            <option value="all">All</option>
+          <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+            <option value="active">{tr('نشط', 'Active')}</option>
+            <option value="deleted">{tr('محذوف', 'Deleted')}</option>
+            <option value="all">{tr('الكل', 'All')}</option>
           </select>
         }
       />
 
       <FormModal
-        description="إدارة بيانات المزود وحالته العامة من شاشة واحدة. ربط الخدمات يتم لاحقا من شاشة خدمات المزودين."
+        description={tr(
+          'إدارة بيانات المزود وحالته العامة من شاشة واحدة. ربط الخدمات يتم لاحقاً من شاشة خدمات المزودين.',
+          'Manage the provider details and overall status from one screen. Service assignment happens later from the provider services screen.',
+        )}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {selectedProvider ? (
               <Link className="btn-secondary text-center" to={`/admin/provider-services?provider=${selectedProvider.id}`}>
-                خدمات المزود
+                {tr('خدمات المزود', 'Provider services')}
               </Link>
             ) : null}
             <button className="btn-secondary" onClick={closeForm} type="button">
-              إلغاء
+              {tr('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="provider-form" type="submit">
               {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
-              {selectedProvider ? 'حفظ التعديلات' : 'إضافة المزود'}
+              {selectedProvider ? tr('حفظ التعديلات', 'Save changes') : (isArabic ? 'إضافة المزود' : 'Add provider')}
             </button>
           </div>
         }
         onClose={closeForm}
         open={isFormOpen}
         size="lg"
-        title={selectedProvider ? `تعديل المزود: ${selectedProvider.full_name}` : 'مزود جديد'}
+        title={selectedProvider ? tr(`تعديل المزود: ${selectedProvider.full_name}`, `Edit provider: ${selectedProvider.full_name}`) : tr('مزود جديد', 'New provider')}
       >
         <form className="space-y-5" id="provider-form" onSubmit={providerForm.handleSubmit(handleProviderSubmit)}>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="الاسم الكامل">
-              <input className="field" placeholder="الاسم الكامل" {...providerForm.register('full_name', { required: true })} />
+            <Field label={isArabic ? 'الاسم الكامل' : 'Full name'}>
+              <input className="field" placeholder={isArabic ? 'الاسم الكامل' : 'Full name'} {...providerForm.register('full_name', { required: true })} />
             </Field>
-            <Field label="البريد الإلكتروني">
-              <input className="field" placeholder="البريد الإلكتروني" type="email" {...providerForm.register('email', { required: true })} />
-            </Field>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="الهاتف">
-              <input className="field" placeholder="الهاتف" {...providerForm.register('phone', { required: true })} />
-            </Field>
-            <Field label={selectedProvider ? 'كلمة مرور جديدة عند الحاجة' : 'كلمة المرور'}>
-              <input className="field" placeholder="كلمة المرور" type="password" {...providerForm.register('password')} />
+            <Field label={isArabic ? 'البريد الإلكتروني' : 'Email'}>
+              <input className="field" placeholder={isArabic ? 'البريد الإلكتروني' : 'Email'} type="email" {...providerForm.register('email', { required: true })} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="نوع المزود">
-              <input className="field" placeholder="نوع المزود" {...providerForm.register('provider_type', { required: true })} />
+            <Field label={isArabic ? 'الهاتف' : 'Phone'}>
+              <input className="field" placeholder={isArabic ? 'الهاتف' : 'Phone'} {...providerForm.register('phone', { required: true })} />
             </Field>
-            <Field label="المدينة">
-              <input className="field" placeholder="المدينة" {...providerForm.register('city', { required: true })} />
+            <Field label={selectedProvider ? tr('كلمة مرور جديدة عند الحاجة', 'New password if needed') : (isArabic ? 'كلمة المرور' : 'Password')}>
+              <input className="field" placeholder={isArabic ? 'كلمة المرور' : 'Password'} type="password" {...providerForm.register('password')} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="اسم الشركة">
+            <Field label={isArabic ? 'نوع المزود' : 'Provider type'}>
+              <input className="field" placeholder={isArabic ? 'نوع المزود' : 'Provider type'} {...providerForm.register('provider_type', { required: true })} />
+            </Field>
+            <Field label={isArabic ? 'المدينة' : 'City'}>
+              <input className="field" placeholder={isArabic ? 'المدينة' : 'City'} {...providerForm.register('city', { required: true })} />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label={tr('اسم الشركة', 'Company name')}>
               <input className="field" {...providerForm.register('company_name')} />
             </Field>
-            <Field label="السجل التجاري">
+            <Field label={tr('السجل التجاري', 'Commercial registration')}>
               <input className="field" {...providerForm.register('commercial_registration_number')} />
             </Field>
-            <Field label="الرقم الضريبي">
+            <Field label={tr('الرقم الضريبي', 'Tax number')}>
               <input className="field" {...providerForm.register('tax_number')} />
             </Field>
-            <Field label="العنوان">
+            <Field label={tr('العنوان', 'Address')}>
               <input className="field" {...providerForm.register('address')} />
             </Field>
           </div>
 
-          <Field hint="الفئات العامة التي يستطيع المزود تنفيذها" label="فئات الخدمات">
+          <Field hint={tr('الفئات العامة التي يستطيع المزود تنفيذها', 'The general categories this provider can serve')} label={tr('فئات الخدمات', 'Service categories')}>
             <select
               className="field min-h-40"
               multiple
@@ -468,36 +436,42 @@ function ProvidersManagementPage() {
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name_ar}
+                  {isArabic ? category.name_ar : (category.name_en || category.name_ar)}
                 </option>
               ))}
             </select>
           </Field>
 
           <div className="grid gap-3 md:grid-cols-3">
-            <CheckboxField label="متاح للتعيين" registration={providerForm.register('is_available')} />
-            <CheckboxField label="معتمد" registration={providerForm.register('is_approved')} />
-            <CheckboxField label="الحساب نشط" registration={providerForm.register('account_active')} />
+            <CheckboxField label={tr('متاح للتعيين', 'Available for assignment')} registration={providerForm.register('is_available')} />
+            <CheckboxField label={tr('معتمد', 'Approved')} registration={providerForm.register('is_approved')} />
+            <CheckboxField label={tr('الحساب نشط', 'Account active')} registration={providerForm.register('account_active')} />
           </div>
         </form>
       </FormModal>
 
       <ConfirmModal
-        confirmLabel="Restore"
-        description={`This will restore "${pendingRestore?.full_name || ''}" back to provider management screens.`}
+        confirmLabel={tr('استعادة', 'Restore')}
+        description={tr(
+          `سيتم استعادة "${pendingRestore?.full_name || ''}" وإعادته إلى شاشات إدارة المزودين.`,
+          `This will restore "${pendingRestore?.full_name || ''}" back to provider management screens.`,
+        )}
         onClose={() => setPendingRestore(null)}
         onConfirm={handleRestoreConfirm}
         open={!!pendingRestore}
-        title="Restore provider"
+        title={tr('استعادة المزود', 'Restore provider')}
       />
 
       <ConfirmModal
-        confirmLabel="نعم، عطّل المزود"
-        description={`سيتم تعطيل حساب "${pendingDelete?.full_name}" وإخفاؤه من مسارات التعيين.`}
+        confirmLabel={tr('نعم، عطّل المزود', 'Yes, deactivate')}
+        description={tr(
+          `سيتم تعطيل حساب "${pendingDelete?.full_name}" وإخفاؤه من مسارات التعيين.`,
+          `The account "${pendingDelete?.full_name}" will be deactivated and hidden from assignment flows.`,
+        )}
         onClose={() => setPendingDelete(null)}
         onConfirm={handleDeleteConfirm}
         open={!!pendingDelete}
-        title="تأكيد تعطيل المزود"
+        title={tr('تأكيد تعطيل المزود', 'Confirm provider deactivation')}
         variant="danger"
       />
     </div>

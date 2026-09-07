@@ -20,6 +20,7 @@ function applyServerErrors(error, setError, setFeedback) {
 
 function HomepageContentEditorPage() {
   const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
   const { data, loading, reload } = useAsyncData(() => api.getAdminPublicSiteContent(), [], null)
   const [feedback, setFeedback] = useState(null)
   const form = useForm({ defaultValues: fallbackPublicContent })
@@ -63,7 +64,7 @@ function HomepageContentEditorPage() {
       }
       await api.updateAdminPublicSiteContent(payload)
       broadcastPublicSiteUpdate('homepage-content')
-      setFeedback({ type: 'success', text: 'تم حفظ محتوى الصفحة الرئيسية.' })
+      setFeedback({ type: 'success', text: tr('تم حفظ محتوى الصفحة الرئيسية.', 'Homepage content saved.') })
       reload()
     } catch (error) {
       applyServerErrors(error, form.setError, setFeedback)
@@ -79,46 +80,49 @@ function HomepageContentEditorPage() {
       <PageHeader
         icon={FileText}
         title={isArabic ? 'محرر محتوى الصفحة الرئيسية' : 'Homepage Content Editor'}
-        eyebrow={isArabic ? 'الموقع العام' : 'PUBLIC SITE'}
-        description="حرر النصوص والصور وروابط الأزرار وبيانات التواصل التي تظهر على الصفحة الرئيسية العامة."
+        eyebrow={isArabic ? 'الموقع العام' : 'Public site'}
+        description={tr(
+          'حرر النصوص والصور وروابط الأزرار وبيانات التواصل التي تظهر على الصفحة الرئيسية العامة.',
+          'Edit the text, images, button links and contact details shown on the public homepage.',
+        )}
       />
 
       <form className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]" onSubmit={form.handleSubmit(onSubmit)}>
         <section className="glass-panel space-y-5 p-6">
-          <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'قسم البطل' : 'Hero Section'}</h2>
-          <FieldGroup error={form.formState.errors.version_name} hint="اسم داخلي فقط" label="Version name / اسم النسخة">
-            <input className="field" {...form.register('version_name', { required: 'اسم النسخة مطلوب' })} />
+          <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'قسم البطل' : 'Hero section'}</h2>
+          <FieldGroup error={form.formState.errors.version_name} hint={tr('اسم داخلي فقط', 'Internal name only')} label={tr('اسم النسخة', 'Version name')}>
+            <input className="field" {...form.register('version_name', { required: tr('اسم النسخة مطلوب', 'Version name is required') })} />
           </FieldGroup>
-          <FieldGroup error={form.formState.errors.hero_title_ar} label="Hero title AR / العنوان الرئيسي">
-            <input className="field" {...form.register('hero_title_ar', { required: 'العنوان العربي مطلوب' })} />
+          <FieldGroup error={form.formState.errors.hero_title_ar} label={tr('العنوان الرئيسي (عربي)', 'Hero title (Arabic)')}>
+            <input className="field" {...form.register('hero_title_ar', { required: tr('العنوان العربي مطلوب', 'Arabic title is required') })} />
           </FieldGroup>
-          <FieldGroup error={form.formState.errors.hero_title_en} label="Hero title EN / English title">
+          <FieldGroup error={form.formState.errors.hero_title_en} label={tr('العنوان الرئيسي (إنجليزي)', 'Hero title (English)')}>
             <input className="field" {...form.register('hero_title_en')} />
           </FieldGroup>
-          <FieldGroup error={form.formState.errors.hero_subtitle_ar} label="Hero subtitle AR / النص التعريفي">
-            <textarea className="field min-h-28" {...form.register('hero_subtitle_ar', { required: 'النص العربي مطلوب' })} />
+          <FieldGroup error={form.formState.errors.hero_subtitle_ar} label={tr('النص التعريفي (عربي)', 'Hero subtitle (Arabic)')}>
+            <textarea className="field min-h-28" {...form.register('hero_subtitle_ar', { required: tr('النص العربي مطلوب', 'Arabic subtitle is required') })} />
           </FieldGroup>
-          <FieldGroup error={form.formState.errors.hero_subtitle_en} label="Hero subtitle EN / English subtitle">
+          <FieldGroup error={form.formState.errors.hero_subtitle_en} label={tr('النص التعريفي (إنجليزي)', 'Hero subtitle (English)')}>
             <textarea className="field min-h-28" {...form.register('hero_subtitle_en')} />
           </FieldGroup>
           <div className="grid gap-4 md:grid-cols-2">
-            <FieldGroup error={form.formState.errors.primary_button_text} label="Primary button text AR / نص الزر الرئيسي">
-              <input className="field" {...form.register('primary_button_text', { required: 'نص الزر الرئيسي مطلوب' })} />
+            <FieldGroup error={form.formState.errors.primary_button_text} label={tr('نص الزر الرئيسي (عربي)', 'Primary button text (Arabic)')}>
+              <input className="field" {...form.register('primary_button_text', { required: tr('نص الزر الرئيسي مطلوب', 'Primary button text is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.primary_button_text_en} label="Primary button text EN / English primary button">
+            <FieldGroup error={form.formState.errors.primary_button_text_en} label={tr('نص الزر الرئيسي (إنجليزي)', 'Primary button text (English)')}>
               <input className="field" {...form.register('primary_button_text_en')} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.primary_button_url} label="Primary button URL / رابط الزر الرئيسي">
-              <input className="field" {...form.register('primary_button_url', { required: 'رابط الزر الرئيسي مطلوب' })} />
+            <FieldGroup error={form.formState.errors.primary_button_url} label={tr('رابط الزر الرئيسي', 'Primary button URL')}>
+              <input className="field" {...form.register('primary_button_url', { required: tr('رابط الزر الرئيسي مطلوب', 'Primary button URL is required') })} />
             </FieldGroup>
             <div />
-            <FieldGroup error={form.formState.errors.secondary_button_text} label="Secondary button text AR / نص الزر الثانوي">
+            <FieldGroup error={form.formState.errors.secondary_button_text} label={tr('نص الزر الثانوي (عربي)', 'Secondary button text (Arabic)')}>
               <input className="field" {...form.register('secondary_button_text')} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.secondary_button_text_en} label="Secondary button text EN / English secondary button">
+            <FieldGroup error={form.formState.errors.secondary_button_text_en} label={tr('نص الزر الثانوي (إنجليزي)', 'Secondary button text (English)')}>
               <input className="field" {...form.register('secondary_button_text_en')} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.secondary_button_url} label="Secondary button URL / رابط الزر الثانوي">
+            <FieldGroup error={form.formState.errors.secondary_button_url} label={tr('رابط الزر الثانوي', 'Secondary button URL')}>
               <input className="field" {...form.register('secondary_button_url')} />
             </FieldGroup>
           </div>
@@ -128,48 +132,48 @@ function HomepageContentEditorPage() {
             fileList={heroImageFile}
             fileUrl={data?.hero_image_url}
             hint="JPG, PNG, WEBP, GIF | max 10 MB"
-            label="Hero image / صورة البطل"
+            label={tr('صورة البطل', 'Hero image')}
             registration={form.register('hero_image')}
           />
         </section>
 
         <section className="space-y-6">
           <div className="glass-panel space-y-5 p-6">
-            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'كيف تعمل المنصة' : 'How It Works'}</h2>
-            <FieldGroup error={form.formState.errors.how_it_works_text} label="How it works AR / نص كيف تعمل المنصة">
-              <textarea className="field min-h-32" {...form.register('how_it_works_text', { required: 'هذا النص مطلوب' })} />
+            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'كيف تعمل المنصة' : 'How it works'}</h2>
+            <FieldGroup error={form.formState.errors.how_it_works_text} label={tr('نص «كيف تعمل المنصة» (عربي)', 'How it works text (Arabic)')}>
+              <textarea className="field min-h-32" {...form.register('how_it_works_text', { required: tr('هذا النص مطلوب', 'This text is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.how_it_works_text_en} label="How it works EN / English how it works text">
+            <FieldGroup error={form.formState.errors.how_it_works_text_en} label={tr('نص «كيف تعمل المنصة» (إنجليزي)', 'How it works text (English)')}>
               <textarea className="field min-h-32" {...form.register('how_it_works_text_en')} />
             </FieldGroup>
           </div>
 
           <div className="glass-panel space-y-5 p-6">
-            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'التواصل والتذييل' : 'Contact and Footer'}</h2>
-            <FieldGroup error={form.formState.errors.contact_phone} label="Phone / رقم الهاتف">
-              <input className="field" {...form.register('contact_phone', { required: 'رقم الهاتف مطلوب' })} />
+            <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'التواصل والتذييل' : 'Contact and footer'}</h2>
+            <FieldGroup error={form.formState.errors.contact_phone} label={tr('رقم الهاتف', 'Phone')}>
+              <input className="field" {...form.register('contact_phone', { required: tr('رقم الهاتف مطلوب', 'Phone is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.whatsapp_number} label="WhatsApp / رقم واتساب">
-              <input className="field" {...form.register('whatsapp_number', { required: 'رقم واتساب مطلوب' })} />
+            <FieldGroup error={form.formState.errors.whatsapp_number} label={tr('رقم واتساب', 'WhatsApp')}>
+              <input className="field" {...form.register('whatsapp_number', { required: tr('رقم واتساب مطلوب', 'WhatsApp number is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.email} label="Email / البريد الإلكتروني">
-              <input className="field" type="email" {...form.register('email', { required: 'البريد الإلكتروني مطلوب' })} />
+            <FieldGroup error={form.formState.errors.email} label={tr('البريد الإلكتروني', 'Email')}>
+              <input className="field" type="email" {...form.register('email', { required: tr('البريد الإلكتروني مطلوب', 'Email is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.office_address} label="Office address AR / عنوان المكتب">
-              <input className="field" {...form.register('office_address', { required: 'عنوان المكتب مطلوب' })} />
+            <FieldGroup error={form.formState.errors.office_address} label={tr('عنوان المكتب (عربي)', 'Office address (Arabic)')}>
+              <input className="field" {...form.register('office_address', { required: tr('عنوان المكتب مطلوب', 'Office address is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.office_address_en} label="Office address EN / English office address">
+            <FieldGroup error={form.formState.errors.office_address_en} label={tr('عنوان المكتب (إنجليزي)', 'Office address (English)')}>
               <input className="field" {...form.register('office_address_en')} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.footer_text} label="Footer text AR / نص التذييل">
-              <textarea className="field min-h-28" {...form.register('footer_text', { required: 'نص التذييل مطلوب' })} />
+            <FieldGroup error={form.formState.errors.footer_text} label={tr('نص التذييل (عربي)', 'Footer text (Arabic)')}>
+              <textarea className="field min-h-28" {...form.register('footer_text', { required: tr('نص التذييل مطلوب', 'Footer text is required') })} />
             </FieldGroup>
-            <FieldGroup error={form.formState.errors.footer_text_en} label="Footer text EN / English footer text">
+            <FieldGroup error={form.formState.errors.footer_text_en} label={tr('نص التذييل (إنجليزي)', 'Footer text (English)')}>
               <textarea className="field min-h-28" {...form.register('footer_text_en')} />
             </FieldGroup>
             <ToggleField
-              description="يتم عرض هذه النسخة مباشرة على الموقع العام."
-              label="Active content version / النسخة النشطة"
+              description={tr('يتم عرض هذه النسخة مباشرة على الموقع العام.', 'This version is shown directly on the public site.')}
+              label={tr('النسخة النشطة', 'Active content version')}
               registration={form.register('active_content')}
             />
           </div>
@@ -177,7 +181,7 @@ function HomepageContentEditorPage() {
           <div className="glass-panel space-y-4 p-6">
             <button className="btn-primary w-full" type="submit">
               <Save className="h-4 w-4" />
-              حفظ المحتوى
+              {tr('حفظ المحتوى', 'Save content')}
             </button>
             <FormMessage message={feedback} />
           </div>

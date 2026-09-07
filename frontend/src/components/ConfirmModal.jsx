@@ -1,5 +1,6 @@
 import { TriangleAlert } from 'lucide-react'
 import { useEffect } from 'react'
+import { useLanguage } from '../context/LanguageContext'
 
 function ConfirmModal({
   open,
@@ -7,13 +8,17 @@ function ConfirmModal({
   description,
   onConfirm,
   onClose,
-  confirmLabel = 'تأكيد',
-  cancelLabel = 'إلغاء',
+  confirmLabel,
+  cancelLabel,
   variant = 'default',
   loading = false,
   confirmDisabled = false,
   children,
 }) {
+  const { isArabic } = useLanguage()
+  const resolvedConfirmLabel = confirmLabel ?? (isArabic ? 'تأكيد' : 'Confirm')
+  const resolvedCancelLabel = cancelLabel ?? (isArabic ? 'إلغاء' : 'Cancel')
+
   useEffect(() => {
     if (!open) return
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -45,10 +50,10 @@ function ConfirmModal({
             type="button"
           >
             {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : null}
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </button>
           <button className="btn-secondary flex-1" onClick={onClose} disabled={loading} type="button">
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
         </div>
       </div>

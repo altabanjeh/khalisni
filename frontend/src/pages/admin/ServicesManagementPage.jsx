@@ -82,12 +82,12 @@ const defaultDefinitionValues = {
 
 const SERVICE_CURRENCY_CODE = 'JOD'
 const DOCUMENT_EXTENSION_OPTIONS = [
-  { value: '.pdf', label: 'PDF document' },
-  { value: '.jpg', label: 'JPG image' },
-  { value: '.jpeg', label: 'JPEG image' },
-  { value: '.png', label: 'PNG image' },
-  { value: '.doc', label: 'Word DOC' },
-  { value: '.docx', label: 'Word DOCX' },
+  { value: '.pdf', label_ar: 'ملف PDF', label_en: 'PDF document' },
+  { value: '.jpg', label_ar: 'صورة JPG', label_en: 'JPG image' },
+  { value: '.jpeg', label_ar: 'صورة JPEG', label_en: 'JPEG image' },
+  { value: '.png', label_ar: 'صورة PNG', label_en: 'PNG image' },
+  { value: '.doc', label_ar: 'ملف Word DOC', label_en: 'Word DOC' },
+  { value: '.docx', label_ar: 'ملف Word DOCX', label_en: 'Word DOCX' },
 ]
 const DOCUMENT_SIZE_OPTIONS = [
   { value: 1 * 1024 * 1024, label: '1 MB' },
@@ -139,24 +139,26 @@ function SectionCard({ icon: Icon, title, description, action, children }) {
   )
 }
 
-function getDocumentExtensionLabel(value) {
-  return DOCUMENT_EXTENSION_OPTIONS.find((option) => option.value === value)?.label || value
+function getDocumentExtensionLabel(value, isArabic) {
+  const option = DOCUMENT_EXTENSION_OPTIONS.find((item) => item.value === value)
+  if (!option) return value
+  return isArabic ? option.label_ar : option.label_en
 }
 
-function formatExtensionList(value) {
+function formatExtensionList(value, isArabic) {
   const items = Array.isArray(value) ? value : []
-  return items.map(getDocumentExtensionLabel).join(', ') || 'Not set'
+  return items.map((item) => getDocumentExtensionLabel(item, isArabic)).join('، ') || (isArabic ? 'غير محدد' : 'Not set')
 }
 
 const schemaFieldTypeOptions = [
-  { value: 'text', label: 'نص قصير' },
-  { value: 'textarea', label: 'نص طويل' },
-  { value: 'number', label: 'رقم' },
-  { value: 'email', label: 'بريد إلكتروني' },
-  { value: 'tel', label: 'رقم هاتف' },
-  { value: 'date', label: 'تاريخ' },
-  { value: 'select', label: 'قائمة خيارات' },
-  { value: 'checkbox', label: 'صح / خطأ' },
+  { value: 'text', label_ar: 'نص قصير', label_en: 'Short text' },
+  { value: 'textarea', label_ar: 'نص طويل', label_en: 'Long text' },
+  { value: 'number', label_ar: 'رقم', label_en: 'Number' },
+  { value: 'email', label_ar: 'بريد إلكتروني', label_en: 'Email' },
+  { value: 'tel', label_ar: 'رقم هاتف', label_en: 'Phone number' },
+  { value: 'date', label_ar: 'تاريخ', label_en: 'Date' },
+  { value: 'select', label_ar: 'قائمة خيارات', label_en: 'Options list' },
+  { value: 'checkbox', label_ar: 'صح / خطأ', label_en: 'True / false' },
 ]
 
 let schemaFieldRowCounter = 0
@@ -240,18 +242,22 @@ function getGeneratedSchemaFieldName(field, index) {
   return sanitizeSchemaFieldToken(field.label || field.placeholder || `field_${index + 1}`, `field_${index + 1}`)
 }
 
-function validateSchemaFieldRows(fields) {
+function validateSchemaFieldRows(fields, isArabic) {
   const errors = []
 
   fields.forEach((field, index) => {
     if (isSchemaFieldRowBlank(field)) return
 
     if (!field.label_ar.trim() && !field.label.trim()) {
-      errors.push(`الحقل ${index + 1}: أضف الاسم الذي سيظهر للمستخدم.`)
+      errors.push(isArabic
+        ? `الحقل ${index + 1}: أضف الاسم الذي سيظهر للمستخدم.`
+        : `Field ${index + 1}: add the name shown to the user.`)
     }
 
     if (normalizeSchemaFieldType(field.type) === 'select' && !parseSchemaOptionsText(field.options_text).length) {
-      errors.push(`الحقل ${index + 1}: أضف خيارات القائمة، كل خيار في سطر منفصل.`)
+      errors.push(isArabic
+        ? `الحقل ${index + 1}: أضف خيارات القائمة، كل خيار في سطر منفصل.`
+        : `Field ${index + 1}: add the list options, one option per line.`)
     }
   })
 
@@ -280,17 +286,22 @@ function buildRequiredInformationSchema(fields) {
 }
 
 function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField, onRemoveField }) {
+  const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
   return (
     <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <h3 className="text-base font-bold text-ink">البيانات المطلوبة من العميل</h3>
+          <h3 className="text-base font-bold text-ink">{tr('البيانات المطلوبة من العميل', 'Information required from the customer')}</h3>
           <p className="text-sm leading-6 text-slate-600">
-            أضف الحقول التي سيملؤها العميل عند طلب الخدمة، وسيتم توليد JSON تلقائياً في الخلفية.
+            {tr(
+              'أضف الحقول التي سيملؤها العميل عند طلب الخدمة، وسيتم توليد JSON تلقائياً في الخلفية.',
+              'Add the fields the customer fills in when requesting the service; the JSON is generated automatically in the background.',
+            )}
           </p>
         </div>
         <button className="btn-secondary whitespace-nowrap" onClick={onAddField} type="button">
-          + حقل مطلوب
+          {isArabic ? '+ حقل مطلوب' : '+ Required field'}
         </button>
       </div>
 
@@ -300,9 +311,10 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
             <div key={field.row_id} className="space-y-4 rounded-[1.5rem] border border-border bg-white p-4 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-bold text-ink">الحقل {index + 1}</p>
+                  <p className="text-sm font-bold text-ink">{tr(`الحقل ${index + 1}`, `Field ${index + 1}`)}</p>
                   <p className="text-xs text-slate-500">
-                    المعرّف المولّد: <span className="font-mono text-ink">{getGeneratedSchemaFieldName(field, index)}</span>
+                    {tr('المعرّف المولّد:', 'Generated identifier:')}{' '}
+                    <span className="font-mono text-ink">{getGeneratedSchemaFieldName(field, index)}</span>
                   </p>
                 </div>
                 <button
@@ -310,12 +322,12 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                   onClick={() => onRemoveField(field.row_id)}
                   type="button"
                 >
-                  حذف الحقل
+                  {tr('حذف الحقل', 'Remove field')}
                 </button>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="الاسم الظاهر بالعربية">
+                <Field label={tr('الاسم الظاهر بالعربية', 'Display name (Arabic)')}>
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'label_ar', event.target.value)}
@@ -323,7 +335,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                     value={field.label_ar}
                   />
                 </Field>
-                <Field hint="يُستخدم أيضاً لتوليد معرّف مناسب إذا تُرك الحقل التقني فارغاً." label="الاسم الظاهر بالإنجليزية">
+                <Field hint={tr('يُستخدم أيضاً لتوليد معرّف مناسب إذا تُرك الحقل التقني فارغاً.', 'Also used to generate an identifier when the technical field is left blank.')} label={tr('الاسم الظاهر بالإنجليزية', 'Display name (English)')}>
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'label', event.target.value)}
@@ -334,7 +346,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field hint="اختياري. إن تُرك فارغاً سنولّده تلقائياً." label="المعرّف التقني">
+                <Field hint={tr('اختياري. إن تُرك فارغاً سنولّده تلقائياً.', 'Optional. Generated automatically when left blank.')} label={tr('المعرّف التقني', 'Technical identifier')}>
                   <input
                     className="field font-mono"
                     dir="ltr"
@@ -343,11 +355,11 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                     value={field.technical_name}
                   />
                 </Field>
-                <Field label="نوع الحقل">
+                <Field label={tr('نوع الحقل', 'Field type')}>
                   <select className="field" onChange={(event) => onChangeField(field.row_id, 'type', event.target.value)} value={field.type}>
                     {schemaFieldTypeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {isArabic ? option.label_ar : option.label_en}
                       </option>
                     ))}
                   </select>
@@ -355,7 +367,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="نص توضيحي">
+                <Field label={tr('نص توضيحي', 'Placeholder text')}>
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'placeholder', event.target.value)}
@@ -363,7 +375,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                     value={field.placeholder}
                   />
                 </Field>
-                <Field label="شرح إضافي">
+                <Field label={tr('شرح إضافي', 'Extra help text')}>
                   <input
                     className="field"
                     onChange={(event) => onChangeField(field.row_id, 'help_text', event.target.value)}
@@ -373,7 +385,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               </div>
 
               {field.type === 'select' ? (
-                <Field hint="كل خيار في سطر منفصل." label="خيارات القائمة">
+                <Field hint={tr('كل خيار في سطر منفصل.', 'One option per line.')} label={tr('خيارات القائمة', 'List options')}>
                   <textarea
                     className="field min-h-28"
                     onChange={(event) => onChangeField(field.row_id, 'options_text', event.target.value)}
@@ -383,7 +395,7 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
               ) : null}
 
               <CheckboxField
-                label="الحقل مطلوب عند الطلب"
+                label={isArabic ? 'الحقل مطلوب عند الطلب' : 'Field is required on request'}
                 registration={{
                   checked: field.required,
                   onChange: (event) => onChangeField(field.row_id, 'required', event.target.checked),
@@ -394,7 +406,10 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
         </div>
       ) : (
         <div className="rounded-[1.5rem] border border-dashed border-border bg-white px-4 py-6 text-sm text-slate-500">
-          إذا كانت الخدمة تحتاج بيانات إضافية من العميل فأضفها من هنا. إذا لم تحتج أي حقول إضافية سيبقى JSON فارغاً.
+          {tr(
+            'إذا كانت الخدمة تحتاج بيانات إضافية من العميل فأضفها من هنا. إذا لم تحتج أي حقول إضافية سيبقى JSON فارغاً.',
+            'Add fields here if the service needs extra information from the customer. If none are needed the JSON stays empty.',
+          )}
         </div>
       )}
 
@@ -419,16 +434,17 @@ function isClearImageValue(value) {
   return value === true || value === 'true' || value === 'on'
 }
 
-function formatDefinitionSummary(definition) {
-  const extensions = formatExtensionList(definition.allowed_extensions)
-  if (!extensions) return 'بدون امتدادات مخصصة'
+function formatDefinitionSummary(definition, isArabic) {
+  const extensions = formatExtensionList(definition.allowed_extensions, isArabic)
+  if (!extensions) return isArabic ? 'بدون امتدادات مخصصة' : 'No custom extensions'
   const sizeOption = DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(definition.max_file_size || 0))
-  return `${extensions} | ${sizeOption?.label || 'Custom size'}`
+  return `${extensions} | ${sizeOption?.label || (isArabic ? 'حجم مخصص' : 'Custom size')}`
 }
 
 function ServicesManagementPage() {
   const { isArabic } = useLanguage()
   const { toast } = useToast()
+  const tr = (ar, en) => (isArabic ? ar : en)
   const [serviceFilterCategory, setServiceFilterCategory] = useState('')
   const [categoryStatus, setCategoryStatus] = useState('active')
   const [serviceStatus, setServiceStatus] = useState('active')
@@ -654,10 +670,10 @@ function ServicesManagementPage() {
 
       if (selectedCategory) {
         await api.updateAdminCategory(selectedCategory.id, payload)
-        toast('تم تحديث الفئة.', 'success')
+        toast(tr('تم تحديث الفئة.', 'Category updated.'), 'success')
       } else {
         await api.createAdminCategory(payload)
-        toast('تم إنشاء الفئة.', 'success')
+        toast(tr('تم إنشاء الفئة.', 'Category created.'), 'success')
       }
 
       reloadCategories()
@@ -673,7 +689,7 @@ function ServicesManagementPage() {
   async function handleServiceSubmit(values) {
     setSubmitting(true)
     try {
-      const schemaErrors = validateSchemaFieldRows(serviceSchemaFields)
+      const schemaErrors = validateSchemaFieldRows(serviceSchemaFields, isArabic)
       if (schemaErrors.length) {
         setServiceSchemaErrors(schemaErrors)
         setSubmitting(false)
@@ -686,7 +702,7 @@ function ServicesManagementPage() {
       } catch {
         serviceForm.setError('required_information_schema_text', {
           type: 'manual',
-          message: 'صيغة JSON غير صالحة.',
+          message: tr('صيغة JSON غير صالحة.', 'Invalid JSON format.'),
         })
         setSubmitting(false)
         return
@@ -695,7 +711,7 @@ function ServicesManagementPage() {
       if (!Array.isArray(requiredInformationSchema)) {
         serviceForm.setError('required_information_schema_text', {
           type: 'manual',
-          message: 'يجب أن تكون البنية مصفوفة JSON.',
+          message: tr('يجب أن تكون البنية مصفوفة JSON.', 'The structure must be a JSON array.'),
         })
         setSubmitting(false)
         return
@@ -750,10 +766,10 @@ function ServicesManagementPage() {
 
       if (selectedService) {
         await api.updateAdminService(selectedService.id, payload)
-        toast('تم تحديث الخدمة.', 'success')
+        toast(tr('تم تحديث الخدمة.', 'Service updated.'), 'success')
       } else {
         await api.createAdminService(payload)
-        toast('تم إنشاء الخدمة.', 'success')
+        toast(tr('تم إنشاء الخدمة.', 'Service created.'), 'success')
       }
 
       reloadServices()
@@ -812,10 +828,10 @@ function ServicesManagementPage() {
 
       if (selectedDefinition) {
         await api.updateAdminRequiredDocumentDefinition(selectedDefinition.id, payload)
-        toast('تم تحديث تعريف الوثيقة.', 'success')
+        toast(tr('تم تحديث تعريف الوثيقة.', 'Document definition updated.'), 'success')
       } else {
         await api.createAdminRequiredDocumentDefinition(payload)
-        toast('تم إنشاء تعريف الوثيقة.', 'success')
+        toast(tr('تم إنشاء تعريف الوثيقة.', 'Document definition created.'), 'success')
       }
 
       reloadDefinitions()
@@ -839,20 +855,20 @@ function ServicesManagementPage() {
         await api.deleteAdminCategory(item.id, payload)
         reloadCategories()
         reloadServices()
-        toast('تم تعطيل الفئة.', 'success')
+        toast(tr('تم تعطيل الفئة.', 'Category deactivated.'), 'success')
       }
 
       if (type === 'service') {
         await api.deleteAdminService(item.id, payload)
         reloadServices()
-        toast('تم تعطيل الخدمة.', 'success')
+        toast(tr('تم تعطيل الخدمة.', 'Service deactivated.'), 'success')
       }
 
       if (type === 'definition') {
         await api.deleteAdminRequiredDocumentDefinition(item.id, payload)
         reloadDefinitions()
         reloadServices()
-        toast('تم تعطيل تعريف الوثيقة.', 'success')
+        toast(tr('تم تعطيل تعريف الوثيقة.', 'Document definition deactivated.'), 'success')
       }
 
       if (
@@ -891,54 +907,54 @@ function ServicesManagementPage() {
         reloadServices()
       }
 
-      toast(isArabic ? 'تمت الاستعادة بنجاح.' : 'Record restored successfully.', 'success')
+      toast(tr('تمت الاستعادة بنجاح.', 'Record restored successfully.'), 'success')
     } catch (error) {
       toast(getDisplayError(error), 'error')
     }
   }
 
+  const statusCell = (row) => (row.is_deleted ? tr('محذوف', 'Deleted') : row.is_active ? tr('نشط', 'Active') : tr('موقوف', 'Inactive'))
+  const deletedBadge = (row) =>
+    row.is_deleted ? (
+      <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
+        {tr('محذوف', 'Deleted')}
+      </span>
+    ) : null
+
   const categoryColumns = [
     {
       key: 'name_ar',
-      label: 'Category',
+      label: tr('الفئة', 'Category'),
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span>{row.name_ar}</span>
-          {row.is_deleted ? (
-            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
-              Deleted
-            </span>
-          ) : null}
+          <span>{isArabic ? row.name_ar : (row.name_en || row.name_ar)}</span>
+          {deletedBadge(row)}
         </div>
       ),
     },
-    { key: 'slug', label: 'Slug' },
-    { key: 'display_order', label: 'Order' },
-    {
-      key: 'is_active',
-      label: 'Status',
-      render: (row) => (row.is_deleted ? 'Deleted' : row.is_active ? 'Active' : 'Inactive'),
-    },
+    { key: 'slug', label: tr('المعرّف', 'Slug') },
+    { key: 'display_order', label: tr('الترتيب', 'Order') },
+    { key: 'is_active', label: tr('الحالة', 'Status'), render: statusCell },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tr('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           {row.is_deleted ? (
             <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore({ type: 'category', item: row })} type="button">
-              Restore
+              {tr('استعادة', 'Restore')}
             </button>
           ) : (
             <>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openCategoryForm(row.id)} type="button">
-                Edit
+                {tr('تعديل', 'Edit')}
               </button>
               <button
                 className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
                 onClick={() => setPendingDelete({ type: 'category', item: row })}
                 type="button"
               >
-                Delete
+                {tr('حذف', 'Delete')}
               </button>
             </>
           )}
@@ -950,47 +966,43 @@ function ServicesManagementPage() {
   const serviceColumns = [
     {
       key: 'name_ar',
-      label: 'Service',
+      label: tr('الخدمة', 'Service'),
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span>{row.name_ar}</span>
-          {row.is_deleted ? (
-            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
-              Deleted
-            </span>
-          ) : null}
+          <span>{isArabic ? row.name_ar : (row.name_en || row.name_ar)}</span>
+          {deletedBadge(row)}
         </div>
       ),
     },
-    { key: 'category_name', label: 'Category', render: (row) => row.category?.name_ar || row.category_name || 'Unassigned' },
-    { key: 'duration_display', label: 'Delivery' },
-    { key: 'required_documents', label: 'Documents', render: (row) => row.required_documents?.length || 0 },
-    { key: 'show_on_public_site', label: 'Public site', render: (row) => (row.show_on_public_site ? 'Visible' : 'Hidden') },
     {
-      key: 'is_active',
-      label: 'Status',
-      render: (row) => (row.is_deleted ? 'Deleted' : row.is_active ? 'Active' : 'Inactive'),
+      key: 'category_name',
+      label: tr('الفئة', 'Category'),
+      render: (row) => (isArabic ? row.category?.name_ar : row.category?.name_en) || row.category?.name_ar || row.category_name || tr('غير مصنّفة', 'Unassigned'),
     },
+    { key: 'duration_display', label: tr('التسليم', 'Delivery') },
+    { key: 'required_documents', label: tr('الوثائق', 'Documents'), render: (row) => row.required_documents?.length || 0 },
+    { key: 'show_on_public_site', label: tr('الموقع العام', 'Public site'), render: (row) => (row.show_on_public_site ? tr('ظاهرة', 'Visible') : tr('مخفية', 'Hidden')) },
+    { key: 'is_active', label: tr('الحالة', 'Status'), render: statusCell },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tr('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           {row.is_deleted ? (
             <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore({ type: 'service', item: row })} type="button">
-              Restore
+              {tr('استعادة', 'Restore')}
             </button>
           ) : (
             <>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openServiceForm(row.id)} type="button">
-                Edit
+                {tr('تعديل', 'Edit')}
               </button>
               <button
                 className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
                 onClick={() => setPendingDelete({ type: 'service', item: row })}
                 type="button"
               >
-                Delete
+                {tr('حذف', 'Delete')}
               </button>
             </>
           )}
@@ -1002,55 +1014,47 @@ function ServicesManagementPage() {
   const definitionColumns = [
     {
       key: 'name_ar',
-      label: 'Document',
+      label: tr('الوثيقة', 'Document'),
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span>{row.name_ar}</span>
-          {row.is_deleted ? (
-            <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
-              Deleted
-            </span>
-          ) : null}
+          <span>{isArabic ? row.name_ar : (row.name_en || row.name_ar)}</span>
+          {deletedBadge(row)}
         </div>
       ),
     },
-    { key: 'code', label: 'Code' },
+    { key: 'code', label: tr('الكود', 'Code') },
     {
       key: 'allowed_extensions',
-      label: 'Extensions',
-      render: (row) => formatExtensionList(row.allowed_extensions),
+      label: tr('الامتدادات', 'Extensions'),
+      render: (row) => formatExtensionList(row.allowed_extensions, isArabic),
     },
     {
       key: 'max_file_size',
-      label: 'Max size',
-      render: (row) => DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(row.max_file_size || 0))?.label || 'Custom size',
+      label: tr('الحد الأقصى للحجم', 'Max size'),
+      render: (row) => DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(row.max_file_size || 0))?.label || tr('حجم مخصص', 'Custom size'),
     },
-    { key: 'sort_order', label: 'Order' },
-    {
-      key: 'is_active',
-      label: 'Status',
-      render: (row) => (row.is_deleted ? 'Deleted' : row.is_active ? 'Active' : 'Inactive'),
-    },
+    { key: 'sort_order', label: tr('الترتيب', 'Order') },
+    { key: 'is_active', label: tr('الحالة', 'Status'), render: statusCell },
     {
       key: 'actions',
-      label: 'Actions',
+      label: tr('الإجراءات', 'Actions'),
       render: (row) => (
         <div className="flex gap-2">
           {row.is_deleted ? (
             <button className="btn-secondary px-3 py-2 text-xs" onClick={() => setPendingRestore({ type: 'definition', item: row })} type="button">
-              Restore
+              {tr('استعادة', 'Restore')}
             </button>
           ) : (
             <>
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openDefinitionForm(row.id)} type="button">
-                Edit
+                {tr('تعديل', 'Edit')}
               </button>
               <button
                 className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
                 onClick={() => setPendingDelete({ type: 'definition', item: row })}
                 type="button"
               >
-                Delete
+                {tr('حذف', 'Delete')}
               </button>
             </>
           )}
@@ -1059,54 +1063,63 @@ function ServicesManagementPage() {
     },
   ]
 
+  const statusFilterOptions = (
+    <>
+      <option value="active">{tr('نشط', 'Active')}</option>
+      <option value="deleted">{tr('محذوف', 'Deleted')}</option>
+      <option value="all">{tr('الكل', 'All')}</option>
+    </>
+  )
+
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        description="إدارة موحدة للفئات والخدمات وتعريفات الوثائق الرئيسية. الوثيقة تُنشأ مرة واحدة، ثم تُربط بالخدمة من داخل نموذج الخدمة نفسه."
-        eyebrow="الخدمات"
+        description={tr(
+          'إدارة موحدة للفئات والخدمات وتعريفات الوثائق الرئيسية. الوثيقة تُنشأ مرة واحدة، ثم تُربط بالخدمة من داخل نموذج الخدمة نفسه.',
+          'Unified management of categories, services and master document definitions. A document is created once, then linked to a service from the service form itself.',
+        )}
+        eyebrow={tr('الخدمات', 'Services')}
         icon={Settings}
-        title="إدارة الخدمات"
+        title={tr('إدارة الخدمات', 'Service management')}
       />
 
       <section className="glass-panel grid gap-4 p-5 md:grid-cols-3">
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">الفئات</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">نظّم كروت الموقع العام ومسارات العرض من نفس الصفحة.</p>
+          <p className="text-sm font-bold text-ink">{tr('الفئات', 'Categories')}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{tr('نظّم كروت الموقع العام ومسارات العرض من نفس الصفحة.', 'Organise public site cards and browsing paths from the same page.')}</p>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">الخدمات</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">تحكم بالتسعير، مدة التسليم، الظهور العام، والبيانات المطلوبة من العميل.</p>
+          <p className="text-sm font-bold text-ink">{tr('الخدمات', 'Services')}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{tr('تحكم بالتسعير، مدة التسليم، الظهور العام، والبيانات المطلوبة من العميل.', 'Control pricing, delivery time, public visibility and the information required from the customer.')}</p>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/70 p-5">
-          <p className="text-sm font-bold text-ink">تعريفات الوثائق</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">أنشئ تعريف الوثيقة مرة واحدة ثم اختره من الخدمات بدل تكرار نفس النصوص.</p>
+          <p className="text-sm font-bold text-ink">{tr('تعريفات الوثائق', 'Document definitions')}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{tr('أنشئ تعريف الوثيقة مرة واحدة ثم اختره من الخدمات بدل تكرار نفس النصوص.', 'Create a document definition once, then pick it from services instead of retyping the same text.')}</p>
         </div>
       </section>
 
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openCategoryForm()} type="button">
-            + فئة جديدة
+            {tr('+ فئة جديدة', '+ New category')}
           </button>
         }
-        description="أنشئ الفئات وعدّلها وعطّلها من شاشة الخدمات نفسها."
+        description={tr('أنشئ الفئات وعدّلها وعطّلها من شاشة الخدمات نفسها.', 'Create, edit and deactivate categories from the services screen itself.')}
         icon={FolderTree}
-        title="الفئات"
+        title={tr('الفئات', 'Categories')}
       >
         <DataTable
           columns={categoryColumns}
-          emptyDescription="أضف أول فئة لتنظيم الخدمات."
-          emptyTitle="لا توجد فئات"
+          emptyDescription={tr('أضف أول فئة لتنظيم الخدمات.', 'Add the first category to organise services.')}
+          emptyTitle={tr('لا توجد فئات', 'No categories')}
           loading={categoriesLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
           rows={categories}
           toolbar={
             <div className="grid gap-3 md:grid-cols-1">
-              <select aria-label="حالة التصنيفات" className="field" value={categoryStatus} onChange={(event) => setCategoryStatus(event.target.value)}>
-                <option value="active">Active</option>
-                <option value="deleted">Deleted</option>
-                <option value="all">All</option>
+              <select aria-label={tr('حالة التصنيفات', 'Category status')} className="field" value={categoryStatus} onChange={(event) => setCategoryStatus(event.target.value)}>
+                {statusFilterOptions}
               </select>
             </div>
           }
@@ -1116,33 +1129,34 @@ function ServicesManagementPage() {
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openServiceForm()} type="button">
-            + خدمة جديدة
+            {isArabic ? '+ خدمة جديدة' : '+ New service'}
           </button>
         }
-        description="كل خصائص الخدمة الأساسية موجودة هنا، بما فيها اختيار الوثائق الرئيسية وآلية عرض الأسعار للعامة."
+        description={tr(
+          'كل خصائص الخدمة الأساسية موجودة هنا، بما فيها اختيار الوثائق الرئيسية وآلية عرض الأسعار للعامة.',
+          'All core service attributes live here, including master document selection and how prices are shown to the public.',
+        )}
         icon={Settings}
-        title="الخدمات"
+        title={tr('الخدمات', 'Services')}
       >
         <DataTable
           columns={serviceColumns}
-          emptyDescription="أضف أول خدمة لتظهر في الموقع ولوحات التشغيل."
-          emptyTitle="لا توجد خدمات"
+          emptyDescription={tr('أضف أول خدمة لتظهر في الموقع ولوحات التشغيل.', 'Add the first service so it appears on the site and operational boards.')}
+          emptyTitle={tr('لا توجد خدمات', 'No services')}
           loading={servicesLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
           rows={services}
           toolbar={
             <div className="grid gap-3 md:grid-cols-2">
-              <select aria-label="حالة الخدمات" className="field" value={serviceStatus} onChange={(event) => setServiceStatus(event.target.value)}>
-                <option value="active">Active</option>
-                <option value="deleted">Deleted</option>
-                <option value="all">All</option>
+              <select aria-label={tr('حالة الخدمات', 'Service status')} className="field" value={serviceStatus} onChange={(event) => setServiceStatus(event.target.value)}>
+                {statusFilterOptions}
               </select>
-              <select aria-label="تصفية حسب التصنيف" className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
-                <option value="">كل الفئات</option>
+              <select aria-label={tr('تصفية حسب التصنيف', 'Filter by category')} className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
+                <option value="">{tr('كل الفئات', 'All categories')}</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || category.name_ar}
+                    {category.full_path_name || (isArabic ? category.name_ar : (category.name_en || category.name_ar))}
                   </option>
                 ))}
               </select>
@@ -1154,27 +1168,25 @@ function ServicesManagementPage() {
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openDefinitionForm()} type="button">
-            + تعريف وثيقة
+            {tr('+ تعريف وثيقة', '+ Document definition')}
           </button>
         }
-        description="هذه هي القائمة الرئيسية التي يختار منها المسؤول الوثائق المطلوبة لكل خدمة."
+        description={tr('هذه هي القائمة الرئيسية التي يختار منها المسؤول الوثائق المطلوبة لكل خدمة.', 'This is the master list the admin picks required documents from for each service.')}
         icon={Files}
-        title="تعريفات الوثائق"
+        title={tr('تعريفات الوثائق', 'Document definitions')}
       >
         <DataTable
           columns={definitionColumns}
-          emptyDescription="أضف أول تعريف وثيقة رئيسي."
-          emptyTitle="لا توجد تعريفات وثائق"
+          emptyDescription={tr('أضف أول تعريف وثيقة رئيسي.', 'Add the first master document definition.')}
+          emptyTitle={tr('لا توجد تعريفات وثائق', 'No document definitions')}
           loading={definitionsLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
           rows={definitions}
           toolbar={
             <div className="grid gap-3 md:grid-cols-1">
-              <select aria-label="حالة التعريفات" className="field" value={definitionStatus} onChange={(event) => setDefinitionStatus(event.target.value)}>
-                <option value="active">Active</option>
-                <option value="deleted">Deleted</option>
-                <option value="all">All</option>
+              <select aria-label={tr('حالة التعريفات', 'Definition status')} className="field" value={definitionStatus} onChange={(event) => setDefinitionStatus(event.target.value)}>
+                {statusFilterOptions}
               </select>
             </div>
           }
@@ -1182,33 +1194,33 @@ function ServicesManagementPage() {
       </SectionCard>
 
       <FormModal
-        description="عدّل بيانات الفئة من هنا بدل توزيعها على شاشة أخرى."
+        description={tr('عدّل بيانات الفئة من هنا بدل توزيعها على شاشة أخرى.', 'Edit category details here instead of spreading them across another screen.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              إلغاء
+              {tr('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="service-category-form" type="submit">
-              {selectedCategory ? 'حفظ التعديلات' : 'إضافة الفئة'}
+              {selectedCategory ? tr('حفظ التعديلات', 'Save changes') : tr('إضافة الفئة', 'Add category')}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'category'}
         size="lg"
-        title={selectedCategory ? `تعديل الفئة: ${selectedCategory.name_ar}` : 'فئة جديدة'}
+        title={selectedCategory ? tr(`تعديل الفئة: ${selectedCategory.name_ar}`, `Edit category: ${selectedCategory.name_en || selectedCategory.name_ar}`) : tr('فئة جديدة', 'New category')}
       >
         <form className="space-y-4" id="service-category-form" onSubmit={categoryForm.handleSubmit(handleCategorySubmit)}>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="الاسم بالعربية">
+            <Field label={tr('الاسم بالعربية', 'Name (Arabic)')}>
               <input className="field" {...categoryForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="الاسم بالإنجليزية">
+            <Field label={tr('الاسم بالإنجليزية', 'Name (English)')}>
               <input className="field" {...categoryForm.register('name_en', { required: true })} />
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="إذا تركته فارغاً سيُولد من الاسم." label="المعرّف">
+            <Field hint={tr('إذا تركته فارغاً سيُولد من الاسم.', 'Generated from the name when left blank.')} label={tr('المعرّف', 'Slug')}>
               <input
                 className="field"
                 {...categoryForm.register('slug', {
@@ -1216,7 +1228,7 @@ function ServicesManagementPage() {
                 })}
               />
             </Field>
-            <Field label="الأيقونة">
+            <Field label={tr('الأيقونة', 'Icon')}>
               <input
                 className="field"
                 {...categoryForm.register('icon', {
@@ -1225,10 +1237,10 @@ function ServicesManagementPage() {
               />
             </Field>
           </div>
-          <Field label="الوصف بالعربية">
+          <Field label={tr('الوصف بالعربية', 'Description (Arabic)')}>
             <textarea className="field min-h-24" {...categoryForm.register('description_ar')} />
           </Field>
-          <Field label="الوصف بالإنجليزية">
+          <Field label={tr('الوصف بالإنجليزية', 'Description (English)')}>
             <textarea className="field min-h-24" {...categoryForm.register('description_en')} />
           </Field>
           <input type="hidden" {...categoryForm.register('clear_image')} />
@@ -1250,53 +1262,56 @@ function ServicesManagementPage() {
             }
             registration={categoryForm.register('image')}
           />
-          <Field label="ترتيب العرض">
+          <Field label={tr('ترتيب العرض', 'Display order')}>
             <input className="field" type="number" {...categoryForm.register('display_order')} />
           </Field>
-          <CheckboxField label="الفئة نشطة" registration={categoryForm.register('is_active')} />
+          <CheckboxField label={tr('الفئة نشطة', 'Category is active')} registration={categoryForm.register('is_active')} />
         </form>
       </FormModal>
 
       <FormModal
-        description="تحرير كامل للخدمة: بياناتها، التسعير العام، التسليم، الوثائق الرئيسية، وبنية البيانات المطلوبة."
+        description={tr(
+          'تحرير كامل للخدمة: بياناتها، التسعير العام، التسليم، الوثائق الرئيسية، وبنية البيانات المطلوبة.',
+          'Full service editing: details, public pricing, delivery, master documents and the required information structure.',
+        )}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              إلغاء
+              {tr('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="service-form" type="submit">
-              {selectedService ? 'حفظ التعديلات' : 'إضافة الخدمة'}
+              {selectedService ? tr('حفظ التعديلات', 'Save changes') : (isArabic ? 'إضافة الخدمة' : 'Add service')}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'service'}
         size="xl"
-        title={selectedService ? `تعديل الخدمة: ${selectedService.name_ar}` : 'خدمة جديدة'}
+        title={selectedService ? tr(`تعديل الخدمة: ${selectedService.name_ar}`, `Edit service: ${selectedService.name_en || selectedService.name_ar}`) : tr('خدمة جديدة', 'New service')}
       >
         <form className="space-y-5" id="service-form" onSubmit={serviceForm.handleSubmit(handleServiceSubmit)}>
-          <Field label="الفئة">
+          <Field label={tr('الفئة', 'Category')}>
             <select className="field" {...serviceForm.register('category_id', { required: true })}>
-              <option value="">اختر الفئة</option>
+              <option value="">{tr('اختر الفئة', 'Select category')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name_ar}
+                  {isArabic ? category.name_ar : (category.name_en || category.name_ar)}
                 </option>
               ))}
             </select>
           </Field>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="اسم الخدمة بالعربية">
+            <Field label={tr('اسم الخدمة بالعربية', 'Service name (Arabic)')}>
               <input className="field" {...serviceForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="اسم الخدمة بالإنجليزية">
+            <Field label={tr('اسم الخدمة بالإنجليزية', 'Service name (English)')}>
               <input className="field" {...serviceForm.register('name_en')} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="إذا تركته فارغاً سيُولد من الاسم." label="المعرّف">
+            <Field hint={tr('إذا تركته فارغاً سيُولد من الاسم.', 'Generated from the name when left blank.')} label={tr('المعرّف', 'Slug')}>
               <input
                 className="field"
                 {...serviceForm.register('slug', {
@@ -1304,24 +1319,24 @@ function ServicesManagementPage() {
                 })}
               />
             </Field>
-            <Field label="ترتيب العرض">
+            <Field label={tr('ترتيب العرض', 'Display order')}>
               <input className="field" type="number" {...serviceForm.register('display_order')} />
             </Field>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="وصف مختصر بالعربية">
+            <Field label={tr('وصف مختصر بالعربية', 'Short description (Arabic)')}>
               <input className="field" {...serviceForm.register('short_description_ar')} />
             </Field>
-            <Field label="وصف مختصر بالإنجليزية">
+            <Field label={tr('وصف مختصر بالإنجليزية', 'Short description (English)')}>
               <input className="field" {...serviceForm.register('short_description_en')} />
             </Field>
           </div>
 
-          <Field label="الوصف بالعربية">
+          <Field label={tr('الوصف بالعربية', 'Description (Arabic)')}>
             <textarea className="field min-h-28" {...serviceForm.register('description_ar', { required: true })} />
           </Field>
-          <Field label="الوصف بالإنجليزية">
+          <Field label={tr('الوصف بالإنجليزية', 'Description (English)')}>
             <textarea className="field min-h-28" {...serviceForm.register('description_en')} />
           </Field>
 
@@ -1332,8 +1347,8 @@ function ServicesManagementPage() {
             error={serviceForm.formState.errors.image}
             fileList={serviceImageFile}
             fileUrl={serviceClearImage ? '' : selectedService?.image_url || selectedService?.image || ''}
-            hint={isArabic ? 'اختياري. تظهر على بطاقات الخدمة وصفحة تفاصيل الخدمة في الموقع العام. JPEG أو PNG أو WebP، حتى 5 ميجابايت. عند عدم وجود صورة تُعرض صورة افتراضية بهوية خلصني.' : 'Optional. Appears on public service cards and the service detail page. JPEG, PNG or WebP, up to 5 MB. A Khalsni-branded placeholder is shown when no image is set.'}
-            label={isArabic ? 'صورة الخدمة' : 'Service Image'}
+            hint={isArabic ? 'اختياري. تظهر على بطاقات الخدمة وصفحة تفاصيل الخدمة في الموقع العام. JPEG أو PNG أو WebP، حتى 5 ميجابايت. عند عدم وجود صورة مرفوعة تُعرض صورة نظام افتراضية بهوية خلصني (ليست صورة حقيقية للخدمة).' : 'Optional. Appears on public service cards and the service detail page. JPEG, PNG or WebP, up to 5 MB. When no image is uploaded, a Khalsni-branded system fallback cover is shown (not a real photo of the service).'}
+            label={isArabic ? 'صورة الخدمة المرفوعة' : 'Uploaded service image'}
             onClear={
               selectedService?.image_url || selectedService?.image
                 ? () => {
@@ -1344,6 +1359,11 @@ function ServicesManagementPage() {
             }
             registration={serviceForm.register('image')}
           />
+          <p className="-mt-2 text-xs text-slate-500">
+            {selectedService?.image_url || selectedService?.image
+              ? tr('الحالة: صورة مرفوعة خاصة بالخدمة.', 'Status: an uploaded image specific to this service.')
+              : tr('الحالة: لا توجد صورة مرفوعة — سيظهر غلاف النظام الافتراضي بهوية خلصني.', 'Status: no uploaded image — the Khalsni-branded system fallback cover will be shown.')}
+          </p>
 
           <ServiceSchemaBuilder
             errorMessages={serviceSchemaErrors}
@@ -1359,8 +1379,8 @@ function ServicesManagementPage() {
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">تعريفات الوثائق المطلوبة</h3>
-              <p className="text-sm leading-6 text-slate-600">اختر من القائمة الرئيسية. إذا كانت الوثيقة غير موجودة، أنشئها أولاً من قسم تعريفات الوثائق.</p>
+              <h3 className="text-base font-bold text-ink">{tr('تعريفات الوثائق المطلوبة', 'Required document definitions')}</h3>
+              <p className="text-sm leading-6 text-slate-600">{tr('اختر من القائمة الرئيسية. إذا كانت الوثيقة غير موجودة، أنشئها أولاً من قسم تعريفات الوثائق.', 'Pick from the master list. If a document is missing, create it first in the document definitions section.')}</p>
             </div>
             {definitions.length ? (
               <div className="grid gap-3 md:grid-cols-2">
@@ -1368,10 +1388,13 @@ function ServicesManagementPage() {
                   <label key={definition.id} className="rounded-2xl border border-border bg-white p-4 text-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ink">{definition.name_ar}</p>
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-brand-600">{tr('تعريف وثيقة', 'Document definition')}</p>
+                        <p className="font-semibold text-ink">{isArabic ? definition.name_ar : (definition.name_en || definition.name_ar)}</p>
                         <p className="mt-1 font-mono text-xs text-slate-500">{definition.code}</p>
-                        {definition.description_ar ? <p className="mt-2 text-slate-500">{definition.description_ar}</p> : null}
-                        <p className="mt-2 text-xs text-slate-500">{formatDefinitionSummary(definition)}</p>
+                        {(isArabic ? definition.description_ar : definition.description_en || definition.description_ar) ? (
+                          <p className="mt-2 text-slate-500">{isArabic ? definition.description_ar : (definition.description_en || definition.description_ar)}</p>
+                        ) : null}
+                        <p className="mt-2 text-xs text-slate-500">{formatDefinitionSummary(definition, isArabic)}</p>
                       </div>
                       <input
                         className="mt-1 h-4 w-4 accent-brand-600"
@@ -1385,41 +1408,41 @@ function ServicesManagementPage() {
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-border bg-white px-4 py-5 text-sm text-slate-500">
-                لا توجد تعريفات وثائق بعد. أضف تعريفاً رئيسياً ثم عد لاختياره داخل الخدمة.
+                {tr('لا توجد تعريفات وثائق بعد. أضف تعريفاً رئيسياً ثم عد لاختياره داخل الخدمة.', 'No document definitions yet. Add a master definition then come back to select it inside the service.')}
               </div>
             )}
-            <p className="text-sm text-slate-500">المحدد الآن: {selectedRequiredDocumentIds.length} تعريف</p>
+            <p className="text-sm text-slate-500">{tr(`المحدد الآن: ${selectedRequiredDocumentIds.length} تعريف`, `Selected: ${selectedRequiredDocumentIds.length} definition(s)`)}</p>
           </div>
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">التسعير والظهور العام</h3>
-              <p className="text-sm leading-6 text-slate-600">كل الرسوم تحفظ داخلياً دائماً، لكنك تختار ما يظهر على الموقع العام.</p>
+              <h3 className="text-base font-bold text-ink">{tr('التسعير والظهور العام', 'Pricing and public visibility')}</h3>
+              <p className="text-sm leading-6 text-slate-600">{tr('كل الرسوم تحفظ داخلياً دائماً، لكنك تختار ما يظهر على الموقع العام.', 'All fees are always stored internally, but you choose what appears on the public site.')}</p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <Field hint={`جميع الأسعار تستخدم ${SERVICE_CURRENCY_CODE}.`} label="العملة">
+              <Field hint={tr(`جميع الأسعار تستخدم ${SERVICE_CURRENCY_CODE}.`, `All prices use ${SERVICE_CURRENCY_CODE}.`)} label={tr('العملة', 'Currency')}>
                 <input className="field bg-slate-50 text-slate-600" readOnly value={SERVICE_CURRENCY_CODE} />
               </Field>
-              <Field label={`السعر الأساسي (${SERVICE_CURRENCY_CODE})`}>
+              <Field label={tr(`السعر الأساسي (${SERVICE_CURRENCY_CODE})`, `Base price (${SERVICE_CURRENCY_CODE})`)}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('base_price')} />
               </Field>
-              <Field label={`رسوم الشركة (${SERVICE_CURRENCY_CODE})`}>
+              <Field label={tr(`رسوم الشركة (${SERVICE_CURRENCY_CODE})`, `Company fee (${SERVICE_CURRENCY_CODE})`)}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('service_fee')} />
               </Field>
-              <Field label={`الرسوم الحكومية (${SERVICE_CURRENCY_CODE})`}>
+              <Field label={tr(`الرسوم الحكومية (${SERVICE_CURRENCY_CODE})`, `Government fee (${SERVICE_CURRENCY_CODE})`)}>
                 <input className="field" step="0.01" type="number" {...serviceForm.register('government_fee')} />
               </Field>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
-              <CheckboxField label="إظهار السعر الإجمالي للعامة" registration={serviceForm.register('show_total_price_public')} />
-              <CheckboxField label="إظهار الرسوم الحكومية للعامة" registration={serviceForm.register('show_government_fee_public')} />
-              <CheckboxField label="إظهار رسوم الشركة للعامة" registration={serviceForm.register('show_company_fee_public')} />
+              <CheckboxField label={tr('إظهار السعر الإجمالي للعامة', 'Show total price publicly')} registration={serviceForm.register('show_total_price_public')} />
+              <CheckboxField label={tr('إظهار الرسوم الحكومية للعامة', 'Show government fee publicly')} registration={serviceForm.register('show_government_fee_public')} />
+              <CheckboxField label={tr('إظهار رسوم الشركة للعامة', 'Show company fee publicly')} registration={serviceForm.register('show_company_fee_public')} />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="ملاحظة السعر بالعربية">
+              <Field label={tr('ملاحظة السعر بالعربية', 'Price note (Arabic)')}>
                 <textarea className="field min-h-24" {...serviceForm.register('public_price_note_ar')} />
               </Field>
-              <Field label="ملاحظة السعر بالإنجليزية">
+              <Field label={tr('ملاحظة السعر بالإنجليزية', 'Price note (English)')}>
                 <textarea className="field min-h-24" {...serviceForm.register('public_price_note_en')} />
               </Field>
             </div>
@@ -1427,119 +1450,125 @@ function ServicesManagementPage() {
 
           <div className="space-y-4 rounded-[1.75rem] border border-border bg-slate-50/60 p-4 sm:p-5">
             <div>
-              <h3 className="text-base font-bold text-ink">التسليم</h3>
-              <p className="text-sm leading-6 text-slate-600">يمكنك استخدام مدة متوقعة أو فترة من تاريخ إلى تاريخ للخدمات التي تتأثر بجهة خارجية.</p>
+              <h3 className="text-base font-bold text-ink">{tr('التسليم', 'Delivery')}</h3>
+              <p className="text-sm leading-6 text-slate-600">{tr('يمكنك استخدام مدة متوقعة أو نطاق زمني للخدمات التي تتأثر بجهة خارجية.', 'Use an expected duration or an expected range for services that depend on an external party.')}</p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <Field label="نوع التسليم">
+              <Field label={tr('نوع التسليم', 'Delivery type')}>
                 <select className="field" {...serviceForm.register('delivery_time_mode')}>
-                  <option value="duration">مدة متوقعة</option>
-                  <option value="duration_range">نطاق زمني متوقع</option>
+                  <option value="duration">{tr('مدة متوقعة', 'Expected duration')}</option>
+                  <option value="duration_range">{tr('نطاق زمني متوقع', 'Expected range')}</option>
                 </select>
               </Field>
-              <Field label="نوع السعر">
+              <Field label={tr('نوع السعر', 'Price type')}>
                 <select className="field" {...serviceForm.register('price_type')}>
-                  <option value="fixed">Fixed</option>
-                  <option value="starts_from">Starts from</option>
-                  <option value="quotation">Quotation</option>
-                  <option value="free">Free</option>
+                  <option value="fixed">{tr('ثابت', 'Fixed')}</option>
+                  <option value="starts_from">{tr('يبدأ من', 'Starts from')}</option>
+                  <option value="quotation">{tr('عرض سعر', 'Quotation')}</option>
+                  <option value="free">{tr('مجاني', 'Free')}</option>
                 </select>
               </Field>
-              <Field label="وحدة المدة">
+              <Field label={tr('وحدة المدة', 'Duration unit')}>
                 <select className="field" {...serviceForm.register('estimated_duration_unit')}>
-                  <option value="hours">Hours</option>
-                  <option value="days">Days</option>
-                  <option value="weeks">Weeks</option>
+                  <option value="hours">{tr('ساعات', 'Hours')}</option>
+                  <option value="days">{tr('أيام', 'Days')}</option>
+                  <option value="weeks">{tr('أسابيع', 'Weeks')}</option>
                 </select>
               </Field>
             </div>
 
             {deliveryTimeMode === 'duration_range' ? (
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="من">
+                <Field label={tr('من', 'From')}>
                   <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration_min')} />
                 </Field>
-                <Field label="إلى">
+                <Field label={tr('إلى', 'To')}>
                   <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration_max')} />
                 </Field>
               </div>
             ) : (
-              <Field label="مدة التنفيذ">
+              <Field label={tr('مدة التنفيذ', 'Execution time')}>
                 <input className="field" min="1" type="number" {...serviceForm.register('estimated_duration')} />
               </Field>
             )}
 
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="ملاحظة التسليم بالعربية">
+              <Field label={tr('ملاحظة التسليم بالعربية', 'Delivery note (Arabic)')}>
                 <textarea className="field min-h-24" {...serviceForm.register('delivery_note_ar')} />
               </Field>
-              <Field label="ملاحظة التسليم بالإنجليزية">
+              <Field label={tr('ملاحظة التسليم بالإنجليزية', 'Delivery note (English)')}>
                 <textarea className="field min-h-24" {...serviceForm.register('delivery_note_en')} />
               </Field>
             </div>
           </div>
 
-          <Field label="الشروط بالعربية">
+          <Field label={tr('الشروط بالعربية', 'Terms (Arabic)')}>
             <textarea className="field min-h-24" {...serviceForm.register('terms_ar')} />
           </Field>
-          <Field label="الشروط بالإنجليزية">
+          <Field label={tr('الشروط بالإنجليزية', 'Terms (English)')}>
             <textarea className="field min-h-24" {...serviceForm.register('terms_en')} />
           </Field>
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <CheckboxField label="الخدمة نشطة" registration={serviceForm.register('is_active')} />
-            <CheckboxField label="تظهر في الموقع العام" registration={serviceForm.register('show_on_public_site')} />
-            <CheckboxField label="تنفذ أونلاين" registration={serviceForm.register('is_online')} />
-            <CheckboxField label="تحتاج مزود خدمة" registration={serviceForm.register('provider_required')} />
-            <CheckboxField label="تحتاج مراجعة يدوية" registration={serviceForm.register('requires_manual_review')} />
-            <CheckboxField label="تحتاج موعد" registration={serviceForm.register('requires_appointment')} />
-            <CheckboxField label="خدمة مميزة" registration={serviceForm.register('is_featured')} />
+            <CheckboxField label={tr('الخدمة نشطة', 'Service is active')} registration={serviceForm.register('is_active')} />
+            <CheckboxField label={tr('تظهر في الموقع العام', 'Visible on public site')} registration={serviceForm.register('show_on_public_site')} />
+            <CheckboxField label={tr('تنفذ أونلاين', 'Delivered online')} registration={serviceForm.register('is_online')} />
+            <CheckboxField label={tr('تحتاج مزود خدمة', 'Requires a service provider')} registration={serviceForm.register('provider_required')} />
+            <CheckboxField label={tr('تحتاج مراجعة يدوية', 'Requires manual review')} registration={serviceForm.register('requires_manual_review')} />
+            <CheckboxField label={tr('تحتاج موعد', 'Requires an appointment')} registration={serviceForm.register('requires_appointment')} />
+            <CheckboxField label={tr('خدمة مميزة', 'Featured service')} registration={serviceForm.register('is_featured')} />
           </div>
         </form>
       </FormModal>
 
       <FormModal
-        description="أنشئ أو عدّل تعريف الوثيقة الرئيسي الذي سيُستخدم داخل الخدمات."
+        description={tr('أنشئ أو عدّل تعريف الوثيقة الرئيسي الذي سيُستخدم داخل الخدمات.', 'Create or edit the master document definition used inside services.')}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeModal} type="button">
-              إلغاء
+              {tr('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="document-definition-form" type="submit">
-              {selectedDefinition ? 'حفظ التعديلات' : 'إضافة التعريف'}
+              {selectedDefinition ? tr('حفظ التعديلات', 'Save changes') : tr('إضافة التعريف', 'Add definition')}
             </button>
           </div>
         }
         onClose={closeModal}
         open={activeModal === 'definition'}
         size="lg"
-        title={selectedDefinition ? `تعديل التعريف: ${selectedDefinition.name_ar}` : 'تعريف وثيقة جديد'}
+        title={selectedDefinition ? tr(`تعديل التعريف: ${selectedDefinition.name_ar}`, `Edit definition: ${selectedDefinition.name_en || selectedDefinition.name_ar}`) : tr('تعريف وثيقة جديد', 'New document definition')}
       >
         <form className="space-y-4" id="document-definition-form" onSubmit={definitionForm.handleSubmit(handleDefinitionSubmit)}>
+          <p className="rounded-2xl border border-border bg-brand-50/40 px-4 py-3 text-xs text-slate-600">
+            {tr(
+              'هذا تعريف وثيقة (نموذج بيانات رئيسي) — وليس ملفاً رفعه عميل. الملفات التي يرفعها العملاء تُدار من داخل الطلبات.',
+              'This is a document definition (a master data template) — not a file uploaded by a customer. Customer-uploaded files are managed inside orders.',
+            )}
+          </p>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="كود ثابت يُستخدم في الربط والتحقق." label="الكود">
+            <Field hint={tr('كود ثابت يُستخدم في الربط والتحقق.', 'A stable code used for linking and verification.')} label={tr('الكود', 'Code')}>
               <input className="field font-mono" {...definitionForm.register('code', { required: true })} />
             </Field>
-            <Field label="ترتيب العرض">
+            <Field label={tr('ترتيب العرض', 'Display order')}>
               <input className="field" type="number" {...definitionForm.register('sort_order')} />
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="الاسم بالعربية">
+            <Field label={tr('الاسم بالعربية', 'Name (Arabic)')}>
               <input className="field" {...definitionForm.register('name_ar', { required: true })} />
             </Field>
-            <Field label="الاسم بالإنجليزية">
+            <Field label={tr('الاسم بالإنجليزية', 'Name (English)')}>
               <input className="field" {...definitionForm.register('name_en')} />
             </Field>
           </div>
-          <Field label="الوصف بالعربية">
+          <Field label={tr('الوصف بالعربية', 'Description (Arabic)')}>
             <textarea className="field min-h-24" {...definitionForm.register('description_ar')} />
           </Field>
-          <Field label="الوصف بالإنجليزية">
+          <Field label={tr('الوصف بالإنجليزية', 'Description (English)')}>
             <textarea className="field min-h-24" {...definitionForm.register('description_en')} />
           </Field>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field hint="اختر أنواع الملفات التي يسمح برفعها." label="أنواع الملفات المسموحة">
+            <Field hint={tr('اختر أنواع الملفات التي يسمح برفعها.', 'Choose which file types can be uploaded.')} label={tr('أنواع الملفات المسموحة', 'Allowed file types')}>
               <div className="grid gap-3 md:grid-cols-1">
                 {DOCUMENT_EXTENSION_OPTIONS.map((option) => (
                   <label key={option.value} className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm">
@@ -1556,12 +1585,12 @@ function ServicesManagementPage() {
                       }
                       type="checkbox"
                     />
-                    <span>{option.label}</span>
+                    <span>{isArabic ? option.label_ar : option.label_en}</span>
                   </label>
                 ))}
               </div>
             </Field>
-            <Field hint="اختر الحد الأقصى من قائمة جاهزة." label="الحد الأقصى لحجم الملف">
+            <Field hint={tr('اختر الحد الأقصى من قائمة جاهزة.', 'Pick the maximum from a ready-made list.')} label={tr('الحد الأقصى لحجم الملف', 'Maximum file size')}>
               <select className="field" {...definitionForm.register('max_file_size')}>
                 {DOCUMENT_SIZE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -1571,7 +1600,7 @@ function ServicesManagementPage() {
               </select>
             </Field>
           </div>
-          <CheckboxField label="التعريف نشط" registration={definitionForm.register('is_active')} />
+          <CheckboxField label={tr('التعريف نشط', 'Definition is active')} registration={definitionForm.register('is_active')} />
         </form>
       </FormModal>
 
@@ -1611,6 +1640,3 @@ function ServicesManagementPage() {
 }
 
 export default ServicesManagementPage
-
-
-

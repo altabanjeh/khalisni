@@ -307,7 +307,7 @@ function ServiceProviderAssignmentsPage() {
             >
               <option value="">{isArabic ? 'اختر الخدمة' : 'Select service'}</option>
               {availableServices.map((service) => (
-                <option key={service.id} value={service.id}>{service.name_ar}</option>
+                <option key={service.id} value={service.id}>{isArabic ? service.name_ar : (service.name_en || service.name_ar)}</option>
               ))}
             </select>
           </Field>

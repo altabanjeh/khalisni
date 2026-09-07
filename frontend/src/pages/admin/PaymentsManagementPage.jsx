@@ -7,6 +7,7 @@ import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
@@ -14,14 +15,14 @@ import { formatDateTime } from '../../utils/format'
 const PAGE_SIZE = 20
 
 const statusOptions = [
-  { value: '', label: 'كل الحالات' },
-  { value: 'pending', label: 'معلق' },
-  { value: 'processing', label: 'قيد المعالجة' },
-  { value: 'paid', label: 'مدفوع' },
-  { value: 'failed', label: 'فشل' },
-  { value: 'refunded', label: 'مسترجع' },
-  { value: 'partially_refunded', label: 'مسترجع جزئياً' },
-  { value: 'cancelled', label: 'ملغي' },
+  { value: '', label_ar: 'كل الحالات', label_en: 'All statuses' },
+  { value: 'pending', label_ar: 'معلق', label_en: 'Pending' },
+  { value: 'processing', label_ar: 'قيد المعالجة', label_en: 'Processing' },
+  { value: 'paid', label_ar: 'مدفوع', label_en: 'Paid' },
+  { value: 'failed', label_ar: 'فشل', label_en: 'Failed' },
+  { value: 'refunded', label_ar: 'مسترجع', label_en: 'Refunded' },
+  { value: 'partially_refunded', label_ar: 'مسترجع جزئياً', label_en: 'Partially refunded' },
+  { value: 'cancelled', label_ar: 'ملغي', label_en: 'Cancelled' },
 ]
 
 const statusMap = {
@@ -45,6 +46,9 @@ function Field({ label, children }) {
 
 function PaymentsManagementPage() {
   const { toast } = useToast()
+  const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
+  const optionLabel = (option) => (isArabic ? option.label_ar : option.label_en)
   const [filterStatus, setFilterStatus] = useState('')
   const [filterOrderNumber, setFilterOrderNumber] = useState('')
   const [selectedPaymentId, setSelectedPaymentId] = useState(null)
@@ -81,7 +85,7 @@ function PaymentsManagementPage() {
     setSubmitting(true)
     try {
       await api.updateAdminPaymentStatus(selectedPayment.id, values)
-      toast('تم تحديث حالة الدفع.', 'success')
+      toast(tr('تم تحديث حالة الدفع.', 'Payment status updated.'), 'success')
       reload()
       closeForm()
     } catch (error) {
@@ -96,43 +100,44 @@ function PaymentsManagementPage() {
       <div className="relative">
         <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
+          aria-label={tr('بحث برقم الطلب', 'Search by order number')}
           className="field ps-9 text-sm"
           onChange={(event) => { setFilterOrderNumber(event.target.value); setPage(1) }}
-          placeholder="رقم الطلب..."
+          placeholder={tr('رقم الطلب...', 'Order number…')}
           value={filterOrderNumber}
         />
       </div>
-      <select className="field min-w-44 text-sm" onChange={(event) => { setFilterStatus(event.target.value); setPage(1) }} value={filterStatus}>
+      <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field min-w-44 text-sm" onChange={(event) => { setFilterStatus(event.target.value); setPage(1) }} value={filterStatus}>
         {statusOptions.map((option) => (
-          <option key={option.value} value={option.value}>{option.label}</option>
+          <option key={option.value} value={option.value}>{optionLabel(option)}</option>
         ))}
       </select>
     </div>
   )
 
   const columns = [
-    { key: 'payment_number', label: 'رقم الدفع' },
-    { key: 'order_number', label: 'رقم الطلب' },
-    { key: 'customer_name', label: 'العميل' },
-    { key: 'payment_type_label', label: 'النوع' },
-    { key: 'method_label', label: 'طريقة الدفع' },
+    { key: 'payment_number', label: tr('رقم الدفع', 'Payment #') },
+    { key: 'order_number', label: tr('رقم الطلب', 'Order #') },
+    { key: 'customer_name', label: tr('العميل', 'Customer') },
+    { key: 'payment_type_label', label: tr('النوع', 'Type') },
+    { key: 'method_label', label: tr('طريقة الدفع', 'Method') },
     {
       key: 'status',
-      label: 'الحالة',
+      label: tr('الحالة', 'Status'),
       render: (row) => <StatusBadge status={statusMap[row.status] || row.status} />,
     },
     {
       key: 'amount',
-      label: 'المبلغ',
+      label: tr('المبلغ', 'Amount'),
       render: (row) => `${row.amount} ${row.currency || 'JOD'}`,
     },
-    { key: 'created_at', label: 'التاريخ', render: (row) => formatDateTime(row.created_at) },
+    { key: 'created_at', label: tr('التاريخ', 'Date'), render: (row) => formatDateTime(row.created_at) },
     {
       key: 'actions',
-      label: 'الإجراءات',
+      label: tr('الإجراءات', 'Actions'),
       render: (row) => (
         <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
-          تعديل الحالة
+          {tr('تعديل الحالة', 'Update status')}
         </button>
       ),
     },
@@ -141,22 +146,28 @@ function PaymentsManagementPage() {
   return (
     <div className="page-section space-y-6">
       <PageHeader
-        description="استعرض سجل الدفعات وحدث حالة أي عملية من نافذة واضحة بدلاً من بطاقة جانبية ضيقة."
-        eyebrow="إدارة المدفوعات"
+        description={tr(
+          'استعرض سجل الدفعات وحدّث حالة أي عملية من نافذة واضحة بدلاً من بطاقة جانبية ضيقة.',
+          'Review the payment log and update any transaction status from a clear dialog instead of a narrow side card.',
+        )}
+        eyebrow={tr('إدارة المدفوعات', 'Payments management')}
         icon={CreditCard}
-        title="المدفوعات"
+        title={tr('المدفوعات', 'Payments')}
       />
 
       <section className="glass-panel p-5">
         <p className="text-sm leading-7 text-slate-600">
-          افتح أي دفعة من الجدول لتحديث حالتها أو إضافة المرجع والملاحظات. تم نقل نموذج التعديل إلى نافذة مستقلة حتى تبقى القائمة أسهل في المراجعة والمتابعة.
+          {tr(
+            'افتح أي دفعة من الجدول لتحديث حالتها أو إضافة المرجع والملاحظات. تم نقل نموذج التعديل إلى نافذة مستقلة حتى تبقى القائمة أسهل في المراجعة والمتابعة.',
+            'Open any payment from the table to update its status or add a reference and notes. The edit form moved to a dedicated dialog so the list stays easy to review and follow.',
+          )}
         </p>
       </section>
 
       <DataTable
         columns={columns}
-        emptyDescription="لا توجد مدفوعات مسجلة بعد أو لا تطابق أي نتيجة المرشحات الحالية."
-        emptyTitle="لا توجد مدفوعات"
+        emptyDescription={tr('لا توجد مدفوعات مسجلة بعد أو لا تطابق أي نتيجة المرشحات الحالية.', 'No payments recorded yet, or none match the current filters.')}
+        emptyTitle={tr('لا توجد مدفوعات', 'No payments')}
         loading={loading}
         mobileCard={(row) => (
           <div className="space-y-2">
@@ -174,51 +185,54 @@ function PaymentsManagementPage() {
       />
 
       <FormModal
-        description="حدث الحالة وأضف المرجع أو الملاحظات عند الحاجة. استخدم سبب الفشل فقط للحالات الفاشلة أو الملغاة."
+        description={tr(
+          'حدّث الحالة وأضف المرجع أو الملاحظات عند الحاجة. استخدم سبب الفشل فقط للحالات الفاشلة أو الملغاة.',
+          'Update the status and add a reference or notes when needed. Use the failure reason only for failed or cancelled states.',
+        )}
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="btn-secondary" onClick={closeForm} type="button">
-              إلغاء
+              {tr('إلغاء', 'Cancel')}
             </button>
             <button className="btn-primary min-w-40" disabled={submitting} form="payment-status-form" type="submit">
               {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
-              تحديث الحالة
+              {tr('تحديث الحالة', 'Update status')}
             </button>
           </div>
         }
         onClose={closeForm}
         open={isFormOpen}
         size="md"
-        title={selectedPayment ? `تعديل ${selectedPayment.payment_number}` : 'تعديل حالة الدفع'}
+        title={selectedPayment ? tr(`تعديل ${selectedPayment.payment_number}`, `Edit ${selectedPayment.payment_number}`) : tr('تعديل حالة الدفع', 'Edit payment status')}
       >
         {selectedPayment ? (
           <form className="space-y-5" id="payment-status-form" onSubmit={statusForm.handleSubmit(handleStatusUpdate)}>
             <div className="rounded-3xl border border-border bg-slate-50 p-4 text-sm space-y-2">
-              <p>رقم الطلب: <span className="font-semibold">{selectedPayment.order_number}</span></p>
-              <p>العميل: <span className="font-semibold">{selectedPayment.customer_name}</span></p>
-              <p>المبلغ: <span className="font-semibold">{selectedPayment.amount} {selectedPayment.currency}</span></p>
-              <p>طريقة الدفع: <span className="font-semibold">{selectedPayment.method_label}</span></p>
+              <p>{tr('رقم الطلب:', 'Order number:')} <span className="font-semibold">{selectedPayment.order_number}</span></p>
+              <p>{tr('العميل:', 'Customer:')} <span className="font-semibold">{selectedPayment.customer_name}</span></p>
+              <p>{tr('المبلغ:', 'Amount:')} <span className="font-semibold">{selectedPayment.amount} {selectedPayment.currency}</span></p>
+              <p>{tr('طريقة الدفع:', 'Payment method:')} <span className="font-semibold">{selectedPayment.method_label}</span></p>
             </div>
 
-            <Field label="الحالة الجديدة">
+            <Field label={tr('الحالة الجديدة', 'New status')}>
               <select className="field" {...statusForm.register('status', { required: true })}>
-                <option value="">اختر الحالة الجديدة</option>
+                <option value="">{tr('اختر الحالة الجديدة', 'Select the new status')}</option>
                 {statusOptions.filter((option) => option.value).map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                  <option key={option.value} value={option.value}>{optionLabel(option)}</option>
                 ))}
               </select>
             </Field>
 
-            <Field label="المرجع أو رقم الإيصال">
-              <input className="field" placeholder="المرجع أو رقم الإيصال" {...statusForm.register('reference_number')} />
+            <Field label={tr('المرجع أو رقم الإيصال', 'Reference or receipt number')}>
+              <input className="field" placeholder={tr('المرجع أو رقم الإيصال', 'Reference or receipt number')} {...statusForm.register('reference_number')} />
             </Field>
 
-            <Field label="ملاحظات">
-              <textarea className="field min-h-24" placeholder="ملاحظات إضافية" {...statusForm.register('notes')} />
+            <Field label={tr('ملاحظات', 'Notes')}>
+              <textarea className="field min-h-24" placeholder={tr('ملاحظات إضافية', 'Additional notes')} {...statusForm.register('notes')} />
             </Field>
 
-            <Field label="سبب الفشل">
-              <input className="field" placeholder="يستخدم عند الحاجة فقط" {...statusForm.register('failure_reason')} />
+            <Field label={tr('سبب الفشل', 'Failure reason')}>
+              <input className="field" placeholder={tr('يستخدم عند الحاجة فقط', 'Used only when needed')} {...statusForm.register('failure_reason')} />
             </Field>
           </form>
         ) : null}
