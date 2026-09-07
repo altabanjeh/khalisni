@@ -1,0 +1,636 @@
+{
+  "apiServices": 32,
+  "apiCategories": 7,
+  "servicesWithoutImageUrl": [],
+  "categoriesWithoutImageUrl": [],
+  "captured": [
+    "ar-home-1440",
+    "ar-services-1440",
+    "ar-category-1-civil-status-and-passports-1440",
+    "ar-category-2-land-and-survey-1440",
+    "ar-category-3-business_services-1440",
+    "ar-category-4-quick-public-services-1440",
+    "ar-category-5-tax-1440",
+    "ar-category-6-municipal-services-1440",
+    "ar-category-7-ministry-of-labour-1440",
+    "ar-service-01-passport-appointment-booking-1440",
+    "ar-service-02-business_company_registration-1440",
+    "ar-service-03-request-property-registration-certificate-1440",
+    "ar-service-04-business_company_information_amendment-1440",
+    "ar-service-05-request-cadastral-map-1440",
+    "ar-service-06-traffic-fines-payment-1440",
+    "ar-service-07-business_company_add_activities-1440",
+    "ar-service-08-request-property-ownership-transfer-1440",
+    "ar-service-09-tax-clearance-1440",
+    "ar-service-10-business_commercial_registration_certificate-1440",
+    "ar-service-11-request-inheritance-registration-1440",
+    "ar-service-12-business-license-renewal-1440",
+    "ar-home-390",
+    "ar-services-390",
+    "ar-category-1-civil-status-and-passports-390",
+    "ar-category-2-land-and-survey-390",
+    "ar-category-3-business_services-390",
+    "ar-category-4-quick-public-services-390",
+    "ar-category-5-tax-390",
+    "ar-category-6-municipal-services-390",
+    "ar-category-7-ministry-of-labour-390",
+    "ar-service-01-passport-appointment-booking-390",
+    "ar-service-02-business_company_registration-390",
+    "ar-service-03-request-property-registration-certificate-390",
+    "ar-service-04-business_company_information_amendment-390",
+    "ar-service-05-request-cadastral-map-390",
+    "ar-service-06-traffic-fines-payment-390",
+    "ar-service-07-business_company_add_activities-390",
+    "ar-service-08-request-property-ownership-transfer-390",
+    "ar-service-09-tax-clearance-390",
+    "ar-service-10-business_commercial_registration_certificate-390",
+    "ar-service-11-request-inheritance-registration-390",
+    "ar-service-12-business-license-renewal-390",
+    "en-home-1440",
+    "en-services-1440",
+    "en-category-1-civil-status-and-passports-1440",
+    "en-category-2-land-and-survey-1440",
+    "en-category-3-business_services-1440",
+    "en-category-4-quick-public-services-1440",
+    "en-category-5-tax-1440",
+    "en-category-6-municipal-services-1440",
+    "en-category-7-ministry-of-labour-1440",
+    "en-service-01-passport-appointment-booking-1440",
+    "en-service-02-business_company_registration-1440",
+    "en-service-03-request-property-registration-certificate-1440",
+    "en-service-04-business_company_information_amendment-1440",
+    "en-service-05-request-cadastral-map-1440",
+    "en-service-06-traffic-fines-payment-1440",
+    "en-service-07-business_company_add_activities-1440",
+    "en-service-08-request-property-ownership-transfer-1440",
+    "en-service-09-tax-clearance-1440",
+    "en-service-10-business_commercial_registration_certificate-1440",
+    "en-service-11-request-inheritance-registration-1440",
+    "en-service-12-business-license-renewal-1440",
+    "en-home-390",
+    "en-services-390",
+    "en-category-1-civil-status-and-passports-390",
+    "en-category-2-land-and-survey-390",
+    "en-category-3-business_services-390",
+    "en-category-4-quick-public-services-390",
+    "en-category-5-tax-390",
+    "en-category-6-municipal-services-390",
+    "en-category-7-ministry-of-labour-390",
+    "en-service-01-passport-appointment-booking-390",
+    "en-service-02-business_company_registration-390",
+    "en-service-03-request-property-registration-certificate-390",
+    "en-service-04-business_company_information_amendment-390",
+    "en-service-05-request-cadastral-map-390",
+    "en-service-06-traffic-fines-payment-390",
+    "en-service-07-business_company_add_activities-390",
+    "en-service-08-request-property-ownership-transfer-390",
+    "en-service-09-tax-clearance-390",
+    "en-service-10-business_commercial_registration_certificate-390",
+    "en-service-11-request-inheritance-registration-390",
+    "en-service-12-business-license-renewal-390"
+  ],
+  "brokenImages": [],
+  "gradientOnlyCovers": [],
+  "fallbackSvgCovers": [
+    "ar home @1440: 4",
+    "ar category-1-civil-status-and-passports @1440: 1",
+    "ar category-2-land-and-survey @1440: 1",
+    "ar category-3-business_services @1440: 1",
+    "ar category-4-quick-public-services @1440: 1",
+    "ar category-5-tax @1440: 1",
+    "ar category-6-municipal-services @1440: 1",
+    "ar category-7-ministry-of-labour @1440: 1",
+    "ar home @390: 4",
+    "ar category-1-civil-status-and-passports @390: 1",
+    "ar category-2-land-and-survey @390: 1",
+    "ar category-3-business_services @390: 1",
+    "ar category-4-quick-public-services @390: 1",
+    "ar category-5-tax @390: 1",
+    "ar category-6-municipal-services @390: 1",
+    "ar category-7-ministry-of-labour @390: 1",
+    "en home @1440: 4",
+    "en category-1-civil-status-and-passports @1440: 1",
+    "en category-2-land-and-survey @1440: 1",
+    "en category-3-business_services @1440: 1",
+    "en category-4-quick-public-services @1440: 1",
+    "en category-5-tax @1440: 1",
+    "en category-6-municipal-services @1440: 1",
+    "en category-7-ministry-of-labour @1440: 1",
+    "en home @390: 4",
+    "en category-1-civil-status-and-passports @390: 1",
+    "en category-2-land-and-survey @390: 1",
+    "en category-3-business_services @390: 1",
+    "en category-4-quick-public-services @390: 1",
+    "en category-5-tax @390: 1",
+    "en category-6-municipal-services @390: 1",
+    "en category-7-ministry-of-labour @390: 1"
+  ],
+  "consoleErrors": [],
+  "overflow": [],
+  "coverKindByScreen": {
+    "ar home @1440": {
+      "total": 4,
+      "media": 0,
+      "fallbackSvg": 4,
+      "gradient": 0
+    },
+    "ar services @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar category-1-civil-status-and-passports @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-2-land-and-survey @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-3-business_services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-4-quick-public-services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-5-tax @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-6-municipal-services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-7-ministry-of-labour @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar service-01-passport-appointment-booking @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-02-business_company_registration @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-03-request-property-registration-certificate @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-04-business_company_information_amendment @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-05-request-cadastral-map @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-06-traffic-fines-payment @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-07-business_company_add_activities @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-08-request-property-ownership-transfer @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-09-tax-clearance @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-10-business_commercial_registration_certificate @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-11-request-inheritance-registration @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-12-business-license-renewal @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar home @390": {
+      "total": 4,
+      "media": 0,
+      "fallbackSvg": 4,
+      "gradient": 0
+    },
+    "ar services @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar category-1-civil-status-and-passports @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-2-land-and-survey @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-3-business_services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-4-quick-public-services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-5-tax @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-6-municipal-services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar category-7-ministry-of-labour @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "ar service-01-passport-appointment-booking @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-02-business_company_registration @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-03-request-property-registration-certificate @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-04-business_company_information_amendment @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-05-request-cadastral-map @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-06-traffic-fines-payment @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-07-business_company_add_activities @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-08-request-property-ownership-transfer @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-09-tax-clearance @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-10-business_commercial_registration_certificate @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-11-request-inheritance-registration @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "ar service-12-business-license-renewal @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en home @1440": {
+      "total": 4,
+      "media": 0,
+      "fallbackSvg": 4,
+      "gradient": 0
+    },
+    "en services @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en category-1-civil-status-and-passports @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-2-land-and-survey @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-3-business_services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-4-quick-public-services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-5-tax @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-6-municipal-services @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-7-ministry-of-labour @1440": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en service-01-passport-appointment-booking @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-02-business_company_registration @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-03-request-property-registration-certificate @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-04-business_company_information_amendment @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-05-request-cadastral-map @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-06-traffic-fines-payment @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-07-business_company_add_activities @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-08-request-property-ownership-transfer @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-09-tax-clearance @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-10-business_commercial_registration_certificate @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-11-request-inheritance-registration @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-12-business-license-renewal @1440": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en home @390": {
+      "total": 4,
+      "media": 0,
+      "fallbackSvg": 4,
+      "gradient": 0
+    },
+    "en services @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en category-1-civil-status-and-passports @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-2-land-and-survey @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-3-business_services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-4-quick-public-services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-5-tax @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-6-municipal-services @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en category-7-ministry-of-labour @390": {
+      "total": 1,
+      "media": 0,
+      "fallbackSvg": 1,
+      "gradient": 0
+    },
+    "en service-01-passport-appointment-booking @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-02-business_company_registration @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-03-request-property-registration-certificate @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-04-business_company_information_amendment @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-05-request-cadastral-map @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-06-traffic-fines-payment @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-07-business_company_add_activities @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-08-request-property-ownership-transfer @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-09-tax-clearance @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-10-business_commercial_registration_certificate @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-11-request-inheritance-registration @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    },
+    "en service-12-business-license-renewal @390": {
+      "total": 0,
+      "media": 0,
+      "fallbackSvg": 0,
+      "gradient": 0
+    }
+  }
+}
