@@ -16,7 +16,7 @@ import { useLanguage } from '../context/LanguageContext'
  *
  * Consumers wrap each child in <ServiceRailItem> to get consistent snap widths.
  */
-export function ServiceRail({ title, description, action, children, itemCount = 0, id }) {
+export function ServiceRail({ title, description, action, children, itemCount = 0, id, eyebrow }) {
   const railRef = useRef(null)
   const { isArabic } = useLanguage()
   const PreviousIcon = isArabic ? ArrowRight : ArrowLeft
@@ -60,17 +60,18 @@ export function ServiceRail({ title, description, action, children, itemCount = 
   const headingId = id ? `${id}-heading` : undefined
 
   return (
-    <section aria-labelledby={headingId} className="kh-public-container py-7 sm:py-9">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <section aria-labelledby={headingId} className="kh-public-container py-8 sm:py-11">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-3xl text-start">
+          {eyebrow ? <span className="kh-eyebrow mb-3">{eyebrow}</span> : null}
           <h2
-            className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl"
+            className="text-[1.75rem] font-black leading-tight tracking-tight text-[var(--khalsni-public-navy)] sm:text-4xl"
             id={headingId}
           >
             {title}
           </h2>
           {description ? (
-            <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
+            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">
               {description}
             </p>
           ) : null}
@@ -81,7 +82,7 @@ export function ServiceRail({ title, description, action, children, itemCount = 
             <div className="hidden items-center gap-2 md:flex">
               <button
                 aria-label={labels.previous}
-                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]"
+                className="kh-focusable grid h-11 w-11 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] text-[var(--khalsni-public-navy)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)] hover:shadow-md"
                 onClick={() => scrollByStep(-1)}
                 type="button"
               >
@@ -89,7 +90,7 @@ export function ServiceRail({ title, description, action, children, itemCount = 
               </button>
               <button
                 aria-label={labels.next}
-                className="kh-focusable grid h-10 w-10 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]"
+                className="kh-focusable grid h-11 w-11 place-items-center rounded-full border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] text-[var(--khalsni-public-navy)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)] hover:shadow-md"
                 onClick={() => scrollByStep(1)}
                 type="button"
               >
@@ -101,7 +102,7 @@ export function ServiceRail({ title, description, action, children, itemCount = 
       </div>
       <div
         aria-label={labels.region}
-        className="kh-focusable -mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-3 scroll-smooth sm:mx-0 sm:px-0"
+        className="kh-focusable kh-rail-scroll kh-rail-fade -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 pt-1 scroll-smooth sm:-mx-6 sm:px-6 lg:gap-5"
         onKeyDown={handleKeyDown}
         ref={railRef}
         role="group"
@@ -116,10 +117,10 @@ export function ServiceRail({ title, description, action, children, itemCount = 
 export function ServiceRailItem({ children, size = 'standard' }) {
   const width =
     size === 'featured'
-      ? 'w-[86vw] sm:w-[22rem] lg:w-[21rem]'
+      ? 'w-[78vw] xs:w-[70vw] sm:w-[21rem] lg:w-[22rem]'
       : size === 'compact'
-        ? 'w-[70vw] sm:w-[15rem] lg:w-[16rem]'
-        : 'w-[82vw] sm:w-[19rem] lg:w-[20rem]'
+        ? 'w-[62vw] xs:w-[55vw] sm:w-[15rem] lg:w-[16rem]'
+        : 'w-[74vw] xs:w-[64vw] sm:w-[19rem] lg:w-[20rem]'
   return <div className={`shrink-0 snap-start ${width}`}>{children}</div>
 }
 

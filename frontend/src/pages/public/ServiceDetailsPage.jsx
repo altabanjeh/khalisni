@@ -9,14 +9,12 @@ import {
   Layers3,
   ListChecks,
   ReceiptText,
-  ShieldCheck,
   WalletCards,
 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import ServiceCard from '../../components/ServiceCard'
 import {
   EmptyState,
-  ImageFallback,
   PublicLinkButton,
   PublicLoading,
   PublicPageShell,
@@ -26,6 +24,7 @@ import {
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getCover } from '../../utils/cover'
 import { formatCurrency } from '../../utils/format'
 import { getLocalizedField } from '../../utils/i18n'
 import {
@@ -122,7 +121,6 @@ function ServiceDetailsPage() {
   const serviceName = getServiceName(service, language)
   const serviceDescription = getServiceDescription(service, language, '')
   const categoryName = getCategoryName(service.category, language, isArabic ? 'الخدمات' : 'Services')
-  const serviceImageUrl = service.image_url || service.image || service.category?.image_url || service.category?.image
   const duration = getServiceDuration(service, language)
   const price = getServicePublicPrice(service, language)
   const pricing = service.pricing || {}
@@ -174,55 +172,68 @@ function ServiceDetailsPage() {
       : null,
   ].filter(Boolean)
 
+  const heroCover = getCover(service, service?.category?.slug || '')
+
   return (
     <PublicPageShell className="pb-24 lg:pb-7">
-      <section className="grid gap-5 rounded-[var(--radius-xl)] bg-white p-4 text-start shadow-soft ring-1 ring-[var(--khalsni-public-border)] sm:p-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
-        <ImageFallback
-          alt={serviceName}
-          className="aspect-[16/10] min-h-56 rounded-[var(--radius-lg)] lg:min-h-[23rem]"
-          icon={FileText}
-          src={serviceImageUrl}
-        />
-
-        <div className="min-w-0 space-y-5 lg:px-4">
-          <div>
-            <Link
-              className="kh-focusable inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-accent-text)] transition hover:bg-[var(--khalsni-public-primary)] hover:text-white"
-              to={service.category?.slug ? `/services/category/${service.category.slug}` : '/services'}
-            >
-              <Layers3 aria-hidden="true" className="h-4 w-4" />
-              {categoryName}
-            </Link>
-            <h1 className="mt-4 text-3xl font-black leading-tight text-[var(--khalsni-public-navy)] sm:text-4xl lg:text-5xl">{serviceName}</h1>
-            {serviceDescription ? (
-              <p className="mt-4 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">
-                {serviceDescription}
-              </p>
+      {/* Cinematic service hero */}
+      <section className="kh-cover relative min-h-[20rem] overflow-hidden rounded-[var(--radius-2xl)] text-start shadow-2xl sm:min-h-[24rem]" style={heroCover.hasImage ? undefined : heroCover.style}>
+        {heroCover.hasImage ? (
+          <img alt={serviceName} className="absolute inset-0 h-full w-full object-cover" src={heroCover.imageUrl} />
+        ) : (
+          <>
+            <span aria-hidden="true" className="kh-cover-pattern" />
+            <Layers3 aria-hidden="true" className="kh-cover-glyph" />
+          </>
+        )}
+        <div className="kh-cover-content flex min-h-[inherit] flex-col justify-end gap-5 p-6 sm:p-9 lg:p-11">
+          <Link
+            className="kh-focusable inline-flex w-fit items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm backdrop-blur transition hover:bg-white"
+            to={service.category?.slug ? `/services/category/${service.category.slug}` : '/services'}
+          >
+            <Layers3 aria-hidden="true" className="h-4 w-4 text-[var(--khalsni-public-accent-text)]" />
+            {categoryName}
+          </Link>
+          <h1 className="max-w-4xl text-3xl font-black leading-[1.1] tracking-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl">{serviceName}</h1>
+          {serviceDescription ? (
+            <p className="max-w-2xl text-sm font-semibold leading-7 text-white/90 sm:text-base">{serviceDescription}</p>
+          ) : null}
+          <div className="flex flex-wrap gap-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur">
+              <Clock3 aria-hidden="true" className="h-4 w-4" />{duration.label}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur">
+              <WalletCards aria-hidden="true" className="h-4 w-4" />{price.label}
+            </span>
+            {requiredDocuments.length ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur">
+                <FileText aria-hidden="true" className="h-4 w-4" />{requiredDocuments.length} {isArabic ? 'مستند' : 'documents'}
+              </span>
             ) : null}
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            <DetailPill icon={Clock3} label={isArabic ? 'المدة' : 'Duration'} value={duration.label} />
-            <DetailPill icon={WalletCards} label={isArabic ? 'السعر' : 'Price'} value={price.label} />
-            <DetailPill icon={ShieldCheck} label={isArabic ? 'التصنيف' : 'Category'} value={categoryName} />
-          </div>
-
-          {duration.note || price.note ? (
-            <div className="rounded-[var(--radius-lg)] bg-[var(--khalsni-public-bg-secondary)] p-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
-              {[duration.note, price.note].filter(Boolean).join(' · ')}
-            </div>
-          ) : null}
-
           <div className="flex flex-col gap-3 sm:flex-row">
-            <PublicLinkButton className="w-full sm:w-auto" to={requestPath}>
+            <Link
+              className="kh-focusable inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-sm font-extrabold text-[var(--khalsni-public-primary)] shadow-lg transition hover:bg-white/90"
+              to={requestPath}
+            >
               {isArabic ? 'ابدأ الطلب' : 'Start request'}
-            </PublicLinkButton>
-            <PublicLinkButton className="w-full sm:w-auto" to="/services" variant="secondary">
+              {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
+            </Link>
+            <Link
+              className="kh-focusable inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-white/40 bg-white/10 px-6 text-sm font-extrabold text-white backdrop-blur transition hover:bg-white/20"
+              to="/services"
+            >
               {isArabic ? 'كل الخدمات' : 'All services'}
-            </PublicLinkButton>
+            </Link>
           </div>
         </div>
       </section>
+
+      {duration.note || price.note ? (
+        <div className="rounded-[var(--radius-lg)] bg-[var(--khalsni-public-bg-secondary)] p-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
+          {[duration.note, price.note].filter(Boolean).join(' · ')}
+        </div>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <main className="space-y-6">

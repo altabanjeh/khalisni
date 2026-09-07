@@ -105,12 +105,12 @@ function MyOrdersPage() {
       </section>
 
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
           {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton className="h-64" key={index} />)}
         </div>
       ) : filtered.length ? (
         <>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
             {filtered.slice(0, visible).map((order) => (
               <RequestCard key={order.id} order={order} />
             ))}

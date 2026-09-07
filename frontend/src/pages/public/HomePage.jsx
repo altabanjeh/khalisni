@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Clock3,
   FileText,
+  Layers,
   Loader2,
   Search,
   SendHorizontal,
@@ -19,10 +20,10 @@ import CategoryCard from '../../components/CategoryCard'
 import ServiceCard from '../../components/ServiceCard'
 import { ServiceRail, ServiceRailItem } from '../../components/ServiceRail'
 import { ImageFallback } from '../../components/public/PublicPage'
+import { getCover } from '../../utils/cover'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
-import { usePublicSite } from '../../context/PublicSiteContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import {
@@ -34,7 +35,6 @@ import {
   getServicePublicPrice,
 } from '../../utils/servicePresentation'
 
-const heroImage = '/images/homepage/hero-property.jpg'
 
 const copy = {
   ar: {
@@ -365,44 +365,71 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
 }
 
 
-function HeroVisual({ content, services, categories, dictionary, isArabic, language }) {
-  const previewService = services[0]
-  const previewName = previewService ? getServiceName(previewService, language, isArabic ? 'خدمة' : 'Service') : dictionary.heroCardTitle
-  const previewDuration = previewService ? getServiceDuration(previewService, language).label : dictionary.servicesLabel
-  const previewPrice = previewService ? getServicePublicPrice(previewService, language).label : dictionary.categoriesLabel
-  const serviceImage = previewService?.image_url || previewService?.image || previewService?.category?.image_url || previewService?.category?.image
+function HeroPreviewCard({ service, dictionary, isArabic, language, className = '' }) {
+  const name = service ? getServiceName(service, language, isArabic ? 'خدمة' : 'Service') : dictionary.heroCardTitle
+  const category = service?.category ? getCategoryName(service.category, language, '') : ''
+  const durationLabel = service ? getServiceDuration(service, language).label : dictionary.servicesLabel
+  const priceLabel = service ? getServicePublicPrice(service, language).label : dictionary.categoriesLabel
+  const cover = getCover(service || { slug: name }, service?.category?.slug || '')
 
   return (
-    <div className="relative mx-auto w-full max-w-xl lg:ms-auto">
-      <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--khalsni-public-border)] bg-white p-3 shadow-lg">
-        <ImageFallback
-          alt={isArabic ? 'تصفح خدمات خلصني' : 'Browsing Khalsni services'}
-          className="aspect-[4/3] rounded-[var(--radius-xl)]"
-          src={content.hero_image_url || heroImage}
-        />
-        <div className="absolute inset-x-6 bottom-6 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface-elevated)] p-4 text-start shadow-lg">
-          <div className="flex items-start gap-3">
-            <ImageFallback alt={previewName} className="h-14 w-14 shrink-0 rounded-[var(--radius-md)]" icon={FileText} src={serviceImage} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-black text-[var(--khalsni-public-navy)]">{previewName}</p>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">
-                <span className="inline-flex min-w-0 items-center gap-1">
-                  <Clock3 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-accent-text)]" />
-                  <span className="truncate">{previewDuration}</span>
-                </span>
-                <span className="inline-flex min-w-0 items-center gap-1">
-                  <WalletCards aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[var(--khalsni-public-accent-text)]" />
-                  <span className="truncate">{previewPrice}</span>
-                </span>
-              </div>
-            </div>
+    <div className={`w-64 overflow-hidden rounded-[var(--radius-xl)] border border-black/5 bg-white shadow-xl ${className}`}>
+      <div className="kh-cover relative h-24 w-full" style={cover.style}>
+        <span aria-hidden="true" className="kh-cover-pattern" />
+        <Layers aria-hidden="true" className="kh-cover-glyph" />
+        {category ? (
+          <div className="kh-cover-content flex h-full items-start p-3">
+            <span className="rounded-full bg-white/95 px-2 py-0.5 text-[0.65rem] font-extrabold text-[var(--khalsni-public-navy)]">{category}</span>
           </div>
+        ) : null}
+      </div>
+      <div className="p-3 text-start">
+        <p className="line-clamp-2 text-sm font-black leading-5 text-[var(--khalsni-public-navy)]">{name}</p>
+        <div className="mt-2 flex items-center gap-3 text-[0.7rem] font-bold text-[var(--khalsni-public-text-secondary)]">
+          <span className="inline-flex items-center gap-1">
+            <Clock3 aria-hidden="true" className="h-3.5 w-3.5 text-[var(--khalsni-public-accent-text)]" />
+            <span className="truncate">{durationLabel}</span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <WalletCards aria-hidden="true" className="h-3.5 w-3.5 text-[var(--khalsni-public-accent-text)]" />
+            <span className="truncate">{priceLabel}</span>
+          </span>
         </div>
       </div>
-      <div className="absolute -top-3 start-3 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-accent-text)] shadow-md">
-        {services.length} {dictionary.servicesLabel}
+    </div>
+  )
+}
+
+function HeroVisual({ services, categories, dictionary, isArabic, language }) {
+  return (
+    <div className="relative mx-auto w-full max-w-md lg:ms-auto lg:max-w-none">
+      {/* Branded gradient stage */}
+      <div className="kh-cover relative aspect-[4/3] w-full rounded-[var(--radius-2xl)] shadow-2xl sm:aspect-[5/4]" style={getCover({ slug: 'khalsni-hero' }).style}>
+        <span aria-hidden="true" className="kh-cover-pattern" />
+        <div className="kh-cover-content absolute inset-0" />
       </div>
-      <div className="absolute -bottom-3 end-5 rounded-full border border-[var(--khalsni-public-border)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--khalsni-public-navy)] shadow-md">
+
+      {/* Floating service preview cards */}
+      <HeroPreviewCard
+        className="absolute -start-4 top-6 -rotate-6 sm:-start-8"
+        dictionary={dictionary}
+        isArabic={isArabic}
+        language={language}
+        service={services[0]}
+      />
+      <HeroPreviewCard
+        className="absolute -end-3 bottom-8 rotate-6 sm:-end-6"
+        dictionary={dictionary}
+        isArabic={isArabic}
+        language={language}
+        service={services[1] || services[0]}
+      />
+
+      {/* Metric chips */}
+      <div className="absolute -top-4 end-6 rounded-full bg-white px-4 py-2 text-xs font-black text-[var(--khalsni-public-accent-text)] shadow-lg ring-1 ring-black/5">
+        +{services.length} {dictionary.servicesLabel}
+      </div>
+      <div className="absolute -bottom-4 start-8 rounded-full bg-white px-4 py-2 text-xs font-black text-[var(--khalsni-public-navy)] shadow-lg ring-1 ring-black/5">
         {categories.length} {dictionary.categoriesLabel}
       </div>
     </div>
@@ -411,7 +438,6 @@ function HeroVisual({ content, services, categories, dictionary, isArabic, langu
 
 function HomePage() {
   const { toast } = useToast()
-  const { content } = usePublicSite()
   const { language, isArabic } = useLanguage()
   const dictionary = copy[isArabic ? 'ar' : 'en']
   const { data: services = [], loading: loadingServices } = useAsyncData(() => api.getServices(), [], [])
@@ -468,44 +494,57 @@ function HomePage() {
 
   return (
     <div className="bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]">
-      <section className="overflow-hidden bg-[linear-gradient(180deg,var(--khalsni-public-bg-secondary)_0%,var(--khalsni-public-bg)_100%)]">
-        <div className="kh-public-container grid gap-8 pb-8 pt-7 sm:pb-10 sm:pt-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.82fr)] lg:items-center lg:gap-12">
-          <div className="max-w-3xl text-start">
-            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
-              <Sparkles aria-hidden="true" className="h-4 w-4" />
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            backgroundImage:
+              'radial-gradient(60% 55% at 88% 8%, color-mix(in srgb, var(--khalsni-public-primary) 16%, transparent) 0%, transparent 70%), radial-gradient(45% 45% at 4% 100%, color-mix(in srgb, var(--khalsni-public-primary) 10%, transparent) 0%, transparent 70%)',
+          }}
+        />
+        <div className="kh-public-container grid items-center gap-12 pb-14 pt-8 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.9fr)] lg:gap-16 lg:pb-20">
+          <div className="max-w-2xl text-start">
+            <span className="kh-eyebrow">
+              <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
               {dictionary.heroEyebrow}
-            </p>
-            <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.16] text-[var(--khalsni-public-navy)] sm:text-5xl lg:text-[3.55rem]">
+            </span>
+            <h1 className="kh-display-xl mt-5">
               {dictionary.headline}
               <span className="block text-[var(--khalsni-public-accent-text)]">{dictionary.headlineAccent}</span>
             </h1>
-            <p className="mt-4 max-w-2xl text-base font-semibold leading-8 text-[var(--khalsni-public-text-secondary)] sm:text-lg">
+            <p className="mt-5 max-w-xl text-base font-semibold leading-8 text-[var(--khalsni-public-text-secondary)] sm:text-lg">
               {dictionary.heroText}
             </p>
-            <div className="mt-6 max-w-2xl">
+            <div className="mt-7 max-w-xl">
               <ServiceSearch categories={categories} loading={loadingCatalog} onSpecialRequest={openSpecialRequest} services={services} />
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-5 py-3 text-sm font-extrabold text-white shadow-md transition hover:bg-[var(--khalsni-public-primary-hover)]" to="/services">
+              <Link className="kh-focusable inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-6 text-sm font-extrabold text-white shadow-lg shadow-[color:color-mix(in_srgb,var(--khalsni-public-primary)_35%,transparent)] transition hover:bg-[var(--khalsni-public-primary-hover)] hover:shadow-xl" to="/services">
                 {dictionary.browseServices}
                 {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
               </Link>
-              <Link className="kh-focusable inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-5 py-3 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/track-order">
+              <Link className="kh-focusable inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-6 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" to="/track-order">
                 {dictionary.trackRequest}
               </Link>
             </div>
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-[var(--khalsni-public-accent-text)]" />{dictionary.trustItems[0][0]}</span>
+              <span className="inline-flex items-center gap-1.5"><WalletCards aria-hidden="true" className="h-4 w-4 text-[var(--khalsni-public-accent-text)]" />{dictionary.trustItems[1][0]}</span>
+              <span className="inline-flex items-center gap-1.5"><FileText aria-hidden="true" className="h-4 w-4 text-[var(--khalsni-public-accent-text)]" />{dictionary.trustItems[2][0]}</span>
+            </div>
           </div>
 
-          <HeroVisual categories={publicCategories} content={content} dictionary={dictionary} isArabic={isArabic} language={language} services={latestServices} />
+          <HeroVisual categories={publicCategories} dictionary={dictionary} isArabic={isArabic} language={language} services={latestServices} />
         </div>
       </section>
 
-      <section className="kh-public-container grid gap-3 py-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="kh-public-container grid gap-3 pb-2 sm:grid-cols-2 lg:grid-cols-4">
         {dictionary.trustItems.map(([title, text], index) => {
           const Icon = [ShieldCheck, WalletCards, FileText, UploadCloud][index]
           return (
-            <article className="flex items-start gap-3 rounded-[var(--radius-lg)] bg-white p-4 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
+            <article className="flex items-start gap-3 rounded-[var(--radius-lg)] bg-white p-4 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)] transition hover:-translate-y-0.5 hover:shadow-md" key={title}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
                 <Icon aria-hidden="true" className="h-5 w-5" />
               </span>
               <div>
@@ -518,8 +557,9 @@ function HomePage() {
       </section>
 
       <ServiceRail
-        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
+        action={<Link className="kh-focusable inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
         description={dictionary.latestText}
+        eyebrow={isArabic ? 'اكتشف' : 'Discover'}
         id="home-latest-services"
         itemCount={latestServices.length}
         title={dictionary.latestTitle}
@@ -540,8 +580,9 @@ function HomePage() {
       </ServiceRail>
 
       <ServiceRail
-        action={<Link className="kh-focusable inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
+        action={<Link className="kh-focusable inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
         description={dictionary.categoriesText}
+        eyebrow={isArabic ? 'تصفح' : 'Browse'}
         id="home-categories"
         itemCount={categorySections.length}
         title={dictionary.categoriesTitle}
@@ -562,15 +603,16 @@ function HomePage() {
       </ServiceRail>
 
       {categoryRows.length ? (
-        <section className="kh-public-container py-7 sm:py-9">
-          <div className="mb-5 max-w-3xl text-start">
-            <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{dictionary.categoryRowsTitle}</h2>
-            <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.categoryRowsText}</p>
+        <section className="kh-public-container py-8 sm:py-11">
+          <div className="mb-6 max-w-3xl text-start">
+            <span className="kh-eyebrow mb-3">{isArabic ? 'مجموعات' : 'Collections'}</span>
+            <h2 className="text-[1.75rem] font-black leading-tight tracking-tight text-[var(--khalsni-public-navy)] sm:text-4xl">{dictionary.categoryRowsTitle}</h2>
+            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">{dictionary.categoryRowsText}</p>
           </div>
-          <div className="grid gap-6">
+          <div className="grid gap-5">
             {categoryRows.map((section) => (
               <article className="rounded-[var(--radius-xl)] bg-white p-4 shadow-soft ring-1 ring-[var(--khalsni-public-border)] sm:p-5" key={section.id}>
-                <div className="mb-4 flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-3 text-start">
                   <div>
                     <h3 className="text-xl font-black text-[var(--khalsni-public-navy)]">{section.title}</h3>
                     <p className="mt-1 text-sm font-semibold text-[var(--khalsni-public-text-secondary)]">
@@ -581,13 +623,11 @@ function HomePage() {
                     {dictionary.viewAll}
                   </Link>
                 </div>
-                {/* D-UX2: a responsive 2-up grid fills the row and wraps, instead
-                    of a fixed-width scroll rail that left-flushed 1-2 cards with
-                    a large empty gap on desktop. Two columns keeps sparse
-                    categories (1 service) from leaving a wide empty band. */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {section.services.slice(0, 4).map((service) => (
-                    <ServiceCard key={service.id || service.slug} service={service} />
+                <div className="kh-rail-scroll -mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
+                  {section.services.slice(0, 6).map((service) => (
+                    <div className="w-[74vw] shrink-0 snap-start xs:w-[15rem] sm:w-[16rem]" key={service.id || service.slug}>
+                      <ServiceCard service={service} variant="compact" />
+                    </div>
                   ))}
                 </div>
               </article>
@@ -596,29 +636,34 @@ function HomePage() {
         </section>
       ) : null}
 
-      <section className="kh-public-container py-7 sm:py-9">
-        <div className="grid gap-6 lg:grid-cols-[0.72fr_1fr] lg:items-start">
-          <div className="text-start">
-            <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)] sm:text-3xl">{dictionary.howTitle}</h2>
-            <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.howText}</p>
+      <section className="relative overflow-hidden py-10 sm:py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[var(--khalsni-public-bg-secondary)]"
+        />
+        <div className="kh-public-container">
+          <div className="max-w-2xl text-start">
+            <span className="kh-eyebrow mb-3">{isArabic ? 'الخطوات' : 'How it works'}</span>
+            <h2 className="text-[1.75rem] font-black leading-tight tracking-tight text-[var(--khalsni-public-navy)] sm:text-4xl">{dictionary.howTitle}</h2>
+            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">{dictionary.howText}</p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {dictionary.steps.map(([title, text], index) => {
               const StepIcon = [Search, FileText, UploadCloud, CheckCircle2][index]
               return (
-                <article className="relative rounded-[var(--radius-lg)] bg-white p-5 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
-                      <StepIcon aria-hidden="true" className="h-5 w-5" />
-                    </span>
-                    <span className="text-2xl font-black text-[var(--khalsni-public-primary-soft)]">{index + 1}</span>
-                  </div>
-                  <h3 className="mt-4 text-lg font-black text-[var(--khalsni-public-navy)]">{title}</h3>
-                  <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{text}</p>
-                </article>
+                <li className="relative rounded-[var(--radius-lg)] bg-white p-5 text-start shadow-sm ring-1 ring-[var(--khalsni-public-border)]" key={title}>
+                  <span className="absolute -top-3 inset-inline-start-5 grid h-9 w-9 place-items-center rounded-full bg-[var(--khalsni-public-primary)] text-sm font-black text-white shadow-md">
+                    {index + 1}
+                  </span>
+                  <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
+                    <StepIcon aria-hidden="true" className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-base font-black text-[var(--khalsni-public-navy)]">{title}</h3>
+                  <p className="mt-1.5 text-sm font-semibold leading-6 text-[var(--khalsni-public-text-secondary)]">{text}</p>
+                </li>
               )
             })}
-          </div>
+          </ol>
         </div>
       </section>
 

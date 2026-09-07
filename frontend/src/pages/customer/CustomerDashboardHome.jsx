@@ -1,4 +1,4 @@
-import { ArrowUpRight, Bell, ClipboardList, Compass, FilePlus2, LifeBuoy } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Bell, CheckCircle2, ClipboardList, Clock3, Compass, FilePlus2, LifeBuoy } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -39,11 +39,13 @@ function CustomerDashboardHome() {
     const active = list.filter(
       (o) => !TERMINAL.has(String(o.status).toUpperCase()) && !actionRequired.includes(o),
     )
+    const completed = list.filter((o) => ['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'].includes(String(o.status).toUpperCase()))
     const sortByUpdated = (a, b) =>
       new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)
     return {
       actionRequired: [...actionRequired].sort(sortByUpdated),
       active: [...active].sort(sortByUpdated),
+      completedCount: completed.length,
       recent: [...list].sort(sortByUpdated).slice(0, 4),
     }
   }, [orders])
@@ -51,17 +53,27 @@ function CustomerDashboardHome() {
   if (loading) return <LoadingSpinner />
 
   const firstName = (user?.full_name || '').split(' ')[0]
+  const stats = [
+    { icon: Clock3, label: isArabic ? 'قيد التنفيذ' : 'Active', value: buckets.active.length },
+    { icon: AlertTriangle, label: isArabic ? 'بانتظارك' : 'Needs you', value: buckets.actionRequired.length, warn: true },
+    { icon: CheckCircle2, label: isArabic ? 'مكتملة' : 'Completed', value: buckets.completedCount },
+  ]
 
   return (
     <div className="space-y-6">
-      {/* Customer header */}
-      <section className="rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      {/* Customer header — branded band */}
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft sm:p-7">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-0"
+          style={{ backgroundImage: 'radial-gradient(50% 80% at 100% 0%, color-mix(in srgb, var(--kh-primary) 12%, transparent), transparent 70%)' }}
+        />
+        <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-brand-600">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-600">
               {isArabic ? 'بوابة العميل' : 'Customer portal'}
             </p>
-            <h1 className="mt-1.5 text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
+            <h1 className="mt-1.5 text-[1.75rem] font-black leading-tight tracking-tight text-ink sm:text-4xl">
               {isArabic ? `أهلاً ${firstName || ''}`.trim() : `Welcome${firstName ? `, ${firstName}` : ''}`}
             </h1>
             <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-600">
@@ -69,16 +81,25 @@ function CustomerDashboardHome() {
                 ? 'كل ما يخص طلباتك في مكان واحد — ابدأ بما هو مطلوب منك الآن.'
                 : 'Everything about your requests in one place — start with what needs you now.'}
             </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link className="btn-primary" to="/customer/orders/new">
+                <FilePlus2 className="h-4 w-4" />
+                {isArabic ? 'طلب خدمة جديدة' : 'New request'}
+              </Link>
+              <Link className="btn-secondary" to="/services">
+                <Compass className="h-4 w-4" />
+                {isArabic ? 'تصفح الخدمات' : 'Browse services'}
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link className="btn-primary" to="/customer/orders/new">
-              <FilePlus2 className="h-4 w-4" />
-              {isArabic ? 'طلب خدمة جديدة' : 'New request'}
-            </Link>
-            <Link className="btn-secondary" to="/services">
-              <Compass className="h-4 w-4" />
-              {isArabic ? 'تصفح الخدمات' : 'Browse services'}
-            </Link>
+          <div className="grid grid-cols-3 gap-3 lg:w-[22rem]">
+            {stats.map(({ icon: Icon, label, value, warn }) => (
+              <div key={label} className={`rounded-[var(--radius-lg)] border p-3 text-start ${warn && value ? 'border-amber-200 bg-amber-50' : 'border-border bg-brand-50/50'}`}>
+                <Icon className={`h-4 w-4 ${warn && value ? 'text-amber-600' : 'text-brand-600'}`} />
+                <p className="mt-2 text-2xl font-black text-ink">{value}</p>
+                <p className="text-[0.7rem] font-bold text-slate-500">{label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -91,15 +112,28 @@ function CustomerDashboardHome() {
         />
       ) : null}
 
-      {/* Action required — only when there is something */}
+      {/* Action required — prominent highlighted band */}
       {buckets.actionRequired.length ? (
-        <section>
-          <SectionTitle count={buckets.actionRequired.length}>
-            {isArabic ? 'مطلوب إجراء منك' : 'Action required'}
-          </SectionTitle>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section className="overflow-hidden rounded-[var(--radius-xl)] border-2 border-amber-300 bg-amber-50 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-amber-200 bg-amber-100/60 px-5 py-4 sm:px-6">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-amber-400 text-amber-950">
+                <AlertTriangle className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="text-lg font-black text-amber-950 sm:text-xl">
+                  {isArabic ? 'مطلوب إجراء منك' : 'Action required'}
+                  <span className="ms-2 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-black text-amber-950">{buckets.actionRequired.length}</span>
+                </h2>
+                <p className="text-xs font-semibold text-amber-900">
+                  {isArabic ? 'أكمل النواقص لإعادة طلبك إلى مسار التنفيذ.' : 'Complete the missing items to keep your request moving.'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 p-5 sm:p-6">
             {buckets.actionRequired.map((order) => (
-              <RequestCard key={order.id} order={order} />
+              <RequestCard className="w-full max-w-sm sm:w-80" key={order.id} order={order} />
             ))}
           </div>
         </section>
@@ -119,7 +153,7 @@ function CustomerDashboardHome() {
           {isArabic ? 'طلبات قيد التنفيذ' : 'Active requests'}
         </SectionTitle>
         {buckets.active.length ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
             {buckets.active.map((order) => (
               <RequestCard key={order.id} order={order} />
             ))}

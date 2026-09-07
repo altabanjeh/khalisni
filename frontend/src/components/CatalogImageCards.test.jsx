@@ -93,7 +93,7 @@ test('service card removes image element after load error', () => {
   expect(screen.queryByRole('img', { name: 'Service A' })).not.toBeInTheDocument()
 })
 
-test('service card shows the Khalsni-branded placeholder (never a broken image) when no image is set', () => {
+test('service card shows a branded cover (never a broken image) when no image is set', () => {
   const { container } = render(
     <MemoryRouter>
       <ServiceCard
@@ -102,12 +102,13 @@ test('service card shows the Khalsni-branded placeholder (never a broken image) 
     </MemoryRouter>,
   )
 
-  // no content image...
+  // no content image, no broken <img>...
   expect(screen.queryByRole('img', { name: 'بدون صورة' })).not.toBeInTheDocument()
-  // ...but a decorative Khalsni brand mark is rendered as the placeholder
-  const placeholder = container.querySelector('img[src="/brand/khalsni-app-icon.png"]')
-  expect(placeholder).toBeInTheDocument()
-  expect(placeholder).toHaveAttribute('alt', '')
+  expect(container.querySelector('img')).toBeNull()
+  // ...a deterministic branded gradient cover panel stands in for it
+  const cover = container.querySelector('.kh-cover')
+  expect(cover).toBeInTheDocument()
+  expect(cover.getAttribute('style') || '').toMatch(/background-image/i)
 })
 
 test('service card alt text derives from the localized service name', () => {

@@ -307,13 +307,107 @@
 
   @media (hover: hover) and (pointer: fine) {
     .kh-interactive-card:hover {
-      transform: translateY(-2px);
-      border-color: color-mix(in srgb, var(--khalsni-public-primary) 42%, var(--khalsni-public-border));
+      transform: translateY(-4px);
+      border-color: color-mix(in srgb, var(--khalsni-public-primary) 55%, var(--khalsni-public-border));
       box-shadow: var(--shadow-lift);
     }
 
     .kh-interactive-card:hover .kh-card-image-zoom {
-      transform: scale(1.035);
+      transform: scale(1.06);
+    }
+
+    .kh-interactive-card:hover .kh-cover-cta {
+      background: var(--khalsni-public-primary);
+      color: #fff;
+    }
+  }
+
+  /* --- Discovery presentation (Phase 3) ------------------------------------ */
+
+  .kh-display-xl {
+    @apply font-black leading-[1.05] tracking-tight text-[var(--khalsni-public-navy)];
+    font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.25rem);
+  }
+
+  .kh-eyebrow {
+    @apply inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-[0.72rem] font-extrabold uppercase;
+    letter-spacing: 0.1em;
+    background: var(--khalsni-public-primary-soft);
+    color: var(--khalsni-public-accent-text);
+  }
+
+  /* Arabic script must stay joined — never letter-space it. */
+  [dir='rtl'] .kh-eyebrow {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* Branded cover panel used when a service/category has no real photo. The
+     gradient is set inline (deterministic per record); this adds the depth
+     treatment, a soft vignette and a fine grid pattern. */
+  .kh-cover {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background-color: var(--khalsni-public-primary);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .kh-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(90% 60% at 15% 0%, rgba(255, 255, 255, 0.22), transparent 60%),
+      linear-gradient(180deg, transparent 35%, rgba(4, 12, 30, 0.42) 100%);
+    z-index: 1;
+  }
+
+  .kh-cover-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.5;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.10) 1px, transparent 1px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(120% 90% at 80% 10%, #000 0%, transparent 75%);
+    mask-image: radial-gradient(120% 90% at 80% 10%, #000 0%, transparent 75%);
+  }
+
+  .kh-cover-glyph {
+    position: absolute;
+    inset-block-start: -12%;
+    inset-inline-end: -8%;
+    z-index: 0;
+    width: 62%;
+    height: auto;
+    color: rgba(255, 255, 255, 0.22);
+  }
+
+  .kh-cover > .kh-cover-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .kh-rail-scroll {
+    scroll-padding-inline: 4px;
+    scrollbar-width: none;
+  }
+  .kh-rail-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .kh-rail-fade {
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+      mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+    }
+    [dir='rtl'] .kh-rail-fade {
+      -webkit-mask-image: linear-gradient(to left, transparent, #000 3%, #000 97%, transparent);
+      mask-image: linear-gradient(to left, transparent, #000 3%, #000 97%, transparent);
     }
   }
 
