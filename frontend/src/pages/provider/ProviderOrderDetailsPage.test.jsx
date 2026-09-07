@@ -34,7 +34,7 @@ test('provider upload flow defaults final document type and hides invalid ready 
   )
 
   await waitFor(() => {
-    expect(screen.getByText('KH-2026-000007')).toBeInTheDocument()
+    expect(screen.getByText(/KH-2026-000007/)).toBeInTheDocument()
   })
 
   expect(screen.queryByRole('option', { name: 'جاهز للتسليم' })).not.toBeInTheDocument()

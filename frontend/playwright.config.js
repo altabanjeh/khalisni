@@ -34,7 +34,13 @@ export default defineConfig({
     baseURL: BASE_URL,
     channel: 'chrome',
     headless: true,
-    trace: 'retain-on-failure',
+    // Tracing is opt-in. `retain-on-failure` writes/zips a trace per failed test
+    // into outputDir; on Windows, when a bulk sweep (100+ tests) finalises while
+    // its artifact dir is being cleaned, the zip step races and throws
+    // `ENOENT ... .playwright-artifacts-*/traces/*.trace` — surfacing as fake
+    // failures unrelated to the app. Default off; set PW_TRACE=retain-on-failure
+    // (or on) when actively debugging a single spec.
+    trace: process.env.PW_TRACE || 'off',
     screenshot: 'only-on-failure',
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
