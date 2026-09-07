@@ -1,5 +1,6 @@
 import { Eye } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
+import { useLanguage } from '../../context/LanguageContext'
 import PageHeader from '../../components/PageHeader'
 import PublicHomepageTemplate from '../../components/publicSite/PublicHomepageTemplate'
 import { api } from '../../api/services'
@@ -14,6 +15,7 @@ import {
 import { subscribePublicSiteUpdates } from '../../utils/publicSiteSync'
 
 function PreviewPublicPage() {
+  const { isArabic } = useLanguage()
   const { data: themeData, loading: themeLoading, reload: reloadTheme } = useAsyncData(() => api.getPublicTheme(), [], fallbackPublicTheme)
   const { data: homepageData, loading: homepageLoading, reload: reloadHomepage } = useAsyncData(() => api.getPublicHomepage(), [], fallbackHomepagePayload)
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getServices(), [], [])
@@ -30,16 +32,16 @@ function PreviewPublicPage() {
   }, [reloadTheme, reloadHomepage])
 
   if (themeLoading && homepageLoading) {
-    return <div className="glass-panel p-6 text-sm text-slate-500">جاري تحميل المعاينة...</div>
+    return <div className="glass-panel p-6 text-sm text-slate-500">{isArabic ? "جاري تحميل المعاينة..." : "Loading preview..."}</div>
   }
 
   return (
     <div className="page-section">
       <PageHeader
         icon={Eye}
-        title="Preview Public Page"
-        eyebrow="PUBLIC SITE"
-        description="هذه معاينة مباشرة للبيانات العامة القادمة من نفس API المستخدمة في الصفحة الرئيسية العامة."
+        title={isArabic ? "معاينة الموقع العام" : "Preview public site"}
+        eyebrow={isArabic ? "الموقع العام" : "Public site"}
+        description={isArabic ? "معاينة مباشرة للبيانات العامة من نفس واجهة API المستخدمة في الصفحة الرئيسية." : "A live preview of the public data from the same API used by the public homepage."}
       />
 
       <div className="overflow-hidden rounded-[2rem] border border-border" style={getPublicSiteCssVariables(theme)}>

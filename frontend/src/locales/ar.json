@@ -55,6 +55,8 @@
   "manual.currentRoleVisibility": "عرض أدلة الدور الحالي",
   "manual.expectedResult": "النتيجة المتوقعة",
   "manual.fieldsAndDataEntry": "الحقول وإدخال البيانات",
+  "manual.filterByCategory": "تصفية حسب التصنيف",
+  "manual.filterByRole": "تصفية حسب الدور",
   "manual.general": "دليل عام",
   "manual.guidePages": "صفحات الدليل",
   "manual.inAppManual": "الدليل داخل النظام",

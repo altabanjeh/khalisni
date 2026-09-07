@@ -55,6 +55,8 @@
   "manual.currentRoleVisibility": "Current role visibility",
   "manual.expectedResult": "Expected result",
   "manual.fieldsAndDataEntry": "Fields and data entry",
+  "manual.filterByCategory": "Filter by category",
+  "manual.filterByRole": "Filter by role",
   "manual.general": "General",
   "manual.guidePages": "Guide pages",
   "manual.inAppManual": "In-app manual",

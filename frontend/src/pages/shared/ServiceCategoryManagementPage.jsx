@@ -344,7 +344,7 @@ function ServiceCategoryManagementPage() {
         emptyDescription={isArabic ? 'أنشئ أول تصنيف لتنظيم الكتالوج.' : 'Create the first service category to organize the catalog.'}
         toolbar={
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <select aria-label="تصفية حسب الحالة" className="field" value={recordStatus} onChange={(event) => setRecordStatus(event.target.value)}>
+            <select aria-label={isArabic ? 'تصفية حسب الحالة' : 'Filter by record status'} className="field" value={recordStatus} onChange={(event) => setRecordStatus(event.target.value)}>
               <option value="active">{isArabic ? 'النشطة' : 'Active'}</option>
               <option value="deleted">{isArabic ? 'المحذوفة' : 'Deleted'}</option>
               <option value="all">{isArabic ? 'الكل' : 'All'}</option>

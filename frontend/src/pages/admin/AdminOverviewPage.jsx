@@ -14,10 +14,12 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import { api } from '../../api/services'
+import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatCurrency } from '../../utils/format'
 
 function AdminOverviewPage() {
+  const { language, isArabic } = useLanguage()
   const { data, loading } = useAsyncData(() => api.getAdminDashboard(), [], null)
 
   if (loading || !data) {
@@ -25,26 +27,28 @@ function AdminOverviewPage() {
   }
 
   return (
-    <div className="page-section">
+    <div className="space-y-6">
       <PageHeader
-        description="نظرة تشغيلية عالية المستوى على الطلبات، الأداء، والإيراد التقديري. تم تبسيط الشاشة لتبقى مركزة على القرارات."
-        eyebrow="الإدارة"
+        description={isArabic
+          ? 'نظرة تشغيلية عالية المستوى على الطلبات والأداء والإيراد التقديري.'
+          : 'A high-level operational view of requests, performance and estimated revenue.'}
+        eyebrow={isArabic ? 'الإدارة' : 'Administration'}
         icon={LayoutDashboard}
-        title="لوحة الإدارة"
+        title={isArabic ? 'لوحة الإدارة' : 'Admin dashboard'}
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <StatCard icon={BarChart3} title="طلبات جديدة اليوم" value={data.cards.new_orders_today} />
-        <StatCard icon={Clock3} title="قيد التنفيذ" value={data.cards.orders_in_progress} />
-        <StatCard icon={UsersRound} title="بانتظار العميل" tone="warning" value={data.cards.waiting_customer} />
-        <StatCard icon={BarChart3} title="مكتمل هذا الأسبوع" tone="success" value={data.cards.completed_this_week} />
-        <StatCard icon={Clock3} title="طلبات متأخرة" tone="warning" value={data.cards.delayed_orders} />
-        <StatCard icon={BarChart3} title="تقدير الإيراد" value={formatCurrency(data.cards.revenue_estimate)} />
+        <StatCard icon={BarChart3} title={isArabic ? 'طلبات جديدة اليوم' : 'New requests today'} value={data.cards.new_orders_today} />
+        <StatCard icon={Clock3} title={isArabic ? 'قيد التنفيذ' : 'In progress'} value={data.cards.orders_in_progress} />
+        <StatCard icon={UsersRound} title={isArabic ? 'بانتظار العميل' : 'Waiting for customer'} tone="warning" value={data.cards.waiting_customer} />
+        <StatCard icon={BarChart3} title={isArabic ? 'مكتمل هذا الأسبوع' : 'Completed this week'} tone="success" value={data.cards.completed_this_week} />
+        <StatCard icon={Clock3} title={isArabic ? 'طلبات متأخرة' : 'Delayed requests'} tone="warning" value={data.cards.delayed_orders} />
+        <StatCard icon={BarChart3} title={isArabic ? 'تقدير الإيراد' : 'Estimated revenue'} value={formatCurrency(data.cards.revenue_estimate, language)} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="glass-panel p-6">
-          <h2 className="text-xl font-bold text-ink">الطلبات حسب الحالة</h2>
+          <h2 className="text-xl font-bold text-ink">{isArabic ? "الطلبات حسب الحالة" : "Requests by status"}</h2>
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
               <BarChart data={data.orders_by_status}>
@@ -58,7 +62,7 @@ function AdminOverviewPage() {
           </div>
         </div>
         <div className="glass-panel p-6">
-          <h2 className="text-xl font-bold text-ink">الخدمات الأكثر طلباً</h2>
+          <h2 className="text-xl font-bold text-ink">{isArabic ? "الخدمات الأكثر طلباً" : "Most requested services"}</h2>
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
               <PieChart>
