@@ -7,6 +7,7 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getCategoryDescription, getCategoryName } from '../../utils/servicePresentation'
+import { resolveCategoryImage } from '../../utils/catalogImagery'
 
 function isPublicRecord(record) {
   return record && record.is_deleted !== true && record.is_active !== false && record.show_on_public_site !== false
@@ -27,7 +28,7 @@ function ServiceCategoryPage() {
     .slice(0, 6)
   const title = getCategoryName(category, language, isArabic ? 'تصنيف الخدمات' : 'Service category')
   const description = getCategoryDescription(category, language, '')
-  const categoryImageUrl = category.image_url || category.image
+  const categoryImageUrl = category.image_url || category.image || resolveCategoryImage(category).url
   const serviceCount = category.service_count ?? publicServices.length
 
   return (

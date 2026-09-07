@@ -1,0 +1,336 @@
+{
+  "captured": [
+    "ar-home-1440",
+    "ar-services-1440",
+    "ar-category-1440",
+    "ar-service-detail-1-1440",
+    "ar-service-detail-2-1440",
+    "ar-service-detail-3-1440",
+    "ar-customer-dashboard-1440",
+    "ar-customer-orders-1440",
+    "ar-home-390",
+    "ar-services-390",
+    "ar-category-390",
+    "ar-service-detail-1-390",
+    "ar-service-detail-2-390",
+    "ar-service-detail-3-390",
+    "ar-customer-dashboard-390",
+    "ar-customer-orders-390",
+    "en-home-1440",
+    "en-services-1440",
+    "en-category-1440",
+    "en-service-detail-1-1440",
+    "en-service-detail-2-1440",
+    "en-service-detail-3-1440",
+    "en-customer-dashboard-1440",
+    "en-customer-orders-1440",
+    "en-home-390",
+    "en-services-390",
+    "en-category-390",
+    "en-service-detail-1-390",
+    "en-service-detail-2-390",
+    "en-service-detail-3-390",
+    "en-customer-dashboard-390",
+    "en-customer-orders-390"
+  ],
+  "brokenImages": [],
+  "gradientOnlyCovers": [],
+  "coverSrcByCard": {
+    "ar home @1440": [
+      "/images/khalsni/hero/discovery.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg"
+    ],
+    "ar services @1440": [
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg"
+    ],
+    "ar category @1440": [
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg"
+    ],
+    "ar service-detail-1 @1440": [
+      "/images/khalsni/services/business-license-renewal.svg"
+    ],
+    "ar service-detail-2 @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "ar service-detail-3 @1440": [
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg"
+    ],
+    "ar customer-dashboard @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg"
+    ],
+    "ar customer-orders @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "ar home @390": [
+      "/images/khalsni/hero/discovery.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg"
+    ],
+    "ar services @390": [
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg"
+    ],
+    "ar category @390": [
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg"
+    ],
+    "ar service-detail-1 @390": [
+      "/images/khalsni/services/business-license-renewal.svg"
+    ],
+    "ar service-detail-2 @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "ar service-detail-3 @390": [
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg"
+    ],
+    "ar customer-dashboard @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg"
+    ],
+    "ar customer-orders @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "en home @1440": [
+      "/images/khalsni/hero/discovery.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg"
+    ],
+    "en services @1440": [
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg"
+    ],
+    "en category @1440": [
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg"
+    ],
+    "en service-detail-1 @1440": [
+      "/images/khalsni/services/business-license-renewal.svg"
+    ],
+    "en service-detail-2 @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "en service-detail-3 @1440": [
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg"
+    ],
+    "en customer-dashboard @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg"
+    ],
+    "en customer-orders @1440": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "en home @390": [
+      "/images/khalsni/hero/discovery.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg"
+    ],
+    "en services @390": [
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/municipal-services.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg",
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/property-registration-deed.svg",
+      "/images/khalsni/services/tax-clearance.svg",
+      "/images/khalsni/services/traffic-fines-payment.svg"
+    ],
+    "en category @390": [
+      "/images/khalsni/services/business-license-renewal.svg",
+      "/images/khalsni/categories/civil-status-and-passports.svg",
+      "/images/khalsni/categories/land-and-survey.svg",
+      "/images/khalsni/categories/ministry-of-labour.svg",
+      "/images/khalsni/categories/quick-public-services.svg",
+      "/images/khalsni/categories/tax.svg"
+    ],
+    "en service-detail-1 @390": [
+      "/images/khalsni/services/business-license-renewal.svg"
+    ],
+    "en service-detail-2 @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ],
+    "en service-detail-3 @390": [
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/passport-renewal.svg"
+    ],
+    "en customer-dashboard @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg"
+    ],
+    "en customer-orders @390": [
+      "/images/khalsni/services/no-criminal-record-certificate.svg",
+      "/images/khalsni/services/passport-renewal.svg",
+      "/images/khalsni/services/passport-appointment-booking.svg",
+      "/images/khalsni/services/no-criminal-record-certificate.svg"
+    ]
+  },
+  "distinctCoverSrc": {
+    "ar home @1440": "14/19",
+    "ar services @1440": "13/13",
+    "ar category @1440": "6/6",
+    "ar service-detail-1 @1440": "1/1",
+    "ar service-detail-2 @1440": "1/1",
+    "ar service-detail-3 @1440": "2/2",
+    "ar customer-dashboard @1440": "2/3",
+    "ar customer-orders @1440": "3/4",
+    "ar home @390": "14/19",
+    "ar services @390": "13/13",
+    "ar category @390": "6/6",
+    "ar service-detail-1 @390": "1/1",
+    "ar service-detail-2 @390": "1/1",
+    "ar service-detail-3 @390": "2/2",
+    "ar customer-dashboard @390": "2/3",
+    "ar customer-orders @390": "3/4",
+    "en home @1440": "14/19",
+    "en services @1440": "13/13",
+    "en category @1440": "6/6",
+    "en service-detail-1 @1440": "1/1",
+    "en service-detail-2 @1440": "1/1",
+    "en service-detail-3 @1440": "2/2",
+    "en customer-dashboard @1440": "2/3",
+    "en customer-orders @1440": "3/4",
+    "en home @390": "14/19",
+    "en services @390": "13/13",
+    "en category @390": "6/6",
+    "en service-detail-1 @390": "1/1",
+    "en service-detail-2 @390": "1/1",
+    "en service-detail-3 @390": "2/2",
+    "en customer-dashboard @390": "2/3",
+    "en customer-orders @390": "3/4"
+  },
+  "consoleErrors": [],
+  "overflow": []
+}

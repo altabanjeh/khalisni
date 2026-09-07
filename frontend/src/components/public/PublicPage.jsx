@@ -215,10 +215,12 @@ export function PublicLoading({ label = 'Loading...' }) {
   )
 }
 
-export function EmptyState({ title, description, icon: Icon, action, className = '' }) {
+export function EmptyState({ title, description, icon: Icon, action, illustration, className = '' }) {
   return (
     <div className={clsx('flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-6 py-12 text-center shadow-soft', className)}>
-      {Icon ? (
+      {illustration ? (
+        <img alt="" className="h-32 w-auto max-w-[13rem] opacity-90" decoding="async" loading="lazy" src={illustration} />
+      ) : Icon ? (
         <span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-primary)]">
           <Icon aria-hidden="true" className="h-5 w-5" />
         </span>

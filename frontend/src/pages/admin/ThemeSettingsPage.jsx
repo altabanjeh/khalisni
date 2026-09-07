@@ -20,6 +20,7 @@ function applyServerErrors(error, setError, setFeedback) {
 
 function ThemeSettingsPage() {
   const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
   const { data, loading, reload } = useAsyncData(() => api.getAdminPublicSiteTheme(), [], null)
   const [feedback, setFeedback] = useState(null)
   const form = useForm({ defaultValues: fallbackPublicTheme })
@@ -85,16 +86,16 @@ function ThemeSettingsPage() {
 
       <form className="grid gap-6 xl:grid-cols-[1fr_0.9fr]" onSubmit={form.handleSubmit(onSubmit)}>
         <section className="glass-panel space-y-5 p-6">
-          <FieldGroup error={form.formState.errors.name} label={isArabic ? 'اسم النمط / Theme name' : 'Theme name / اسم النمط'}>
-            <input className="field" {...form.register('name', { required: isArabic ? 'اسم النمط مطلوب' : 'Theme name is required' })} />
+          <FieldGroup error={form.formState.errors.name} label={tr('اسم النمط', 'Theme name')}>
+            <input className="field" {...form.register('name', { required: tr('اسم النمط مطلوب', 'Theme name is required') })} />
           </FieldGroup>
           <div className="grid gap-4 md:grid-cols-2">
-            <ColorPickerField error={form.formState.errors.primary_color} hint={isArabic ? 'رئيسي' : 'Primary'} label={isArabic ? 'اللون الرئيسي / Primary color' : 'Primary color / اللون الرئيسي'} name="primary_color" register={form.register} setValue={form.setValue} value={primaryColor} />
-            <ColorPickerField error={form.formState.errors.secondary_color} hint={isArabic ? 'ثانوي' : 'Secondary'} label={isArabic ? 'اللون الثانوي / Secondary color' : 'Secondary color / اللون الثانوي'} name="secondary_color" register={form.register} setValue={form.setValue} value={secondaryColor} />
-            <ColorPickerField error={form.formState.errors.background_color} hint={isArabic ? 'خلفية الصفحة' : 'Page background'} label={isArabic ? 'خلفية الصفحة / Background color' : 'Background color / خلفية الصفحة'} name="background_color" register={form.register} setValue={form.setValue} value={backgroundColor} />
-            <ColorPickerField error={form.formState.errors.text_color} hint={isArabic ? 'النص الرئيسي' : 'Main text'} label={isArabic ? 'لون النص / Text color' : 'Text color / لون النص'} name="text_color" register={form.register} setValue={form.setValue} value={textColor} />
-            <ColorPickerField error={form.formState.errors.header_background_color} hint={isArabic ? 'الرأس' : 'Header'} label={isArabic ? 'خلفية الرأس / Header background' : 'Header background / خلفية الرأس'} name="header_background_color" register={form.register} setValue={form.setValue} value={headerBackgroundColor} />
-            <ColorPickerField error={form.formState.errors.footer_background_color} hint={isArabic ? 'التذييل' : 'Footer'} label={isArabic ? 'خلفية التذييل / Footer background' : 'Footer background / خلفية التذييل'} name="footer_background_color" register={form.register} setValue={form.setValue} value={footerBackgroundColor} />
+            <ColorPickerField error={form.formState.errors.primary_color} hint={tr('رئيسي', 'Primary')} label={tr('اللون الرئيسي', 'Primary colour')} name="primary_color" register={form.register} setValue={form.setValue} value={primaryColor} />
+            <ColorPickerField error={form.formState.errors.secondary_color} hint={tr('ثانوي', 'Secondary')} label={tr('اللون الثانوي', 'Secondary colour')} name="secondary_color" register={form.register} setValue={form.setValue} value={secondaryColor} />
+            <ColorPickerField error={form.formState.errors.background_color} hint={tr('خلفية الصفحة', 'Page background')} label={tr('خلفية الصفحة', 'Background colour')} name="background_color" register={form.register} setValue={form.setValue} value={backgroundColor} />
+            <ColorPickerField error={form.formState.errors.text_color} hint={tr('النص الرئيسي', 'Main text')} label={tr('لون النص', 'Text colour')} name="text_color" register={form.register} setValue={form.setValue} value={textColor} />
+            <ColorPickerField error={form.formState.errors.header_background_color} hint={tr('الرأس', 'Header')} label={tr('خلفية الرأس', 'Header background')} name="header_background_color" register={form.register} setValue={form.setValue} value={headerBackgroundColor} />
+            <ColorPickerField error={form.formState.errors.footer_background_color} hint={tr('التذييل', 'Footer')} label={tr('خلفية التذييل', 'Footer background')} name="footer_background_color" register={form.register} setValue={form.setValue} value={footerBackgroundColor} />
           </div>
         </section>
 
@@ -105,8 +106,8 @@ function ThemeSettingsPage() {
               error={form.formState.errors.logo}
               fileList={logoFile}
               fileUrl={data?.logo_url}
-              hint={isArabic ? 'مقترح لشعار الرأس' : 'Recommended for header branding'}
-              label={isArabic ? 'الشعار / Logo' : 'Logo / الشعار'}
+              hint={tr('مقترح لشعار الرأس', 'Recommended for header branding')}
+              label={tr('الشعار', 'Logo')}
               registration={form.register('logo')}
             />
             <ImageUploadField
@@ -114,13 +115,13 @@ function ThemeSettingsPage() {
               error={form.formState.errors.favicon}
               fileList={faviconFile}
               fileUrl={data?.favicon_url}
-              hint={isArabic ? 'أيقونة تبويب المتصفح' : 'Browser tab icon'}
-              label={isArabic ? 'أيقونة المتصفح / Favicon' : 'Favicon / أيقونة المتصفح'}
+              hint={tr('أيقونة تبويب المتصفح', 'Browser tab icon')}
+              label={tr('أيقونة المتصفح', 'Favicon')}
               registration={form.register('favicon')}
             />
             <ToggleField
-              description={isArabic ? 'يتم استخدام هذا النمط على الواجهة العامة مباشرة.' : 'Apply this theme directly to the public site.'}
-              label={isArabic ? 'النمط النشط / Active theme' : 'Active theme / النمط النشط'}
+              description={tr('يتم استخدام هذا النمط على الواجهة العامة مباشرة.', 'Apply this theme directly to the public site.')}
+              label={tr('النمط النشط', 'Active theme')}
               registration={form.register('active_theme')}
             />
           </div>

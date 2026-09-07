@@ -13,6 +13,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
+import { resolveServiceImage } from '../../utils/catalogImagery'
 
 const defaultCategoryValues = {
   name_ar: '',
@@ -488,6 +489,8 @@ function ServicesManagementPage() {
   const categoryImageFile = categoryForm.watch('image')
   const categoryClearImage = categoryForm.watch('clear_image')
   const serviceImageFile = serviceForm.watch('image')
+  const watchedServiceSlug = serviceForm.watch('slug')
+  const watchedCategoryId = serviceForm.watch('category_id')
   const serviceClearImage = serviceForm.watch('clear_image')
   const deliveryTimeMode = serviceForm.watch('delivery_time_mode')
   const selectedDefinitionExtensions = definitionForm.watch('allowed_extensions') || []
@@ -1359,11 +1362,28 @@ function ServicesManagementPage() {
             }
             registration={serviceForm.register('image')}
           />
-          <p className="-mt-2 text-xs text-slate-500">
-            {selectedService?.image_url || selectedService?.image
-              ? tr('الحالة: صورة مرفوعة خاصة بالخدمة.', 'Status: an uploaded image specific to this service.')
-              : tr('الحالة: لا توجد صورة مرفوعة — سيظهر غلاف النظام الافتراضي بهوية خلصني.', 'Status: no uploaded image — the Khalsni-branded system fallback cover will be shown.')}
-          </p>
+          {selectedService?.image_url || selectedService?.image ? (
+            <p className="-mt-2 text-xs text-slate-500">
+              {tr('الحالة: صورة مرفوعة خاصة بالخدمة.', 'Status: an uploaded image specific to this service.')}
+            </p>
+          ) : (
+            <div className="-mt-2 flex items-center gap-3 rounded-2xl border border-border bg-brand-50/40 p-3">
+              <img
+                alt=""
+                className="h-14 w-24 shrink-0 rounded-xl object-cover ring-1 ring-border"
+                src={resolveServiceImage({
+                  slug: watchedServiceSlug || selectedService?.slug,
+                  category: categories.find((item) => String(item.id) === String(watchedCategoryId)) || selectedService?.category,
+                }).url}
+              />
+              <p className="text-xs text-slate-500">
+                {tr(
+                  'لا توجد صورة مرفوعة. هذه هي الصورة الافتراضية للنظام التي تظهر للعملاء حالياً — ارفع صورة حقيقية لاستبدالها دون أي تغيير في الكود.',
+                  'No custom image uploaded. This is the current public system fallback shown to customers — upload a real image to replace it, no code change needed.',
+                )}
+              </p>
+            </div>
+          )}
 
           <ServiceSchemaBuilder
             errorMessages={serviceSchemaErrors}

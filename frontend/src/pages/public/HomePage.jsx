@@ -21,6 +21,7 @@ import ServiceCard from '../../components/ServiceCard'
 import { ServiceRail, ServiceRailItem } from '../../components/ServiceRail'
 import { ImageFallback } from '../../components/public/PublicPage'
 import { getCover } from '../../utils/cover'
+import { CUSTOM_REQUEST_ILLUSTRATION, HERO_ILLUSTRATION } from '../../utils/catalogImagery'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
@@ -370,13 +371,21 @@ function HeroPreviewCard({ service, dictionary, isArabic, language, className = 
   const category = service?.category ? getCategoryName(service.category, language, '') : ''
   const durationLabel = service ? getServiceDuration(service, language).label : dictionary.servicesLabel
   const priceLabel = service ? getServicePublicPrice(service, language).label : dictionary.categoriesLabel
-  const cover = getCover(service || { slug: name }, service?.category?.slug || '')
+  const cover = getCover(service || { slug: name }, service?.category?.slug || '', { as: 'service' })
+  const [imageFailed, setImageFailed] = useState(false)
+  const showImage = cover.hasImage && !imageFailed
 
   return (
     <div className={`w-64 overflow-hidden rounded-[var(--radius-xl)] border border-black/5 bg-white shadow-xl ${className}`}>
-      <div className="kh-cover relative h-24 w-full" style={cover.style}>
-        <span aria-hidden="true" className="kh-cover-pattern" />
-        <Layers aria-hidden="true" className="kh-cover-glyph" />
+      <div className="kh-cover relative h-24 w-full" style={showImage ? undefined : cover.style}>
+        {showImage ? (
+          <img alt={name} className="absolute inset-0 h-full w-full object-cover" decoding="async" loading="lazy" onError={() => setImageFailed(true)} src={cover.imageUrl} />
+        ) : (
+          <>
+            <span aria-hidden="true" className="kh-cover-pattern" />
+            <Layers aria-hidden="true" className="kh-cover-glyph" />
+          </>
+        )}
         {category ? (
           <div className="kh-cover-content flex h-full items-start p-3">
             <span className="rounded-full bg-white/95 px-2 py-0.5 text-[0.65rem] font-extrabold text-[var(--khalsni-public-navy)]">{category}</span>
@@ -403,9 +412,16 @@ function HeroPreviewCard({ service, dictionary, isArabic, language, className = 
 function HeroVisual({ services, categories, dictionary, isArabic, language }) {
   return (
     <div className="relative mx-auto w-full max-w-md lg:ms-auto lg:max-w-none">
-      {/* Branded gradient stage */}
+      {/* Branded discovery stage */}
       <div className="kh-cover relative aspect-[4/3] w-full rounded-[var(--radius-2xl)] shadow-2xl sm:aspect-[5/4]" style={getCover({ slug: 'khalsni-hero' }).style}>
-        <span aria-hidden="true" className="kh-cover-pattern" />
+        <img
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          decoding="async"
+          fetchPriority="high"
+          onError={(event) => { event.currentTarget.style.display = 'none' }}
+          src={HERO_ILLUSTRATION}
+        />
         <div className="kh-cover-content absolute inset-0" />
       </div>
 
@@ -670,7 +686,7 @@ function HomePage() {
       <section className="kh-public-container pb-10 pt-6" id="special-request">
         <article className="overflow-hidden rounded-[var(--radius-xl)] bg-white shadow-soft ring-1 ring-[var(--khalsni-public-border)]">
           <div className="grid gap-0 md:grid-cols-[0.62fr_1fr]">
-            <ImageFallback alt={dictionary.specialTitle} className="aspect-[16/10] min-h-48 md:h-full" src="/images/homepage/custom-request.jpg" />
+            <ImageFallback alt="" className="aspect-[16/10] min-h-48 md:h-full" imgClassName="object-cover" src={CUSTOM_REQUEST_ILLUSTRATION} />
             <div className="p-5 text-start sm:p-6">
               <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)]">{dictionary.specialTitle}</h2>
               <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.specialText}</p>

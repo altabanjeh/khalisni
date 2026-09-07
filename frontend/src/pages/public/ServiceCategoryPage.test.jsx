@@ -62,7 +62,7 @@ test('category page renders image, services, and navigation links from the publi
   expect(screen.getByRole('link', { name: /عرض الخدمة/ })).toHaveAttribute('href', '/services/passport-renewal')
 })
 
-test('category page handles an empty category without rendering a broken image', async () => {
+test('category page shows a curated illustration (never a broken image) for a category with no upload', async () => {
   vi.spyOn(api, 'getPublicServiceCategories').mockResolvedValueOnce([
     {
       id: 3,
@@ -81,5 +81,5 @@ test('category page handles an empty category without rendering a broken image',
     expect(screen.getByText('لا توجد خدمات منشورة')).toBeInTheDocument()
   })
 
-  expect(screen.queryByRole('img', { name: 'تصنيف فارغ' })).not.toBeInTheDocument()
+  expect(screen.getByRole('img', { name: 'تصنيف فارغ' }).getAttribute('src')).toMatch(/\/images\/khalsni\//)
 })

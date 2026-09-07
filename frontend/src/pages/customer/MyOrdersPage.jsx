@@ -7,6 +7,7 @@ import { EmptyState, LoadingSkeleton } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { EMPTY_STATE_ILLUSTRATIONS } from '../../utils/catalogImagery'
 
 const PAGE_SIZE = 12
 const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED', 'CANCELLED', 'REJECTED'])
@@ -125,6 +126,7 @@ function MyOrdersPage() {
         </>
       ) : (
         <EmptyState
+          illustration={EMPTY_STATE_ILLUSTRATIONS.requests}
           icon={Search}
           title={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
           description={

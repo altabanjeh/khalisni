@@ -29,16 +29,18 @@ async function tok(role) {
 const adminTok = await tok('admin')
 const employeeTok = await tok('employee')
 
-// find a real order id for the employee order-detail screen
+// find real order ids for the order-detail screens
 let orderId = null
+let newOrderId = null
 try {
   const ctx = await b.newContext()
-  const res = await ctx.request.get(`${API}/api/orders/?page_size=1`, {
-    headers: { Authorization: `Bearer ${employeeTok.access}` },
+  const res = await ctx.request.get(`${API}/api/admin/orders/`, {
+    headers: { Authorization: `Bearer ${adminTok.access}` },
   })
   const data = await res.json()
   const rows = Array.isArray(data) ? data : data.results || []
-  orderId = rows[0]?.id ?? null
+  orderId = rows.find((r) => r.status === 'IN_PROGRESS')?.id ?? rows[0]?.id ?? null
+  newOrderId = rows.find((r) => r.status === 'NEW')?.id ?? orderId
   await ctx.close()
 } catch { /* leave null */ }
 
@@ -56,14 +58,19 @@ const ADMIN_SCREENS = [
   ['public-site-advertisements', '/admin/public-site/advertisements'],
   ['public-site-theme', '/admin/public-site/theme'],
   ['cms', '/admin/cms'],
+  ['orders', '/admin/orders'],
+  ['order-detail', orderId ? `/admin/orders/${orderId}` : '/admin/orders'],
 ]
 const EMPLOYEE_SCREENS = [
-  ['employee-order-detail', orderId ? `/employee/orders/${orderId}` : '/employee/orders'],
+  ['employee-home', '/employee'],
+  ['employee-orders', '/employee/orders'],
+  ['employee-order-detail', newOrderId ? `/employee/orders/${newOrderId}` : '/employee/orders'],
+  ['employee-reports', '/employee/reports'],
   ['employee-service-relations', '/employee/service-relations'],
 ]
 const COMPLEX = new Set(['services', 'rules', 'service-relations', 'public-site-content', 'public-site-advertisements'])
 
-const report = { captured: [], enArabicLeak: [], overflow: [], errors: [], orderId }
+const report = { captured: [], enArabicLeak: [], overflow: [], errors: [], orderId, newOrderId }
 
 async function shoot(token, name, route, lang, width, height) {
   const ctx = await b.newContext({
@@ -124,4 +131,5 @@ console.log(JSON.stringify({
   overflow: report.overflow,
   errors: report.errors,
   orderId,
+  newOrderId,
 }, null, 2))

@@ -36,7 +36,7 @@ function ServiceCard({ service, className = '', variant = 'standard' }) {
   const docCount = service?.required_documents_count ?? service?.required_documents?.length ?? null
   const href = `/services/${service?.slug ?? service?.id ?? ''}`
   const viewLabel = isArabic ? 'عرض الخدمة' : 'View service'
-  const cover = getCover(service, service?.category?.slug || '')
+  const cover = getCover(service, service?.category?.slug || '', { as: 'service' })
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = cover.hasImage && !imageFailed
 
@@ -46,6 +46,7 @@ function ServiceCard({ service, className = '', variant = 'standard' }) {
         <img
           alt={serviceName}
           className="kh-card-image-zoom absolute inset-0 h-full w-full object-cover transition-transform duration-500"
+          decoding="async"
           loading="lazy"
           onError={() => setImageFailed(true)}
           src={cover.imageUrl}

@@ -63,7 +63,12 @@ test('service details respects hidden pricing while rendering duration documents
   expect(screen.queryByText(/999/)).not.toBeInTheDocument()
   expect(screen.queryByText(/777/)).not.toBeInTheDocument()
   expect(screen.queryByText(/555/)).not.toBeInTheDocument()
-  expect(screen.queryByRole('img', { name: 'خدمة تجريبية' })).not.toBeInTheDocument()
+  // No uploaded image → the hero shows a curated Khalsni fallback illustration
+  // (a real bundled <img>, never a broken image or bare gradient). It is
+  // decorative (alt="") since the service name is the adjacent H1.
+  const heroImg = document.querySelector('section img')
+  expect(heroImg).not.toBeNull()
+  expect(heroImg.getAttribute('src')).toMatch(/\/images\/khalsni\//)
 })
 
 test('service details renders visible pricing and related services from the public payload', async () => {

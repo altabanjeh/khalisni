@@ -204,6 +204,7 @@ function ProvidersManagementPage() {
   }, {})
 
   const noCategories = tr('بدون فئات', 'No categories')
+  const listSep = isArabic ? '، ' : ', '
 
   const tableColumns = [
     {
@@ -224,12 +225,12 @@ function ProvidersManagementPage() {
     {
       key: 'service_categories',
       label: tr('الفئات', 'Categories'),
-      render: (row) => row.service_categories?.join('، ') || noCategories,
+      render: (row) => row.service_categories?.join(listSep) || noCategories,
     },
     {
       key: 'assigned_services',
       label: tr('الخدمات المسندة', 'Assigned services'),
-      render: (row) => assignmentMap[String(row.id)]?.join('، ') || tr('لم يتم ربط خدمات بعد', 'No services linked yet'),
+      render: (row) => assignmentMap[String(row.id)]?.join(listSep) || tr('لم يتم ربط خدمات بعد', 'No services linked yet'),
     },
     { key: 'city', label: tr('المدينة', 'City') },
     {
@@ -263,7 +264,7 @@ function ProvidersManagementPage() {
                 onClick={() => handleActivationChange(row, !row.account_active)}
                 type="button"
               >
-                {row.account_active ? tr('إيقاف الحساب', 'Deactivate') : tr('تفعيل الحساب', 'Activate')}
+                {row.account_active ? tr('إيقاف الحساب', 'Suspend account') : tr('تفعيل الحساب', 'Activate account')}
               </button>
               <Link className="btn-secondary px-3 py-2 text-xs" to={`/admin/provider-services?provider=${row.id}`}>
                 {tr('إدارة الخدمات', 'Manage services')}
@@ -273,7 +274,7 @@ function ProvidersManagementPage() {
                 onClick={() => setPendingDelete(row)}
                 type="button"
               >
-                {tr('تعطيل', 'Deactivate')}
+                {tr('تعطيل المزود', 'Deactivate provider')}
               </button>
             </>
           )}
@@ -344,7 +345,7 @@ function ProvidersManagementPage() {
               <StatusBadge status={row.is_deleted ? 'REJECTED' : row.account_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
             </div>
             <p className="text-sm text-slate-600">{row.provider_type || tr('مزود خدمة', 'Service provider')}</p>
-            <p className="text-sm text-slate-500">{row.service_categories?.join('، ') || noCategories}</p>
+            <p className="text-sm text-slate-500">{row.service_categories?.join(listSep) || noCategories}</p>
           </div>
         )}
         mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}

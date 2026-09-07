@@ -36,7 +36,7 @@ function RequestCard({ order, className = '', to }) {
   const lastLog = Array.isArray(order?.status_logs) && order.status_logs.length ? order.status_logs[order.status_logs.length - 1] : null
   const latestUpdate = lastLog?.note || order?.latest_update || ''
   const updatedAt = order?.updated_at || lastLog?.created_at || order?.created_at
-  const cover = getCover(order?.service || { slug: serviceName }, order?.service?.category?.slug || '')
+  const cover = getCover(order?.service || { slug: serviceName }, order?.service?.category?.slug || '', { as: 'service' })
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = cover.hasImage && !imageFailed
 
@@ -74,7 +74,7 @@ function RequestCard({ order, className = '', to }) {
     >
       <div className="kh-cover relative h-28 w-full" style={showImage ? undefined : cover.style}>
         {showImage ? (
-          <img alt={serviceName} className="kh-card-image-zoom absolute inset-0 h-full w-full object-cover transition-transform duration-500" loading="lazy" onError={() => setImageFailed(true)} src={cover.imageUrl} />
+          <img alt={serviceName} className="kh-card-image-zoom absolute inset-0 h-full w-full object-cover transition-transform duration-500" decoding="async" loading="lazy" onError={() => setImageFailed(true)} src={cover.imageUrl} />
         ) : (
           <>
             <span aria-hidden="true" className="kh-cover-pattern" />

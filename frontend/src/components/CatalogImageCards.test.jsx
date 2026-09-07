@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import CategoryCard from './CategoryCard'
 import ServiceCard from './ServiceCard'
 
-test('category card renders uploaded image and falls back without a broken image', () => {
+test('category card prefers the uploaded image, then a curated illustration (never a broken image)', () => {
   const { rerender } = render(
     <MemoryRouter>
       <CategoryCard category={{ id: 1, name_ar: 'Category A', slug: 'category-a', image_url: '/media/category-a.jpg' }} count={2} />
@@ -12,16 +12,31 @@ test('category card renders uploaded image and falls back without a broken image
 
   expect(screen.getByRole('img', { name: 'Category A' })).toHaveAttribute('src', '/media/category-a.jpg')
 
+  // No upload, unknown slug → the generic Khalsni category illustration, still a
+  // real <img> with a meaningful alt (never a browser broken-image icon).
   rerender(
     <MemoryRouter>
       <CategoryCard category={{ id: 1, name_ar: 'Category A', slug: 'category-a' }} count={2} />
     </MemoryRouter>,
   )
 
-  expect(screen.queryByRole('img', { name: 'Category A' })).not.toBeInTheDocument()
+  const fallback = screen.getByRole('img', { name: 'Category A' })
+  expect(fallback.getAttribute('src')).toMatch(/\/images\/khalsni\/(categories|fallback)\//)
 })
 
-test('service card prefers service image, then category image, then visual fallback', () => {
+test('category card resolves a real catalog slug to its curated category illustration', () => {
+  render(
+    <MemoryRouter>
+      <CategoryCard category={{ id: 6, name_ar: 'الأراضي والمساحة', slug: 'land-and-survey' }} count={3} />
+    </MemoryRouter>,
+  )
+  expect(screen.getByRole('img', { name: 'الأراضي والمساحة' })).toHaveAttribute(
+    'src',
+    '/images/khalsni/categories/land-and-survey.svg',
+  )
+})
+
+test('service card resolution order: uploaded → category image → curated fallback', () => {
   const { rerender } = render(
     <MemoryRouter>
       <ServiceCard
@@ -36,7 +51,6 @@ test('service card prefers service image, then category image, then visual fallb
       />
     </MemoryRouter>,
   )
-
   expect(screen.getByRole('img', { name: 'Service A' })).toHaveAttribute('src', '/media/service-a.jpg')
 
   rerender(
@@ -52,9 +66,9 @@ test('service card prefers service image, then category image, then visual fallb
       />
     </MemoryRouter>,
   )
-
   expect(screen.getByRole('img', { name: 'Service A' })).toHaveAttribute('src', '/media/category-a.jpg')
 
+  // No upload anywhere, unknown slug → generic Khalsni service illustration.
   rerender(
     <MemoryRouter>
       <ServiceCard
@@ -68,12 +82,27 @@ test('service card prefers service image, then category image, then visual fallb
       />
     </MemoryRouter>,
   )
-
-  expect(screen.queryByRole('img', { name: 'Service A' })).not.toBeInTheDocument()
+  expect(screen.getByRole('img', { name: 'Service A' }).getAttribute('src')).toMatch(
+    /\/images\/khalsni\/(services|categories|fallback)\//,
+  )
 })
 
-test('service card removes image element after load error', () => {
+test('service card resolves a real catalog slug to its own service illustration', () => {
   render(
+    <MemoryRouter>
+      <ServiceCard
+        service={{ id: 3, slug: 'passport-renewal', name_ar: 'تجديد جواز السفر', description_ar: 'x', category: { id: 1, slug: 'civil-status-and-passports', name_ar: 'الأحوال' } }}
+      />
+    </MemoryRouter>,
+  )
+  expect(screen.getByRole('img', { name: 'تجديد جواز السفر' })).toHaveAttribute(
+    'src',
+    '/images/khalsni/services/passport-renewal.svg',
+  )
+})
+
+test('service card drops to the branded gradient cover only after an image load error', () => {
+  const { container } = render(
     <MemoryRouter>
       <ServiceCard
         service={{
@@ -90,22 +119,8 @@ test('service card removes image element after load error', () => {
 
   fireEvent.error(screen.getByRole('img', { name: 'Service A' }))
 
+  // No broken <img>; a deterministic branded gradient panel stands in.
   expect(screen.queryByRole('img', { name: 'Service A' })).not.toBeInTheDocument()
-})
-
-test('service card shows a branded cover (never a broken image) when no image is set', () => {
-  const { container } = render(
-    <MemoryRouter>
-      <ServiceCard
-        service={{ id: 9, slug: 'no-image', name_ar: 'بدون صورة', description_ar: 'تفاصيل', category: { id: 1, name_ar: 'فئة' } }}
-      />
-    </MemoryRouter>,
-  )
-
-  // no content image, no broken <img>...
-  expect(screen.queryByRole('img', { name: 'بدون صورة' })).not.toBeInTheDocument()
-  expect(container.querySelector('img')).toBeNull()
-  // ...a deterministic branded gradient cover panel stands in for it
   const cover = container.querySelector('.kh-cover')
   expect(cover).toBeInTheDocument()
   expect(cover.getAttribute('style') || '').toMatch(/background-image/i)

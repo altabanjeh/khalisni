@@ -15,6 +15,7 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getCategoryDescription, getCategoryName } from '../../utils/servicePresentation'
+import { EMPTY_STATE_ILLUSTRATIONS } from '../../utils/catalogImagery'
 
 function isPublicRecord(record) {
   return record && record.is_deleted !== true && record.is_active !== false && record.show_on_public_site !== false
@@ -230,6 +231,7 @@ function ServicesPage() {
           </div>
         ) : (
           <PublicEmptyState
+            illustration={EMPTY_STATE_ILLUSTRATIONS.results}
             icon={Search}
             title={isArabic ? 'لا توجد نتائج مطابقة' : 'No matching results'}
             description={isArabic ? 'جرّب تصنيفاً آخر أو عدّل عبارة البحث للوصول إلى الخدمة المناسبة.' : 'Try another category or adjust the search phrase.'}

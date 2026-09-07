@@ -18,7 +18,7 @@ function CategoryCard({ category, count }) {
   const href = category?.slug ? `/services/category/${category.slug}` : '/services'
   const serviceCount = count ?? category?.service_count
   const hasServiceCount = serviceCount != null && serviceCount !== ''
-  const cover = getCover(category, category?.slug || '')
+  const cover = getCover(category, category?.slug || '', { as: 'category' })
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = cover.hasImage && !imageFailed
 
@@ -33,6 +33,7 @@ function CategoryCard({ category, count }) {
           <img
             alt={name}
             className="kh-card-image-zoom absolute inset-0 h-full w-full object-cover transition-transform duration-500"
+            decoding="async"
             loading="lazy"
             onError={() => setImageFailed(true)}
             src={cover.imageUrl}

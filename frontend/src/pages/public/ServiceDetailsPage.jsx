@@ -11,6 +11,7 @@ import {
   ReceiptText,
   WalletCards,
 } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ServiceCard from '../../components/ServiceCard'
 import {
@@ -95,6 +96,7 @@ function ServiceDetailsPage() {
   const { language, isArabic } = useLanguage()
   const { slug } = useParams()
   const { data: service, loading, error } = useAsyncData(() => api.getService(slug), [slug], null)
+  const [heroImageFailed, setHeroImageFailed] = useState(false)
   const ArrowIcon = isArabic ? ArrowLeft : ArrowRight
 
   if (loading) {
@@ -172,14 +174,39 @@ function ServiceDetailsPage() {
       : null,
   ].filter(Boolean)
 
-  const heroCover = getCover(service, service?.category?.slug || '')
+  const heroCover = getCover(service, service?.category?.slug || '', { as: 'service' })
+  const showHeroImage = heroCover.hasImage && !heroImageFailed
 
   return (
     <PublicPageShell className="pb-24 lg:pb-7">
       {/* Cinematic service hero */}
-      <section className="kh-cover relative min-h-[20rem] overflow-hidden rounded-[var(--radius-2xl)] text-start shadow-2xl sm:min-h-[24rem]" style={heroCover.hasImage ? undefined : heroCover.style}>
-        {heroCover.hasImage ? (
-          <img alt={serviceName} className="absolute inset-0 h-full w-full object-cover" src={heroCover.imageUrl} />
+      <section
+        className="kh-cover relative min-h-[20rem] overflow-hidden rounded-[var(--radius-2xl)] text-start shadow-2xl sm:min-h-[24rem]"
+        style={showHeroImage && heroCover.isRealImage ? undefined : heroCover.style}
+      >
+        {showHeroImage ? (
+          heroCover.isRealImage ? (
+            <img
+              alt={serviceName}
+              className="absolute inset-0 h-full w-full object-cover"
+              decoding="async"
+              fetchPriority="high"
+              onError={() => setHeroImageFailed(true)}
+              src={heroCover.imageUrl}
+            />
+          ) : (
+            // Curated illustration: keep it whole on the brand field (a wide
+            // cover-crop would slice the subject). Anchored right so the
+            // bottom-left title/CTA stack stays clear.
+            <img
+              alt=""
+              className="pointer-events-none absolute inset-y-0 end-0 h-full w-[58%] object-contain object-[92%_center] opacity-90 sm:w-[62%]"
+              decoding="async"
+              fetchPriority="high"
+              onError={() => setHeroImageFailed(true)}
+              src={heroCover.imageUrl}
+            />
+          )
         ) : (
           <>
             <span aria-hidden="true" className="kh-cover-pattern" />
