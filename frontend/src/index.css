@@ -36,7 +36,9 @@
   --kh-border-strong: #c9d6e5;
   --kh-success: #12b76a;
   --kh-warning: #f79009;
-  --kh-danger: #f04438;
+  /* #f04438 is 3.75:1 as 12px text on white (axe serious). #d92d20 clears
+     4.5:1 and keeps white button text AA. Same red family. */
+  --kh-danger: #d92d20;
   --kh-space-1: 4px;
   --kh-space-2: 8px;
   --kh-space-3: 12px;

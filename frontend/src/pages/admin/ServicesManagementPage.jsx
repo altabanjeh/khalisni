@@ -1103,7 +1103,7 @@ function ServicesManagementPage() {
           rows={categories}
           toolbar={
             <div className="grid gap-3 md:grid-cols-1">
-              <select className="field" value={categoryStatus} onChange={(event) => setCategoryStatus(event.target.value)}>
+              <select aria-label="حالة التصنيفات" className="field" value={categoryStatus} onChange={(event) => setCategoryStatus(event.target.value)}>
                 <option value="active">Active</option>
                 <option value="deleted">Deleted</option>
                 <option value="all">All</option>
@@ -1133,12 +1133,12 @@ function ServicesManagementPage() {
           rows={services}
           toolbar={
             <div className="grid gap-3 md:grid-cols-2">
-              <select className="field" value={serviceStatus} onChange={(event) => setServiceStatus(event.target.value)}>
+              <select aria-label="حالة الخدمات" className="field" value={serviceStatus} onChange={(event) => setServiceStatus(event.target.value)}>
                 <option value="active">Active</option>
                 <option value="deleted">Deleted</option>
                 <option value="all">All</option>
               </select>
-              <select className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
+              <select aria-label="تصفية حسب التصنيف" className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
                 <option value="">كل الفئات</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
@@ -1171,7 +1171,7 @@ function ServicesManagementPage() {
           rows={definitions}
           toolbar={
             <div className="grid gap-3 md:grid-cols-1">
-              <select className="field" value={definitionStatus} onChange={(event) => setDefinitionStatus(event.target.value)}>
+              <select aria-label="حالة التعريفات" className="field" value={definitionStatus} onChange={(event) => setDefinitionStatus(event.target.value)}>
                 <option value="active">Active</option>
                 <option value="deleted">Deleted</option>
                 <option value="all">All</option>

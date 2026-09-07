@@ -1,51 +1,66 @@
-import { CheckCircle2 } from 'lucide-react'
+import clsx from 'clsx'
+import { Check } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 
-function ApplicationStepper({ steps = [], currentIndex = 0 }) {
+/**
+ * Functional application progress + navigation.
+ *
+ *  - completed steps are buttons (jump back)
+ *  - the current step is highlighted with aria-current="step"
+ *  - future steps are inert
+ *  - a step can be marked `blocked` (validation failed) — shown in danger tone
+ */
+function ApplicationStepper({ steps = [], currentIndex = 0, onStepClick, blockedIndex = -1 }) {
   const { isArabic } = useLanguage()
-  const kicker = (index, isActive, isDone) => {
-    if (isDone) return isArabic ? 'تم' : 'Done'
-    if (isActive) return isArabic ? 'الخطوة الحالية' : 'Current step'
-    return isArabic ? `الخطوة ${index + 1}` : `Step ${index + 1}`
-  }
+
   return (
-    <nav aria-label="Application steps" className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft">
-      <ol className="grid gap-3 md:grid-cols-4">
+    <nav aria-label={isArabic ? 'مراحل الطلب' : 'Application steps'} className="rounded-[var(--radius-xl)] border border-border bg-card p-3 shadow-soft sm:p-4">
+      <ol className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2">
         {steps.map((step, index) => {
           const isActive = index === currentIndex
           const isDone = index < currentIndex
+          const isBlocked = index === blockedIndex
+          const clickable = typeof onStepClick === 'function' && (isDone || index < currentIndex)
+          const Tag = clickable ? 'button' : 'div'
 
           return (
-            <li
-              key={step}
-              aria-current={isActive ? 'step' : undefined}
-              className={
-                isActive
-                  ? 'rounded-[var(--radius)] bg-brand-600 p-4 text-white'
-                  : isDone
-                    ? 'rounded-[var(--radius)] border border-green-200 bg-green-50 p-4 text-green-700'
-                    : 'rounded-[var(--radius)] border border-border bg-slate-50 p-4 text-slate-600'
-              }
-            >
-              <div className="flex items-center gap-3">
+            <li className="flex-1" key={step}>
+              <Tag
+                {...(clickable ? { type: 'button', onClick: () => onStepClick(index) } : {})}
+                aria-current={isActive ? 'step' : undefined}
+                className={clsx(
+                  'flex w-full items-center gap-3 rounded-[var(--radius)] p-3 text-start transition',
+                  isBlocked
+                    ? 'border border-red-200 bg-red-50 text-red-700'
+                    : isActive
+                      ? 'bg-brand-600 text-white shadow-sm'
+                      : isDone
+                        ? 'border border-green-200 bg-green-50 text-green-700 hover:brightness-95'
+                        : 'border border-border bg-slate-50 text-slate-500',
+                  clickable && 'kh-focusable cursor-pointer',
+                )}
+              >
                 <span
-                  className={
-                    isDone
-                      ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700'
+                  className={clsx(
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black',
+                    isBlocked
+                      ? 'bg-red-100 text-red-700'
                       : isActive
-                        ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white font-extrabold text-brand-700'
-                        : 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card font-extrabold text-slate-500'
-                  }
+                        ? 'bg-white text-brand-700'
+                        : isDone
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-white text-slate-400',
+                  )}
                 >
-                  {isDone ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
+                  {isDone ? <Check className="h-4 w-4" /> : index + 1}
                 </span>
-                <span className="text-sm font-extrabold">
-                  <span className="block text-[0.65rem] font-bold uppercase tracking-wide opacity-70">
-                    {kicker(index, isActive, isDone)}
+                <span className="min-w-0">
+                  <span className="block text-[0.6rem] font-bold uppercase tracking-wide opacity-70">
+                    {isDone ? (isArabic ? 'مكتملة' : 'Done') : isActive ? (isArabic ? 'الحالية' : 'Current') : `${index + 1}`}
                   </span>
-                  {step}
+                  <span className="block truncate text-sm font-extrabold">{step}</span>
                 </span>
-              </div>
+              </Tag>
             </li>
           )
         })}

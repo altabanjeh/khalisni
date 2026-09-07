@@ -526,7 +526,7 @@ function HelpGuidePanel({ onClose, open }) {
                 />
               </div>
               {panelView === 'library' ? (
-                <select className="field" onChange={(event) => setCategoryFilter(event.target.value)} value={categoryFilter}>
+                <select aria-label={t('manual.filterByCategory', 'تصفية حسب التصنيف')} className="field" onChange={(event) => setCategoryFilter(event.target.value)} value={categoryFilter}>
                   <option value="">{t('manual.allCategories', 'كل التصنيفات')}</option>
                   {(libraryData.categories || []).map((item) => (
                     <option key={item.value} value={item.value}>
@@ -541,6 +541,7 @@ function HelpGuidePanel({ onClose, open }) {
               )}
               {panelView === 'library' ? (
                 <select
+                  aria-label={t('manual.filterByRole', 'تصفية حسب الدور')}
                   className="field"
                   disabled={!libraryData.can_manage_help_guides}
                   onChange={(event) => setRoleFilter(event.target.value)}

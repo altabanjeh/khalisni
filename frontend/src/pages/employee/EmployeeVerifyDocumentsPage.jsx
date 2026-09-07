@@ -1,180 +1,194 @@
-import { Eye, ShieldCheck, XCircle } from 'lucide-react'
+import { CheckCircle2, Download, Eye, FileText, ShieldCheck, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
-import ContextHelpButton from '../../components/ContextHelpButton'
 import EmptyState from '../../components/EmptyState'
 import LoadingSpinner from '../../components/LoadingSpinner'
-import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
+import { getDisplayError } from '../../api/client'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
 
-function getErrorMessage(error) {
-  const detail = error?.response?.data
-  if (typeof detail === 'string') return detail
-  if (detail?.detail) return detail.detail
-  if (detail && typeof detail === 'object') {
-    return Object.entries(detail)
-      .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-      .join(' | ')
-  }
-  return 'تعذر تنفيذ العملية.'
-}
-
 function EmployeeVerifyDocumentsPage() {
   const [searchParams] = useSearchParams()
   const { toast } = useToast()
+  const { isArabic, language } = useLanguage()
   const [selectedDocumentId, setSelectedDocumentId] = useState(null)
-  const verifyForm = useForm()
+  const [tokenizedUrl, setTokenizedUrl] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const verifyForm = useForm({ defaultValues: { note: '' } })
   const orderId = searchParams.get('order')
+
   const { data: documents = [], loading, error, setData: setDocuments, reload } = useAsyncData(
     () => api.getStaffDocuments(orderId ? { order: orderId } : {}),
     [orderId],
     [],
   )
 
-  const selectedDocument = documents.find((document) => document.id === selectedDocumentId) || documents[0] || null
-  const [tokenizedUrl, setTokenizedUrl] = useState(null)
+  const selectedDocument = documents.find((d) => d.id === selectedDocumentId) || documents[0] || null
 
   useEffect(() => {
     if (!selectedDocument?.id || !selectedDocument?.download_url) {
       setTokenizedUrl(null)
-      return
+      return undefined
     }
     let cancelled = false
-    api.getDownloadToken(selectedDocument.id).then(({ token }) => {
-      if (!cancelled) setTokenizedUrl(`${selectedDocument.download_url}?token=${encodeURIComponent(token)}`)
-    }).catch(() => {
-      if (!cancelled) setTokenizedUrl(null)
-    })
+    api.getDownloadToken(selectedDocument.id)
+      .then(({ token }) => { if (!cancelled) setTokenizedUrl(`${selectedDocument.download_url}?token=${encodeURIComponent(token)}`) })
+      .catch(() => { if (!cancelled) setTokenizedUrl(null) })
     return () => { cancelled = true }
   }, [selectedDocument?.id, selectedDocument?.download_url])
 
   if (loading) return <LoadingSpinner />
-
-  if (error) {
-    return <EmptyState description={getErrorMessage(error)} title="تعذر تحميل الوثائق" />
-  }
-
+  if (error) return <EmptyState description={getDisplayError(error)} title={isArabic ? 'تعذر تحميل الوثائق' : 'Could not load documents'} />
   if (!selectedDocument) {
-    return <EmptyState description="لا توجد وثائق بانتظار التحقق حالياً." title="قائمة التحقق فارغة" />
+    return <EmptyState icon={ShieldCheck} description={isArabic ? 'لا توجد وثائق بانتظار التحقق حالياً.' : 'No documents are waiting for verification right now.'} title={isArabic ? 'قائمة التحقق فارغة' : 'Verification queue is empty'} />
   }
 
   async function submitVerification(isVerified) {
+    const note = verifyForm.getValues('note').trim()
+    if (!isVerified && !note) {
+      verifyForm.setError('note', { message: isArabic ? 'سبب الرفض مطلوب.' : 'A rejection reason is required.' })
+      return
+    }
+    setBusy(true)
     try {
-      const note = verifyForm.getValues('note')
-      const verifiedDocument = await api.verifyStaffDocument(selectedDocument.id, { is_verified: isVerified, note })
-      setDocuments((current) =>
-        current.map((document) =>
-          document.id === selectedDocument.id ? { ...document, ...verifiedDocument } : document,
-        ),
-      )
+      const updated = await api.verifyStaffDocument(selectedDocument.id, { is_verified: isVerified, note })
+      setDocuments((current) => current.map((d) => (d.id === selectedDocument.id ? { ...d, ...updated } : d)))
+      verifyForm.reset({ note: '' })
       reload()
-      toast(isVerified ? 'تم اعتماد الوثيقة.' : 'تم رفض الوثيقة وطلب استبدالها.', 'success')
+      toast(isVerified ? (isArabic ? 'تم اعتماد الوثيقة.' : 'Document approved.') : (isArabic ? 'تم رفض الوثيقة وطلب استبدالها.' : 'Document rejected — replacement requested.'), 'success')
     } catch (submitError) {
-      toast(getErrorMessage(submitError), 'error')
+      toast(getDisplayError(submitError), 'error')
+    } finally {
+      setBusy(false)
     }
   }
 
-  const isImage = (selectedDocument.mime_type || '').startsWith('image/')
-  const isPdf = (selectedDocument.mime_type || '').includes('pdf')
+  const mime = selectedDocument.mime_type || ''
+  const isImage = mime.startsWith('image/')
+  const isPdf = mime.includes('pdf')
+  const pending = documents.filter((d) => ['pending_review', 'uploaded', 'PENDING', 'SUBMITTED'].includes(String(d.status))).length
+
+  const meta = [
+    { label: isArabic ? 'الطلب' : 'Request', value: selectedDocument.order?.order_number },
+    { label: isArabic ? 'الخدمة' : 'Service', value: selectedDocument.order?.service_name || (isArabic ? 'غير محدد' : 'Not set') },
+    { label: isArabic ? 'العميل' : 'Customer', value: selectedDocument.order?.customer_name || selectedDocument.uploaded_by_name || '—' },
+    { label: isArabic ? 'نوع المستند' : 'Document type', value: selectedDocument.document_type },
+    { label: isArabic ? 'اسم الملف' : 'File name', value: selectedDocument.original_filename },
+    { label: isArabic ? 'رفع بواسطة' : 'Uploaded by', value: selectedDocument.uploaded_by_name || selectedDocument.uploaded_by_role || '—' },
+    { label: isArabic ? 'تاريخ الرفع' : 'Uploaded at', value: formatDateTime(selectedDocument.created_at, language) },
+  ]
+  if (selectedDocument.rejection_reason) meta.push({ label: isArabic ? 'سبب رفض سابق' : 'Previous rejection', value: selectedDocument.rejection_reason })
 
   return (
-    <div className="page-section">
-      <PageHeader
-        actions={<ContextHelpButton label="Open help for verifying documents" />}
-        description="راجع الوثائق التي ما زالت بانتظار التحقق، ثم اعتمدها أو ارفضها مع سبب واضح حتى تبقى المراجعة قابلة للتتبع."
-        eyebrow="التحقق من الوثائق"
-        icon={ShieldCheck}
-        title="مراجعة الوثائق"
-      />
+    <div className="space-y-6">
+      <header className="rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft sm:p-6">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-600">{isArabic ? 'العمليات' : 'Operations'}</p>
+        <h1 className="mt-1 text-2xl font-black text-ink sm:text-3xl">
+          <ShieldCheck className="me-2 inline h-6 w-6 text-brand-600" />
+          {isArabic ? 'التحقق من الوثائق' : 'Document verification'}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-slate-600">
+          {isArabic
+            ? 'راجع كل ملف مرفوع، تحقق من وضوحه ومطابقته لنوع الخدمة، ثم اعتمده أو ارفضه بسبب واضح.'
+            : 'Review each uploaded file, confirm it is legible and matches the service, then approve or reject it with a clear reason.'}
+        </p>
+      </header>
 
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <aside className="space-y-3">
+      <div className="grid gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
+        {/* queue */}
+        <aside className="space-y-2">
+          <p className="px-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+            {isArabic ? `بانتظار التحقق (${pending})` : `Awaiting review (${pending})`}
+          </p>
           {documents.map((document) => (
             <button
-              key={document.id}
-              className={`w-full rounded-3xl border px-4 py-4 text-start transition ${
-                selectedDocument.id === document.id ? 'border-brand-400 bg-brand-50' : 'border-border bg-white hover:bg-brand-50'
+              className={`kh-focusable w-full rounded-[var(--radius-lg)] border p-3 text-start transition ${
+                selectedDocument.id === document.id ? 'border-brand-400 bg-brand-50' : 'border-border bg-card hover:bg-brand-50'
               }`}
+              key={document.id}
               onClick={() => setSelectedDocumentId(document.id)}
               type="button"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-bold text-ink">{document.original_filename}</p>
-                  <p className="mt-1 text-xs text-slate-500">{document.order?.order_number}</p>
-                </div>
+              <div className="flex items-center justify-between gap-2">
+                <p className="min-w-0 truncate text-sm font-black text-ink">{document.original_filename}</p>
                 <StatusBadge status={document.status} />
               </div>
+              <p className="mt-1 text-xs font-semibold text-slate-500">
+                #{document.order?.order_number} · {document.document_type}
+              </p>
             </button>
           ))}
         </aside>
 
-        <section className="glass-panel p-6">
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="panel-muted flex min-h-72 flex-col overflow-hidden p-4 text-center">
-              {isImage && tokenizedUrl ? (
-                <img alt={selectedDocument.original_filename} className="h-full w-full rounded-2xl object-contain" src={tokenizedUrl} />
-              ) : null}
-              {isPdf && tokenizedUrl ? (
-                <iframe className="min-h-72 w-full rounded-2xl border border-border bg-white" src={tokenizedUrl} title={selectedDocument.original_filename} />
-              ) : null}
-              {!isImage && !isPdf ? (
-                <div className="flex min-h-72 flex-col items-center justify-center">
-                  <span className="icon-chip mb-4">
-                    <Eye className="h-5 w-5" />
-                  </span>
-                  <p className="font-bold text-ink">{selectedDocument.original_filename}</p>
-                  <p className="mt-2 text-sm text-slate-600">لا توجد معاينة مباشرة لهذا النوع من الملفات. استخدم زر التنزيل لفتح الوثيقة.</p>
-                </div>
-              ) : null}
+        {/* workspace */}
+        <section className="grid gap-5 lg:grid-cols-[1fr_20rem]">
+          {/* preview */}
+          <div className="flex min-h-[24rem] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-border bg-slate-50 p-4">
+            {isImage && tokenizedUrl ? (
+              <img alt={selectedDocument.original_filename} className="h-full w-full rounded-[var(--radius-lg)] object-contain" src={tokenizedUrl} />
+            ) : isPdf && tokenizedUrl ? (
+              <iframe className="min-h-[24rem] w-full rounded-[var(--radius-lg)] border border-border bg-white" src={tokenizedUrl} title={selectedDocument.original_filename} />
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center text-center">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600"><Eye className="h-6 w-6" /></span>
+                <p className="mt-3 font-black text-ink">{selectedDocument.original_filename}</p>
+                <p className="mt-1 max-w-xs text-sm font-semibold text-slate-500">
+                  {isArabic ? 'لا توجد معاينة مباشرة لهذا النوع. نزّل الملف لفتحه.' : 'No inline preview for this type. Download the file to open it.'}
+                </p>
+              </div>
+            )}
+            <a
+              className="btn-secondary mt-4 self-start"
+              href={tokenizedUrl || selectedDocument.download_url}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Download className="h-4 w-4" />
+              {isArabic ? 'تنزيل / فتح' : 'Download / open'}
+            </a>
+          </div>
+
+          {/* metadata + actions */}
+          <div className="space-y-4">
+            <div className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft">
+              <h2 className="flex items-center gap-2 text-sm font-black text-ink">
+                <FileText className="h-4 w-4 text-brand-600" />
+                {isArabic ? 'تفاصيل الوثيقة' : 'Document details'}
+              </h2>
+              <dl className="mt-3 space-y-2 text-sm">
+                {meta.map((row) => (
+                  <div className="flex justify-between gap-3" key={row.label}>
+                    <dt className="shrink-0 font-bold text-slate-500">{row.label}</dt>
+                    <dd className="min-w-0 truncate text-end font-bold text-ink">{row.value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            <div>
-              <h2 className="text-xl font-bold text-ink">{selectedDocument.document_type}</h2>
-              <p className="mt-2 text-sm text-slate-600">الطلب: {selectedDocument.order?.order_number}</p>
-              <div className="mt-4 space-y-2 rounded-3xl border border-border bg-white p-4 text-sm text-slate-700">
-                <p>الخدمة: {selectedDocument.order?.service_name || 'غير محدد'}</p>
-                <p>رفع بواسطة: {selectedDocument.uploaded_by_name || selectedDocument.uploaded_by_role || 'غير محدد'}</p>
-                <p>تاريخ الرفع: {formatDateTime(selectedDocument.created_at)}</p>
-                {selectedDocument.verified_by_name ? <p>آخر تحقق بواسطة: {selectedDocument.verified_by_name}</p> : null}
-                {selectedDocument.verified_at ? <p>تاريخ آخر تحقق: {formatDateTime(selectedDocument.verified_at)}</p> : null}
-                {selectedDocument.rejection_reason ? <p>سبب الرفض السابق: {selectedDocument.rejection_reason}</p> : null}
-                {selectedDocument.verification_note ? <p>ملاحظة التحقق السابقة: {selectedDocument.verification_note}</p> : null}
-              </div>
-              <a className="btn-secondary mt-4 inline-flex" href={tokenizedUrl || selectedDocument.download_url} rel="noreferrer" target="_blank">
-                تنزيل أو فتح الوثيقة
-              </a>
-              <div className="mt-5 space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-sm text-slate-700">
-                <p>1. تأكد من وضوح المستند ومطابقته لنوع الخدمة.</p>
-                <p>2. استخدم الرفض فقط عند وجود نقص جوهري أو ملف غير صالح.</p>
-                <p>3. دوّن سبباً واضحاً عند طلب الاستبدال حتى يتمكن العميل أو المزود من التصحيح.</p>
-              </div>
-
-              <form className="mt-5 space-y-4">
-                <textarea
-                  className="field min-h-28"
-                  placeholder="أضف ملاحظة داخلية عند الاعتماد أو سبباً واضحاً عند طلب الاستبدال"
-                  {...verifyForm.register('note')}
-                />
-              </form>
-
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
-                <button className="btn-primary" onClick={() => submitVerification(true)} type="button">
-                  <ShieldCheck className="h-4 w-4" />
-                  اعتماد الوثيقة
+            <div className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft">
+              <h2 className="text-sm font-black text-ink">{isArabic ? 'قرار التحقق' : 'Verification decision'}</h2>
+              <textarea
+                aria-label={isArabic ? 'ملاحظة التحقق' : 'Verification note'}
+                className="field mt-3 min-h-24"
+                placeholder={isArabic ? 'ملاحظة داخلية عند الاعتماد، أو سبب واضح عند الرفض' : 'Internal note on approval, or a clear reason on rejection'}
+                {...verifyForm.register('note')}
+              />
+              {verifyForm.formState.errors.note ? (
+                <p className="mt-1 text-xs font-bold text-danger" role="alert">{verifyForm.formState.errors.note.message}</p>
+              ) : null}
+              <div className="mt-3 grid gap-2">
+                <button className="btn-primary" disabled={busy} onClick={() => submitVerification(true)} type="button">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {isArabic ? 'اعتماد الوثيقة' : 'Approve document'}
                 </button>
-                <button
-                  className="btn-secondary border-red-200 text-danger hover:bg-red-50"
-                  onClick={() => submitVerification(false)}
-                  type="button"
-                >
+                <button className="btn-secondary border-red-200 text-danger hover:bg-red-50" disabled={busy} onClick={() => submitVerification(false)} type="button">
                   <XCircle className="h-4 w-4" />
-                  رفض الوثيقة وطلب استبدالها
+                  {isArabic ? 'رفض وطلب استبدال' : 'Reject & request replacement'}
                 </button>
               </div>
             </div>

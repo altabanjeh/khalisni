@@ -291,10 +291,10 @@ function ServiceCategoryManagementPage() {
                 <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
                   {isArabic ? 'تعديل' : 'Edit'}
                 </button>
-                <button className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, -1)} type="button">
+                <button aria-label={isArabic ? 'تحريك لأعلى' : 'Move up'} className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, -1)} type="button">
                   <ArrowUp className="h-3.5 w-3.5" />
                 </button>
-                <button className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, 1)} type="button">
+                <button aria-label={isArabic ? 'تحريك لأسفل' : 'Move down'} className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, 1)} type="button">
                   <ArrowDown className="h-3.5 w-3.5" />
                 </button>
                 <button
@@ -344,12 +344,13 @@ function ServiceCategoryManagementPage() {
         emptyDescription={isArabic ? 'أنشئ أول تصنيف لتنظيم الكتالوج.' : 'Create the first service category to organize the catalog.'}
         toolbar={
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <select className="field" value={recordStatus} onChange={(event) => setRecordStatus(event.target.value)}>
+            <select aria-label="تصفية حسب الحالة" className="field" value={recordStatus} onChange={(event) => setRecordStatus(event.target.value)}>
               <option value="active">{isArabic ? 'النشطة' : 'Active'}</option>
               <option value="deleted">{isArabic ? 'المحذوفة' : 'Deleted'}</option>
               <option value="all">{isArabic ? 'الكل' : 'All'}</option>
             </select>
             <select
+              aria-label={isArabic ? 'تصفية حسب التفعيل' : 'Filter by active state'}
               className="field"
               value={filters.is_active}
               onChange={(event) => setFilters((current) => ({ ...current, is_active: event.target.value }))}
@@ -359,6 +360,7 @@ function ServiceCategoryManagementPage() {
               <option value="false">{isArabic ? 'موقّف' : 'Inactive'}</option>
             </select>
             <select
+              aria-label={isArabic ? 'تصفية حسب الظهور' : 'Filter by visibility'}
               className="field"
               value={filters.show_on_public_site}
               onChange={(event) => setFilters((current) => ({ ...current, show_on_public_site: event.target.value }))}
@@ -368,6 +370,7 @@ function ServiceCategoryManagementPage() {
               <option value="false">{isArabic ? 'داخلي فقط' : 'Internal only'}</option>
             </select>
             <select
+              aria-label={isArabic ? 'تصفية حسب التصنيف الأصل' : 'Filter by parent category'}
               className="field"
               value={filters.parent}
               onChange={(event) => setFilters((current) => ({ ...current, parent: event.target.value }))}

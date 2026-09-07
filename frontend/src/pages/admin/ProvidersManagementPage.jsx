@@ -386,7 +386,7 @@ function ProvidersManagementPage() {
         rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
         rows={providers}
         toolbar={
-          <select className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+          <select aria-label="تصفية حسب الحالة" className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
             <option value="active">Active</option>
             <option value="deleted">Deleted</option>
             <option value="all">All</option>

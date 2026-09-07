@@ -305,7 +305,7 @@ function AdminUsersRolesPage() {
   const filtersToolbar = (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
       {toolbar}
-      <select className="field text-sm" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+      <select aria-label="تصفية حسب الحالة" className="field text-sm" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
         <option value="active">نشط</option>
         <option value="deleted">محذوف</option>
         <option value="all">الكل</option>
