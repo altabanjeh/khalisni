@@ -75,7 +75,7 @@ function ForgotPasswordPage() {
           </PublicButton>
           <p className="text-center text-sm font-semibold text-slate-600">
             <Link
-              className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"
+              className="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
               to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login'}
             >
               {isArabic ? 'العودة إلى تسجيل الدخول' : 'Back to sign in'}

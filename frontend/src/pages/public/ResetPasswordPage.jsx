@@ -93,7 +93,7 @@ function ResetPasswordPage() {
             {isSubmitting ? (isArabic ? 'جار إعادة التعيين...' : 'Resetting...') : isArabic ? 'إعادة تعيين كلمة المرور' : 'Reset password'}
           </PublicButton>
           <p className="text-center text-sm font-semibold text-slate-600">
-            <Link className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]" to="/login">
+            <Link className="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]" to="/login">
               {isArabic ? 'العودة إلى تسجيل الدخول' : 'Back to sign in'}
             </Link>
           </p>

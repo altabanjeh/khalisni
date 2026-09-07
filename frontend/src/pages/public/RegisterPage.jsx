@@ -129,7 +129,7 @@ function RegisterPage() {
             <p className="text-center text-sm font-semibold text-slate-600">
               {isArabic ? 'لديك حساب بالفعل؟' : 'Already have an account?'}{' '}
               <Link
-                className="font-extrabold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"
+                className="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
                 to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login'}
               >
                 {isArabic ? 'سجل الدخول' : 'Sign in'}

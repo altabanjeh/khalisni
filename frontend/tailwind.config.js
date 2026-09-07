@@ -10,10 +10,11 @@ export default {
           200: '#bfdbfe',
           300: '#93c5fd',
           400: '#60a5fa',
-          /* 500/600 were #146ef0 — 4.27:1 as text on the brand-50 (#eff6ff) chip,
-             below WCAG AA. Shifted to the existing Khalsni brand-700 shade so
-             blue-on-pale-blue and white-on-blue both clear 4.5:1. Same blue family. */
-          500: '#0f5dd8',
+          /* 500 = Khalsni identity blue (brand marks, non-text accents, solid
+             fills with white text — all AA). 600 = accessible interaction shade
+             for blue TEXT, incl. on the pale brand-50 chip where #146ef0 is
+             4.27:1. `bg-brand-600` fills also stay AA with white text. */
+          500: '#146ef0',
           600: '#0f5dd8',
           700: '#0b49b5',
           800: '#0a3f9e',

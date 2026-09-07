@@ -86,7 +86,7 @@ function TrackOrderPage() {
             <PublicPanel>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'ملخص الطلب' : 'Request summary'}</p>
+                  <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'ملخص الطلب' : 'Request summary'}</p>
                   <h2 className="mt-2 text-3xl font-extrabold text-ink">{result.order_number}</h2>
                 </div>
                 <StatusBadge status={result.status} />
@@ -111,7 +111,7 @@ function TrackOrderPage() {
             </PublicPanel>
 
             <PublicPanel>
-              <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'خط سير الطلب' : 'Request timeline'}</p>
+              <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'خط سير الطلب' : 'Request timeline'}</p>
               <h2 className="mt-1 text-2xl font-extrabold text-ink">{isArabic ? 'تحديثات فعلية من النظام' : 'Actual system updates'}</h2>
               <div className="mt-5">
                 <OrderTimeline items={result.timeline || []} variant="public" />
@@ -128,7 +128,7 @@ function TrackOrderPage() {
 
           <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             <PublicPanel>
-              <p className="text-sm font-bold text-[var(--khalsni-public-primary)]">{isArabic ? 'الحالة الحالية' : 'Current status'}</p>
+              <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'الحالة الحالية' : 'Current status'}</p>
               <div className="mt-4"><StatusBadge status={result.status} /></div>
               <p className="mt-4 text-sm font-semibold leading-7 text-slate-600">
                 {isArabic ? 'لا نعرض أي ملاحظات داخلية أو مستندات خاصة من صفحة التتبع العامة.' : 'Internal notes and private documents are not exposed on public tracking.'}

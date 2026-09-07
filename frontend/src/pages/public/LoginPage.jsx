@@ -91,7 +91,7 @@ function LoginPage() {
                 <span>{isArabic ? 'الإبقاء على تسجيل الدخول' : 'Remember me on this device'}</span>
               </label>
               <Link
-                className="text-sm font-bold text-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-primary-hover)]"
+                className="text-sm font-bold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
                 to={nextPath ? `/forgot-password?next=${encodeURIComponent(nextPath)}` : '/forgot-password'}
               >
                 {isArabic ? 'نسيت كلمة المرور؟' : 'Forgot your password?'}

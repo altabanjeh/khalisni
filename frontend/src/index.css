@@ -8,12 +8,22 @@
   --kh-surface-muted: #f6f9ff;
   --kh-soft-blue: #eff6ff;
   --kh-soft-blue-strong: #dbeafe;
-  /* Khalsni brand blue. #0f5dd8 (was #146ef0) so brand-blue text on the
-     brand-50 chip and white text on the brand fill both clear WCAG AA 4.5:1.
-     Same blue family — this is the palette's own brand-700 shade. */
-  --kh-primary: #0f5dd8;
-  --kh-primary-hover: #0b49b5;
-  --kh-primary-active: #0a3f9e;
+  /* Two roles for the Khalsni blue:
+     --kh-brand-primary : the identity colour. Used for brand marks, decorative
+       accents, non-text indicators, icon fills, image treatments — anywhere
+       contrast rules allow, and for solid fills that carry white text
+       (#ffffff on #146ef0 = 4.65:1, AA).
+     --kh-action-primary : the accessible interaction colour. Used for link /
+       control TEXT, especially on pale-blue (brand-50) surfaces where the
+       identity blue is 4.27:1. #0f5dd8 on #eff6ff = 5.24:1, on white = 5.6:1.
+     --kh-primary stays the general-purpose alias (= brand) so existing
+     `bg-[var(--kh-primary)]` fills are unchanged. */
+  --kh-brand-primary: #146ef0;
+  --kh-primary: #146ef0;
+  --kh-primary-hover: #0f5dd8;
+  --kh-primary-active: #0b49b5;
+  --kh-action-primary: #0f5dd8;
+  --kh-action-primary-hover: #0b49b5;
   --kh-navy: #0b1533;
   --kh-navy-soft: #17213a;
   --kh-text: #17213a;
@@ -80,7 +90,8 @@
   --khalsni-public-bg-secondary: var(--kh-surface-muted);
   --khalsni-public-surface: #ffffff;
   --khalsni-public-surface-elevated: #ffffff;
-  --khalsni-public-primary: var(--kh-primary);
+  /* Identity blue — solid fills (white text is AA), icons, accents. */
+  --khalsni-public-primary: var(--kh-brand-primary);
   --khalsni-public-primary-hover: var(--kh-primary-hover);
   --khalsni-public-primary-active: var(--kh-primary-active);
   --khalsni-public-primary-soft: var(--kh-soft-blue);
@@ -98,10 +109,10 @@
   --khalsni-radius-small: var(--radius-sm);
   --khalsni-radius-medium: var(--radius-md);
   --khalsni-radius-large: var(--radius-lg);
-  /* Semantic alias for link / eyebrow / icon text — the Khalsni brand blue.
-     Kept as its own token so accent text can be tuned independently of the
-     --khalsni-public-primary button fill if contrast ever requires it. */
-  --khalsni-public-accent-text: var(--kh-primary);
+  /* Accessible interaction colour for brand-blue TEXT (links, eyebrows, section
+     labels) — clears 4.5:1 on white and on the pale brand-50 chip, where the
+     identity blue would not. Decorative icons keep --khalsni-public-primary. */
+  --khalsni-public-accent-text: var(--kh-action-primary);
 }
 
 @layer base {
