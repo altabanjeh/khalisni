@@ -78,7 +78,7 @@ function CustomerOrderDetailsPage() {
   const requiredDocuments = serviceDetails?.required_documents || []
   const selectedDocumentType = uploadForm.watch('document_type')
   const selectedRequirement = findRequiredDocument(requiredDocuments, selectedDocumentType)
-  const customerActionRequired = allowedActions.can_view_missing_documents_form || allowedActions.can_upload_customer_document
+  const customerActionRequired = allowedActions.can_view_missing_documents_form
   const isComplete = ['COMPLETED', 'DELIVERED', 'CLOSED'].includes(String(order.status || '').toUpperCase())
   const responsibilityTitle = customerActionRequired
     ? 'إجراء مطلوب منك'

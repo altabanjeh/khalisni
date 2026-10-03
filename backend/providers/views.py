@@ -64,7 +64,7 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                 is_available=True,
                 is_approved=True,
             ).filter(
-                Q(service_assignments__service=order.service, service_assignments__is_active=True)
+                Q(service_assignments__service=order.service, service_assignments__is_active=True, service_assignments__is_deleted=False)
                 | Q(service_categories=order.service.category)
             ).distinct()
         elif service_id:
@@ -79,7 +79,7 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                 is_available=True,
                 is_approved=True,
             ).filter(
-                Q(service_assignments__service=service, service_assignments__is_active=True)
+                Q(service_assignments__service=service, service_assignments__is_active=True, service_assignments__is_deleted=False)
                 | Q(service_categories=service.category)
             ).distinct()
         else:

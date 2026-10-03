@@ -1,26 +1,28 @@
 import { Bell, BellRing } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { api } from '../api/services'
 import { useLanguage } from '../context/LanguageContext'
-import { useAsyncData } from '../hooks/useAsyncData'
+import { useNotifications } from '../context/NotificationContext'
 import { hasPermission } from '../utils/authz'
 import { formatDateTime } from '../utils/format'
 import EmptyState from './EmptyState'
 
 function NotificationPanel({ user, onNavigate }) {
   const { t } = useLanguage()
-  const { data: notifications = [], reload } = useAsyncData(() => api.getNotificationCenter(), [], [])
+  const { notifications, markRead, markAllRead, loading, error } = useNotifications()
   const unreadCount = notifications.filter((item) => !item.is_read).length
   const notificationPath = hasPermission(user, 'accounts.manage_user_roles') ? '/admin/notifications' : null
 
   async function handleMarkAllRead() {
-    try {
-      await api.markAllNotificationsRead()
-    } finally {
-      reload()
-    }
+    await markAllRead()
   }
 
+  async function handleOpen(notification) {
+    if (!notification.is_read) await markRead(notification.id)
+    onNavigate?.(notification)
+  }
+
+  if (loading && !notifications.length) return <div className="p-4 text-sm" role="status">{t('common.loading', 'جارٍ التحميل...')}</div>
+  if (error && !notifications.length) return <div className="p-4 text-sm text-danger" role="alert">{t('notifications.loadError', 'تعذر تحميل الإشعارات.')}</div>
   if (!notifications.length) {
     return (
       <div className="w-full sm:max-w-sm">
@@ -61,7 +63,7 @@ function NotificationPanel({ user, onNavigate }) {
           <button
             key={notification.id}
             className="w-full rounded-2xl border border-border px-4 py-3 text-start transition hover:bg-brand-50"
-            onClick={() => onNavigate?.(notification)}
+            onClick={() => handleOpen(notification)}
             type="button"
           >
             <div className="flex items-start justify-between gap-3">

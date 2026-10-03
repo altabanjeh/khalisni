@@ -532,6 +532,10 @@ class AdminWorkflowRulesAPIView(APIView):
                     "from_status_label": status_labels.get(rule.from_status, rule.from_status),
                     "to_status_label": status_labels.get(rule.to_status, rule.to_status),
                     "action": rule.action,
+                    "channel": "status" if rule.generic_status_update else (
+                        "provider_status" if rule.action.startswith("provider_") else "dedicated"
+                    ),
+                    "validation_checks": list(rule.validation_checks),
                     "allowed_roles": sorted(rule.allowed_roles),
                     "allowed_role_labels": [role_labels.get(role, role.title()) for role in sorted(rule.allowed_roles)],
                     "reason_required": rule.reason_required,

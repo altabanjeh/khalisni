@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import HomePage from './HomePage'
 import { PublicSiteProvider } from '../../context/PublicSiteContext'
+import { fallbackPublicContent } from '../../utils/publicSiteDefaults'
 
 function renderHomePage() {
   return render(
@@ -17,8 +18,8 @@ function renderHomePage() {
 test('homepage renders approved hero, real search, categories, and services', async () => {
   renderHomePage()
 
-  expect(screen.getByText('ركّز على اللي بهمّك...')).toBeInTheDocument()
-  expect(screen.getByText('وإحنا بنخلّص الباقي.')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: fallbackPublicContent.hero_title_ar, level: 1 })).toBeInTheDocument()
+  expect(screen.getByText(fallbackPublicContent.hero_subtitle_ar)).toBeInTheDocument()
   expect(screen.getByRole('combobox', { name: 'البحث في خدمات خلصني' })).toHaveAttribute('placeholder', 'ابحث عن خدمة أو تصنيف...')
 
   await waitFor(() => {

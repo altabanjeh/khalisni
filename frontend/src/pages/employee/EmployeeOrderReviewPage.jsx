@@ -71,11 +71,6 @@ function EmployeeOrderReviewPage() {
   const { data: order, loading, error, reload } = useAsyncData(() => api.getEmployeeOrder(id), [id], null)
   const { data: providers = [], error: providersError } = useAsyncData(() => api.getProviders({ order: id }), [id], [])
   const { data: templates = [] } = useAsyncData(() => api.getEmployeeNotificationTemplates(), [], [])
-  const { data: serviceDetails } = useAsyncData(
-    () => (order?.service?.slug ? api.getService(order.service.slug) : Promise.resolve(null)),
-    [order?.service?.slug],
-    null,
-  )
   const assignForm = useForm()
   const docsRequestForm = useForm()
   const noteForm = useForm()
@@ -99,27 +94,27 @@ function EmployeeOrderReviewPage() {
   if (error) return <div className="rounded-[var(--radius-xl)] border border-red-200 bg-red-50 p-6 text-sm font-bold text-danger">{getDisplayError(error)}</div>
   if (loading || !order) return <LoadingSpinner />
 
-  const requiredDocuments = serviceDetails?.required_documents || []
+  const requiredDocuments = order.required_documents || []
   const allowedActions = getOrderAllowedActions(order)
   const transitions = allowedActions.available_status_transitions || []
   const canStartReview = transitions.includes('UNDER_REVIEW') && order.status === 'NEW'
   const canReturnToProvider = transitions.includes('IN_PROGRESS')
   const canReturnToInternalReview = transitions.includes('UNDER_REVIEW') && order.status === 'READY_FOR_DELIVERY'
-  const requiredDocumentRows = requiredDocuments.map((document, index) => {
-    const documentType = getRequiredDocumentType(document, index)
-    const uploads = (order.documents || []).filter((item) => String(item.document_type || '').toLowerCase() === documentType)
-    return { documentType, label: getRequiredDocumentLabel(document), isMissing: (order.missing_document_types || []).includes(documentType), latestUpload: uploads[0] || null }
-  })
+  const readiness = allowedActions.readiness
+  const requiredDocumentRows = (readiness?.documents || []).map((item) => ({
+    documentType: item.document_type,
+    label: (isArabic ? item.name_ar || item.name_en : item.name_en || item.name_ar) || item.document_type,
+    isRequired: item.is_required,
+    state: item.state,
+    latestUpload: (order.documents || []).find((document) => document.id === item.document_id) || null,
+  }))
   const internalNotes = (order.notes || []).filter((n) => n.visibility === 'INTERNAL')
   const customerNotes = (order.notes || []).filter((n) => n.visibility === 'CUSTOMER')
   const providerNotes = (order.notes || []).filter((n) => n.visibility === 'PROVIDER')
   const finalDocuments = (order.documents || []).filter((d) => d.is_final_document)
   const canViewProviderCandidates = hasPermission(user, 'orders.assign_order')
   const shouldShowProviderSection = canViewProviderCandidates || allowedActions.can_assign_provider || providers.length > 0 || Boolean(providersError)
-  const documentsPendingValidation = requiredDocumentRows.filter((item) => {
-    const s = String(item.latestUpload?.status || '').toLowerCase()
-    return !item.latestUpload || s !== 'approved'
-  })
+  const documentsPendingValidation = requiredDocumentRows.filter((item) => item.isRequired && item.state !== 'approved')
 
   async function ensureReviewStarted() {
     if (!canStartReview) return
@@ -229,7 +224,7 @@ function EmployeeOrderReviewPage() {
                           : tr('لم يتم رفع هذا المستند بعد.', 'This document has not been uploaded yet.')}
                       </p>
                     </div>
-                    <StatusBadge status={item.latestUpload?.status || (item.isMissing ? 'REJECTED' : 'pending_review')} />
+                    <StatusBadge status={item.state} />
                   </div>
                 </div>
               )) : <p className="rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3 text-sm font-semibold text-slate-600">{tr('لا توجد متطلبات وثائق معرّفة لهذه الخدمة.', 'No document requirements are defined for this service.')}</p>}

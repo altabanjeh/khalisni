@@ -27,7 +27,10 @@ def visible_services_queryset(*, organization=None):
         category__show_on_public_site=True,
     ).select_related("category", "organization")
 
-    if organization is None:
+    # A platform customer has no partner-specific catalog configuration.
+    # Keep global services visible after their first order links their profile
+    # to the platform organization.
+    if organization is None or organization.organization_type == Organization.OrganizationType.PLATFORM:
         return base_queryset.filter(scope=Service.Scope.GLOBAL)
 
     config_qs = PartnerServiceConfig.objects.filter(

@@ -30,6 +30,7 @@ export const statusMeta = {
   ARCHIVED: { label: { ar: 'مؤرشف', en: 'Archived' }, className: 'bg-stone-200 text-stone-700', icon: Ban },
   uploaded: { label: { ar: 'مرفوع', en: 'Uploaded' }, className: 'bg-sky-100 text-sky-800', icon: Send },
   pending_review: { label: { ar: 'بانتظار التحقق', en: 'Pending review' }, className: 'bg-amber-100 text-amber-800', icon: SearchCheck },
+  not_uploaded: { label: { ar: 'لم يُرفع بعد', en: 'Not uploaded' }, className: 'bg-slate-100 text-slate-700', icon: SearchCheck },
   approved: { label: { ar: 'معتمد', en: 'Approved' }, className: 'bg-green-100 text-green-700', icon: ShieldCheck },
   rejected: { label: { ar: 'مرفوض', en: 'Rejected' }, className: 'bg-red-100 text-red-700', icon: XCircle },
 }

@@ -15,7 +15,7 @@ from notifications.models import Notification
 from orders.models import MissingDocumentRequest, Order
 from providers.models import ProviderProfile
 from services.order_completion import create_related_service_notifications
-from services.models import Service, ServiceCategory, ServiceRelation, ServiceRequiredDocument
+from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
 
 
 class OrderAPITests(APITestCase):
@@ -405,6 +405,57 @@ class OrderAPITests(APITestCase):
         self.assertIn("available_status_transitions", response.data["allowed_actions"])
         self.assertIn(Order.Status.UNDER_REVIEW, response.data["allowed_actions"]["available_status_transitions"])
 
+    def test_workflow_options_distinguish_dedicated_action_and_blocked_resume(self):
+        from orders.services import request_missing_documents
+
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="national_id",
+            name_ar="National ID", name_en="National ID", is_required=True,
+        )
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.UNDER_REVIEW, assigned_employee=self.employee_user,
+        )
+        self.client.force_authenticate(self.employee_user)
+        response = self.client.get(f"/api/admin/orders/{order.id}/")
+        actions = response.data["allowed_actions"]
+        assign = next(option for option in actions["workflow_transitions"] if option["action"] == "assign_provider")
+        self.assertEqual(assign["channel"], "dedicated")
+        self.assertFalse(assign["available"])
+        self.assertIn("Required documents", assign["blocked_reasons"][0])
+        self.assertNotIn(Order.Status.ASSIGNED, actions["available_status_transitions"])
+
+        request_missing_documents(
+            order=order, actor=self.employee_user, note_text="Upload ID",
+            missing_document_types=["national_id"],
+        )
+        response = self.client.get(f"/api/admin/orders/{order.id}/")
+        actions = response.data["allowed_actions"]
+        resume = next(option for option in actions["workflow_transitions"] if option["action"] == "resume_review")
+        self.assertFalse(resume["available"])
+        self.assertIn("national_id", resume["blocked_reasons"][0])
+        self.assertEqual(actions["available_status_transitions"], [])
+
+    def test_deleted_provider_service_link_is_not_eligible(self):
+        self.provider.service_categories.clear()
+        link = ServiceProviderAssignment.objects.create(service=self.service, provider=self.provider)
+        link.is_deleted = True
+        link.save()
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.UNDER_REVIEW, assigned_employee=self.employee_user,
+        )
+        self.client.force_authenticate(self.admin_user)
+        eligible = self.client.get(f"/api/admin/providers/?order={order.id}")
+        self.assertEqual(eligible.status_code, status.HTTP_200_OK)
+        rows = self._rows(eligible)
+        self.assertNotIn(self.provider.id, [row["id"] for row in rows])
+        assigned = self.client.patch(
+            f"/api/admin/orders/{order.id}/assign/",
+            {"provider_id": self.provider.id}, format="json",
+        )
+        self.assertEqual(assigned.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_employee_sees_only_allowed_actions_for_current_status(self):
         order = Order.objects.create(
             customer=self.customer,
@@ -423,10 +474,34 @@ class OrderAPITests(APITestCase):
         self.assertEqual(sorted(actions["available_status_transitions"]), sorted([Order.Status.UNDER_REVIEW, Order.Status.IN_PROGRESS]))
         self.assertFalse(actions["can_assign_provider"])
         self.assertFalse(actions["can_request_documents"])
-        self.assertTrue(actions["can_complete"])
+        self.assertFalse(actions["can_complete"])
+        completion = next(option for option in actions["workflow_transitions"] if option["action"] == "complete_order")
+        self.assertIn("verified final result", completion["blocked_reasons"][0])
         self.assertTrue(actions["can_send_manual_notification"])
 
+    def test_customer_order_detail_carries_upload_requirements(self):
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="national_id",
+            name_ar="هوية وطنية", name_en="National ID", is_required=True,
+            allowed_extensions=[".pdf"],
+        )
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.WAITING_CUSTOMER,
+            missing_document_types=["national_id"],
+        )
+        self.client.force_authenticate(self.customer)
+        response = self.client.get(f"/api/customer/orders/{order.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["required_documents"][0]["document_type"], "national_id")
+        self.assertEqual(response.data["required_documents"][0]["name_en"], "National ID")
+
     def test_request_missing_documents_persists_required_types(self):
+        for document_type in ("national_id", "authorization_letter"):
+            ServiceRequiredDocument.objects.create(
+                service=self.service, document_type=document_type,
+                name_ar=document_type, is_required=True,
+            )
         order = Order.objects.create(
             customer=self.customer,
             service=self.service,
@@ -447,6 +522,39 @@ class OrderAPITests(APITestCase):
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.WAITING_CUSTOMER)
         self.assertEqual(order.missing_document_types, ["authorization_letter", "national_id"])
+
+    def test_missing_document_request_rejects_empty_and_unconfigured_types(self):
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="national_id",
+            name_ar="National ID", is_required=True,
+        )
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.UNDER_REVIEW, assigned_employee=self.employee_user,
+        )
+        self.client.force_authenticate(self.employee_user)
+        url = f"/api/admin/orders/{order.id}/request-documents/"
+        for document_types in ([], ["unconfigured_document"]):
+            response = self.client.post(url, {"note": "Need a file", "document_types": document_types}, format="json")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            order.refresh_from_db()
+            self.assertEqual(order.status, Order.Status.UNDER_REVIEW)
+            self.assertFalse(MissingDocumentRequest.objects.filter(order=order).exists())
+
+    def test_waiting_order_without_valid_request_cannot_resume_on_arbitrary_upload(self):
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.WAITING_CUSTOMER, missing_document_types=[],
+        )
+        self.client.force_authenticate(self.customer)
+        response = self.client.post(
+            f"/api/customer/orders/{order.id}/documents/",
+            {"document_type": "national_id", "file": self._pdf_upload("qa.pdf")},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.WAITING_CUSTOMER)
 
     def test_provider_assignment_requires_required_documents_to_be_approved(self):
         ServiceRequiredDocument.objects.create(
@@ -473,7 +581,7 @@ class OrderAPITests(APITestCase):
             format="json",
         )
         self.assertEqual(assign_without_document.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("All required documents must be approved", str(assign_without_document.data["detail"][0]))
+        self.assertIn("Required documents are incomplete", str(assign_without_document.data["detail"][0]))
 
         self.client.force_authenticate(self.customer)
         upload_response = self.client.post(
@@ -715,6 +823,16 @@ class OrderAPITests(APITestCase):
         )
         self.assertEqual(no_document_response.status_code, status.HTTP_400_BAD_REQUEST)
 
+        self.client.force_authenticate(self.employee_user)
+        employee_override = self.client.post(
+            f"/api/admin/orders/{missing_final_order.id}/complete/",
+            {"admin_confirmation": True},
+            format="json",
+        )
+        self.assertEqual(employee_override.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("admin_confirmation", employee_override.data)
+        self.client.force_authenticate(self.admin_user)
+
         upload_response = self.client.post(
             f"/api/admin/orders/{order.id}/final-document/",
             {
@@ -855,11 +973,21 @@ class OrderAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_missing_document_upload_only_removes_uploaded_type(self):
+        for document_type in ("national_id", "authorization_letter"):
+            ServiceRequiredDocument.objects.create(
+                service=self.service, document_type=document_type,
+                name_ar=document_type, is_required=True,
+            )
         order = Order.objects.create(
             customer=self.customer,
             service=self.service,
             city="Amman",
-            status=Order.Status.WAITING_CUSTOMER,
+            status=Order.Status.UNDER_REVIEW,
+            assigned_employee=self.employee_user,
+        )
+        from orders.services import request_missing_documents
+        request_missing_documents(
+            order=order, actor=self.employee_user, note_text="Please upload both documents",
             missing_document_types=["authorization_letter", "national_id"],
         )
         self.client.force_authenticate(self.customer)
@@ -957,6 +1085,10 @@ class OrderAPITests(APITestCase):
         self.assertIsNone(order.completed_at)
 
     def test_full_order_flow_updates_statuses_for_each_actor(self):
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="national_id",
+            name_ar="National ID", name_en="National ID", is_required=False,
+        )
         order = self._create_customer_order(phone="0796666666")
         self.assertEqual(order.status, Order.Status.NEW)
         self.assertEqual(order.final_price, self.service.total_fee)
@@ -1113,6 +1245,10 @@ class OrderAPITests(APITestCase):
 
     def test_missing_document_request_model_is_created_and_resolved(self):
         """MissingDocumentRequest row created on request-documents and resolved when customer uploads all types."""
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="national_id",
+            name_ar="National ID", name_en="National ID", is_required=True,
+        )
         order = Order.objects.create(
             customer=self.customer,
             service=self.service,

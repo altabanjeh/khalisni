@@ -517,6 +517,9 @@ class Order(models.Model):
         if provider is None:
             raise ValidationError("Provider is required.")
 
+        if provider.is_deleted or provider.user.is_deleted or not provider.user.is_active:
+            raise ValidationError("Provider account is not active.")
+
         if not provider.is_available:
             raise ValidationError("Provider is not currently available.")
 
@@ -529,6 +532,7 @@ class Order(models.Model):
         has_service_assignment = self.service.provider_assignments.filter(
             provider=provider,
             is_active=True,
+            is_deleted=False,
         ).exists()
         has_category_assignment = provider.service_categories.filter(
             pk=self.service.category_id

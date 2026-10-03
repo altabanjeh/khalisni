@@ -17,6 +17,7 @@ from orders.allowed_actions import get_order_allowed_actions
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
 from services.models import Service
+from services.serializers import ServiceRequiredDocumentSerializer
 from services.selectors import visible_services_queryset
 from workflow.rules import get_transition_rule
 
@@ -154,6 +155,7 @@ class OrderDetailSerializer(OrderListSerializer):
     status_logs = OrderStatusLogSerializer(read_only=True, many=True)
     notes = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
+    required_documents = serializers.SerializerMethodField()
 
     class Meta(OrderListSerializer.Meta):
         fields = OrderListSerializer.Meta.fields + (
@@ -162,6 +164,7 @@ class OrderDetailSerializer(OrderListSerializer):
             "customer_notes",
             "internal_notes",
             "missing_document_types",
+            "required_documents",
             "rejection_reason",
             "is_archived",
             "completed_at",
@@ -189,6 +192,12 @@ class OrderDetailSerializer(OrderListSerializer):
         role = (getattr(user, "role", "") or "").lower()
         serializer_class = StaffDocumentSerializer if role in {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT} else DocumentSerializer
         return serializer_class(queryset, many=True, context={"request": request}).data
+
+    def get_required_documents(self, obj):
+        requirements = obj.service.document_requirements.filter(
+            is_active=True, is_deleted=False,
+        ).select_related("document_definition").order_by("display_order", "name_ar")
+        return ServiceRequiredDocumentSerializer(requirements, many=True, context=self.context).data
 
     def get_notes(self, obj):
         public_track = self.context.get("public_track", False)

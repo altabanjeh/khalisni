@@ -18,6 +18,7 @@ const WEB_PORT = process.env.E2E_WEB_PORT || '4319'
 const BASE_URL = process.env.E2E_BASE_URL || `http://127.0.0.1:${WEB_PORT}`
 const API_URL = process.env.E2E_API_URL || `http://127.0.0.1:${API_PORT}`
 const EXTERNAL = Boolean(process.env.E2E_BASE_URL)
+const QA_MODE = process.env.E2E_QA_MODE === '1'
 
 export default defineConfig({
   testDir: './e2e',
@@ -61,12 +62,12 @@ export default defineConfig({
     : [
         {
           command:
-            `python manage.py migrate --noinput && python manage.py seed_demo && ` +
+            `python manage.py migrate --noinput && python manage.py ${QA_MODE ? 'seed_client_audit_qa --rebuild-owned' : 'seed_demo'} && ` +
             `python manage.py runserver 127.0.0.1:${API_PORT} --noreload`,
           cwd: '../backend',
           env: {
             POSTGRES_DB: '',
-            DJANGO_SQLITE_NAME: '../frontend/e2e-results/e2e_db.sqlite3',
+            DJANGO_SQLITE_NAME: process.env.E2E_DB_PATH || '../frontend/e2e-results/e2e_db.sqlite3',
             DJANGO_DEBUG: 'True',
             DJANGO_SECRET_KEY: 'e2e-only-insecure-key',
             DJANGO_ALLOWED_HOSTS: '127.0.0.1,localhost',

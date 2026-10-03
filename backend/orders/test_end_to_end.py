@@ -74,6 +74,17 @@ class OrderFlowEndToEndTests(APITestCase):
             provider_required=True,
             requires_manual_review=True,
         )
+        for document_type, label in (
+            ("national_id", "National ID"),
+            ("authorization_letter", "Authorization Letter"),
+        ):
+            ServiceRequiredDocument.objects.create(
+                service=self.missing_docs_service,
+                document_type=document_type,
+                name_ar=label,
+                name_en=label,
+                is_required=False,
+            )
 
         self.config_service = Service.objects.create(
             category=self.category,

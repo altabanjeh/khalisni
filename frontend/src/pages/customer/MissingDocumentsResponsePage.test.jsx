@@ -11,15 +11,13 @@ test('missing documents flow uploads required document types from order details'
     status: 'WAITING_CUSTOMER',
     service: { slug: 'service-with-required-docs' },
     missing_document_types: ['national_id'],
+    required_documents: [{ id: 1, document_type: 'national_id', name_ar: 'الهوية الشخصية', allowed_extensions: ['.pdf'] }],
     notes: [{ id: 1, visibility: 'CUSTOMER', note: 'يرجى رفع الهوية.' }],
     allowed_actions: {
       can_view_missing_documents_form: true,
     },
   })
-  vi.spyOn(api, 'getService').mockResolvedValue({
-    slug: 'service-with-required-docs',
-    required_documents: [{ id: 1, document_type: 'national_id', name_ar: 'الهوية الشخصية', allowed_extensions: ['.pdf'] }],
-  })
+  const publicServiceSpy = vi.spyOn(api, 'getService')
   const uploadSpy = vi.spyOn(api, 'uploadCustomerDocument').mockResolvedValue({})
 
   const user = userEvent.setup()
@@ -45,4 +43,5 @@ test('missing documents flow uploads required document types from order details'
     expect(uploadSpy).toHaveBeenCalledTimes(1)
   })
   expect(uploadSpy.mock.calls[0][0]).toBe('1')
+  expect(publicServiceSpy).not.toHaveBeenCalled()
 })

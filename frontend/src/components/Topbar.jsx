@@ -20,8 +20,21 @@ function Topbar({ title, onMenuClick }) {
     navigate('/login')
   }
 
-  function handleNotificationNavigate() {
+  function handleNotificationNavigate(notification) {
     setNotificationsOpen(false)
+    const orderId = notification?.order_id || notification?.order
+    if (!orderId) return
+    const role = String(user?.role || '').toLowerCase()
+    if (role === 'customer') {
+      const missing = notification.template_key === 'missing_documents_requested'
+      navigate(`/customer/orders/${orderId}${missing ? '/missing-docs' : ''}`)
+    } else if (role === 'provider') {
+      navigate(`/provider/orders/${orderId}`)
+    } else if (role === 'employee' || role === 'support') {
+      navigate(`/employee/orders/${orderId}`)
+    } else {
+      navigate(`/admin/orders/${orderId}`)
+    }
   }
 
   useEffect(() => {

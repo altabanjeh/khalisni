@@ -7,6 +7,7 @@ import { EmptyState } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
+import { useNotifications } from '../../context/NotificationContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
 const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'CANCELLED', 'REJECTED', 'VERIFIED'])
@@ -29,7 +30,7 @@ function CustomerDashboardHome() {
   const { user } = useAuth()
   const { isArabic } = useLanguage()
   const { data: orders = [], loading, error } = useAsyncData(() => api.getCustomerOrders(), [], [])
-  const { data: notifications = [] } = useAsyncData(() => api.getNotificationCenter(), [], [])
+  const { notifications } = useNotifications()
 
   const buckets = useMemo(() => {
     const list = Array.isArray(orders) ? orders : []

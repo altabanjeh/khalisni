@@ -76,6 +76,7 @@ class NotificationCenterTests(APITestCase):
         records = self._rows(response)
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["title"], "Own")
+        self.assertEqual(records[0]["order_id"], self.order.id)
 
     def test_admin_can_crud_notifications_and_templates(self):
         admin = CustomUser.objects.create_user(

@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from core.choices import OrderStatus, UserRole
 from organizations.selectors import is_partner_admin, is_partner_operational_user, is_provider_user
 from orders.selectors import can_view_order
-from workflow.rules import get_generic_status_update_targets
+from orders.readiness import evaluate_order_requirements, unresolved_missing_request_types
+from workflow.rules import WORKFLOW_TRANSITIONS
 from workflow.transition_permissions import assert_can_cancel_order, assert_order_transition_allowed
 
 
@@ -31,23 +32,46 @@ def _can_cancel(*, user, order):
     return True
 
 
-def _allowed_status_transitions(*, user, order):
-    if not user or not user.is_authenticated:
-        return []
-
-    role = _role(user)
-    if role == UserRole.PROVIDER or is_provider_user(user):
-        candidates = [OrderStatus.IN_PROGRESS, OrderStatus.WAITING_GOVERNMENT]
-    elif _has_perm(user, "orders.manage_order_workflow") or is_partner_operational_user(user):
-        candidates = get_generic_status_update_targets(order.status)
-    else:
-        candidates = ()
-
-    return [
-        status_value
-        for status_value in candidates
-        if _can_transition(user=user, order=order, target_status=status_value)
-    ]
+def _workflow_transitions(*, user, order, readiness):
+    """Describe every rule from this state, including why it is unavailable now."""
+    options = []
+    for rule in WORKFLOW_TRANSITIONS:
+        if rule.from_status != order.status:
+            continue
+        reasons = []
+        try:
+            assert_order_transition_allowed(actor=user, order=order, new_status=rule.to_status)
+        except ValidationError as error:
+            reasons.append(str(error.messages[0]))
+        if not reasons and rule.action == "assign_provider" and not readiness["requirements_complete"]:
+            reasons.append("Required documents are incomplete.")
+        if not reasons and rule.action == "request_missing_documents" and not order.service.document_requirements.filter(
+            is_active=True, is_deleted=False
+        ).exists():
+            reasons.append("This service has no uploadable document requirements.")
+        if not reasons and rule.action == "resume_review":
+            unresolved = unresolved_missing_request_types(order)
+            if unresolved is None:
+                reasons.append("No valid missing-document request exists.")
+            elif unresolved:
+                reasons.append(f"Requested documents still need upload: {', '.join(unresolved)}.")
+        if not reasons and rule.action in {"mark_ready_for_delivery", "complete_order"} and not readiness["requirements_complete"]:
+            reasons.append("Required documents are incomplete.")
+        if not reasons and rule.action == "complete_order" and _role(user) != UserRole.ADMIN:
+            if not order.documents.filter(is_deleted=False, is_final_document=True, is_verified=True).exists():
+                reasons.append("A verified final result is required before completion.")
+        options.append({
+            "to_status": rule.to_status,
+            "action": rule.action,
+            "channel": (
+                "status" if rule.generic_status_update else
+                "provider_status" if rule.action.startswith("provider_") else "dedicated"
+            ),
+            "available": not reasons,
+            "blocked_reasons": reasons,
+            "reason_required": rule.reason_required,
+        })
+    return options
 
 
 def _can_assign_provider(*, user, order):
@@ -56,34 +80,7 @@ def _can_assign_provider(*, user, order):
     if not _can_transition(user=user, order=order, target_status=OrderStatus.ASSIGNED):
         return False
 
-    # Use prefetched attribute when available (list views), fall back to DB query otherwise.
-    prefetched = getattr(order.service, "_active_required_docs", None)
-    if prefetched is not None:
-        required_document_types = [doc.document_type for doc in prefetched]
-    else:
-        required_document_types = list(
-            order.service.document_requirements.filter(is_active=True, is_deleted=False, is_required=True).values_list("document_type", flat=True)
-        )
-    if not required_document_types:
-        return True
-
-    # Use prefetched documents when possible, otherwise query.
-    all_docs = getattr(order, "_prefetched_objects_cache", {}).get("documents")
-    if all_docs is not None:
-        approved_document_types = {
-            doc.document_type
-            for doc in all_docs
-            if not doc.is_deleted and doc.status == "approved" and doc.document_type in required_document_types
-        }
-    else:
-        approved_document_types = set(
-            order.documents.filter(
-                is_deleted=False,
-                status="approved",
-                document_type__in=required_document_types,
-            ).values_list("document_type", flat=True)
-        )
-    return set(required_document_types).issubset(approved_document_types)
+    return evaluate_order_requirements(order)["requirements_complete"]
 
 
 def get_order_allowed_actions(*, user, order, can_view=None):
@@ -92,7 +89,13 @@ def get_order_allowed_actions(*, user, order, can_view=None):
     # the queryset already guarantees visibility.
     if can_view is None:
         can_view = bool(user and user.is_authenticated and can_view_order(user, order))
-    status_transitions = _allowed_status_transitions(user=user, order=order) if can_view else []
+    readiness = evaluate_order_requirements(order) if can_view else None
+    workflow_transitions = _workflow_transitions(user=user, order=order, readiness=readiness) if can_view else []
+    status_transitions = [
+        option["to_status"] for option in workflow_transitions
+        if option["available"] and option["channel"] in {"status", "provider_status"}
+    ]
+    available_actions = {option["action"] for option in workflow_transitions if option["available"]}
 
     can_add_internal_note = can_view and (
         ((role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user)) and (_has_perm(user, "orders.review_order") or is_partner_operational_user(user)))
@@ -103,14 +106,15 @@ def get_order_allowed_actions(*, user, order, can_view=None):
     return {
         "can_view": can_view,
         "available_status_transitions": status_transitions,
+        "workflow_transitions": workflow_transitions,
+        "readiness": readiness,
         "can_cancel": can_view and _can_cancel(user=user, order=order),
         "can_upload_customer_document": can_view and role == UserRole.CUSTOMER and not order.is_final_state,
         "can_view_missing_documents_form": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.WAITING_CUSTOMER,
         "can_submit_rating": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.COMPLETED and not hasattr(order, "rating"),
-        "can_request_documents": can_view
-        and (_has_perm(user, "orders.request_missing_documents") or is_partner_operational_user(user))
-        and _can_transition(user=user, order=order, target_status=OrderStatus.WAITING_CUSTOMER),
-        "can_assign_provider": can_view and _can_assign_provider(user=user, order=order),
+        "can_request_documents": "request_missing_documents" in available_actions
+        and (_has_perm(user, "orders.request_missing_documents") or is_partner_operational_user(user)),
+        "can_assign_provider": "assign_provider" in available_actions and _can_assign_provider(user=user, order=order),
         "can_add_internal_note": can_add_internal_note,
         "can_add_customer_note": can_view
         and (role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user))
@@ -118,10 +122,9 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         "can_verify_documents": can_view and (_has_perm(user, "documents.verify_document") or is_partner_operational_user(user)),
         "can_send_manual_notification": can_view and _has_perm(user, "notifications.send_manual_notification"),
         "can_reject": can_view and (_has_perm(user, "orders.reject_order") or is_partner_operational_user(user)) and _can_transition(user=user, order=order, target_status=OrderStatus.REJECTED),
-        "can_complete": can_view
-        and (_has_perm(user, "orders.manage_order_workflow") or is_partner_operational_user(user))
-        and _can_transition(user=user, order=order, target_status=OrderStatus.COMPLETED),
+        "can_complete": "complete_order" in available_actions
+        and (_has_perm(user, "orders.manage_order_workflow") or is_partner_operational_user(user)),
         "can_upload_final_document": can_view
         and (role == UserRole.PROVIDER or is_provider_user(user) or _has_perm(user, "documents.upload_final_document"))
-        and _can_transition(user=user, order=order, target_status=OrderStatus.READY_FOR_DELIVERY),
+        and "mark_ready_for_delivery" in available_actions,
     }

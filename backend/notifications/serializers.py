@@ -22,6 +22,7 @@ def _validate_safe_template_text(value):
 
 
 class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
+    order_id = serializers.IntegerField(read_only=True)
     recipient_name = serializers.CharField(source="recipient.full_name", read_only=True)
     actor_name = serializers.CharField(source="actor.full_name", read_only=True)
     order_number = serializers.CharField(source="order.order_number", read_only=True)

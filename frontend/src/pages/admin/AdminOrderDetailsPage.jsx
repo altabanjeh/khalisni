@@ -53,6 +53,7 @@ function AdminOrderDetailsPage() {
   const notSet = isArabic ? 'غير محددة' : 'Not set'
   const allowedActions = getOrderAllowedActions(order)
   const transitions = allowedActions.available_status_transitions || []
+  const blockedWorkflow = (allowedActions.workflow_transitions || []).find((option) => !option.available && option.blocked_reasons?.length)
   const noteVisibilityOptions = [
     ...(allowedActions.can_add_internal_note ? [{ value: 'INTERNAL', label: isArabic ? 'داخلية' : 'Internal' }] : []),
     ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: isArabic ? 'مرئية للعميل' : 'Visible to customer' }] : []),
@@ -109,7 +110,9 @@ function AdminOrderDetailsPage() {
       ? (isArabic ? 'بحاجة إلى تعيين مزوّد.' : 'Needs a provider assigned.')
       : transitions.length
         ? (isArabic ? 'تحديث الحالة متاح لهذه المرحلة.' : 'A status update is available for this stage.')
-        : (isArabic ? 'لا يوجد إجراء مطلوب الآن.' : 'No action required right now.')
+        : blockedWorkflow
+          ? `${isArabic ? 'الإجراء التالي غير متاح بعد' : 'Next workflow action is blocked'}: ${blockedWorkflow.action} — ${blockedWorkflow.blocked_reasons.join(' ')}`
+          : (isArabic ? 'لا يوجد إجراء مطلوب الآن.' : 'No action required right now.')
 
   return (
     <div className="space-y-6">

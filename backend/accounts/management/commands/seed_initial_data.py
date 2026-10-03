@@ -177,6 +177,14 @@ class Command(BaseCommand):
             order=waiting_customer,
             actor=employee_user,
             note_text="Please upload the missing authorization letter.",
+            missing_document_types=[
+                waiting_customer.service.document_requirements.filter(
+                    is_active=True, is_deleted=False, document_type="authorization-letter",
+                ).values_list("document_type", flat=True).first()
+                or waiting_customer.service.document_requirements.filter(
+                    is_active=True, is_deleted=False, is_required=True,
+                ).values_list("document_type", flat=True).first()
+            ],
         )
 
         in_progress = Order.objects.create(

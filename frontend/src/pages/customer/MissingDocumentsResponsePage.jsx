@@ -36,11 +36,6 @@ function MissingDocumentsResponsePage() {
     setError,
     clearErrors,
   } = useForm()
-  const { data: serviceDetails } = useAsyncData(
-    () => (order?.service?.slug ? api.getService(order.service.slug) : Promise.resolve(null)),
-    [order?.service?.slug],
-    null,
-  )
 
   if (loading) return <LoadingSpinner />
 
@@ -51,7 +46,7 @@ function MissingDocumentsResponsePage() {
   const allowedActions = getOrderAllowedActions(order)
   const requestedDocuments = order.missing_document_types || []
   const customerNotes = order.notes?.filter((note) => note.visibility === 'CUSTOMER') || []
-  const requiredDocuments = serviceDetails?.required_documents || []
+  const requiredDocuments = order.required_documents || []
   const existingDocs = order.documents || []
 
   if (!allowedActions.can_view_missing_documents_form) {

@@ -8,6 +8,7 @@ from notifications.services import notify_client, send_notification_event
 from organizations.models import OrganizationMembership
 from organizations.services import resolve_order_organization
 from orders.models import MissingDocumentRequest, Order, OrderAssignmentHistory, OrderNote, OrderStatusLog, Rating
+from orders.readiness import unresolved_missing_request_types
 from services.order_completion import create_related_service_notifications
 from services.order_validation import validate_order_prerequisites
 from workflow.rules import get_transition_rule
@@ -63,38 +64,19 @@ def _sync_customer_organization(customer, organization):
     )
 
 
-def _required_document_types(order):
-    return list(
-        order.service.document_requirements.filter(is_active=True, is_deleted=False, is_required=True).values_list("document_type", flat=True)
-    )
-
-
-def _approved_document_types(order, *, document_types):
-    return set(
-        order.documents.filter(
-            is_deleted=False,
-            status="approved",
-            document_type__in=document_types,
-        ).values_list("document_type", flat=True)
-    )
-
-
 def _assert_required_documents_satisfied(order):
-    if order.missing_document_types:
-        raise ValidationError({"detail": "Order still has unresolved missing customer documents."})
+    from orders.readiness import evaluate_order_requirements
 
-    required_document_types = _required_document_types(order)
-    if not required_document_types:
-        return
-
-    approved_document_types = _approved_document_types(order, document_types=required_document_types)
-    missing_approved_types = sorted(set(required_document_types) - approved_document_types)
-    if missing_approved_types:
+    readiness = evaluate_order_requirements(order)
+    if not readiness["requirements_complete"]:
         raise ValidationError(
             {
                 "detail": (
-                    "All required documents must be approved before continuing workflow. "
-                    f"Missing approvals for: {', '.join(missing_approved_types)}."
+                    "Required documents are incomplete: "
+                    + ", ".join(
+                        f"{reason['document_type']} ({reason['code']})"
+                        for reason in readiness["blocking_reasons"]
+                    )
                 )
             }
         )
@@ -526,6 +508,28 @@ def request_missing_documents(*, order, actor, note_text, missing_document_types
             if str(document_type).strip()
         }
     )
+    if not normalized_document_types:
+        raise ValidationError({"document_types": "Select at least one configured document requirement."})
+    requirements = {
+        requirement.document_type: requirement
+        for requirement in order.service.document_requirements.filter(
+            is_active=True, is_deleted=False, document_type__in=normalized_document_types,
+        ).select_related("document_definition")
+    }
+    invalid = [
+        document_type for document_type in normalized_document_types
+        if document_type not in requirements
+        or not (requirements[document_type].name_ar or requirements[document_type].name_en)
+        or (
+            requirements[document_type].document_definition_id
+            and (
+                not requirements[document_type].document_definition.is_active
+                or requirements[document_type].document_definition.is_deleted
+            )
+        )
+    ]
+    if invalid:
+        raise ValidationError({"document_types": f"Unknown or inactive service document requirement: {', '.join(invalid)}."})
     clean_note = _require_text(
         note_text,
         field_name="note",
@@ -667,6 +671,9 @@ def complete_order(*, order, actor, admin_confirmation=False, request=None):
     """
     if order.status == Order.Status.COMPLETED:
         raise ValidationError({"detail": "Order is already completed."})
+
+    if admin_confirmation and actor.role != CustomUser.Role.ADMIN:
+        raise ValidationError({"admin_confirmation": "Only an administrator may override final-result verification."})
 
     assert_order_transition_allowed(actor=actor, order=order, new_status=Order.Status.COMPLETED)
     _assert_required_documents_satisfied(order)
@@ -890,6 +897,12 @@ def resume_review(*, order, actor, note="", request=None):
 
     if order.missing_document_types:
         raise ValidationError({"detail": "All requested missing documents must be uploaded before review can resume."})
+    if order.status == Order.Status.WAITING_CUSTOMER:
+        not_uploaded = unresolved_missing_request_types(order)
+        if not_uploaded is None:
+            raise ValidationError({"detail": "This order has no valid missing-document request to resubmit."})
+        if not_uploaded:
+            raise ValidationError({"detail": f"Requested documents still need a valid upload: {', '.join(not_uploaded)}."})
     assert_order_transition_allowed(actor=actor, order=order, new_status=Order.Status.UNDER_REVIEW)
     clean_note = (note or "").strip() or "Order returned to review"
     if getattr(actor, "role", "") in {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT}:

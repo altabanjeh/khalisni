@@ -25,6 +25,7 @@ import { CUSTOM_REQUEST_ILLUSTRATION, HERO_ILLUSTRATION } from '../../utils/cata
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
+import { usePublicSite } from '../../context/PublicSiteContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import {
@@ -409,7 +410,7 @@ function HeroPreviewCard({ service, dictionary, isArabic, language, className = 
   )
 }
 
-function HeroVisual({ services, categories, dictionary, isArabic, language }) {
+function HeroVisual({ services, categories, dictionary, isArabic, language, heroImageUrl }) {
   return (
     <div className="relative mx-auto w-full max-w-md lg:ms-auto lg:max-w-none">
       {/* Branded discovery stage */}
@@ -420,7 +421,7 @@ function HeroVisual({ services, categories, dictionary, isArabic, language }) {
           decoding="async"
           fetchPriority="high"
           onError={(event) => { event.currentTarget.style.display = 'none' }}
-          src={HERO_ILLUSTRATION}
+          src={heroImageUrl || HERO_ILLUSTRATION}
         />
         <div className="kh-cover-content absolute inset-0" />
       </div>
@@ -455,7 +456,22 @@ function HeroVisual({ services, categories, dictionary, isArabic, language }) {
 function HomePage() {
   const { toast } = useToast()
   const { language, isArabic } = useLanguage()
+  const { content } = usePublicSite()
   const dictionary = copy[isArabic ? 'ar' : 'en']
+  const localized = (ar, en) => (isArabic ? ar : en || ar)
+  const heroTitle = localized(content.hero_title_ar, content.hero_title_en)
+  const heroSubtitle = localized(content.hero_subtitle_ar, content.hero_subtitle_en)
+  const primaryLabel = localized(content.primary_button_text, content.primary_button_text_en)
+  const secondaryLabel = localized(content.secondary_button_text, content.secondary_button_text_en)
+  const safeHref = (value, fallback) => {
+    const url = String(value || '').trim()
+    if (url.startsWith('/') && !url.startsWith('//')) return url
+    try {
+      const parsed = new URL(url)
+      if (['https:', 'http:', 'mailto:', 'tel:'].includes(parsed.protocol)) return url
+    } catch { /* Use the default route. */ }
+    return fallback
+  }
   const { data: services = [], loading: loadingServices } = useAsyncData(() => api.getServices(), [], [])
   const { data: categories = [], loading: loadingCategories } = useAsyncData(() => api.getPublicServiceCategories(), [], [])
   const [customOpen, setCustomOpen] = useState(false)
@@ -526,23 +542,22 @@ function HomePage() {
               {dictionary.heroEyebrow}
             </span>
             <h1 className="kh-display-xl mt-5">
-              {dictionary.headline}
-              <span className="block text-[var(--khalsni-public-accent-text)]">{dictionary.headlineAccent}</span>
+              {heroTitle}
             </h1>
             <p className="mt-5 max-w-xl text-base font-semibold leading-8 text-[var(--khalsni-public-text-secondary)] sm:text-lg">
-              {dictionary.heroText}
+              {heroSubtitle}
             </p>
             <div className="mt-7 max-w-xl">
               <ServiceSearch categories={categories} loading={loadingCatalog} onSpecialRequest={openSpecialRequest} services={services} />
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link className="kh-focusable inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-6 text-sm font-extrabold text-white shadow-lg shadow-[color:color-mix(in_srgb,var(--khalsni-public-primary)_35%,transparent)] transition hover:bg-[var(--khalsni-public-primary-hover)] hover:shadow-xl" to="/services">
-                {dictionary.browseServices}
+              <a className="kh-focusable inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-6 text-sm font-extrabold text-white shadow-lg shadow-[color:color-mix(in_srgb,var(--khalsni-public-primary)_35%,transparent)] transition hover:bg-[var(--khalsni-public-primary-hover)] hover:shadow-xl" href={safeHref(content.primary_button_url, '/services')}>
+                {primaryLabel || dictionary.browseServices}
                 {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
-              </Link>
-              <Link className="kh-focusable inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-6 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" to="/track-order">
-                {dictionary.trackRequest}
-              </Link>
+              </a>
+              <a className="kh-focusable inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-6 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm transition hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" href={safeHref(content.secondary_button_url, '/track-order')}>
+                {secondaryLabel || dictionary.trackRequest}
+              </a>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-bold text-[var(--khalsni-public-text-secondary)]">
               <span className="inline-flex items-center gap-1.5"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-[var(--khalsni-public-accent-text)]" />{dictionary.trustItems[0][0]}</span>
@@ -551,7 +566,7 @@ function HomePage() {
             </div>
           </div>
 
-          <HeroVisual categories={publicCategories} dictionary={dictionary} isArabic={isArabic} language={language} services={latestServices} />
+          <HeroVisual categories={publicCategories} dictionary={dictionary} heroImageUrl={content.hero_image_url} isArabic={isArabic} language={language} services={latestServices} />
         </div>
       </section>
 
@@ -661,7 +676,7 @@ function HomePage() {
           <div className="max-w-2xl text-start">
             <span className="kh-eyebrow mb-3">{isArabic ? 'الخطوات' : 'How it works'}</span>
             <h2 className="text-[1.75rem] font-black leading-tight tracking-tight text-[var(--khalsni-public-navy)] sm:text-4xl">{dictionary.howTitle}</h2>
-            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">{dictionary.howText}</p>
+            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">{localized(content.how_it_works_text, content.how_it_works_text_en) || dictionary.howText}</p>
           </div>
           <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {dictionary.steps.map(([title, text], index) => {

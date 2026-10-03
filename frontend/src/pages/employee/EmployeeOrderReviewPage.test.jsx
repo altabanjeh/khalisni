@@ -123,3 +123,40 @@ test('employee can still see provider candidates before assignment is allowed', 
   expect(assignmentNote).toBeDisabled()
   expect(assignButton).toBeDisabled()
 })
+
+test('an absent requested file is shown as not uploaded and blocks readiness', async () => {
+  vi.spyOn(api, 'getEmployeeOrder').mockResolvedValue({
+    id: 12,
+    order_number: 'KH-2026-000012',
+    status: 'WAITING_CUSTOMER',
+    city: 'Amman',
+    customer: { full_name: 'Customer' },
+    service: { name_ar: serviceLabel, slug: 'service-slug' },
+    documents: [],
+    status_logs: [],
+    missing_document_types: ['qa-authorization'],
+    allowed_actions: {
+      available_status_transitions: [],
+      can_assign_provider: false,
+      can_verify_documents: true,
+      readiness: {
+        requirements_complete: false,
+        documents: [{ document_type: 'qa-authorization', name_ar: 'تفويض تجريبي', is_required: true, state: 'not_uploaded', document_id: null }],
+        blocking_reasons: [{ code: 'not_uploaded', document_type: 'qa-authorization' }],
+      },
+    },
+  })
+  vi.spyOn(api, 'getProviders').mockResolvedValue([])
+  vi.spyOn(api, 'getEmployeeNotificationTemplates').mockResolvedValue([])
+  vi.spyOn(api, 'getService').mockResolvedValue({ slug: 'service-slug', required_documents: [] })
+
+  render(
+    <MemoryRouter initialEntries={['/employee/orders/12']}>
+      <Routes><Route path="/employee/orders/:id" element={<EmployeeOrderReviewPage />} /></Routes>
+    </MemoryRouter>,
+  )
+
+  expect((await screen.findAllByText('تفويض تجريبي')).length).toBeGreaterThan(0)
+  expect(screen.getByText('لم يُرفع بعد')).toBeInTheDocument()
+  expect(screen.queryByText('مرفوض')).not.toBeInTheDocument()
+})
