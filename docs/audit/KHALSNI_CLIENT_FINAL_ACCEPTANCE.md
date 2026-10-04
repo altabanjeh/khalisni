@@ -54,3 +54,7 @@ Allowed final statuses are used below. **PASS** means the technical behavior was
 | FAIL | 0 | None |
 
 **Can I truthfully tell the client that every audit note has been addressed? NO.** D05/D06 need approved client content, B10 needs business rules, and B04/B09 still need external acceptance checks. B05/B08 require scope confirmation if the client expected external payment or notification delivery in this release.
+
+## Post-deployment verification attempt (2026-10-04)
+
+The deployment was reported complete, but the candidate domain from the local environment configuration, `https://khalisnidev.raedaltabanjeh.com`, timed out for public pages and `/api/health/` over HTTPS and HTTP. Its identity as the intended release, served commit/build, applied migrations, release catalog, and live QA journey could not be verified. The statuses above retain their **local remediation** meanings; they are not deployed acceptance claims. No old demo or real customer record was changed. See `KHALSNI_POST_DEPLOYMENT_ACCEPTANCE.md` for the precise deployed evidence gap and safe next checks. Until those checks pass, readiness for client acceptance is **NO**.
