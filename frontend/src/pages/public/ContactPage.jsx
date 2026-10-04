@@ -1,6 +1,8 @@
 import { Mail, MessageCircle, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { getDisplayError } from '../../api/client'
+import { api } from '../../api/services'
 import {
   PublicButton,
   PublicCard,
@@ -15,14 +17,32 @@ import { useLanguage } from '../../context/LanguageContext'
 function ContactPage() {
   const { isArabic } = useLanguage()
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm()
+
+  async function onSubmit(values) {
+    setSubmitted(false)
+    setSubmitError('')
+    try {
+      await api.createContactInquiry(values)
+      reset()
+      setSubmitted(true)
+    } catch (error) {
+      setSubmitError(getDisplayError(error))
+    }
+  }
 
   function fieldError(name) {
     return errors[name] ? <p className="mt-2 text-sm font-semibold text-danger">{errors[name].message}</p> : null
+  }
+
+  function requirement(required) {
+    return <span className="ms-2 text-xs font-semibold text-slate-600">{required ? (isArabic ? '(مطلوب)' : '(Required)') : (isArabic ? '(اختياري)' : '(Optional)')}</span>
   }
 
   return (
@@ -31,43 +51,42 @@ function ContactPage() {
         eyebrow={isArabic ? 'تواصل معنا' : 'Contact us'}
         icon={MessageCircle}
         title={isArabic ? 'أرسل استفسارك' : 'Send your inquiry'}
-        description={isArabic ? 'فريق خالصني جاهز لمساعدتك في اختيار الخدمة، متابعة الطلب، أو توضيح المتطلبات.' : 'The Khalsni team can help you choose a service, follow up on a request, or clarify requirements.'}
+        description={isArabic ? 'فريق خلصني جاهز لمساعدتك في اختيار الخدمة، متابعة الطلب، أو توضيح المتطلبات.' : 'The Khalsni team can help you choose a service, follow up on a request, or clarify requirements.'}
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <PublicPanel>
           <form
             className="grid gap-4 md:grid-cols-2"
-            onSubmit={handleSubmit(() => {
-              setSubmitted(true)
-            })}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div>
-              <label htmlFor="contact-name" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الاسم' : 'Name'}</label>
-              <PublicInput id="contact-name" {...register('name', { required: isArabic ? 'الاسم مطلوب' : 'Name is required' })} />
+              <label htmlFor="contact-name" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الاسم' : 'Name'}{requirement(true)}</label>
+              <PublicInput aria-required="true" id="contact-name" {...register('name', { required: isArabic ? 'الاسم مطلوب' : 'Name is required' })} />
               {fieldError('name')}
             </div>
             <div>
-              <label htmlFor="contact-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الهاتف' : 'Phone'}</label>
-              <PublicInput id="contact-phone" {...register('phone', { required: isArabic ? 'الهاتف مطلوب' : 'Phone is required' })} />
+              <label htmlFor="contact-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الهاتف' : 'Phone'}{requirement(true)}</label>
+              <PublicInput aria-required="true" id="contact-phone" {...register('phone', { required: isArabic ? 'الهاتف مطلوب' : 'Phone is required' })} />
               {fieldError('phone')}
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="contact-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
-              <PublicInput id="contact-email" type="email" {...register('email')} />
+              <label htmlFor="contact-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email'}{requirement(false)}</label>
+              <PublicInput aria-required="false" id="contact-email" type="email" {...register('email')} />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="contact-message" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الرسالة' : 'Message'}</label>
-              <PublicTextarea id="contact-message" {...register('message', { required: isArabic ? 'الرسالة مطلوبة' : 'Message is required' })} />
+              <label htmlFor="contact-message" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الرسالة' : 'Message'}{requirement(true)}</label>
+              <PublicTextarea aria-required="true" id="contact-message" {...register('message', { required: isArabic ? 'الرسالة مطلوبة' : 'Message is required' })} />
               {fieldError('message')}
             </div>
             <div className="md:col-span-2">
-              <PublicButton type="submit">{isArabic ? 'إرسال' : 'Send'}</PublicButton>
+              <PublicButton disabled={isSubmitting} type="submit">{isSubmitting ? (isArabic ? 'جار الإرسال...' : 'Sending...') : (isArabic ? 'إرسال' : 'Send')}</PublicButton>
             </div>
           </form>
+          {submitError ? <p className="mt-4 text-sm font-semibold text-danger" role="alert">{submitError}</p> : null}
           {submitted ? (
             <p className="mt-4 rounded-[var(--radius-lg)] border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
-              {isArabic ? 'تم تسجيل رسالتك وسيتواصل معك فريق الدعم قريبا.' : 'Your message has been recorded and the support team will contact you soon.'}
+              {isArabic ? 'تم تسجيل رسالتك وسيتمكن فريق الدعم من مراجعتها.' : 'Your message was recorded for the support team to review.'}
             </p>
           ) : null}
         </PublicPanel>

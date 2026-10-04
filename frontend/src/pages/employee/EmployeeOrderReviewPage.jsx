@@ -23,7 +23,7 @@ const REVIEW_STARTED_NOTE_AR = 'بدأ الموظف مراجعة الطلب.'
 
 function MetricCard({ label, value, hint }) {
   return (
-    <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-3">
+    <div className="min-w-0 rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-3">
       <p className="text-xs font-bold text-slate-500">{label}</p>
       <p className="mt-1 truncate text-sm font-black text-ink">{value}</p>
       {hint ? <p className="mt-0.5 truncate text-xs font-semibold text-slate-500">{hint}</p> : null}
@@ -315,7 +315,7 @@ function EmployeeOrderReviewPage() {
                     {requiredDocuments.map((document, index) => (
                       <label key={getRequiredDocumentType(document, index)} className="flex items-center gap-3 text-sm text-ink">
                         <input type="checkbox" value={getRequiredDocumentType(document, index)} {...docsRequestForm.register('document_types')} />
-                        <span>{getRequiredDocumentLabel(document)}</span>
+                        <span>{getRequiredDocumentLabel(document, language)}</span>
                       </label>
                     ))}
                   </div>

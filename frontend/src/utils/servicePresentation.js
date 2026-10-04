@@ -1,5 +1,5 @@
 import { formatCurrency } from './format'
-import { getLocalizedField, normalizeLanguage } from './i18n'
+import { normalizeLanguage } from './i18n'
 
 function hasArabicScript(value) {
   return /[\u0600-\u06FF]/.test(String(value || ''))
@@ -17,23 +17,29 @@ function getPresentationField(record, fields, language, fallback) {
     return fallback
   }
 
-  return getLocalizedField(record, fields, language, fallback)
+  const value = record?.[fields.ar]
+  if (typeof value === 'string' && value.trim() && hasArabicScript(value)) return value
+  return fallback
+}
+
+export function getCatalogText(record, fields, language, fallback = '') {
+  return getPresentationField(record, fields, language, fallback)
 }
 
 export function getServiceName(service, language, fallback = '') {
-  return getPresentationField(service, { ar: 'name_ar', en: 'name_en' }, language, fallback || 'Service')
+  return getPresentationField(service, { ar: 'name_ar', en: 'name_en' }, language, fallback || (normalizeLanguage(language) === 'en' ? 'Service' : 'خدمة'))
 }
 
 export function getServiceDescription(service, language, fallback = '') {
-  return getPresentationField(service, { ar: 'description_ar', en: 'description_en' }, language, fallback || 'Service details are being prepared.')
+  return getPresentationField(service, { ar: 'description_ar', en: 'description_en' }, language, fallback || (normalizeLanguage(language) === 'en' ? 'Service details are being prepared.' : 'تفاصيل الخدمة قيد الإعداد.'))
 }
 
 export function getCategoryName(category, language, fallback = '') {
-  return getPresentationField(category, { ar: 'name_ar', en: 'name_en' }, language, fallback || 'Category')
+  return getPresentationField(category, { ar: 'name_ar', en: 'name_en' }, language, fallback || (normalizeLanguage(language) === 'en' ? 'Category' : 'تصنيف'))
 }
 
 export function getCategoryDescription(category, language, fallback = '') {
-  return getPresentationField(category, { ar: 'description_ar', en: 'description_en' }, language, fallback || 'Services grouped under this category.')
+  return getPresentationField(category, { ar: 'description_ar', en: 'description_en' }, language, fallback || (normalizeLanguage(language) === 'en' ? 'Services grouped under this category.' : 'خدمات ضمن هذا التصنيف.'))
 }
 
 export function getServicePublicPrice(service, language) {

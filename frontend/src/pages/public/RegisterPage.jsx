@@ -18,6 +18,10 @@ function getSafeNextPath(value) {
   return value && value.startsWith('/') ? value : ''
 }
 
+function RequirementHint({ isArabic, required }) {
+  return <span className="ms-2 text-xs font-semibold text-slate-600">{required ? (isArabic ? '(مطلوب)' : '(Required)') : (isArabic ? '(اختياري)' : '(Optional)')}</span>
+}
+
 function RegisterPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -81,32 +85,34 @@ function RegisterPage() {
       <PublicPanel className="mx-auto max-w-4xl">
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
           <div className="md:col-span-2">
-            <label htmlFor="reg-full-name" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الاسم الكامل' : 'Full name'}</label>
-            <PublicInput id="reg-full-name" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
+            <label htmlFor="reg-full-name" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الاسم الكامل' : 'Full name'}<RequirementHint isArabic={isArabic} required /></label>
+            <PublicInput aria-required="true" id="reg-full-name" {...register('full_name', { required: isArabic ? 'الاسم الكامل مطلوب' : 'Full name is required' })} />
             {fieldError('full_name')}
           </div>
 
           <div>
-            <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}</label>
-            <PublicInput id="reg-phone" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
+            <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}<RequirementHint isArabic={isArabic} required /></label>
+            <PublicInput aria-required="true" id="reg-phone" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
             {fieldError('phone')}
           </div>
 
           <div>
-            <label htmlFor="reg-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email'}</label>
-            <PublicInput id="reg-email" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
+            <label htmlFor="reg-email" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'البريد الإلكتروني' : 'Email'}<RequirementHint isArabic={isArabic} required /></label>
+            <PublicInput aria-required="true" id="reg-email" type="email" {...register('email', { required: isArabic ? 'البريد الإلكتروني مطلوب' : 'Email is required' })} />
             {fieldError('email')}
           </div>
 
           <div>
-            <label htmlFor="reg-national-id" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الرقم الوطني' : 'National ID'}</label>
-            <PublicInput id="reg-national-id" {...register('national_id')} />
+            <label htmlFor="reg-national-id" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الرقم الوطني' : 'National ID'}<RequirementHint isArabic={isArabic} required={false} /></label>
+            <PublicInput aria-required="false" id="reg-national-id" {...register('national_id')} />
             {fieldError('national_id')}
           </div>
 
           <div>
-            <label htmlFor="reg-password" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'كلمة المرور' : 'Password'}</label>
+            <label htmlFor="reg-password" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'كلمة المرور' : 'Password'}<RequirementHint isArabic={isArabic} required /></label>
             <PublicInput
+              aria-describedby="reg-password-hint"
+              aria-required="true"
               id="reg-password"
               type="password"
               {...register('password', {
@@ -117,6 +123,7 @@ function RegisterPage() {
                 },
               })}
             />
+            <p className="mt-1 text-xs font-semibold text-slate-600" id="reg-password-hint">{isArabic ? 'ثمانية أحرف على الأقل.' : 'At least eight characters.'}</p>
             {fieldError('password')}
           </div>
 

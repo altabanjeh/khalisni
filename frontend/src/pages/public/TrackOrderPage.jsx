@@ -1,6 +1,7 @@
 import { CalendarClock, FileSearch, HelpCircle, Phone, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import DocumentList from '../../components/DocumentList'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
@@ -15,6 +16,7 @@ import {
 } from '../../components/public/PublicPage'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
+import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { formatDateTime } from '../../utils/format'
 
@@ -28,6 +30,7 @@ function errorClass() {
 
 function TrackOrderPage() {
   const { isArabic, language } = useLanguage()
+  const { user } = useAuth()
   const [result, setResult] = useState(null)
   const [submitError, setSubmitError] = useState('')
   const {
@@ -134,14 +137,26 @@ function TrackOrderPage() {
                 {isArabic ? 'لا نعرض أي ملاحظات داخلية أو مستندات خاصة من صفحة التتبع العامة.' : 'Internal notes and private documents are not exposed on public tracking.'}
               </p>
             </PublicPanel>
-            {result.missing_documents?.length ? (
+            {result.missing_document_details?.length ? (
               <PublicPanel className="border-amber-200 bg-amber-50">
                 <p className="font-bold text-amber-900">{isArabic ? 'مطلوب منك' : 'Required from you'}</p>
                 <div className="mt-4 space-y-3">
-                  {result.missing_documents.map((item) => (
-                    <div key={item} className="rounded-md border border-amber-200 bg-white px-4 py-3 text-sm font-semibold text-amber-800">{item}</div>
+                  {result.missing_document_details.map((item) => (
+                    <div key={item.document_type} className="rounded-md border border-amber-200 bg-white px-4 py-3 text-sm font-semibold text-amber-800">
+                      {isArabic ? item.name_ar : item.name_en}
+                    </div>
                   ))}
                 </div>
+                <Link
+                  className="mt-4 inline-flex min-h-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary)] px-4 text-sm font-extrabold text-white"
+                  to={user?.role === 'customer'
+                    ? `/customer/orders/${result.id}/missing-docs`
+                    : `/login?next=${encodeURIComponent(`/customer/orders/${result.id}/missing-docs`)}`}
+                >
+                  {user?.role === 'customer'
+                    ? (isArabic ? 'ارفع المستندات المطلوبة' : 'Upload required documents')
+                    : (isArabic ? 'سجل الدخول لرفع المستندات' : 'Sign in to upload documents')}
+                </Link>
               </PublicPanel>
             ) : null}
           </aside>

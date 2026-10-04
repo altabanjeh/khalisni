@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
@@ -416,6 +417,8 @@ class PublicOrderCreateSerializer(serializers.Serializer):
         payload.pop("consent", None)
         payload["organization"] = payload.pop("organization_obj", None)
         payload["branch"] = payload.pop("branch_id", None)
+        payload["submission_key"] = self.context.get("submission_key")
+        payload["submission_fingerprint"] = self.context.get("submission_fingerprint", "")
         try:
             return create_customer_order(customer=user, data=payload, request=request)
         except DjangoValidationError as exc:
@@ -427,16 +430,46 @@ class PublicOrderCreateSerializer(serializers.Serializer):
 class TrackOrderSerializer(serializers.ModelSerializer):
     timeline = OrderStatusLogSerializer(source="status_logs", many=True, read_only=True)
     missing_documents = serializers.SerializerMethodField()
+    missing_document_details = serializers.SerializerMethodField()
     final_documents = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ("id", "order_number", "status", "timeline", "missing_documents", "final_documents")
+        fields = ("id", "order_number", "status", "timeline", "missing_documents", "missing_document_details", "final_documents")
 
     def get_missing_documents(self, obj):
         if obj.status != Order.Status.WAITING_CUSTOMER:
             return []
         return list(obj.missing_document_types or [])
+
+    def get_missing_document_details(self, obj):
+        types = self.get_missing_documents(obj)
+        if not types:
+            return []
+        requirements = {
+            requirement.document_type: requirement
+            for requirement in obj.service.document_requirements.filter(
+                document_type__in=types, is_active=True, is_deleted=False,
+            ).select_related("document_definition")
+        }
+        def arabic_name(requirement):
+            for value in (requirement.name_ar, getattr(requirement.document_definition, "name_ar", "")):
+                if re.search(r"[\u0600-\u06ff]", value or ""):
+                    return value
+            return "\u0645\u0633\u062a\u0646\u062f \u0645\u0637\u0644\u0648\u0628"
+
+        return [
+            {
+                "document_type": document_type,
+                "name_ar": arabic_name(requirements[document_type]) if document_type in requirements else "\u0645\u0633\u062a\u0646\u062f \u0645\u0637\u0644\u0648\u0628",
+                "name_en": (
+                    requirements[document_type].name_en
+                    or getattr(requirements[document_type].document_definition, "name_en", "")
+                    or "Required document"
+                ) if document_type in requirements else "Required document",
+            }
+            for document_type in types
+        ]
 
     def get_final_documents(self, obj):
         request = self.context.get("request")

@@ -59,7 +59,7 @@ function LoginPage() {
       <PublicHero
         eyebrow={isArabic ? 'تسجيل الدخول' : 'Sign in'}
         icon={LogIn}
-        title={isArabic ? 'الدخول إلى بوابات خالصني' : 'Access the Khalsni portals'}
+        title={isArabic ? 'الدخول إلى بوابات خلصني' : 'Access the Khalsni portals'}
         description={isArabic ? 'استخدم بيانات الدخول للمتابعة إلى حسابك، أو أنشئ حساب عميل جديد قبل طلب الخدمة.' : 'Use your credentials to continue, or create a customer account before requesting a service.'}
       />
 

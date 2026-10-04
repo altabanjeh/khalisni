@@ -1,10 +1,13 @@
+import re
+
 from django.db import transaction
 
 from accounts.models import CustomUser
 from audit.utils import create_audit_log
 from notifications.event_map import NOTIFICATION_EVENT_MAP
+from notifications.localized_content import render_event_arabic
 from notifications.models import Notification
-from notifications.utils import create_notification, get_active_templates_for_key, render_notification_template
+from notifications.utils import create_notification, get_active_templates_for_key, render_notification_template, render_notification_text
 
 
 def _resolve_recipients(*, recipient_kind, order=None, document=None, payment=None):
@@ -136,16 +139,25 @@ def send_notification_event(*, event_key, order=None, actor=None, document=None,
                         continue
 
                     try:
+                        arabic = render_event_arabic(event.key, context_data, recipient_kind=recipient_kind)
+                        fallback_en_title, fallback_en_message = _fallback_notification_content(
+                            event=event, recipient_kind=recipient_kind, context_data=context_data,
+                        )
                         if template:
                             rendered = render_notification_template(template=template, context_data=context_data)
                             title = rendered["title"]
                             message = rendered["message"]
+                            if re.search(r"[\u0600-\u06ff]", template.title_ar or ""):
+                                arabic["title"] = render_notification_text(template.title_ar, context_data=context_data)
+                            if re.search(r"[\u0600-\u06ff]", template.message_ar or ""):
+                                arabic["message"] = render_notification_text(template.message_ar, context_data=context_data)
+                            english = {
+                                "title": render_notification_text(template.title_en, context_data=context_data) if template.title_en else fallback_en_title,
+                                "message": render_notification_text(template.message_en, context_data=context_data) if template.message_en else fallback_en_message,
+                            }
                         else:
-                            title, message = _fallback_notification_content(
-                                event=event,
-                                recipient_kind=recipient_kind,
-                                context_data=context_data,
-                            )
+                            title, message = fallback_en_title, fallback_en_message
+                            english = {"title": title, "message": message}
                     except ValueError as exc:
                         create_audit_log(
                             request=request,
@@ -171,7 +183,10 @@ def send_notification_event(*, event_key, order=None, actor=None, document=None,
                         channel=channel,
                         template=template,
                         template_key=event.key,
-                        context_data={**context_data, "event_key": event.key, "dedupe_key": dedupe_key},
+                        context_data={
+                            **context_data, "event_key": event.key, "dedupe_key": dedupe_key,
+                            "localized": {"ar": arabic, "en": english},
+                        },
                     )
                     created_notifications.append(notification)
                     create_audit_log(

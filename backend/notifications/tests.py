@@ -78,6 +78,20 @@ class NotificationCenterTests(APITestCase):
         self.assertEqual(records[0]["title"], "Own")
         self.assertEqual(records[0]["order_id"], self.order.id)
 
+    def test_builtin_event_uses_requested_language_without_changing_read_state(self):
+        send_notification_event(event_key="order_under_review", order=self.order, dedupe_key="locale-check")
+        notification = Notification.objects.get(recipient=self.customer, template_key="order_under_review")
+        self.client.force_authenticate(self.customer)
+        arabic_response = self.client.get("/api/notifications/", HTTP_ACCEPT_LANGUAGE="ar")
+        english_response = self.client.get("/api/notifications/", HTTP_ACCEPT_LANGUAGE="en")
+        arabic_row = next(row for row in self._rows(arabic_response) if row["notification_id"] == notification.pk)
+        english_row = next(row for row in self._rows(english_response) if row["notification_id"] == notification.pk)
+        self.assertRegex(arabic_row["title"], r"[\u0600-\u06ff]")
+        self.assertRegex(arabic_row["message"], r"[\u0600-\u06ff]")
+        self.assertEqual(english_row["title"], "Order under review")
+        self.assertEqual(english_row["is_read"], arabic_row["is_read"])
+        self.assertEqual(Notification.objects.filter(recipient=self.customer, template_key="order_under_review").count(), 1)
+
     def test_admin_can_crud_notifications_and_templates(self):
         admin = CustomUser.objects.create_user(
             email="notif-admin@example.com",

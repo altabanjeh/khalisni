@@ -359,7 +359,7 @@ export const mockMissingServiceRequests = [
 ]
 
 export const mockAuditLogs = [
-  { id: 1, user_name: 'Khalisni Admin', action: 'assign_provider', entity_type: 'Order', entity_id: '1', ip_address: '127.0.0.1', created_at: '2026-04-24T12:00:00Z' },
-  { id: 2, user_name: 'Khalisni Admin', action: 'complete_order', entity_type: 'Order', entity_id: '2', ip_address: '127.0.0.1', created_at: '2026-04-24T16:30:00Z' },
+  { id: 1, user_name: 'Khalsni Admin', action: 'assign_provider', entity_type: 'Order', entity_id: '1', ip_address: '127.0.0.1', created_at: '2026-04-24T12:00:00Z' },
+  { id: 2, user_name: 'Khalsni Admin', action: 'complete_order', entity_type: 'Order', entity_id: '2', ip_address: '127.0.0.1', created_at: '2026-04-24T16:30:00Z' },
 ]
 

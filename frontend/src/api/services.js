@@ -140,8 +140,8 @@ const mockSystemSettings = [
     id: 2,
     key: 'site.contact',
     value: {
-      phone: '+962790000000',
-      email: 'info@khalisni.local',
+      phone: '',
+      email: '',
     },
     description: 'Public contact information',
     updated_at: '2026-05-01T09:00:00Z',
@@ -458,6 +458,7 @@ export const api = {
         return created
       })(),
     ),
+  createContactInquiry: async (payload) => withTestValue(() => publicSiteApi.createContactInquiry(payload), { inquiry_id: 1 }),
 
   createOrder: ordersApi.createOrder,
   trackOrder: async (payload) =>

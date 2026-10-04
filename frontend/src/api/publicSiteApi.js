@@ -83,6 +83,10 @@ export const publicSiteApi = {
     return normalizeMissingServiceRequest(await http.post('/public-site/missing-service-requests/', payload))
   },
 
+  async createContactInquiry(payload) {
+    return http.post('/public-site/contact-inquiries/', payload)
+  },
+
   async getAdminPublicSiteContent() {
     return normalizeContent(await http.get('/admin/public-site/content/'))
   },

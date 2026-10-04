@@ -2,6 +2,15 @@ export const draftStorageKey = 'khalisni-client-order-draft'
 export const draftSchemaVersion = 1
 export const draftMaxAgeMs = 14 * 24 * 60 * 60 * 1000
 
+export function draftStorageKeyForUser(user) {
+  if (!user?.id) throw new Error('A customer account is required to store an order draft.')
+  return `${draftStorageKey}:${user.id}`
+}
+
+export function submissionKeyStorageKeyForUser(user) {
+  return `${draftStorageKeyForUser(user)}:submission-key`
+}
+
 export function buildBaseDraftValues({ requestedServiceId, user }) {
   return {
     category_slug: '',
@@ -11,7 +20,7 @@ export function buildBaseDraftValues({ requestedServiceId, user }) {
     national_id: user?.national_id || '',
     city: '',
     notes: '',
-    consent: true,
+    consent: false,
   }
 }
 

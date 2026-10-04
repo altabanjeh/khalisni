@@ -45,6 +45,8 @@ class Order(models.Model):
         db_index=True,
         help_text="Public order number, generated after creation.",
     )
+    submission_key = models.UUIDField(null=True, blank=True)
+    submission_fingerprint = models.CharField(max_length=64, blank=True)
 
     customer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -218,6 +220,10 @@ class Order(models.Model):
     class Meta:
         ordering = ["-created_at"]
         constraints = [
+            models.UniqueConstraint(
+                fields=["customer", "submission_key"],
+                name="unique_customer_order_submission_key",
+            ),
             models.CheckConstraint(
                 check=models.Q(final_price__gte=0) | models.Q(final_price__isnull=True),
                 name="order_final_price_gte_0",

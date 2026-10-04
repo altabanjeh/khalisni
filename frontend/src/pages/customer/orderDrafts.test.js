@@ -1,5 +1,7 @@
 import {
   buildBaseDraftValues,
+  draftStorageKeyForUser,
+  submissionKeyStorageKeyForUser,
   draftMaxAgeMs,
   parseStoredDraft,
   serializeDraft,
@@ -56,6 +58,12 @@ test('buildBaseDraftValues falls back to the authenticated customer profile', ()
     national_id: '1234567890',
     city: '',
     notes: '',
-    consent: true,
+    consent: false,
   })
+})
+
+test('draft storage is isolated by customer account', () => {
+  expect(draftStorageKeyForUser({ id: 10 })).not.toBe(draftStorageKeyForUser({ id: 11 }))
+  expect(submissionKeyStorageKeyForUser({ id: 10 })).not.toBe(submissionKeyStorageKeyForUser({ id: 11 }))
+  expect(() => draftStorageKeyForUser(null)).toThrow()
 })

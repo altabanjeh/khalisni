@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, ContactInquiry, MissingServiceRequest, PublicPageContent, SiteTheme
+
+
+@admin.register(ContactInquiry)
+class ContactInquiryAdmin(admin.ModelAdmin):
+    list_display = ("inquiry_id", "name", "phone", "email", "is_resolved", "created_at")
+    list_filter = ("is_resolved", "created_at")
+    search_fields = ("name", "phone", "email", "message")
+    readonly_fields = ("name", "phone", "email", "message", "created_at", "updated_at")
+    fields = ("name", "phone", "email", "message", "is_resolved", "created_at", "updated_at")
 
 
 @admin.register(SiteTheme)

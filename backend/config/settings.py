@@ -111,6 +111,9 @@ INSTALLED_APPS = [
 
 if HAS_CORSHEADERS:
     INSTALLED_APPS.insert(6, "corsheaders")
+    from corsheaders.defaults import default_headers
+
+    CORS_ALLOW_HEADERS = (*default_headers, "idempotency-key")
 if HAS_DRF:
     INSTALLED_APPS.insert(7 if HAS_CORSHEADERS else 6, "rest_framework")
 if HAS_DRF_AUTHTOKEN:
@@ -275,6 +278,7 @@ if HAS_DRF:
             "user": _get_str_env("API_THROTTLE_USER_RATE", "600/minute"),
             "order_tracking": _get_str_env("API_THROTTLE_ORDER_TRACKING_RATE", "10/minute"),
             "missing_service_request": _get_str_env("API_THROTTLE_MISSING_SERVICE_REQUEST_RATE", "5/hour"),
+            "public_contact": _get_str_env("API_THROTTLE_PUBLIC_CONTACT_RATE", "5/hour"),
             "auth_password_reset": _get_str_env("API_THROTTLE_AUTH_PASSWORD_RESET_RATE", "5/hour"),
         },
     }

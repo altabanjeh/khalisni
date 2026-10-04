@@ -148,7 +148,7 @@ def _extract_options(note):
         return []
     if any(word in note for word in ["حسب", "إذا", "عند"]):
         return []
-    return [{"value": _stable_slug(part, prefix="option"), "label": _clean(part)} for part in re.split(r"[،,]", note) if _clean(part)]
+    return [{"value": _stable_slug(part, prefix="option"), "label_ar": _clean(part)} for part in re.split(r"[،,]", note) if _clean(part)]
 
 
 def _field_from_label(label, *, source_type="", required=True, note="", order=0, source_section=""):
@@ -165,7 +165,7 @@ def _field_from_label(label, *, source_type="", required=True, note="", order=0,
         "type": mapped_type,
         "required": required,
         "display_order": order,
-        "help_text": _clean(note),
+        "help_text_ar": _clean(note),
         "options": _extract_options(note),
         "source_section": source_section,
         "source_type": _clean(source_type),

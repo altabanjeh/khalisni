@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from datetime import timedelta
 
@@ -10,7 +11,7 @@ from rest_framework.throttling import ScopedRateThrottle
 
 from accounts.models import CustomUser
 from notifications.models import Notification
-from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, ContactInquiry, MissingServiceRequest, PublicPageContent, SiteTheme
 from services.models import Service, ServiceCategory
 
 
@@ -58,6 +59,43 @@ class PublicSiteAPITests(TestCase):
             is_online=True,
             provider_required=False,
         )
+
+    def test_contact_inquiry_is_persisted_only_after_valid_submission(self):
+        endpoint = "/api/public-site/contact-inquiries/"
+        invalid = self.client.post(endpoint, {"name": "A", "phone": "0791234567", "message": ""}, format="json")
+        self.assertEqual(invalid.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(ContactInquiry.objects.count(), 0)
+
+        created = self.client.post(endpoint, {
+            "name": "QA Customer", "phone": "0791234567",
+            "email": "qa@example.test", "message": "Please call me about a service.",
+        }, format="json")
+        self.assertEqual(created.status_code, status.HTTP_201_CREATED)
+        inquiry = ContactInquiry.objects.get(pk=created.data["inquiry_id"])
+        self.assertEqual(inquiry.message, "Please call me about a service.")
+        self.assertFalse(inquiry.is_resolved)
+
+    def test_default_public_homepage_does_not_publish_demo_contact_details(self):
+        response = self.client.get("/api/public-site/homepage/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = response.data["content"]
+        for field in ("contact_phone", "whatsapp_number", "email", "office_address"):
+            self.assertEqual(content[field], "")
+
+    def test_published_privacy_policy_requires_both_languages_and_is_public(self):
+        self.client.get("/api/public-site/homepage/")
+        content = PublicPageContent.objects.get(active_content=True)
+        content.privacy_policy_ar = "نص سياسة معتمد للاختبار."
+        content.privacy_policy_en = "Approved QA policy text."
+        content.save()
+
+        response = self.client.get("/api/public-site/homepage/")
+        self.assertEqual(response.data["content"]["privacy_policy_ar"], content.privacy_policy_ar)
+        self.assertEqual(response.data["content"]["privacy_policy_en"], content.privacy_policy_en)
+
+        content.privacy_policy_en = ""
+        with self.assertRaises(ValidationError):
+            content.save()
 
     def test_public_advertisements_endpoint_returns_only_current_active_ads(self):
         now = timezone.now()

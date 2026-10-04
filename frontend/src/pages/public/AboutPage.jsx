@@ -28,8 +28,8 @@ function AboutPage() {
       <PublicHero
         eyebrow={isArabic ? 'من نحن' : 'About us'}
         icon={Building2}
-        title={isArabic ? 'مهمة خالصني' : 'The Khalsni mission'}
-        description={isArabic ? 'خالصني منصة أردنية تبسط المعاملات الحكومية والإدارية وتقلل الوقت والاحتكاك والتشتت بين القنوات المختلفة.' : 'Khalsni is a Jordanian platform that simplifies government and administrative requests while reducing time, friction, and fragmented channels.'}
+        title={isArabic ? 'مهمة خلصني' : 'The Khalsni mission'}
+        description={isArabic ? 'خلصني منصة أردنية تبسط المعاملات الحكومية والإدارية وتقلل الوقت والاحتكاك والتشتت بين القنوات المختلفة.' : 'Khalsni is a Jordanian platform that simplifies government and administrative requests while reducing time, friction, and fragmented channels.'}
       />
 
       <PublicPanel className="scroll-mt-24" id="business">

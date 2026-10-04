@@ -1,0 +1,56 @@
+# Khalsni client audit: final closure assessment
+
+Assessment date: 2026-10-04. Client observation date: 2026-10-01. Source: `D:\ghassam moblie\Khalsni_Website_Audit_AR.docx` and companion evidence ZIP. This assesses the current code and fresh isolated QA records; the May demo orders in the original `backend/db.sqlite3` were neither migrated nor edited. The report's blocked coverage IDs are **B01–B10**. They remain coverage findings, not confirmed client defects.
+
+Allowed final statuses are used below. **PASS** means the technical behavior was demonstrated in an isolated environment; it is not a claim that unreleased migrations were deployed to the client's site. **BLOCKED_EXTERNAL** means a required acceptance environment is unavailable. **NOT_IN_RELEASE_SCOPE** follows the documented MVP scope, with supported internal behavior still tested.
+
+| ID | Final status | Root cause/change | Automated evidence | Manual evidence | Dependency |
+|---|---|---|---|---|---|
+| F01 | PASS | Bell and dashboard now share read state and order navigation. | `notifications.tests`, `NotificationPanel.test.jsx`, fresh journey browser bell/read check. | Prior browser evidence in `docs/audit/evidence/`. | None |
+| F02 | PASS | Missing request requires an actual configured upload requirement. | `orders.tests`, fresh browser upload/resubmit. | Prior browser evidence. | None |
+| F03 | PASS | Central readiness checks mandatory approved documents and explains blockers. | `orders.tests`, full journey/provider assignment. | Prior browser evidence. | None |
+| F04 | PASS | Absent and rejected documents have distinct states. | `EmployeeOrderReviewPage.test.jsx`, browser employee review. | Prior browser evidence. | None |
+| F05 | PASS | Transition visibility and API enforcement use canonical workflow checks. | `orders.tests`, full journey negative/positive actions. | Prior browser evidence. | None |
+| F06 | PASS | CMS preview and published home use published content. | `public_site.tests`, browser CMS publish/preview/public check. | Prior browser evidence. | None |
+| U01 | PASS | Compact mobile work header and secondary menu. | `client-audit-ux.spec.js` at 390 px. | `docs/audit/evidence/U01-mobile-header.png`. | None |
+| U02 | PASS | Search results appear before discovery cards. | `ServicesPage.test.jsx`, mobile browser search. | `docs/audit/evidence/U02-search-first.png`. | None |
+| U03 | PASS | Tracking uses configured document name and safe owner action. | `TrackOrderPage.test.jsx`, browser tracking action. | `docs/audit/evidence/U03-tracking-action.png`. | None |
+| U04 | PASS | Required/optional labels and persisted contact inquiry feedback. | Registration/contact component tests, browser stored inquiry. | `docs/audit/evidence/U04-contact-required.png`. | None |
+| D01 | PASS | Public service detail renders field guidance instead of internal type tokens. | `ServiceDetailsPage.test.jsx`; responsive browser service page in Arabic. | Emulated browser screenshot in Playwright artifacts. | None |
+| D02 | PASS | Customer-facing service wording and public price visibility checked. | `ServiceDetailsPage.test.jsx`, service/pricing tests, browser service page. | Emulated browser screenshot. | None |
+| D03 | PASS | Public catalog Arabic values and legacy schema option/help fields normalized; strict language fallback and bilingual event notification snapshots added. | Strict locale audit on migrated **copy** of May DB: 0 gaps after identifying and repairing 7 legacy option gaps; `services.tests_client_audit_locale`, notification language test, frontend locale tests. | Arabic 390/430/768/1366 service/tracking/role screenshots are emulated. | Apply migrations 0012/0013 and rerun strict audit against each release catalog. Staff-authored free text retains its authored language. |
+| D04 | PASS | Visible brand forms use `Khalsni` / `خلصني`; scan found no competing visible `Khalisni` form. | Brand tests, source scan, full frontend build. | Public page browser snapshots. | None |
+| D05 | CLIENT_INPUT_REQUIRED | Contact values are CMS-configurable; new defaults are blank. The copied old content still has demo support values. | `public_site.tests`; config/source check. | Client screenshot E08/E14 and read-only old content inventory. | Approved support email, phone, WhatsApp decision/number, Arabic and English address, and whether office hours must be shown. Then publish and verify channels. |
+| D06 | CLIENT_INPUT_REQUIRED | Privacy CMS can publish paired Arabic/English approved text; no approved substantive policy exists. | `public_site.tests`, `PrivacyPolicyPage.test.jsx`. | Client screenshot E10. | Approved retention, deletion/request process, privacy contact, uploaded-document handling, lawful exceptions, and third-party processing text. |
+| B01 | PASS | Earlier provider/service eligibility QA gap closed with namespaced fixture. | Full browser provider receipt/progress/final result and authorized download. | Automated browser evidence only. | None |
+| B02 | PASS | Earlier browser file permission limit bypassed with safe QA PDF and real upload path. | Full browser upload/resubmit/review/download, document tests. | Automated browser evidence only. | None |
+| B03 | PASS | Separate active QA identities and isolated browser sessions prove re-entry. | Browser login/logout/re-login/refresh/protected route for customer, employee, admin, provider; inactive login API test. | Automated browser evidence only. | None |
+| B04 | BLOCKED_EXTERNAL | Registration and reset/token/email-generation pipeline work internally; public registration does not require activation. External mailbox delivery was not observed. | `PublicAuthTests`, `PasswordResetTests`, registration/login component tests. | No external mailbox receipt. | QA SMTP/mailbox configuration and receipt check for reset messages. |
+| B05 | NOT_IN_RELEASE_SCOPE | PRD states no external gateway in MVP. Manual payment records and cancellation permissions were tested; gateway charge/refund/webhook flows do not exist. | `payment.tests`, `orders.tests` cancellation, requirements traceability. | No sandbox transaction. | If client adds payment gateway scope, provide gateway contract and sandbox credentials. |
+| B06 | PASS | Two customers/providers and internal note/file fixture exercise isolation. | Full browser/API journey negative cross-customer/provider/file checks and internal-note absence. | Automated browser evidence only. | None |
+| B07 | PASS | Per-customer UUID submission key, payload fingerprint, unique DB constraint, one-order retry response, conflict for changed payload, per-user draft and unchecked consent. Browser CORS now allows the key; Next and Submit have separate controls and rapid UI clicks are guarded. | `orders.tests` duplicate/event checks; multipart browser transport retry and rapid-submit/draft browser check; `orderDrafts.test.js`. | Automated browser evidence only. | Clients using the order API must send `Idempotency-Key` for retry guarantees. |
+| B08 | NOT_IN_RELEASE_SCOPE | PRD limits this MVP to in-system notifications. System events, recipient, language, read state and dedupe are tested; no external delivery channel or provider receipt exists. A DB `sent` value is not an external delivery claim. | `notifications.tests`, language test, full browser journey and bell/read check. | No external receipt. | If email/SMS/WhatsApp notifications become in scope, supply provider integration and delivery acceptance criteria. |
+| B09 | BLOCKED_EXTERNAL | Rendered-page checks exposed and fixed employee email-card overflow at 390 px and customer header clipping at 768/1366 px. Real Android/iOS hardware and WebKit/Safari are unavailable in this environment. | 12 routes × 390/430/768/1366 px = 48 rendered-page overflow checks and screenshots passed in Chromium emulation; mobile UX spec. | Representative `B09-*` screenshots in `docs/audit/evidence/` are **emulated Chromium only**; no real-device or WebKit evidence. | Real device lab or supported WebKit/Safari test environment for final cross-browser signoff. |
+| B10 | BUSINESS_DECISION_REQUIRED | Consent preselection was corrected. Remaining imported form and admin data semantics have no authoritative rule. | `orderDrafts.test.js`, model/serializer/import review, strict catalog audit. | Client audit observations only. | Eight exact decisions in `KHALSNI_CLIENT_DECISIONS_REQUIRED.md`. |
+
+## Regression evidence and limits
+
+- Backend: **170/170** broad tests passed (`accounts`, QA seed, orders/journeys, notifications, documents, services, public site, payment). A later **20/20** focused regression run passed after the legacy schema importer and CORS changes; `python manage.py check` and `makemigrations --check --dry-run` passed.
+- Frontend: the final rerun passed **65/65** component tests; ESLint and the production build passed after the last UI changes.
+- Browser: the final fresh end-to-end request/CMS rerun passed **2/2** in isolated Chromium. The strengthened 48-case rendered-page viewport matrix passed **1/1** after the overflow fixes. The final 390 px UX rerun passed **3/3**. Multipart retry passed at desktop and 390 px. The final rapid-submit/draft browser rerun passed **1/1**, with one order POST and one customer creation notice. Role re-entry passed **1/1** after the header breakpoint adjustment. These final runs had **0 failures**.
+- One exploratory run included a mobile-only UX assertion under the desktop project and failed that unsuitable assertion; the correct mobile project then passed 3/3. An earlier browser run had two stale test expectations (localized API language and dashboard `<main>`); those were corrected. The viewport test was strengthened again to wait for rendered content; it exposed the two real overflows above, which were fixed before the passing 48-case run. The rapid-submit browser test exposed and drove fixes for the missing CORS allowlist and the Next-to-Submit click race; its final rerun passed without a server error.
+- Original May SQLite was read only. A separate copied DB was migrated through the new catalog migrations and audited; strict Arabic published-catalog scan returned `{"findings": [], "count": 0}`. The isolated QA database also returned zero gaps. QA fixtures never rewrite the two old reference orders.
+- Playwright artifacts under `frontend/e2e-results/artifacts/` and the browser logs under `frontend/e2e-results/` are local generated evidence. They are Chromium emulation, not real devices. External mailbox, payment gateway, and external notification receipt were not asserted from database rows or HTTP status alone.
+
+## Closure count
+
+| Category | Count | IDs |
+|---|---:|---|
+| PASS | 19 | F01–F06, U01–U04, D01–D04, B01, B02, B03, B06, B07 |
+| CLIENT_INPUT_REQUIRED | 2 | D05, D06 |
+| BUSINESS_DECISION_REQUIRED | 1 | B10 |
+| BLOCKED_EXTERNAL | 2 | B04, B09 |
+| NOT_IN_RELEASE_SCOPE | 2 | B05, B08 |
+| FAIL | 0 | None |
+
+**Can I truthfully tell the client that every audit note has been addressed? NO.** D05/D06 need approved client content, B10 needs business rules, and B04/B09 still need external acceptance checks. B05/B08 require scope confirmation if the client expected external payment or notification delivery in this release.

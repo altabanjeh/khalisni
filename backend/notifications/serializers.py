@@ -22,6 +22,8 @@ def _validate_safe_template_text(value):
 
 
 class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    message = serializers.SerializerMethodField()
     order_id = serializers.IntegerField(read_only=True)
     recipient_name = serializers.CharField(source="recipient.full_name", read_only=True)
     actor_name = serializers.CharField(source="actor.full_name", read_only=True)
@@ -31,6 +33,19 @@ class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = "__all__"
+
+    def _localized_value(self, obj, field):
+        request = self.context.get("request")
+        language = (request.headers.get("Accept-Language", "ar") if request else "ar").split(",", 1)[0].lower()
+        language = "en" if language.startswith("en") else "ar"
+        localized = (obj.context_data or {}).get("localized") or {}
+        return (localized.get(language) or {}).get(field) or getattr(obj, field)
+
+    def get_title(self, obj):
+        return self._localized_value(obj, "title")
+
+    def get_message(self, obj):
+        return self._localized_value(obj, "message")
 
 
 class ManualNotificationSerializer(serializers.Serializer):

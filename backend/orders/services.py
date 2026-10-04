@@ -159,6 +159,8 @@ def create_public_order(*, data, request=None):
             organization_name_snapshot=organization.name,
             city=data["city"],
             customer_notes=data.get("notes", ""),
+            submission_key=data.get("submission_key"),
+            submission_fingerprint=data.get("submission_fingerprint", ""),
         )
         OrderStatusLog.objects.create(order=order, old_status="", new_status=order.status, changed_by=customer)
 
@@ -230,6 +232,8 @@ def create_customer_order(*, customer, data, request=None):
             organization_name_snapshot=organization.name,
             city=data["city"],
             customer_notes=data.get("notes", ""),
+            submission_key=data.get("submission_key"),
+            submission_fingerprint=data.get("submission_fingerprint", ""),
         )
         OrderStatusLog.objects.create(order=order, old_status="", new_status=order.status, changed_by=customer)
 

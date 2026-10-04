@@ -561,6 +561,26 @@ class PublicAuthTests(TestCase):
         self.assertIn("refresh", login_response.data)
         self.assertEqual(login_response.data["user"]["email"], "portal-user@example.com")
 
+    def test_registration_rejects_missing_and_duplicate_identity_and_inactive_login(self):
+        missing = self.client.post("/api/auth/register/", {"email": "missing@example.test"}, format="json")
+        self.assertEqual(missing.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("full_name", missing.data)
+        payload = {
+            "full_name": "QA Registration",
+            "phone": "0793000098",
+            "email": "qa-register@example.test",
+            "password": "Password@123",
+        }
+        created = self.client.post("/api/auth/register/", payload, format="json")
+        self.assertEqual(created.status_code, status.HTTP_201_CREATED)
+        duplicate = self.client.post("/api/auth/register/", payload, format="json")
+        self.assertEqual(duplicate.status_code, status.HTTP_400_BAD_REQUEST)
+        user = CustomUser.objects.get(email=payload["email"])
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        login = self.client.post("/api/auth/login/", {"email": payload["email"], "password": payload["password"]}, format="json")
+        self.assertEqual(login.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class SeedCommandTests(TestCase):
     def test_baseline_seed_does_not_create_public_demo_users(self):

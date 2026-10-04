@@ -1,6 +1,11 @@
+import hashlib
+import json
+import uuid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import transaction
+from django.core.files.uploadedfile import UploadedFile
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
@@ -63,24 +68,76 @@ def _raise_drf_validation_error(exc):
     raise DRFValidationError(exc.messages)
 
 
+def _submission_fingerprint(data):
+    """Hash the submitted fields and file bytes without storing sensitive form data."""
+    entries = []
+    pairs = data.lists() if hasattr(data, "lists") else ((key, value if isinstance(value, list) else [value]) for key, value in data.items())
+    for key, values in sorted(pairs, key=lambda item: item[0]):
+        if key == "csrfmiddlewaretoken":
+            continue
+        normalized = []
+        for value in values:
+            if isinstance(value, UploadedFile):
+                position = value.tell()
+                digest = hashlib.sha256()
+                for chunk in value.chunks():
+                    digest.update(chunk)
+                value.seek(position)
+                normalized.append({"name": value.name, "size": value.size, "sha256": digest.hexdigest()})
+            else:
+                normalized.append(str(value))
+        entries.append((key, normalized))
+    return hashlib.sha256(json.dumps(entries, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
 class CreateOrderAPIView(generics.CreateAPIView):
     serializer_class = PublicOrderCreateSerializer
     permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
+        raw_key = request.headers.get("Idempotency-Key", "").strip()
+        submission_key = None
+        fingerprint = ""
+        if raw_key:
+            try:
+                submission_key = uuid.UUID(raw_key)
+            except (ValueError, AttributeError):
+                raise DRFValidationError({"idempotency_key": "Use a UUID submission key."})
+            fingerprint = _submission_fingerprint(request.data)
+            existing = Order.objects.filter(customer=request.user, submission_key=submission_key).first()
+            if existing:
+                if existing.submission_fingerprint != fingerprint:
+                    return response.Response({"detail": "This submission key was used for different request data."}, status=status.HTTP_409_CONFLICT)
+                return response.Response(self._order_response(existing), status=status.HTTP_200_OK)
+
+        serializer = self.get_serializer(data=request.data, context={
+            "request": request,
+            "submission_key": submission_key,
+            "submission_fingerprint": fingerprint,
+        })
         serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        return response.Response(
-            {
-                "id": order.pk,
-                "order_number": order.order_number,
-                "status": order.status,
-                "warnings": getattr(order, "prerequisite_warnings", []),
-            },
-            status=status.HTTP_201_CREATED,
-        )
+        try:
+            order = serializer.save()
+        except IntegrityError:
+            if not submission_key:
+                raise
+            existing = Order.objects.filter(customer=request.user, submission_key=submission_key).first()
+            if not existing:
+                raise
+            if existing.submission_fingerprint != fingerprint:
+                return response.Response({"detail": "This submission key was used for different request data."}, status=status.HTTP_409_CONFLICT)
+            return response.Response(self._order_response(existing), status=status.HTTP_200_OK)
+        return response.Response(self._order_response(order), status=status.HTTP_201_CREATED)
+
+    @staticmethod
+    def _order_response(order):
+        return {
+            "id": order.pk,
+            "order_number": order.order_number,
+            "status": order.status,
+            "warnings": getattr(order, "prerequisite_warnings", []),
+        }
 
 
 class TrackOrderAPIView(APIView):

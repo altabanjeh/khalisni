@@ -1,7 +1,9 @@
 import { getServiceSchemaFields } from '../utils/serviceForms'
+import { useLanguage } from '../context/LanguageContext'
 
 function DynamicServiceFields({ service, register, errors = {} }) {
-  const fields = getServiceSchemaFields(service)
+  const { language } = useLanguage()
+  const fields = getServiceSchemaFields(service, language)
 
   if (!fields.length) return null
 

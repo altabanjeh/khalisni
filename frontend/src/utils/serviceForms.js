@@ -1,4 +1,5 @@
 import { getDisplayError } from '../api/client'
+import { getCatalogText } from './servicePresentation'
 
 export const GLOBAL_UPLOAD_RULES = {
   allowed_extensions: ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'],
@@ -11,20 +12,26 @@ function normalizeExtension(value) {
   return nextValue.startsWith('.') ? nextValue : `.${nextValue}`
 }
 
-function normalizeOptions(options) {
+function normalizeOptions(options, language = 'ar') {
   if (!Array.isArray(options)) return []
 
   return options
-    .map((option) => {
+    .map((option, index) => {
       if (option && typeof option === 'object') {
         const value = option.value ?? option.id ?? option.key ?? option.slug
-        const label = option.label ?? option.name_ar ?? option.name ?? option.title ?? value
+        const label = getCatalogText(
+          option, { ar: 'label_ar', en: 'label_en' }, language,
+          language === 'en' ? `Option ${index + 1}` : `خيار ${index + 1}`,
+        )
         if (value == null || value === '') return null
         return { value: String(value), label: String(label) }
       }
 
       if (option == null || option === '') return null
-      return { value: String(option), label: String(option) }
+      const label = /[\u0600-\u06FF]/.test(String(option)) || language === 'en'
+        ? String(option)
+        : `خيار ${index + 1}`
+      return { value: String(option), label }
     })
     .filter(Boolean)
 }
@@ -64,10 +71,10 @@ export function formatBytes(bytes) {
   return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
 }
 
-export function getRequiredDocumentLabel(item) {
-  if (typeof item === 'string') return item
+export function getRequiredDocumentLabel(item, language = 'ar') {
+  if (typeof item === 'string') return /[\u0600-\u06FF]/.test(item) ? item : language === 'en' && !item.includes('_') ? item : language === 'en' ? 'Required document' : 'مستند مطلوب'
   if (!item || typeof item !== 'object') return ''
-  return item.name_ar || item.name_en || item.document_type || ''
+  return getCatalogText(item, { ar: 'name_ar', en: 'name_en' }, language, language === 'en' ? 'Required document' : 'مستند مطلوب')
 }
 
 export function getRequiredDocumentType(item, index = 0) {
@@ -86,7 +93,7 @@ export function getDocumentFieldName(item, index = 0) {
   return `document_${sanitizeFieldToken(getRequiredDocumentType(item, index), `document_${index}`)}`
 }
 
-export function getServiceSchemaFields(service) {
+export function getServiceSchemaFields(service, language = 'ar') {
   const schema = Array.isArray(service?.required_information_schema) ? service.required_information_schema : []
 
   return schema
@@ -95,8 +102,10 @@ export function getServiceSchemaFields(service) {
 
       const rawKey = field.name ?? field.key ?? field.field ?? field.id ?? `field_${index + 1}`
       const inputName = `service_info_${sanitizeFieldToken(rawKey, `field_${index + 1}`)}`
-      const label =
-        field.label_ar || field.label || field.name_ar || field.title || field.placeholder || `Field ${index + 1}`
+      const label = getCatalogText(
+        field, { ar: 'label_ar', en: 'label_en' }, language,
+        language === 'en' ? `Requested information ${index + 1}` : `معلومة مطلوبة ${index + 1}`,
+      )
 
       return {
         key: String(rawKey),
@@ -104,9 +113,9 @@ export function getServiceSchemaFields(service) {
         label: String(label),
         type: normalizeSchemaType(field.type || field.field_type || field.input_type),
         required: Boolean(field.required),
-        placeholder: field.placeholder || '',
-        helpText: field.help_text || field.description || '',
-        options: normalizeOptions(field.options || field.choices || field.values),
+        placeholder: getCatalogText(field, { ar: 'placeholder_ar', en: 'placeholder_en' }, language, ''),
+        helpText: getCatalogText(field, { ar: 'help_text_ar', en: 'help_text_en' }, language, ''),
+        options: normalizeOptions(field.options || field.choices || field.values, language),
       }
     })
     .filter(Boolean)

@@ -1,8 +1,15 @@
 from rest_framework import serializers
 
 from core.serializer_mixins import PkAsIdMixin
-from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, ContactInquiry, PublicPageContent, SiteTheme
 from public_site.models import MissingServiceRequest
+
+
+class ContactInquiryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactInquiry
+        fields = ("inquiry_id", "name", "phone", "email", "message", "created_at")
+        read_only_fields = ("inquiry_id", "created_at")
 
 
 def build_media_url(request, file_field):
@@ -71,6 +78,8 @@ class PublicPageContentPublicSerializer(serializers.ModelSerializer):
             "office_address_en",
             "footer_text",
             "footer_text_en",
+            "privacy_policy_ar",
+            "privacy_policy_en",
             "active_content",
         )
 
@@ -169,6 +178,8 @@ class PublicPageContentAdminSerializer(serializers.ModelSerializer):
             "office_address_en",
             "footer_text",
             "footer_text_en",
+            "privacy_policy_ar",
+            "privacy_policy_en",
             "active_content",
             "created_at",
             "updated_at",

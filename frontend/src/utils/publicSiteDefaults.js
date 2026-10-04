@@ -1,7 +1,7 @@
 ﻿export const fallbackPublicTheme = {
   id: 1,
   theme_id: 1,
-  name: 'Default Khalisni Theme',
+  name: 'Default Khalsni Theme',
   primary_color: '#146ef0',
   secondary_color: '#0f5dd8',
   background_color: '#fbfcff',
@@ -35,8 +35,10 @@ export const fallbackPublicContent = {
   email: '',
   office_address: '',
   office_address_en: '',
-  footer_text: 'Khalisni منصة أردنية لإدارة طلبات الخدمات الحكومية والإدارية.',
-  footer_text_en: 'Khalisni is a Jordanian platform for managing government and administrative service requests.',
+  footer_text: 'خلصني منصة أردنية لإدارة طلبات الخدمات الحكومية والإدارية.',
+  footer_text_en: 'Khalsni is a Jordanian platform for managing government and administrative service requests.',
+  privacy_policy_ar: '',
+  privacy_policy_en: '',
   active_content: true,
 }
 
@@ -98,5 +100,3 @@ export function getPublicSiteCssVariables(theme) {
 export function isExternalUrl(url) {
   return /^(https?:|mailto:|tel:)/i.test(String(url || ''))
 }
-
-

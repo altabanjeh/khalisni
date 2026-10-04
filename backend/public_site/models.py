@@ -96,13 +96,15 @@ class PublicPageContent(TimeStampedModel):
     )
     how_it_works_text = models.TextField(validators=[validate_no_script_content])
     how_it_works_text_en = models.TextField(blank=True, validators=[validate_no_script_content])
-    contact_phone = models.CharField(max_length=30, validators=[validate_no_script_content])
-    whatsapp_number = models.CharField(max_length=30, validators=[validate_no_script_content])
-    email = models.EmailField(validators=[EmailValidator()])
-    office_address = models.CharField(max_length=255, validators=[validate_no_script_content])
+    contact_phone = models.CharField(max_length=30, blank=True, validators=[validate_no_script_content])
+    whatsapp_number = models.CharField(max_length=30, blank=True, validators=[validate_no_script_content])
+    email = models.EmailField(blank=True, validators=[EmailValidator()])
+    office_address = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
     office_address_en = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
     footer_text = models.TextField(validators=[validate_no_script_content])
     footer_text_en = models.TextField(blank=True, validators=[validate_no_script_content])
+    privacy_policy_ar = models.TextField(blank=True, validators=[validate_no_script_content])
+    privacy_policy_en = models.TextField(blank=True, validators=[validate_no_script_content])
     active_content = models.BooleanField(default=False)
 
     class Meta:
@@ -134,6 +136,8 @@ class PublicPageContent(TimeStampedModel):
             errors["secondary_button_url"] = "Secondary button text and URL must be provided together."
         if self.primary_button_text and not self.primary_button_url:
             errors["primary_button_url"] = "Primary button URL is required."
+        if bool(self.privacy_policy_ar.strip()) != bool(self.privacy_policy_en.strip()):
+            errors["privacy_policy_en"] = "Publish approved privacy policy text in both Arabic and English."
         if errors:
             raise ValidationError(errors)
 
@@ -348,3 +352,20 @@ class MissingServiceRequest(TimeStampedModel):
         if is_new and not self.request_number:
             self.request_number = f"MSR-{self.request_id:06d}"
             super().save(update_fields=["request_number", "updated_at"])
+
+
+class ContactInquiry(TimeStampedModel):
+    """Persist public contact messages until a staff member handles them."""
+
+    inquiry_id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255, validators=[validate_no_script_content])
+    phone = models.CharField(max_length=30, validators=[validate_no_script_content])
+    email = models.EmailField(blank=True)
+    message = models.TextField(validators=[validate_no_script_content])
+    is_resolved = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Contact inquiry #{self.pk} from {self.name}"

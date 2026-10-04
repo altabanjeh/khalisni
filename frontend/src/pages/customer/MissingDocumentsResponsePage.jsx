@@ -26,7 +26,7 @@ function MissingDocumentsResponsePage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { toast } = useToast()
-  const { isArabic } = useLanguage()
+  const { language, isArabic } = useLanguage()
   const { data: order, loading } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
   const {
     register,
@@ -139,7 +139,7 @@ function MissingDocumentsResponsePage() {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
         {requestedDocuments.map((documentType, index) => {
           const requirement = findRequiredDocument(requiredDocuments, documentType)
-          const label = getRequiredDocumentLabel(requirement) || getRequiredDocumentLabel(documentType) || documentType
+          const label = getRequiredDocumentLabel(requirement, language) || getRequiredDocumentLabel(documentType, language)
           const state = docState(documentType)
           const providedNow = values[`file_${index}`]?.length
 

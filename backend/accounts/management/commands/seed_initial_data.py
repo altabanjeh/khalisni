@@ -26,7 +26,7 @@ DEMO_ACCOUNT_SPECS = {
         "default_email": "admin@khalisni.local",
         "default_password": "Admin@123",
         "defaults": {
-            "full_name": "Khalisni Admin",
+            "full_name": "Khalsni Admin",
             "phone": "0790000001",
             "role": CustomUser.Role.ADMIN,
             "is_staff": True,
@@ -346,47 +346,47 @@ class Command(BaseCommand):
 
     def _seed_catalog(self):
         categories = [
-            ("Civil Status and Passports", "civil-status-and-passports"),
-            ("Social Security", "social-security"),
-            ("Tax", "tax"),
-            ("Ministry of Labour", "ministry-of-labour"),
-            ("Municipal Services", "municipal-services"),
-            ("Land and Survey", "land-and-survey"),
-            ("Quick Public Services", "quick-public-services"),
+            ("الأحوال المدنية والجوازات", "Civil Status and Passports", "civil-status-and-passports"),
+            ("الضمان الاجتماعي", "Social Security", "social-security"),
+            ("الضريبة", "Tax", "tax"),
+            ("وزارة العمل", "Ministry of Labour", "ministry-of-labour"),
+            ("الخدمات البلدية", "Municipal Services", "municipal-services"),
+            ("الأراضي والمساحة", "Land and Survey", "land-and-survey"),
+            ("خدمات عامة سريعة", "Quick Public Services", "quick-public-services"),
         ]
 
-        for display_name, slug in categories:
+        for name_ar, name_en, slug in categories:
             ServiceCategory.objects.get_or_create(
                 slug=slug,
                 defaults={
-                    "name_ar": display_name,
-                    "name_en": display_name,
-                    "description_ar": display_name,
-                    "description_en": display_name,
+                    "name_ar": name_ar,
+                    "name_en": name_en,
+                    "description_ar": name_ar,
+                    "description_en": name_en,
                     "is_active": True,
                 },
             )
 
         services = [
-            ("No Criminal Record Certificate", "ministry-of-labour", 2, 5, 10),
-            ("Passport Appointment Booking", "civil-status-and-passports", 1, 2, 5),
-            ("Passport Renewal", "civil-status-and-passports", 5, 10, 15),
-            ("Traffic Fines Payment", "quick-public-services", 1, 3, 6),
-            ("Property Registration Deed", "land-and-survey", 4, 12, 18),
-            ("Tax Clearance", "tax", 3, 7, 11),
-            ("Business License Renewal", "municipal-services", 4, 9, 13),
+            ("شهادة عدم محكومية", "No Criminal Record Certificate", "ministry-of-labour", 2, 5, 10),
+            ("حجز موعد جواز سفر", "Passport Appointment Booking", "civil-status-and-passports", 1, 2, 5),
+            ("تجديد جواز السفر", "Passport Renewal", "civil-status-and-passports", 5, 10, 15),
+            ("دفع المخالفات المرورية", "Traffic Fines Payment", "quick-public-services", 1, 3, 6),
+            ("سند تسجيل عقار", "Property Registration Deed", "land-and-survey", 4, 12, 18),
+            ("براءة ذمة ضريبية", "Tax Clearance", "tax", 3, 7, 11),
+            ("تجديد رخصة مهن", "Business License Renewal", "municipal-services", 4, 9, 13),
         ]
-        required_documents = ["National ID", "Authorization Letter"]
+        required_documents = [("الهوية الوطنية", "National ID"), ("خطاب تفويض", "Authorization Letter")]
 
-        for service_name, category_slug, days, government_fee, service_fee in services:
+        for service_name_ar, service_name, category_slug, days, government_fee, service_fee in services:
             category = ServiceCategory.objects.get(slug=category_slug)
             service, _ = Service.objects.get_or_create(
                 slug=slugify(service_name),
                 defaults={
                     "category": category,
-                    "name_ar": service_name,
+                    "name_ar": service_name_ar,
                     "name_en": service_name,
-                    "description_ar": f"Service for {service_name}.",
+                    "description_ar": f"خدمة {service_name_ar}.",
                     "description_en": f"Service for {service_name}.",
                     "estimated_duration": days,
                     "base_price": government_fee + service_fee,
@@ -397,12 +397,12 @@ class Command(BaseCommand):
                 },
             )
 
-            for display_order, document_name in enumerate(required_documents, start=1):
+            for display_order, (document_name_ar, document_name) in enumerate(required_documents, start=1):
                 ServiceRequiredDocument.objects.get_or_create(
                     service=service,
                     document_type=slugify(document_name),
                     defaults={
-                        "name_ar": document_name,
+                        "name_ar": document_name_ar,
                         "name_en": document_name,
                         "display_order": display_order,
                     },

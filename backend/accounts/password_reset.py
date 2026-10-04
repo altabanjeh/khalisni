@@ -77,9 +77,9 @@ def _build_reset_link(raw_token: str) -> str:
 def _send_password_reset_email(*, user: CustomUser, raw_token: str) -> None:
     reset_link = _build_reset_link(raw_token)
     send_mail(
-        subject="Khalisni password reset",
+        subject="Khalsni password reset",
         message=(
-            "We received a request to reset your Khalisni password.\n\n"
+            "We received a request to reset your Khalsni password.\n\n"
             f"Use this link within 30 minutes:\n{reset_link}\n\n"
             "If you did not request this change, you can ignore this email."
         ),
@@ -91,9 +91,9 @@ def _send_password_reset_email(*, user: CustomUser, raw_token: str) -> None:
 
 def send_password_changed_notification(*, user: CustomUser) -> None:
     send_mail(
-        subject="Khalisni password changed",
+        subject="Khalsni password changed",
         message=(
-            "Your Khalisni password was changed successfully.\n\n"
+            "Your Khalsni password was changed successfully.\n\n"
             "If you did not perform this change, contact support immediately."
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,

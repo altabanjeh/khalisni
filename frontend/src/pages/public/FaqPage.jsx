@@ -4,7 +4,7 @@ import { useLanguage } from '../../context/LanguageContext'
 
 const faqItems = {
   ar: [
-    { q: 'هل يجب أن أزور الجهة الحكومية بنفسي؟', a: 'يعتمد ذلك على نوع الخدمة، لكن خالصني يغطي المتابعة والتنسيق والرفع والتسليم قدر الإمكان.' },
+    { q: 'هل يجب أن أزور الجهة الحكومية بنفسي؟', a: 'يعتمد ذلك على نوع الخدمة، لكن خلصني يغطي المتابعة والتنسيق والرفع والتسليم قدر الإمكان.' },
     { q: 'كيف أعرف الوثائق المطلوبة؟', a: 'لكل خدمة صفحة تفاصيل توضح الوثائق المطلوبة والمدة المتوقعة والرسوم.' },
     { q: 'كيف أتابع حالة طلبي؟', a: 'من صفحة تتبع الطلب باستخدام رقم الطلب ورقم الهاتف، أو من لوحة العميل بعد تسجيل الدخول.' },
     { q: 'هل يمكنني رفع وثائق إضافية بعد إنشاء الطلب؟', a: 'نعم، عند طلب وثائق إضافية ستظهر لك إمكانية الرفع من لوحة العميل.' },
@@ -27,7 +27,7 @@ function FaqPage() {
         eyebrow={isArabic ? 'الأسئلة الشائعة' : 'FAQ'}
         icon={HelpCircle}
         title={isArabic ? 'إجابات سريعة قبل البدء' : 'Quick answers before you start'}
-        description={isArabic ? 'أهم الأسئلة حول طلب الخدمات، المستندات، والمتابعة من خالصني.' : 'Common questions about service requests, documents, and tracking with Khalsni.'}
+        description={isArabic ? 'أهم الأسئلة حول طلب الخدمات، المستندات، والمتابعة من خلصني.' : 'Common questions about service requests, documents, and tracking with Khalsni.'}
       />
 
       <div className="grid gap-4 lg:grid-cols-2">

@@ -8,7 +8,6 @@ import {
   Info,
   Layers3,
   ListChecks,
-  ReceiptText,
   WalletCards,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -27,8 +26,8 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getCover } from '../../utils/cover'
 import { formatCurrency } from '../../utils/format'
-import { getLocalizedField } from '../../utils/i18n'
 import {
+  getCatalogText,
   getCategoryName,
   getServiceDescription,
   getServiceDuration,
@@ -37,13 +36,13 @@ import {
 } from '../../utils/servicePresentation'
 
 function getRequiredDocumentLabel(item, language) {
-  if (typeof item === 'string') return item
+  if (typeof item === 'string') return /[\u0600-\u06FF]/.test(item) ? item : language === 'en' && !item.includes('_') ? item : language === 'en' ? 'Required document' : 'مستند مطلوب'
   if (!item || typeof item !== 'object') return ''
-  return getLocalizedField(item, { ar: 'name_ar', en: 'name_en' }, language, item.document_type || '')
+  return getCatalogText(item, { ar: 'name_ar', en: 'name_en' }, language, language === 'en' ? 'Required document' : 'مستند مطلوب')
 }
 
 function getServiceNameFromRelation(item, key, language) {
-  return getLocalizedField(item?.[key], { ar: 'name_ar', en: 'name_en' }, language)
+  return getCatalogText(item?.[key], { ar: 'name_ar', en: 'name_en' }, language, language === 'en' ? 'Required service' : 'خدمة مطلوبة')
 }
 
 function normalizeInformationSchema(schema) {
@@ -53,17 +52,25 @@ function normalizeInformationSchema(schema) {
 }
 
 function getInformationFieldLabel(field, language, index) {
-  const fallback = field?.label || field?.name || field?.key || `Field ${index + 1}`
-  return getLocalizedField(field, { ar: 'label_ar', en: 'label_en' }, language, fallback)
+  const fallback = language === 'en' ? `Requested information ${index + 1}` : `معلومة مطلوبة ${index + 1}`
+  return getCatalogText(field, { ar: 'label_ar', en: 'label_en' }, language, fallback)
 }
 
 function getInformationFieldHelp(field, language) {
-  return getLocalizedField(
+  return getCatalogText(
     field,
     { ar: 'help_text_ar', en: 'help_text_en' },
     language,
-    field?.description || field?.helpText || '',
+    '',
   )
+}
+
+function getInformationFieldGuidance(type, isArabic) {
+  const kind = String(type || '').toLowerCase()
+  if (['select', 'radio', 'choice'].includes(kind)) return isArabic ? 'اختر الإجابة المناسبة عند تعبئة الطلب.' : 'Choose the appropriate option when completing the request.'
+  if (['textarea', 'long_text'].includes(kind)) return isArabic ? 'اكتب التفاصيل المطلوبة عند تعبئة الطلب.' : 'Enter the requested details when completing the request.'
+  if (['number', 'integer', 'decimal'].includes(kind)) return isArabic ? 'أدخل القيمة الرقمية المطلوبة عند تعبئة الطلب.' : 'Enter the requested number when completing the request.'
+  return isArabic ? 'أدخل هذه المعلومة عند تعبئة الطلب.' : 'Enter this information when completing the request.'
 }
 
 function getVisiblePricingItems(pricing, language, isArabic) {
@@ -129,13 +136,13 @@ function ServiceDetailsPage() {
   const visiblePricingItems = getVisiblePricingItems(pricing, language, isArabic)
   const publicPriceNote = isArabic ? pricing.public_note_ar : pricing.public_note_en
   const requestPath = `/create-order?service=${service.id}`
-  const terms = getLocalizedField(service, { ar: 'terms_ar', en: 'terms_en' }, language, '')
+  const terms = getCatalogText(service, { ar: 'terms_ar', en: 'terms_en' }, language, '')
   const informationFields = normalizeInformationSchema(service.required_information_schema)
   const requiredDocuments = (service.required_documents || [])
     .map((item, index) => ({
       id: item?.id || item?.definition_id || item?.document_type || `required-document-${index}`,
       label: getRequiredDocumentLabel(item, language),
-      instructions: getLocalizedField(item, { ar: 'instructions_ar', en: 'instructions_en' }, language, ''),
+      instructions: getCatalogText(item, { ar: 'instructions_ar', en: 'instructions_en' }, language, ''),
       required: item?.is_required !== false,
     }))
     .filter((item) => item.label)
@@ -162,14 +169,14 @@ function ServiceDetailsPage() {
       ? {
           key: 'provider',
           title: isArabic ? 'قد تتضمن مزود خدمة' : 'Provider-supported',
-          description: isArabic ? 'تبقى علاقة المزود محكومة بالإعدادات الحالية.' : 'Provider handling remains governed by current settings.',
+          description: isArabic ? 'قد ينفذ مزود خدمة مؤهل بعض خطوات طلبك.' : 'An eligible service provider may handle part of your request.',
         }
       : null,
     service.is_online === false
       ? {
           key: 'offline',
           title: isArabic ? 'ليست إلكترونية بالكامل' : 'Not fully online',
-          description: isArabic ? 'قد تحتاج متابعة خارجية حسب إعدادات الخدمة.' : 'External follow-up may be required based on service settings.',
+          description: isArabic ? 'قد تتطلب الخدمة متابعة خارج الموقع؛ سنوضح الخطوة التالية عند مراجعة طلبك.' : 'This service may require offline follow-up. We will explain the next step after reviewing your request.',
         }
       : null,
   ].filter(Boolean)
@@ -271,9 +278,8 @@ function ServiceDetailsPage() {
               title={isArabic ? 'ما الذي تحتاج معرفته قبل البدء؟' : 'What to know before starting'}
               description={serviceDescription}
             />
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
               <DetailPill icon={Clock3} label={isArabic ? 'مدة الإنجاز' : 'Duration'} value={duration.label} />
-              <DetailPill icon={ReceiptText} label={isArabic ? 'السعر الظاهر' : 'Visible price'} value={price.label} />
               <DetailPill icon={Layers3} label={isArabic ? 'التصنيف' : 'Category'} value={categoryName} />
             </div>
           </PublicPanel>
@@ -324,8 +330,7 @@ function ServiceDetailsPage() {
                         <p className="font-extrabold leading-7 text-[var(--khalsni-public-navy)]">{label}</p>
                         {required ? <span className="rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'مطلوب' : 'Required'}</span> : null}
                       </div>
-                      {type ? <p className="mt-2 text-xs font-bold uppercase text-[var(--khalsni-public-text-muted)]">{type}</p> : null}
-                      {help ? <p className="mt-3 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{help}</p> : null}
+                      <p className="mt-3 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{help || getInformationFieldGuidance(type, isArabic)}</p>
                     </div>
                   )
                 })}
@@ -404,7 +409,6 @@ function ServiceDetailsPage() {
             <h2 className="mt-2 text-2xl font-extrabold leading-8 text-[var(--khalsni-public-navy)]">{serviceName}</h2>
             <div className="mt-5 space-y-3">
               <DetailPill icon={Clock3} label={isArabic ? 'المدة' : 'Duration'} value={duration.label} />
-              <DetailPill icon={WalletCards} label={isArabic ? 'السعر' : 'Price'} value={price.label} />
             </div>
             {visiblePricingItems.length > 1 ? (
               <div className="mt-4 space-y-2 rounded-[var(--radius-lg)] bg-[var(--khalsni-public-bg-secondary)] p-4">
@@ -416,7 +420,7 @@ function ServiceDetailsPage() {
                 ))}
               </div>
             ) : null}
-            {publicPriceNote ? <p className="mt-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{publicPriceNote}</p> : null}
+            {publicPriceNote && publicPriceNote !== price.note ? <p className="mt-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{publicPriceNote}</p> : null}
             <PublicLinkButton className="mt-5 w-full" to={requestPath}>
               {isArabic ? 'ابدأ الطلب الآن' : 'Start request'}
             </PublicLinkButton>
@@ -429,7 +433,7 @@ function ServiceDetailsPage() {
             <CheckCircle2 className="h-8 w-8 text-[var(--khalsni-public-accent-text)]" />
             <p className="mt-3 font-extrabold text-[var(--khalsni-public-navy)]">{isArabic ? 'بياناتك محمية' : 'Your data is protected'}</p>
             <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
-              {isArabic ? 'روابط المستندات وصلاحيات الوصول تبقى محكومة بسياسات خلصني الحالية.' : 'Document links and access remain governed by current Khalsni policies.'}
+              {isArabic ? 'يمكنك متابعة مستندات طلبك من حسابك بعد تسجيل الدخول.' : 'You can review your request documents from your account after signing in.'}
             </p>
           </div>
         </aside>

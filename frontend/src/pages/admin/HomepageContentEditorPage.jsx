@@ -50,6 +50,8 @@ function HomepageContentEditorPage() {
       office_address_en: data.office_address_en || '',
       footer_text: data.footer_text || '',
       footer_text_en: data.footer_text_en || '',
+      privacy_policy_ar: data.privacy_policy_ar || '',
+      privacy_policy_en: data.privacy_policy_en || '',
       active_content: Boolean(data.active_content),
     })
   }, [data, form])
@@ -151,16 +153,16 @@ function HomepageContentEditorPage() {
           <div className="glass-panel space-y-5 p-6">
             <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'التواصل والتذييل' : 'Contact and footer'}</h2>
             <FieldGroup error={form.formState.errors.contact_phone} label={tr('رقم الهاتف', 'Phone')}>
-              <input className="field" {...form.register('contact_phone', { required: tr('رقم الهاتف مطلوب', 'Phone is required') })} />
+              <input className="field" {...form.register('contact_phone')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.whatsapp_number} label={tr('رقم واتساب', 'WhatsApp')}>
-              <input className="field" {...form.register('whatsapp_number', { required: tr('رقم واتساب مطلوب', 'WhatsApp number is required') })} />
+              <input className="field" {...form.register('whatsapp_number')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.email} label={tr('البريد الإلكتروني', 'Email')}>
-              <input className="field" type="email" {...form.register('email', { required: tr('البريد الإلكتروني مطلوب', 'Email is required') })} />
+              <input className="field" type="email" {...form.register('email')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.office_address} label={tr('عنوان المكتب (عربي)', 'Office address (Arabic)')}>
-              <input className="field" {...form.register('office_address', { required: tr('عنوان المكتب مطلوب', 'Office address is required') })} />
+              <input className="field" {...form.register('office_address')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.office_address_en} label={tr('عنوان المكتب (إنجليزي)', 'Office address (English)')}>
               <input className="field" {...form.register('office_address_en')} />
@@ -176,6 +178,17 @@ function HomepageContentEditorPage() {
               label={tr('النسخة النشطة', 'Active content version')}
               registration={form.register('active_content')}
             />
+          </div>
+
+          <div className="glass-panel space-y-5 p-6">
+            <h2 className="text-xl font-extrabold text-ink">{tr('سياسة الخصوصية', 'Privacy policy')}</h2>
+            <p className="text-sm text-slate-600">{tr('أدخل النص المعتمد من العميل فقط. اترك الحقلين فارغين حتى تتم الموافقة.', 'Enter only client-approved text. Leave both fields blank until it is approved.')}</p>
+            <FieldGroup error={form.formState.errors.privacy_policy_ar} label={tr('النص المعتمد (عربي)', 'Approved text (Arabic)')}>
+              <textarea className="field min-h-48" {...form.register('privacy_policy_ar')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.privacy_policy_en} label={tr('النص المعتمد (إنجليزي)', 'Approved text (English)')}>
+              <textarea className="field min-h-48" {...form.register('privacy_policy_en')} />
+            </FieldGroup>
           </div>
 
           <div className="glass-panel space-y-4 p-6">

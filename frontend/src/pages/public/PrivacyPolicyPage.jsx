@@ -1,12 +1,16 @@
 import { ShieldCheck } from 'lucide-react'
+import { api } from '../../api/services'
 import { PublicHero, PublicPageShell, PublicPanel } from '../../components/public/PublicPage'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAsyncData } from '../../hooks/useAsyncData'
 
 function PrivacyPolicyPage() {
   const { isArabic } = useLanguage()
-  const paragraphs = isArabic
+  const { data: homepage } = useAsyncData(() => api.getPublicHomepage(), [], null)
+  const approvedPolicy = String(isArabic ? homepage?.content?.privacy_policy_ar || '' : homepage?.content?.privacy_policy_en || '').trim()
+  const paragraphs = approvedPolicy ? approvedPolicy.split(/\n\s*\n/).filter(Boolean) : isArabic
     ? [
-        'تستخدم خالصني بيانات العميل ووثائقه فقط لغرض تنفيذ الخدمة المطلوبة والتواصل التشغيلي المرتبط بها.',
+        'تستخدم خلصني بيانات العميل ووثائقه فقط لغرض تنفيذ الخدمة المطلوبة والتواصل التشغيلي المرتبط بها.',
         'الوصول إلى الوثائق محمي بصلاحيات حسب الدور، ولا يتم توفير روابط تنزيل عامة غير مصرح بها.',
         'يتم تسجيل العمليات الحساسة إداريا لأغراض التدقيق والجودة والمتابعة التشغيلية.',
         'يمكن للعميل تحديث بياناته الأساسية وطلب المساعدة عبر قنوات الدعم المعتمدة.',
@@ -24,7 +28,7 @@ function PrivacyPolicyPage() {
         eyebrow={isArabic ? 'سياسة الخصوصية' : 'Privacy policy'}
         icon={ShieldCheck}
         title={isArabic ? 'كيف نتعامل مع بياناتك ووثائقك' : 'How we handle your data and documents'}
-        description={isArabic ? 'توضح هذه الصفحة المبادئ العامة لحماية بيانات الطلبات والمستندات داخل خالصني.' : 'This page outlines the general principles for protecting request data and documents inside Khalsni.'}
+        description={isArabic ? 'توضح هذه الصفحة المبادئ العامة لحماية بيانات الطلبات والمستندات داخل خلصني.' : 'This page outlines the general principles for protecting request data and documents inside Khalsni.'}
       />
 
       <PublicPanel>

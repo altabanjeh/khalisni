@@ -13,9 +13,10 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { getServiceName, getServiceDescription, getServiceDuration, getServicePublicPrice } from '../../utils/servicePresentation'
 import {
   buildBaseDraftValues,
-  draftStorageKey,
+  draftStorageKeyForUser,
   parseStoredDraft,
   serializeDraft,
+  submissionKeyStorageKeyForUser,
 } from './orderDrafts'
 import {
   applyServerFieldErrors,
@@ -59,6 +60,8 @@ function Field({ label, hint, error, required, children }) {
 
 function CustomerCreateOrderPage() {
   const { user } = useAuth()
+  const ownedDraftKey = user?.id ? draftStorageKeyForUser(user) : null
+  const ownedSubmissionKey = user?.id ? submissionKeyStorageKeyForUser(user) : null
   const { toast } = useToast()
   const { language, isArabic } = useLanguage()
   const [searchParams] = useSearchParams()
@@ -66,6 +69,7 @@ function CustomerCreateOrderPage() {
   const [submittedOrder, setSubmittedOrder] = useState(null)
   const [maxReached, setMaxReached] = useState(0)
   const topRef = useRef(null)
+  const submitInFlightRef = useRef(false)
 
   const { data: categories = [] } = useAsyncData(() => api.getCategories(), [], [])
   const { data: services = [] } = useAsyncData(() => api.getServices(), [], [])
@@ -91,7 +95,7 @@ function CustomerCreateOrderPage() {
       national_id: user?.national_id || '',
       city: '',
       notes: '',
-      consent: true,
+      consent: false,
     },
   })
 
@@ -107,7 +111,7 @@ function CustomerCreateOrderPage() {
     null,
   )
   const requiredDocuments = selectedServiceDetails?.required_documents || []
-  const schemaFields = getServiceSchemaFields(selectedServiceDetails)
+  const schemaFields = getServiceSchemaFields(selectedServiceDetails, language)
   const startedFromService = Boolean(requestedServiceId && selectedService)
 
   const T = useMemo(
@@ -167,25 +171,25 @@ function CustomerCreateOrderPage() {
 
   // --- draft restore ---------------------------------------------------------
   useEffect(() => {
-    const storedDraft = localStorage.getItem(draftStorageKey)
+    const storedDraft = ownedDraftKey ? localStorage.getItem(ownedDraftKey) : null
     const baseValues = buildBaseDraftValues({ requestedServiceId, user })
     if (storedDraft) {
       try {
         const { values: parsedDraft, message } = parseStoredDraft(storedDraft)
         if (message) {
-          localStorage.removeItem(draftStorageKey)
+          localStorage.removeItem(ownedDraftKey)
           toast(message, 'info')
         }
         if (parsedDraft) {
-          reset({ ...baseValues, ...parsedDraft, service: requestedServiceId || parsedDraft.service || '', consent: true })
+          reset({ ...baseValues, ...parsedDraft, service: requestedServiceId || parsedDraft.service || '', consent: false })
           return
         }
       } catch {
-        localStorage.removeItem(draftStorageKey)
+        localStorage.removeItem(ownedDraftKey)
       }
     }
     reset(baseValues)
-  }, [requestedServiceId, reset, toast, user])
+  }, [ownedDraftKey, requestedServiceId, reset, toast, user])
 
   useEffect(() => {
     if (!requestedServiceId || !selectedService?.category?.slug) return
@@ -207,7 +211,10 @@ function CustomerCreateOrderPage() {
     3: [],
   }
 
-  async function goNext() {
+  async function goNext(event) {
+    // The same nav slot becomes a submit button on the review step. Prevent
+    // the current click's native action before React can replace that button.
+    event?.preventDefault()
     const ok = await trigger(stepFieldNames[step] || [])
     if (!ok) return
     const next = Math.min(step + 1, 3)
@@ -226,11 +233,14 @@ function CustomerCreateOrderPage() {
         delete values[key]
       }
     })
-    localStorage.setItem(draftStorageKey, serializeDraft(values))
+    if (!ownedDraftKey) return
+    localStorage.setItem(ownedDraftKey, serializeDraft(values))
     toast(T.savedDraft, 'info')
   }
 
   async function onSubmit(values) {
+    if (submitInFlightRef.current) return
+    submitInFlightRef.current = true
     clearErrors('root.server')
     const formData = new FormData()
     formData.append('service', values.service)
@@ -254,12 +264,24 @@ function CustomerCreateOrderPage() {
     }
 
     try {
-      const result = await api.createOrder(formData)
+      if (!ownedSubmissionKey) throw new Error('A customer account is required to submit an order.')
+      let submissionKey = localStorage.getItem(ownedSubmissionKey)
+      if (!submissionKey) {
+        submissionKey = crypto.randomUUID()
+        localStorage.setItem(ownedSubmissionKey, submissionKey)
+      }
+      const result = await api.createOrder(formData, submissionKey)
       setSubmittedOrder(result)
       setStep(4)
       ;(result.warnings || []).forEach((warning) => toast(warning, 'info'))
-      localStorage.removeItem(draftStorageKey)
+      if (ownedDraftKey) localStorage.removeItem(ownedDraftKey)
+      localStorage.removeItem(ownedSubmissionKey)
     } catch (submitError) {
+      if (submitError?.response?.status === 409 && ownedSubmissionKey) {
+        // The original payload may have completed before a retry. A changed
+        // draft is a new logical submission and needs its own key.
+        localStorage.removeItem(ownedSubmissionKey)
+      }
       applyServerFieldErrors({
         error: submitError,
         setError,
@@ -273,6 +295,8 @@ function CustomerCreateOrderPage() {
       else if (docFieldNames.some((f) => errors[f]) || errors.consent) setStep(2)
       toast(isArabic ? 'تعذّر إرسال الطلب. راجع الحقول المميزة.' : 'Could not submit. Check the highlighted fields.', 'error')
       void v
+    } finally {
+      submitInFlightRef.current = false
     }
   }
 
@@ -412,7 +436,7 @@ function CustomerCreateOrderPage() {
                     <div className="grid gap-4">
                       {requiredDocuments.map((document, index) => {
                         const fieldName = getDocumentFieldName(document, index)
-                        const label = getRequiredDocumentLabel(document)
+                        const label = getRequiredDocumentLabel(document, language)
                         const optional = document?.is_required === false
                         return (
                           <div className="rounded-[var(--radius-lg)] border border-border bg-card p-4" key={fieldName}>
@@ -525,12 +549,12 @@ function CustomerCreateOrderPage() {
                   {T.back}
                 </button>
                 {step < 3 ? (
-                  <button className="btn-primary" onClick={goNext} type="button">
+                  <button className="btn-primary" key="next-step" onClick={goNext} type="button">
                     {T.next}
                     <NextIcon className="h-4 w-4" />
                   </button>
                 ) : (
-                  <button className="btn-primary" disabled={isSubmitting} type="submit">
+                  <button className="btn-primary" disabled={isSubmitting} key="submit-order" type="submit">
                     <CheckCircle2 className="h-4 w-4" />
                     {isSubmitting ? (isArabic ? 'جارٍ الإرسال...' : 'Submitting...') : T.submit}
                   </button>
@@ -594,7 +618,7 @@ function CustomerCreateOrderPage() {
                         <span className={uploaded ? 'grid h-6 w-6 place-items-center rounded-full bg-green-100 text-green-700' : 'grid h-6 w-6 place-items-center rounded-full bg-slate-100 text-slate-400'}>
                           {uploaded ? <CheckCircle2 className="h-4 w-4" /> : <FileText className="h-3.5 w-3.5" />}
                         </span>
-                        <span className={uploaded ? 'text-ink' : 'text-slate-500'}>{getRequiredDocumentLabel(doc)}</span>
+                        <span className={uploaded ? 'text-ink' : 'text-slate-500'}>{getRequiredDocumentLabel(doc, language)}</span>
                       </li>
                     )
                   })}

@@ -20,6 +20,7 @@ from public_site.selectors import (
 from public_site.serializers import (
     AdvertisementAdminSerializer,
     AdvertisementPublicSerializer,
+    ContactInquiryCreateSerializer,
     HomepagePayloadSerializer,
     MissingServiceRequestAdminSerializer,
     MissingServiceRequestPublicSerializer,
@@ -112,6 +113,22 @@ class PublicMissingServiceRequestCreateAPIView(generics.CreateAPIView):
                 "status": missing_request.status,
                 "source": missing_request.source,
             },
+        )
+
+
+class PublicContactInquiryCreateAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = ContactInquiryCreateSerializer
+    throttle_scope = "public_contact"
+
+    def perform_create(self, serializer):
+        inquiry = serializer.save()
+        create_audit_log(
+            request=self.request,
+            user=self.request.user if self.request.user.is_authenticated else None,
+            action="create_contact_inquiry",
+            entity_type="ContactInquiry",
+            entity_id=inquiry.pk,
         )
 
 

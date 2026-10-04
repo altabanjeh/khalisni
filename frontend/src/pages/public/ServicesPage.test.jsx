@@ -15,3 +15,13 @@ test('service list renders with category cards', async () => {
 
   expect(screen.getAllByText('الجوازات والأحوال المدنية').length).toBeGreaterThan(0)
 })
+
+test('search results appear without the category discovery cards', async () => {
+  render(
+    <MemoryRouter initialEntries={['/services?search=جواز']}>
+      <ServicesPage />
+    </MemoryRouter>,
+  )
+  await waitFor(() => expect(screen.getAllByText(/جواز/).length).toBeGreaterThan(0))
+  expect(screen.queryByRole('heading', { name: 'اختر التصنيف المناسب' })).not.toBeInTheDocument()
+})

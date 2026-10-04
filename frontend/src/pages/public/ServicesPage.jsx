@@ -161,7 +161,7 @@ function ServicesPage() {
         ) : null}
       </section>
 
-      <section className="space-y-4">
+      {!searchParam.trim() ? <section className="space-y-4">
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]">
@@ -197,7 +197,7 @@ function ServicesPage() {
             description={isArabic ? 'ستظهر التصنيفات هنا بعد نشرها من إدارة الكتالوج.' : 'Categories will appear here after they are published from catalog management.'}
           />
         )}
-      </section>
+      </section> : null}
 
       <section className="space-y-5">
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-end sm:justify-between">

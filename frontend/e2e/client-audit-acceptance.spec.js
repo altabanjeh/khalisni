@@ -25,8 +25,11 @@ test('fresh client audit request completes through customer, employee, and provi
       .map(async (role) => [role, await login(role)]),
   ))
   async function call(role, method, path, options = {}) {
+    const { headers = {}, ...requestOptions } = options
     const response = await request.fetch(`${API}/api${path}`, {
-      method, headers: { Authorization: `Bearer ${tokens[role]}` }, ...options,
+      method,
+      headers: { Authorization: `Bearer ${tokens[role]}`, 'Accept-Language': 'en', ...headers },
+      ...requestOptions,
     })
     return response
   }

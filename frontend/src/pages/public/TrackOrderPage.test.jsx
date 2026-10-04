@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import TrackOrderPage from './TrackOrderPage'
 import { api } from '../../api/services'
 
+vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: null }) }))
+
 function renderTrackPage() {
   return render(
     <MemoryRouter>
@@ -57,4 +59,23 @@ test('required fields prevent submission when empty', async () => {
   await waitFor(() => {
     expect(screen.getAllByText(/مطلوب|required/i).length).toBeGreaterThan(0)
   })
+})
+
+test('missing document tracking shows a localized name and a safe sign-in action', async () => {
+  vi.spyOn(api, 'trackOrder').mockResolvedValueOnce({
+    id: 42,
+    order_number: 'KH-2026-000042',
+    status: 'WAITING_CUSTOMER',
+    timeline: [],
+    missing_documents: ['legal_authorization'],
+    missing_document_details: [{ document_type: 'legal_authorization', name_ar: 'خطاب التفويض', name_en: 'Authorization letter' }],
+    final_documents: [],
+  })
+  renderTrackPage()
+  await userEvent.type(screen.getByRole('textbox', { name: /رقم الطلب|order number/i }), 'KH-2026-000042')
+  await userEvent.type(screen.getByRole('textbox', { name: /هاتف|phone/i }), '0791234567')
+  await userEvent.click(screen.getByRole('button', { name: /عرض|show|بحث/i }))
+  expect(await screen.findByText('خطاب التفويض')).toBeInTheDocument()
+  expect(screen.queryByText('legal_authorization')).not.toBeInTheDocument()
+  expect(screen.getByRole('link', { name: /سجل الدخول لرفع المستندات/ })).toHaveAttribute('href', '/login?next=%2Fcustomer%2Forders%2F42%2Fmissing-docs')
 })

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import uuid4
 
 from django.conf import settings
 from django.core.cache import cache
@@ -12,7 +13,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from accounts.models import CustomUser
 from audit.models import AuditLog
 from notifications.models import Notification
-from orders.models import MissingDocumentRequest, Order
+from orders.models import MissingDocumentRequest, Order, OrderStatusLog
 from providers.models import ProviderProfile
 from services.order_completion import create_related_service_notifications
 from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRelation, ServiceRequiredDocument
@@ -111,6 +112,41 @@ class OrderAPITests(APITestCase):
         self.assertEqual(order.service_category_name_snapshot, self.category.name_ar)
         self.customer.refresh_from_db()
         self.assertEqual(self.customer.phone, "0795555555")
+
+    def test_submission_key_retries_create_one_order_event_and_notification_set(self):
+        self.client.force_authenticate(self.customer)
+        key = str(uuid4())
+        payload = {
+            "service": self.service.pk,
+            "full_name": self.customer.full_name,
+            "phone": self.customer.phone,
+            "city": "Amman",
+            "notes": "One logical request",
+            "consent": True,
+        }
+        first = self.client.post("/api/orders/", payload, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        replay = self.client.post("/api/orders/", payload, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(replay.status_code, status.HTTP_200_OK)
+        self.assertEqual(first.data["id"], replay.data["id"])
+        order = Order.objects.get(pk=first.data["id"])
+        self.assertEqual(Order.objects.filter(customer=self.customer).count(), 1)
+        self.assertEqual(OrderStatusLog.objects.filter(order=order).count(), 1)
+        self.assertEqual(AuditLog.objects.filter(entity_type="Order", entity_id=order.pk, action="create_order").count(), 1)
+        self.assertEqual(Notification.objects.filter(order=order, template_key="order_submitted").count(), 2)
+
+        changed = self.client.post("/api/orders/", {**payload, "notes": "Different request"}, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        self.assertEqual(changed.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(Order.objects.filter(customer=self.customer).count(), 1)
+
+        self.client.force_authenticate(self.other_customer)
+        other = self.client.post("/api/orders/", {
+            **payload,
+            "full_name": self.other_customer.full_name,
+            "phone": self.other_customer.phone,
+        }, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        self.assertEqual(other.status_code, status.HTTP_201_CREATED, other.data)
+        self.assertNotEqual(other.data["id"], order.pk)
 
     def test_customer_order_snapshots_date_range_delivery_configuration(self):
         self.service.delivery_time_mode = Service.DeliveryTimeMode.DATE_RANGE
@@ -495,6 +531,25 @@ class OrderAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["required_documents"][0]["document_type"], "national_id")
         self.assertEqual(response.data["required_documents"][0]["name_en"], "National ID")
+
+    def test_public_tracking_names_missing_requirement_without_exposing_internal_notes(self):
+        ServiceRequiredDocument.objects.create(
+            service=self.service, document_type="legal_authorization",
+            name_ar="خطاب التفويض", name_en="Authorization letter", is_required=True,
+        )
+        order = Order.objects.create(
+            customer=self.customer, service=self.service, city="Amman",
+            status=Order.Status.WAITING_CUSTOMER,
+            missing_document_types=["legal_authorization"],
+            internal_notes="Private staff instruction",
+        )
+        response = self.client.get(
+            f"/api/orders/track/?order_number={order.order_number}&phone={self.customer.phone}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["missing_document_details"][0]["name_ar"], "خطاب التفويض")
+        self.assertEqual(response.data["missing_document_details"][0]["name_en"], "Authorization letter")
+        self.assertNotIn("Private staff instruction", str(response.data))
 
     def test_request_missing_documents_persists_required_types(self):
         for document_type in ("national_id", "authorization_letter"):

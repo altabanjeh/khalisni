@@ -1,8 +1,8 @@
 import { buildQuery, http, unwrapList } from './client'
 
 export const ordersApi = {
-  createOrder(formData) {
-    return http.post('/orders/', formData)
+  createOrder(formData, submissionKey) {
+    return http.post('/orders/', formData, submissionKey ? { headers: { 'Idempotency-Key': submissionKey } } : {})
   },
 
   trackOrder(payload) {
