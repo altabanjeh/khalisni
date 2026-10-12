@@ -2,7 +2,7 @@ import { UserRound } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import PageHeader from '../../components/PageHeader'
-import { getDisplayError } from '../../api/client'
+import { AUTH_STORAGE_MODE_LOCAL, getDisplayError, getStoredAuthMode, storeAuthTokens } from '../../api/client'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -27,7 +27,10 @@ function ProfilePage() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    watch,
+    setError,
+    resetField,
+    formState: { isSubmitting, errors },
   } = useForm({
     defaultValues: {
       full_name: user?.full_name,
@@ -37,14 +40,28 @@ function ProfilePage() {
     },
   })
 
+  // Email is the sign-in name and the phone number protects public tracking,
+  // so the server asks for the current password before changing either.
+  const watched = watch(['email', 'phone'])
+  const identityChanged = (watched[0] ?? '') !== (user?.email ?? '') || (watched[1] ?? '') !== (user?.phone ?? '')
+
   async function onSubmit(values) {
     setStatus({ saved: false, error: '' })
+    const payload = { ...values }
+    if (!identityChanged) delete payload.current_password
     try {
-      const updated = await api.updateProfile(values)
+      const { tokens, ...updated } = await api.updateProfile(payload)
+      if (tokens?.access && tokens?.refresh) {
+        // Other sessions were signed out; this one continues with new tokens.
+        storeAuthTokens(tokens, { persistent: getStoredAuthMode() === AUTH_STORAGE_MODE_LOCAL })
+      }
       setUser((current) => ({ ...current, ...updated }))
+      resetField('current_password')
       setStatus({ saved: true, error: '' })
     } catch (error) {
-      setStatus({ saved: false, error: getDisplayError(error) })
+      const passwordError = error?.apiError?.fieldErrors?.current_password?.[0]
+      if (passwordError) setError('current_password', { type: 'server', message: passwordError })
+      setStatus({ saved: false, error: passwordError ? '' : getDisplayError(error) })
     }
   }
 
@@ -80,6 +97,25 @@ function ProfilePage() {
           >
             <input className="field" id="profile-national-id" {...register('national_id')} />
           </Field>
+
+          {identityChanged ? (
+            <div className="md:col-span-2">
+              <Field
+                error={errors.current_password?.message}
+                hint={isArabic ? 'مطلوبة لتغيير البريد الإلكتروني أو رقم الهاتف. سيتم تسجيل الخروج من الأجهزة الأخرى عند تغيير البريد.' : 'Required to change your email or phone number. Changing the email signs out your other devices.'}
+                id="profile-current-password"
+                label={isArabic ? 'كلمة المرور الحالية' : 'Current password'}
+              >
+                <input
+                  autoComplete="current-password"
+                  className="field"
+                  id="profile-current-password"
+                  type="password"
+                  {...register('current_password', { required: isArabic ? 'أدخل كلمة المرور الحالية' : 'Enter your current password' })}
+                />
+              </Field>
+            </div>
+          ) : null}
 
           <div className="flex flex-wrap items-center gap-3 md:col-span-2">
             <button className="btn-primary" disabled={isSubmitting} type="submit">

@@ -606,6 +606,11 @@ def add_order_note(*, order, actor, validated_data, request=None):
             request=request,
             template_key="manual_customer_order_update",
             dedupe_key=f"order_note:{note.pk}",
+            # The body is the staff member's own text; only the title is translated.
+            localized={
+                "ar": {"title": "تحديث على طلبك", "message": note.note},
+                "en": {"title": "Order update", "message": note.note},
+            },
         )
     create_audit_log(request=request, action="add_note", entity_type="OrderNote", entity_id=note.pk)
     return note
@@ -777,6 +782,10 @@ def reject_order(*, order, actor, reason, request=None):
         request=request,
         template_key="manual_order_rejected",
         dedupe_key=f"order_rejected:{order.pk}:{clean_reason}",
+        localized={
+            "ar": {"title": "تم رفض الطلب", "message": order.rejection_reason},
+            "en": {"title": "Order rejected", "message": order.rejection_reason},
+        },
     )
     _audit_transition(
         request=request,

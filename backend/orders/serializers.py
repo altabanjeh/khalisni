@@ -28,7 +28,7 @@ class ServiceBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSer
 
     class Meta:
         model = Service
-        fields = ("id", "name_ar", "slug", "estimated_duration", "service_fee", "government_fee", "category_name")
+        fields = ("id", "name_ar", "name_en", "slug", "estimated_duration", "service_fee", "government_fee", "category_name")
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -420,6 +420,9 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             )
 
         errors = {}
+        # The same per-file problems keyed by document type, so a client can
+        # place each message on the right requirement whatever order it sent.
+        document_errors = {}
         seen_types = set()
         initial_documents = []
 
@@ -427,25 +430,30 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             requirement = requirements_by_type.get(document_type)
             if not requirement:
                 errors[f"document_types[{index}]"] = "This document is not required for the selected service."
+                document_errors.setdefault(document_type, "This document is not required for the selected service.")
                 continue
             if document_type in seen_types:
                 errors[f"document_types[{index}]"] = "This document was uploaded more than once."
+                document_errors.setdefault(document_type, "This document was uploaded more than once.")
                 continue
 
             extension = os.path.splitext(upload.name or "")[1].lower()
             allowed_extensions = [str(item).lower() for item in (requirement.allowed_extensions or []) if str(item).strip()]
             if allowed_extensions and extension not in allowed_extensions:
                 errors[f"documents[{index}]"] = "Unsupported file extension for this document."
+                document_errors.setdefault(document_type, "Unsupported file extension for this document.")
                 continue
 
             max_file_size = requirement.max_file_size or 0
             if max_file_size and upload.size > max_file_size:
                 errors[f"documents[{index}]"] = "This document exceeds the allowed file size."
+                document_errors.setdefault(document_type, "This document exceeds the allowed file size.")
                 continue
 
             # Defect D5: reject files whose real bytes contradict the extension.
             if not sniff_matches_extension(upload, extension):
                 errors[f"documents[{index}]"] = "File content does not match its extension."
+                document_errors.setdefault(document_type, "File content does not match its extension.")
                 continue
 
             seen_types.add(document_type)
@@ -456,6 +464,8 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             missing_labels = [requirements_by_type[doc_type].name_ar or doc_type for doc_type in sorted(missing_types)]
             errors["documents"] = f"Missing required documents: {', '.join(missing_labels)}."
 
+        if document_errors:
+            errors["document_errors"] = document_errors
         if errors:
             raise serializers.ValidationError(errors)
 

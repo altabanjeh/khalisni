@@ -642,6 +642,7 @@ class SeedCommandTests(TestCase):
 
 
 @override_settings(
+    PASSWORD_RESET_EMAIL_ASYNC=False,  # these tests read the message, so send inline
     FRONTEND_BASE_URL="https://portal.example.com",
     PASSWORD_RESET_RATE_LIMIT_EMAIL=2,
     PASSWORD_RESET_RATE_LIMIT_IP=2,
@@ -811,6 +812,7 @@ class PasswordResetTests(TestCase):
 
 
 @override_settings(
+    PASSWORD_RESET_EMAIL_ASYNC=False,
     REST_FRAMEWORK={
         **settings.REST_FRAMEWORK,
         "DEFAULT_THROTTLE_RATES": {

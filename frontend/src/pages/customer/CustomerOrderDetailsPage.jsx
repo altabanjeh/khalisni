@@ -11,10 +11,12 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
-import { getDisplayError } from '../../api/client'
+import { getDisplayError, isStaleActionError } from '../../api/client'
 import { useRegisterPageHelp } from '../../context/HelpGuideContext'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getOrderAllowedActions } from '../../utils/authz'
 import { formatCurrency, formatDate } from '../../utils/format'
 import {
@@ -25,6 +27,7 @@ import {
   getRequiredDocumentLabel,
   validateSingleFileList,
 } from '../../utils/serviceForms'
+import { getServiceName } from '../../utils/servicePresentation'
 
 function MetricCard({ label, value }) {
   return (
@@ -57,7 +60,10 @@ function SectionCard({ icon: Icon, title, description, children }) {
 function CustomerOrderDetailsPage() {
   const { id } = useParams()
   const { toast } = useToast()
+  const { language, isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const { busy, exclusive } = useExclusiveAction()
   const { data: order, loading, error, reload } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
   const uploadForm = useForm({
     defaultValues: {
@@ -76,9 +82,9 @@ function CustomerOrderDetailsPage() {
   if (error || !order) {
     return (
       <EmptyState
-        action={<Link className="btn-secondary" to="/customer/orders">العودة إلى طلباتي</Link>}
-        description={error ? getDisplayError(error) : 'تعذر العثور على الطلب المطلوب.'}
-        title="الطلب غير متاح"
+        action={<Link className="btn-secondary" to="/customer/orders">{tr('العودة إلى طلباتي', 'Back to my requests')}</Link>}
+        description={error ? getDisplayError(error) : tr('تعذر العثور على الطلب المطلوب.', 'The requested order could not be found.')}
+        title={tr('الطلب غير متاح', 'Request not available')}
       />
     )
   }
@@ -91,16 +97,18 @@ function CustomerOrderDetailsPage() {
   const selectedRequirement = findRequiredDocument(requiredDocuments, selectedDocumentType)
   const customerActionRequired = allowedActions.can_view_missing_documents_form
   const isComplete = ['COMPLETED', 'DELIVERED', 'CLOSED'].includes(String(order.status || '').toUpperCase())
+  const notSet = tr('غير محددة', 'Not set')
+  const serviceName = order.service ? getServiceName(order.service, language) : notSet
   const responsibilityTitle = customerActionRequired
-    ? 'إجراء مطلوب منك'
+    ? tr('إجراء مطلوب منك', 'Action needed from you')
     : isComplete
-      ? 'الطلب مكتمل'
-      : 'خلصني تعمل على طلبك'
+      ? tr('الطلب مكتمل', 'Request completed')
+      : tr('خلصني تعمل على طلبك', 'Khalsni is working on your request')
   const responsibilityText = customerActionRequired
-    ? 'راجع بطاقة الإجراء المطلوبة وارفع الوثائق أو أكمل المعلومات المتاحة في النظام.'
+    ? tr('راجع بطاقة الإجراء المطلوبة وارفع الوثائق أو أكمل المعلومات المتاحة في النظام.', 'Review the action card and upload the documents or complete the requested information.')
     : isComplete
-      ? 'تم إكمال مسار الطلب حسب الحالة الحالية في النظام.'
-      : 'الفريق يتابع الطلب الآن، ولا يوجد إجراء مطلوب منك حالياً.'
+      ? tr('تم إكمال مسار الطلب حسب الحالة الحالية في النظام.', 'This request has completed its workflow.')
+      : tr('الفريق يتابع الطلب الآن، ولا يوجد إجراء مطلوب منك حالياً.', 'The team is handling the request. Nothing is needed from you right now.')
 
   async function handleUpload(values) {
     uploadForm.clearErrors('root.server')
@@ -113,14 +121,16 @@ function CustomerOrderDetailsPage() {
       await api.uploadCustomerDocument(id, formData)
       uploadForm.reset({ document_type: values.document_type })
       reload()
-      toast('تم رفع الوثيقة بنجاح.', 'success')
+      toast(tr('تم رفع الوثيقة بنجاح.', 'Document uploaded.'), 'success')
     } catch (submitError) {
       applyServerFieldErrors({
         error: submitError,
         setError: uploadForm.setError,
+        knownFields: ['document_type', 'file'],
         fallbackField: 'root.server',
       })
       toast(getDisplayError(submitError), 'error')
+      if (isStaleActionError(submitError)) reload()
     }
   }
 
@@ -128,20 +138,23 @@ function CustomerOrderDetailsPage() {
     try {
       await api.submitRating(id, values)
       reload()
-      toast('تم إرسال التقييم بنجاح.', 'success')
+      toast(tr('تم إرسال التقييم بنجاح.', 'Rating submitted.'), 'success')
     } catch (submitError) {
       toast(getDisplayError(submitError), 'error')
+      if (isStaleActionError(submitError)) reload()
     }
   }
 
   async function handleCancel() {
-    setConfirmCancel(false)
     try {
-      await api.cancelCustomerOrder(id, { reason: 'تم إلغاء الطلب من جهة العميل.' })
+      await api.cancelCustomerOrder(id, { reason: tr('تم إلغاء الطلب من جهة العميل.', 'Cancelled by the customer.') })
+      setConfirmCancel(false)
       reload()
-      toast('تم إلغاء الطلب.', 'success')
+      toast(tr('تم إلغاء الطلب.', 'Request cancelled.'), 'success')
     } catch (submitError) {
+      setConfirmCancel(false)
       toast(getDisplayError(submitError), 'error')
+      if (isStaleActionError(submitError)) reload()
     }
   }
 
@@ -150,16 +163,18 @@ function CustomerOrderDetailsPage() {
       <section className="rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-soft sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="inline-flex rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">حالة طلبك الآن</p>
+            <p className="inline-flex rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">{tr('حالة طلبك الآن', 'Your request right now')}</p>
             <h1 className="mt-5 text-4xl font-extrabold leading-tight text-ink">{responsibilityTitle}</h1>
             <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600">{responsibilityText}</p>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500">
-              {order.service?.name_ar || 'خدمة غير محددة'} · {order.city || 'مدينة غير محددة'}
+              {serviceName} · {order.city || tr('مدينة غير محددة', 'City not set')}
             </p>
-            <p className="mt-2 text-xs font-bold text-slate-500">رقم الطلب: {order.order_number}</p>
+            <p className="mt-2 text-xs font-bold text-slate-500">
+              {tr('رقم الطلب', 'Request number')}: <bdi dir="ltr">{order.order_number}</bdi>
+            </p>
           </div>
           <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-ink">
-            <p className="mb-3 text-xs font-bold text-slate-500">الحالة الحالية</p>
+            <p className="mb-3 text-xs font-bold text-slate-500">{tr('الحالة الحالية', 'Current status')}</p>
             <StatusBadge status={order.status} />
           </div>
         </div>
@@ -179,7 +194,7 @@ function CustomerOrderDetailsPage() {
           {allowedActions.can_view_missing_documents_form ? (
             <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
               <UploadCloud className="h-4 w-4" />
-              رفع الوثائق المطلوبة
+              {tr('رفع الوثائق المطلوبة', 'Upload the requested documents')}
             </Link>
           ) : null}
         </div>
@@ -189,12 +204,12 @@ function CustomerOrderDetailsPage() {
         <div className="glass-panel border-amber-200 bg-amber-50 p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="font-bold text-amber-900">هذا الطلب يحتاج إلى مستندات إضافية منك</p>
-              <p className="mt-1 text-sm text-amber-800">ارفع النواقص المطلوبة حتى يعود الطلب إلى مسار التنفيذ دون تأخير.</p>
+              <p className="font-bold text-amber-900">{tr('هذا الطلب يحتاج إلى مستندات إضافية منك', 'This request needs additional documents from you')}</p>
+              <p className="mt-1 text-sm text-amber-800">{tr('ارفع النواقص المطلوبة حتى يعود الطلب إلى مسار التنفيذ دون تأخير.', 'Upload the missing items so the request can continue without delay.')}</p>
             </div>
             <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
               <UploadCloud className="h-4 w-4" />
-              فتح شاشة النواقص
+              {tr('فتح شاشة النواقص', 'Open missing documents')}
             </Link>
             <InlineHelp actionKey="open_missing_documents" className="self-center" />
           </div>
@@ -203,10 +218,10 @@ function CustomerOrderDetailsPage() {
 
       <section className="glass-panel p-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="الخدمة" value={order.service?.name_ar || 'غير محددة'} />
-          <MetricCard label="المدينة" value={order.city || 'غير محددة'} />
-          <MetricCard label="التسليم المتوقع" value={formatDate(order.expected_delivery_date)} />
-          <MetricCard label="السعر النهائي" value={formatCurrency(order.final_price)} />
+          <MetricCard label={tr('الخدمة', 'Service')} value={serviceName} />
+          <MetricCard label={tr('المدينة', 'City')} value={order.city || notSet} />
+          <MetricCard label={tr('التسليم المتوقع', 'Expected delivery')} value={formatDate(order.expected_delivery_date, language)} />
+          <MetricCard label={tr('السعر النهائي', 'Final price')} value={formatCurrency(order.final_price, language)} />
         </div>
       </section>
 
@@ -214,16 +229,16 @@ function CustomerOrderDetailsPage() {
         <div className="space-y-6">
           <SectionCard
             icon={FileText}
-            title="الوثائق المرفوعة"
-            description="جميع الملفات التي أرفقتها لهذا الطلب مع حالة كل مستند."
+            title={tr('الوثائق المرفوعة', 'Uploaded documents')}
+            description={tr('جميع الملفات التي أرفقتها لهذا الطلب مع حالة كل مستند.', 'Every file attached to this request, with the status of each.')}
           >
             <DocumentList documents={order.documents || []} requiredDocuments={requiredDocuments} />
           </SectionCard>
 
           <SectionCard
             icon={MessageSquare}
-            title="الخط الزمني"
-            description="تسلسل كامل لتحديثات الطلب من إنشاء الطلب حتى آخر إجراء مسجل."
+            title={tr('الخط الزمني', 'Timeline')}
+            description={tr('تسلسل كامل لتحديثات الطلب من إنشاء الطلب حتى آخر إجراء مسجل.', 'Every update to the request, from creation to the latest recorded step.')}
           >
             <OrderTimeline items={order.status_logs || []} />
           </SectionCard>
@@ -232,56 +247,52 @@ function CustomerOrderDetailsPage() {
         <div className="space-y-6">
           <SectionCard
             icon={MessageSquare}
-            title="ملاحظاتك"
-            description="أي ملاحظة أدخلتها عند إنشاء الطلب أو أثناء المتابعة تظهر هنا."
+            title={tr('ملاحظاتك', 'Your notes')}
+            description={tr('أي ملاحظة أدخلتها عند إنشاء الطلب أو أثناء المتابعة تظهر هنا.', 'Any note you entered when creating or following the request appears here.')}
           >
             <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-sm leading-7 text-slate-600">
-              {order.customer_notes || 'لا توجد ملاحظات مسجلة على هذا الطلب.'}
+              {order.customer_notes ? <bdi>{order.customer_notes}</bdi> : tr('لا توجد ملاحظات مسجلة على هذا الطلب.', 'No notes are recorded on this request.')}
             </div>
           </SectionCard>
 
           {allowedActions.can_view_missing_documents_form && allowedActions.can_upload_customer_document ? (
             <SectionCard
               icon={UploadCloud}
-              title="رفع وثيقة سريعة"
-              description="إذا كنت تعرف نوع المستند المطلوب، يمكنك رفعه مباشرة من هذه الشاشة."
+              title={tr('رفع وثيقة سريعة', 'Quick document upload')}
+              description={tr('إذا كنت تعرف نوع المستند المطلوب، يمكنك رفعه مباشرة من هذه الشاشة.', 'If you know which document is requested, you can upload it here.')}
             >
-              <form className="space-y-4" onSubmit={uploadForm.handleSubmit(handleUpload)}>
-                <label className="mb-2 block text-sm font-semibold text-ink">
-                  <HelpLabel fieldKey="document_type">نوع الوثيقة</HelpLabel>
+              <form className="space-y-4" onSubmit={uploadForm.handleSubmit(exclusive('upload', handleUpload))}>
+                <label className="mb-2 block text-sm font-semibold text-ink" htmlFor="customer-upload-type">
+                  <HelpLabel fieldKey="document_type">{tr('نوع الوثيقة', 'Document type')}</HelpLabel>
                 </label>
-                <select className="field" {...uploadForm.register('document_type', { required: 'اختر نوع الوثيقة' })}>
-                  <option value="">اختر نوع الوثيقة</option>
-                  {missingDocumentTypes.map((item) => {
-                    const requirement = findRequiredDocument(requiredDocuments, item)
-
-                    return (
-                      <option key={item} value={item}>
-                        {getRequiredDocumentLabel(requirement) || item}
-                      </option>
-                    )
-                  })}
+                <select className="field" id="customer-upload-type" {...uploadForm.register('document_type', { required: tr('اختر نوع الوثيقة', 'Select the document type') })}>
+                  <option value="">{tr('اختر نوع الوثيقة', 'Select the document type')}</option>
+                  {missingDocumentTypes.map((item) => (
+                    <option key={item} value={item}>
+                      {getRequiredDocumentLabel(findRequiredDocument(requiredDocuments, item) || item, language)}
+                    </option>
+                  ))}
                 </select>
                 {uploadForm.formState.errors.document_type ? (
-                  <p className="text-sm text-danger">{uploadForm.formState.errors.document_type.message}</p>
+                  <p className="text-sm text-danger" role="alert">{uploadForm.formState.errors.document_type.message}</p>
                 ) : null}
 
                 <FileUploader
                   accept={buildAcceptValue(selectedRequirement)}
                   error={uploadForm.formState.errors.file}
-                  hint={buildUploadHint(selectedRequirement)}
-                  label={<HelpLabel fieldKey="file">الملف</HelpLabel>}
+                  hint={buildUploadHint(selectedRequirement, language)}
+                  label={<HelpLabel fieldKey="file">{tr('الملف', 'File')}</HelpLabel>}
                   registration={uploadForm.register('file', {
-                    validate: (fileList) => validateSingleFileList(fileList, selectedRequirement, 'الملف مطلوب'),
+                    validate: (fileList) => validateSingleFileList(fileList, selectedRequirement, tr('الملف مطلوب', 'A file is required'), language),
                   })}
                 />
 
                 {uploadForm.formState.errors.root?.server ? (
-                  <p className="text-sm text-danger">{uploadForm.formState.errors.root.server.message}</p>
+                  <p className="text-sm text-danger" role="alert">{uploadForm.formState.errors.root.server.message}</p>
                 ) : null}
 
-                <button className="btn-secondary w-full" type="submit">
-                  رفع الوثيقة
+                <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">
+                  {busy === 'upload' ? tr('جارٍ الرفع...', 'Uploading...') : tr('رفع الوثيقة', 'Upload document')}
                 </button>
                 <InlineHelp actionKey="upload_customer_document" className="mt-2" />
               </form>
@@ -291,24 +302,25 @@ function CustomerOrderDetailsPage() {
           {allowedActions.can_submit_rating ? (
             <SectionCard
               icon={Star}
-              title="تقييم الخدمة"
-              description="يساعدنا تقييمك في تحسين جودة التنفيذ ومتابعة أداء المزوّد."
+              title={tr('تقييم الخدمة', 'Rate the service')}
+              description={tr('يساعدنا تقييمك في تحسين جودة التنفيذ ومتابعة أداء المزوّد.', 'Your rating helps us improve quality and follow provider performance.')}
             >
-              <form className="space-y-4" onSubmit={ratingForm.handleSubmit(handleRating)}>
-                <label className="mb-2 block text-sm font-semibold text-ink">
-                  <HelpLabel fieldKey="score">التقييم</HelpLabel>
+              <form className="space-y-4" onSubmit={ratingForm.handleSubmit(exclusive('rating', handleRating))}>
+                <label className="mb-2 block text-sm font-semibold text-ink" htmlFor="customer-rating-score">
+                  <HelpLabel fieldKey="score">{tr('التقييم', 'Rating')}</HelpLabel>
                 </label>
                 <input
                   className="field"
+                  id="customer-rating-score"
                   max="5"
                   min="1"
-                  placeholder="التقييم من 1 إلى 5"
+                  placeholder={tr('التقييم من 1 إلى 5', 'Rating from 1 to 5')}
                   type="number"
                   {...ratingForm.register('score', { required: true })}
                 />
-                <textarea className="field min-h-24" placeholder="تعليقك" {...ratingForm.register('comment')} />
-                <button className="btn-primary w-full" type="submit">
-                  إرسال التقييم
+                <textarea aria-label={tr('تعليقك', 'Your comment')} className="field min-h-24" placeholder={tr('تعليقك', 'Your comment')} {...ratingForm.register('comment')} />
+                <button className="btn-primary w-full" disabled={Boolean(busy)} type="submit">
+                  {busy === 'rating' ? tr('جارٍ الإرسال...', 'Sending...') : tr('إرسال التقييم', 'Submit rating')}
                 </button>
                 <InlineHelp actionKey="submit_rating" className="mt-2" />
               </form>
@@ -317,8 +329,8 @@ function CustomerOrderDetailsPage() {
 
           {allowedActions.can_cancel ? (
             <div className="space-y-2">
-              <button className="btn-danger w-full" onClick={() => setConfirmCancel(true)} type="button">
-                إلغاء الطلب
+              <button className="btn-danger w-full" disabled={Boolean(busy)} onClick={() => setConfirmCancel(true)} type="button">
+                {tr('إلغاء الطلب', 'Cancel request')}
               </button>
               <InlineHelp actionKey="cancel_order" />
             </div>
@@ -327,12 +339,13 @@ function CustomerOrderDetailsPage() {
       </div>
 
       <ConfirmModal
-        confirmLabel="نعم، ألغِ الطلب"
-        description="سيتم إلغاء الطلب نهائياً. هل تريد المتابعة؟"
+        confirmLabel={tr('نعم، ألغِ الطلب', 'Yes, cancel it')}
+        description={tr('سيتم إلغاء الطلب نهائياً. هل تريد المتابعة؟', 'The request will be cancelled permanently. Continue?')}
+        loading={busy === 'cancel'}
         onClose={() => setConfirmCancel(false)}
-        onConfirm={handleCancel}
+        onConfirm={exclusive('cancel', handleCancel)}
         open={confirmCancel}
-        title="تأكيد إلغاء الطلب"
+        title={tr('تأكيد إلغاء الطلب', 'Confirm cancellation')}
         variant="danger"
       />
     </div>

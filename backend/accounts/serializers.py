@@ -160,9 +160,39 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    """
+    Self-service profile.
+
+    The email is the login identifier and the phone number is the second
+    factor of public order tracking, so changing either requires the current
+    password: a borrowed or stolen session alone must not be enough to take
+    the account over.
+    """
+
+    IDENTITY_FIELDS = ("email", "phone")
+
+    current_password = serializers.CharField(write_only=True, required=False, allow_blank=True, trim_whitespace=False)
+
     class Meta:
         model = CustomUser
-        fields = ("full_name", "phone", "email", "national_id")
+        fields = ("full_name", "phone", "email", "national_id", "current_password")
+
+    def validate(self, attrs):
+        current_password = attrs.pop("current_password", "")
+        user = self.instance
+        changed = [
+            field for field in self.IDENTITY_FIELDS
+            if field in attrs and (attrs[field] or "") != (getattr(user, field, "") or "")
+        ]
+        self.identity_fields_changed = changed
+        if changed and user is not None and user.has_usable_password():
+            if not current_password:
+                raise serializers.ValidationError(
+                    {"current_password": "Enter your current password to change your email or phone number."}
+                )
+            if not user.check_password(current_password):
+                raise serializers.ValidationError({"current_password": "The current password is incorrect."})
+        return attrs
 
 
 class CustomerProfileAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):

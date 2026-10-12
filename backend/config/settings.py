@@ -84,7 +84,10 @@ ALLOWED_HOSTS = sorted(
 )
 CORS_ALLOWED_ORIGINS = _cors_allowed_origins
 CSRF_TRUSTED_ORIGINS = _csrf_trusted_origins
-FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", (_cors_allowed_origins[0] if _cors_allowed_origins else "http://localhost:5173"))
+# An empty value (e.g. an unset Compose variable) falls back like a missing one.
+FRONTEND_BASE_URL = (os.getenv("FRONTEND_BASE_URL") or "").strip() or (
+    _cors_allowed_origins[0] if _cors_allowed_origins else "http://localhost:5173"
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -358,3 +361,6 @@ PASSWORD_RESET_TOKEN_TTL_SECONDS = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_SECON
 PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", "1800"))
 PASSWORD_RESET_RATE_LIMIT_EMAIL = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_EMAIL", "3"))
 PASSWORD_RESET_RATE_LIMIT_IP = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_IP", "10"))
+# Send reset emails on a background thread so the response time does not reveal
+# whether an address is registered. Disable only where the send must be inline.
+PASSWORD_RESET_EMAIL_ASYNC = _get_bool_env("PASSWORD_RESET_EMAIL_ASYNC", True)

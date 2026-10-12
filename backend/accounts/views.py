@@ -171,15 +171,36 @@ class CustomerProfileAPIView(generics.UpdateAPIView):
     def get_object(self):
         return self.request.user
 
+    def update(self, request, *args, **kwargs):
+        result = super().update(request, *args, **kwargs)
+        tokens = getattr(self, "_reissued_tokens", None)
+        if tokens:
+            # Sessions opened before the login identifier changed are revoked;
+            # this one continues with a fresh pair.
+            result.data = {**result.data, "tokens": tokens}
+        return result
+
     def perform_update(self, serializer):
-        user = serializer.save()
-        create_audit_log(
-            request=self.request,
-            action="update_profile",
-            entity_type="CustomUser",
-            entity_id=user.pk,
-            new_value=serializer.validated_data,
-        )
+        old_email = serializer.instance.email
+        with transaction.atomic():
+            user = serializer.save()
+            if user.email != old_email:
+                CustomUser.objects.filter(pk=user.pk).update(token_version=F("token_version") + 1)
+                user.refresh_from_db(fields=["token_version"])
+                if RefreshToken is not None:
+                    refresh = CustomTokenObtainPairSerializer.get_token(user)
+                    self._reissued_tokens = {"access": str(refresh.access_token), "refresh": str(refresh)}
+            create_audit_log(
+                request=self.request,
+                action="update_profile",
+                entity_type="CustomUser",
+                entity_id=user.pk,
+                old_value={"email": old_email} if user.email != old_email else None,
+                new_value={
+                    **serializer.validated_data,
+                    "identity_fields_changed": getattr(serializer, "identity_fields_changed", []),
+                },
+            )
 
 
 class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):

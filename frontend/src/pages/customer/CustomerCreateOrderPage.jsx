@@ -251,12 +251,16 @@ function CustomerCreateOrderPage() {
     formData.append('notes', buildDynamicNotes(values.notes, schemaFields, values))
     formData.append('consent', values.consent ? 'true' : 'false')
 
+    // The requirements actually sent, in order. Server errors that refer to a
+    // position are resolved through this list, not the full requirement list.
+    const submittedDocuments = []
     if (requiredDocuments.length) {
       requiredDocuments.forEach((document, index) => {
         const file = values[getDocumentFieldName(document, index)]?.[0]
         if (file) {
           formData.append('document_types', getRequiredDocumentType(document, index))
           formData.append('documents', file)
+          submittedDocuments.push(document)
         }
       })
     } else {
@@ -291,19 +295,28 @@ function CustomerCreateOrderPage() {
         toast(conflictMessage, 'error')
         return
       }
-      applyServerFieldErrors({
+      const stepOneFields = ['full_name', 'phone', 'national_id', 'city', ...schemaFields.map((f) => f.inputName)]
+      const stepTwoFields = [...docFieldNames, 'documents', 'notes', 'consent']
+      const outcome = applyServerFieldErrors({
         error: submitError,
         setError,
         documents: requiredDocuments,
+        submittedDocuments,
+        knownFields: [...(startedFromService ? [] : ['category_slug', 'service']), ...stepOneFields, ...stepTwoFields],
         fallbackField: 'root.server',
         fieldNameForDocumentIndex: (index, document) => getDocumentFieldName(document, index),
       })
-      // jump to the earliest step that now has an error
-      const v = getValues()
-      if (['full_name', 'phone', 'city'].some((f) => errors[f]) || schemaFields.some((f) => errors[f.inputName])) setStep(1)
-      else if (docFieldNames.some((f) => errors[f]) || errors.consent) setStep(2)
-      toast(isArabic ? 'تعذّر إرسال الطلب. راجع الحقول المميزة.' : 'Could not submit. Check the highlighted fields.', 'error')
-      void v
+      // Jump to the earliest step that received an error. Errors without a
+      // visible field stay on screen in the general error area of any step.
+      if (!startedFromService && outcome.fields.some((f) => f === 'category_slug' || f === 'service')) setStep(0)
+      else if (outcome.fields.some((f) => stepOneFields.includes(f))) setStep(1)
+      else if (outcome.fields.some((f) => stepTwoFields.includes(f))) setStep(2)
+      toast(
+        outcome.fields.length
+          ? (isArabic ? 'تعذّر إرسال الطلب. راجع الحقول المميزة.' : 'Could not submit. Check the highlighted fields.')
+          : (outcome.general || (isArabic ? 'تعذّر إرسال الطلب.' : 'Could not submit the request.')),
+        'error',
+      )
     } finally {
       submitInFlightRef.current = false
     }
@@ -376,6 +389,7 @@ function CustomerCreateOrderPage() {
         <div className="min-w-0 space-y-6">
           <form className="space-y-6" id="client-create-order" onSubmit={handleSubmit(onSubmit)} noValidate>
             {/* STEP 0 — SERVICE */}
+            {errors.root?.server && step < 2 ? <p className="mb-4 text-sm font-bold text-danger" role="alert">{errors.root.server.message}</p> : null}
             {step === 0 ? (
               <StepPanel eyebrow={`${isArabic ? 'الخطوة' : 'Step'} 1`} title={T.steps[0]} description={isArabic ? 'اختر الخدمة التي تريد طلبها.' : 'Choose the service you want to request.'}>
                 {startedFromService ? (

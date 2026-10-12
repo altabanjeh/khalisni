@@ -14,10 +14,12 @@ import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getOrderAllowedActions, hasPermission } from '../../utils/authz'
 import { formatDate, formatDateTime } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
-import { getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
+import { findRequiredDocument,
+  getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
 
 const REVIEW_STARTED_NOTE_AR = 'بدأ الموظف مراجعة الطلب.'
 
@@ -68,6 +70,9 @@ function EmployeeOrderReviewPage() {
   const { toast } = useToast()
   const { language, isArabic } = useLanguage()
   const [confirmReject, setConfirmReject] = useState(false)
+  const [confirmComplete, setConfirmComplete] = useState(false)
+  const [rejectReason, setRejectReason] = useState('')
+  const { busy, exclusive } = useExclusiveAction()
   const { data: order, loading, error, reload } = useAsyncData(() => api.getEmployeeOrder(id), [id], null)
   const { data: providers = [], error: providersError } = useAsyncData(() => api.getProviders({ order: id }), [id], [])
   const { data: templates = [] } = useAsyncData(() => api.getEmployeeNotificationTemplates(), [], [])
@@ -147,12 +152,19 @@ function EmployeeOrderReviewPage() {
     } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleReject() {
-    setConfirmReject(false)
+    // The customer receives this text, so it is written by the reviewer.
+    const reason = rejectReason.trim()
+    if (!reason) return
     try {
-      await api.rejectOrder(id, { reason: tr('تعذر استيفاء متطلبات المراجعة الحالية.', 'The current review requirements could not be met.') })
+      await api.rejectOrder(id, { reason })
+      setConfirmReject(false)
+      setRejectReason('')
       reload()
       toast(tr('تم رفض الطلب وتوثيق السبب.', 'Request rejected and the reason recorded.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
+    } catch (e) {
+      toast(getDisplayError(e), 'error')
+      if (isStaleActionError(e)) { setConfirmReject(false); reload() }
+    }
   }
   async function handleStartReview() {
     try {
@@ -178,9 +190,10 @@ function EmployeeOrderReviewPage() {
   async function handleComplete() {
     try {
       await api.completeEmployeeOrder(id, { admin_confirmation: false })
+      setConfirmComplete(false)
       reload()
       toast(tr('تم إكمال الطلب عبر المسار الآمن.', 'Request completed via the safe path.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
+    } catch (e) { setConfirmComplete(false); toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleManualNotification(values) {
     try {
@@ -262,7 +275,7 @@ function EmployeeOrderReviewPage() {
             <div className="rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span>{tr('الطلب ما زال بحالة جديد. ابدأ المراجعة الآن أو سيبدأها النظام مع أول إجراء صالح.', 'The request is still new. Start the review now, or the system will start it with the first valid action.')}</span>
-                <button className="btn-primary shrink-0" onClick={handleStartReview} type="button">{T.startReview}</button>
+                <button className="btn-primary shrink-0" disabled={Boolean(busy)} onClick={exclusive('start', handleStartReview)} type="button">{T.startReview}</button>
               </div>
             </div>
           ) : null}
@@ -270,7 +283,7 @@ function EmployeeOrderReviewPage() {
           <SectionCard icon={CircleAlert} title={tr('المستندات الناقصة الحالية', 'Current missing documents')} description={tr('عرض سريع للنواقص المفتوحة على الطلب.', 'A quick view of the open missing items on the request.')}>
             <div className="space-y-3">
               {(order.missing_document_types || []).length ? order.missing_document_types.map((t) => (
-                <div key={t} className="rounded-[var(--radius-md)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">{t}</div>
+                <div key={t} className="rounded-[var(--radius-md)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">{getRequiredDocumentLabel(findRequiredDocument(requiredDocuments, t) || t, language)}</div>
               )) : <p className="rounded-[var(--radius-md)] border border-border bg-card px-4 py-3 text-sm font-semibold text-slate-600">{tr('لا توجد نواقص معلّقة حالياً.', 'No pending missing items right now.')}</p>}
             </div>
           </SectionCard>
@@ -307,7 +320,7 @@ function EmployeeOrderReviewPage() {
 
           {allowedActions.can_request_documents ? (
             <SectionCard icon={CircleAlert} title={tr('طلب مستندات ناقصة', 'Request missing documents')} description={tr('حدّد المستندات المطلوبة وأرسل ملاحظة واضحة للعميل.', 'Select the required documents and send a clear note to the customer.')}>
-              <form className="space-y-4" onSubmit={docsRequestForm.handleSubmit(handleMissingDocs)}>
+              <form className="space-y-4" onSubmit={docsRequestForm.handleSubmit(exclusive('docs', handleMissingDocs))}>
                 <textarea aria-label={tr('ملاحظة الطلب', 'Request note')} className="field min-h-24" placeholder={tr('اشرح المطلوب بوضوح.', 'Explain clearly what is needed.')} {...docsRequestForm.register('note', { required: tr('ملاحظة الطلب مطلوبة', 'A request note is required') })} />
                 {docsRequestForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{docsRequestForm.formState.errors.note.message}</p> : null}
                 {requiredDocuments.length ? (
@@ -320,7 +333,7 @@ function EmployeeOrderReviewPage() {
                     ))}
                   </div>
                 ) : null}
-                <button className="btn-secondary w-full" type="submit">{tr('إرسال الطلب', 'Send request')}</button>
+                <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'docs' ? tr('جارٍ الإرسال...', 'Sending...') : tr('إرسال الطلب', 'Send request')}</button>
               </form>
             </SectionCard>
           ) : null}
@@ -378,7 +391,7 @@ function EmployeeOrderReviewPage() {
                 )) : <p className="rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3 text-sm font-semibold text-slate-600">{tr('لا يوجد مزوّدون مطابقون لهذه الخدمة حالياً.', 'No matching providers for this service right now.')}</p>}
               </div>
 
-              <form className="mt-5 space-y-4" onSubmit={assignForm.handleSubmit(handleAssign)}>
+              <form className="mt-5 space-y-4" onSubmit={assignForm.handleSubmit(exclusive('assign', handleAssign))}>
                 <select
                   aria-label={tr('اختر المزوّد', 'Select provider')}
                   className="field disabled:cursor-not-allowed disabled:opacity-60"
@@ -392,7 +405,7 @@ function EmployeeOrderReviewPage() {
                 </select>
                 {assignForm.formState.errors.provider_id ? <p className="text-sm font-bold text-danger">{assignForm.formState.errors.provider_id.message}</p> : null}
                 <textarea aria-label={tr('ملاحظة التعيين', 'Assignment note')} className="field min-h-24 disabled:cursor-not-allowed disabled:opacity-60" disabled={!allowedActions.can_assign_provider} placeholder={tr('ملاحظة التعيين', 'Assignment note')} {...assignForm.register('note')} />
-                <button className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60" disabled={!allowedActions.can_assign_provider || !providers.length} type="submit">{tr('تعيين المزوّد', 'Assign provider')}</button>
+                <button className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60" disabled={!allowedActions.can_assign_provider || !providers.length || Boolean(busy)} type="submit">{busy === 'assign' ? tr('جارٍ التعيين...', 'Assigning...') : tr('تعيين المزوّد', 'Assign provider')}</button>
               </form>
             </SectionCard>
           ) : null}
@@ -401,20 +414,20 @@ function EmployeeOrderReviewPage() {
             <SectionCard icon={FileText} title={tr('مراجعة نتيجة المزوّد', 'Review the provider result')} description={tr('اعتمد النتيجة بعد التحقق، أو أعدها للمزوّد أو للمراجعة الداخلية بسبب واضح.', 'Approve the result after verifying it, or return it to the provider or internal review with a clear reason.')}>
               <DocumentList documents={finalDocuments} staff />
               {allowedActions.can_complete ? (
-                <button className="btn-primary mt-4 w-full" onClick={handleComplete} type="button">{tr('اعتماد النتيجة وإكمال الطلب', 'Approve result & complete request')}</button>
+                <button className="btn-primary mt-4 w-full" disabled={Boolean(busy)} onClick={() => setConfirmComplete(true)} type="button">{tr('اعتماد النتيجة وإكمال الطلب', 'Approve result & complete request')}</button>
               ) : null}
               {canReturnToProvider ? (
-                <form className="mt-4 space-y-3" onSubmit={returnProviderForm.handleSubmit(handleReturnToProvider)}>
+                <form className="mt-4 space-y-3" onSubmit={returnProviderForm.handleSubmit(exclusive('returnProvider', handleReturnToProvider))}>
                   <textarea aria-label={tr('سبب الإعادة إلى المزوّد', 'Reason to return to provider')} className="field min-h-20" placeholder={tr('سبب الإعادة إلى المزوّد', 'Reason to return to the provider')} {...returnProviderForm.register('note', { required: tr('سبب الإعادة مطلوب', 'A reason is required') })} />
                   {returnProviderForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{returnProviderForm.formState.errors.note.message}</p> : null}
-                  <button className="btn-secondary w-full" type="submit">{tr('إعادة إلى المزوّد', 'Return to provider')}</button>
+                  <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'returnProvider' ? tr('جارٍ الإرسال...', 'Sending...') : tr('إعادة إلى المزوّد', 'Return to provider')}</button>
                 </form>
               ) : null}
               {canReturnToInternalReview ? (
-                <form className="mt-4 space-y-3" onSubmit={returnInternalForm.handleSubmit(handleReturnToInternal)}>
+                <form className="mt-4 space-y-3" onSubmit={returnInternalForm.handleSubmit(exclusive('returnInternal', handleReturnToInternal))}>
                   <textarea aria-label={tr('سبب الإعادة إلى المراجعة الداخلية', 'Reason to return to internal review')} className="field min-h-20" placeholder={tr('سبب الإعادة إلى المراجعة الداخلية', 'Reason to return to internal review')} {...returnInternalForm.register('note', { required: tr('سبب الإعادة مطلوب', 'A reason is required') })} />
                   {returnInternalForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{returnInternalForm.formState.errors.note.message}</p> : null}
-                  <button className="btn-secondary w-full" type="submit">{tr('إعادة إلى المراجعة الداخلية', 'Return to internal review')}</button>
+                  <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'returnInternal' ? tr('جارٍ الإرسال...', 'Sending...') : tr('إعادة إلى المراجعة الداخلية', 'Return to internal review')}</button>
                 </form>
               ) : null}
             </SectionCard>
@@ -422,17 +435,17 @@ function EmployeeOrderReviewPage() {
 
           {allowedActions.can_add_internal_note ? (
             <SectionCard icon={FileText} title={tr('ملاحظة داخلية', 'Internal note')} description={tr('هذه الملاحظات مخصصة للفريق الداخلي فقط.', 'These notes are for the internal team only.')}>
-              <form className="space-y-4" onSubmit={noteForm.handleSubmit(handleNote)}>
+              <form className="space-y-4" onSubmit={noteForm.handleSubmit(exclusive('note', handleNote))}>
                 <textarea aria-label={tr('نص الملاحظة', 'Note text')} className="field min-h-20" placeholder={tr('ملاحظة للعمل الداخلي فقط', 'A note for internal work only')} {...noteForm.register('note', { required: tr('الملاحظة مطلوبة', 'A note is required') })} />
                 {noteForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{noteForm.formState.errors.note.message}</p> : null}
-                <button className="btn-secondary w-full" type="submit">{tr('حفظ الملاحظة', 'Save note')}</button>
+                <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'note' ? tr('جارٍ الحفظ...', 'Saving...') : tr('حفظ الملاحظة', 'Save note')}</button>
               </form>
             </SectionCard>
           ) : null}
 
           {allowedActions.can_send_manual_notification ? (
             <SectionCard icon={Bell} title={tr('إشعار يدوي معتمد', 'Approved manual notification')} description={tr('يمكنك إرسال قالب إشعار معتمد فقط، دون كتابة رسالة حرة.', 'You may send an approved notification template only — no free-text message.')}>
-              <form className="space-y-4" onSubmit={manualNotificationForm.handleSubmit(handleManualNotification)}>
+              <form className="space-y-4" onSubmit={manualNotificationForm.handleSubmit(exclusive('notify', handleManualNotification))}>
                 <select aria-label={tr('قالب الإشعار', 'Notification template')} className="field" {...manualNotificationForm.register('template_id', { required: tr('اختر القالب', 'Select a template') })}>
                   <option value="">{tr('اختر قالب الإشعار', 'Select a notification template')}</option>
                   {templates.map((template) => (
@@ -440,13 +453,13 @@ function EmployeeOrderReviewPage() {
                   ))}
                 </select>
                 {manualNotificationForm.formState.errors.template_id ? <p className="text-sm font-bold text-danger">{manualNotificationForm.formState.errors.template_id.message}</p> : null}
-                <button className="btn-secondary w-full" type="submit">{tr('إرسال الإشعار', 'Send notification')}</button>
+                <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'notify' ? tr('جارٍ الإرسال...', 'Sending...') : tr('إرسال الإشعار', 'Send notification')}</button>
               </form>
             </SectionCard>
           ) : null}
 
           {allowedActions.can_reject ? (
-            <button className="btn-danger w-full" onClick={() => setConfirmReject(true)} type="button">
+            <button className="btn-danger w-full" disabled={Boolean(busy)} onClick={() => setConfirmReject(true)} type="button">
               <XCircle className="h-4 w-4" />{tr('رفض الطلب', 'Reject request')}
             </button>
           ) : null}
@@ -454,13 +467,34 @@ function EmployeeOrderReviewPage() {
       </div>
 
       <ConfirmModal
+        confirmDisabled={!rejectReason.trim()}
         confirmLabel={tr('نعم، ارفض الطلب', 'Yes, reject it')}
-        description={tr('سيتم رفض الطلب وتوثيق السبب. لا يمكن التراجع.', 'The request will be rejected and the reason recorded. This cannot be undone.')}
+        description={tr('سيتم رفض الطلب وإبلاغ العميل بالسبب الذي تكتبه. لا يمكن التراجع.', 'The request will be rejected and the customer told the reason you write. This cannot be undone.')}
+        loading={busy === 'reject'}
         onClose={() => setConfirmReject(false)}
-        onConfirm={handleReject}
+        onConfirm={exclusive('reject', handleReject)}
         open={confirmReject}
         title={tr('تأكيد رفض الطلب', 'Confirm rejection')}
         variant="danger"
+      >
+        <label className="block text-sm font-bold text-ink" htmlFor="reject-reason">{tr('سبب الرفض (يظهر للعميل)', 'Rejection reason (shown to the customer)')}</label>
+        <textarea
+          className="field mt-2 min-h-24"
+          id="reject-reason"
+          maxLength={1000}
+          onChange={(event) => setRejectReason(event.target.value)}
+          placeholder={tr('اشرح للعميل سبب رفض الطلب.', 'Explain to the customer why the request is rejected.')}
+          value={rejectReason}
+        />
+      </ConfirmModal>
+      <ConfirmModal
+        confirmLabel={tr('نعم، أكمل الطلب', 'Yes, complete it')}
+        description={tr('سيتم اعتماد النتيجة وإكمال الطلب وإشعار العميل. لا يمكن التراجع.', 'The result will be approved, the request completed and the customer notified. This cannot be undone.')}
+        loading={busy === 'complete'}
+        onClose={() => setConfirmComplete(false)}
+        onConfirm={exclusive('complete', handleComplete)}
+        open={confirmComplete}
+        title={tr('تأكيد إكمال الطلب', 'Confirm completion')}
       />
     </div>
   )

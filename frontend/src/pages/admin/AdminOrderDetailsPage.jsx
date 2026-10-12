@@ -1,5 +1,5 @@
 import { FileText, MessageSquare, ShieldCheck, UserRoundPlus } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
@@ -40,6 +40,8 @@ function AdminOrderDetailsPage() {
   const [confirmAssign, setConfirmAssign] = useState(false)
   const [pendingAssign, setPendingAssign] = useState(null)
   const [submitting, setSubmitting] = useState('')
+  const [rejectReason, setRejectReason] = useState('')
+  const runningRef = useRef('')
 
   const { data: order, loading, error, reload } = useAsyncData(() => api.getAdminOrder(id), [id], null)
   const { data: providers = [], error: providersError } = useAsyncData(() => api.getProviders({ order: id }), [id], [])
@@ -59,42 +61,51 @@ function AdminOrderDetailsPage() {
     ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: isArabic ? 'مرئية للعميل' : 'Visible to customer' }] : []),
   ]
 
+  // Returns true on success. One action at a time: the ref closes the gap
+  // before React re-renders, so a rapid double click cannot submit twice.
   async function run(key, fn, successMessage) {
+    if (runningRef.current) return false
+    runningRef.current = key
     setSubmitting(key)
     try {
       await fn()
       reload()
       toast(successMessage, 'success')
+      return true
     } catch (submitError) {
       toast(getDisplayError(submitError), 'error')
       if (isStaleActionError(submitError)) reload()
+      return false
     } finally {
+      runningRef.current = ''
       setSubmitting('')
     }
   }
 
+  // Forms are cleared only after success, so a refused action keeps what was typed.
   async function handleStatus(values) {
-    await run('status', () => api.changeOrderStatus(id, values), isArabic ? 'تم تحديث حالة الطلب.' : 'Request status updated.')
-    statusForm.reset()
+    if (await run('status', () => api.changeOrderStatus(id, values), isArabic ? 'تم تحديث حالة الطلب.' : 'Request status updated.')) statusForm.reset()
   }
   async function handleAssignSubmit(values) { setPendingAssign(values); setConfirmAssign(true) }
   async function handleAssignConfirm() {
     setConfirmAssign(false)
-    await run('assign', () => api.assignOrder(id, pendingAssign), isArabic ? 'تم تعيين مزوّد الخدمة.' : 'Provider assigned.')
-    assignForm.reset()
+    if (await run('assign', () => api.assignOrder(id, pendingAssign), isArabic ? 'تم تعيين مزوّد الخدمة.' : 'Provider assigned.')) assignForm.reset()
   }
   async function handleNote(values) {
     const visibility = noteVisibilityOptions.find((o) => o.value === values.visibility)?.value || 'INTERNAL'
-    await run('note', () => api.addAdminNote(id, { ...values, visibility }), isArabic ? 'تم حفظ الملاحظة.' : 'Note saved.')
-    noteForm.reset({ visibility })
+    if (await run('note', () => api.addAdminNote(id, { ...values, visibility }), isArabic ? 'تم حفظ الملاحظة.' : 'Note saved.')) noteForm.reset({ visibility })
   }
   async function handleComplete() {
     setConfirmComplete(false)
     await run('complete', () => api.completeOrder(id, { admin_confirmation: true }), isArabic ? 'تم إكمال الطلب.' : 'Request completed.')
   }
   async function handleReject() {
+    // The customer receives this text, so it is written by the administrator.
+    const reason = rejectReason.trim()
+    if (!reason) return
+    const ok = await run('reject', () => api.rejectOrder(id, { reason }), isArabic ? 'تم رفض الطلب.' : 'Request rejected.')
+    if (ok) setRejectReason('')
     setConfirmReject(false)
-    await run('reject', () => api.rejectOrder(id, { reason: isArabic ? 'لم يتم استيفاء متطلبات المراجعة.' : 'Review requirements were not met.' }), isArabic ? 'تم رفض الطلب.' : 'Request rejected.')
   }
 
   const meta = [
@@ -202,8 +213,8 @@ function AdminOrderDetailsPage() {
           {allowedActions.can_complete || allowedActions.can_reject ? (
             <Panel tone="danger" title={isArabic ? 'القرار النهائي' : 'Final decision'} description={isArabic ? 'أكمل الطلب بعد اكتمال التنفيذ، أو ارفضه إذا تعذر استيفاء المتطلبات.' : 'Complete once processing is done, or reject if the requirements cannot be met.'}>
               <div className="grid gap-3 sm:grid-cols-2">
-                {allowedActions.can_complete ? <button className="btn-primary" onClick={() => setConfirmComplete(true)} type="button">{isArabic ? 'إكمال الطلب' : 'Complete request'}</button> : null}
-                {allowedActions.can_reject ? <button className="btn-danger" onClick={() => setConfirmReject(true)} type="button">{isArabic ? 'رفض الطلب' : 'Reject request'}</button> : null}
+                {allowedActions.can_complete ? <button className="btn-primary" disabled={Boolean(submitting)} onClick={() => setConfirmComplete(true)} type="button">{isArabic ? 'إكمال الطلب' : 'Complete request'}</button> : null}
+                {allowedActions.can_reject ? <button className="btn-danger" disabled={Boolean(submitting)} onClick={() => setConfirmReject(true)} type="button">{isArabic ? 'رفض الطلب' : 'Reject request'}</button> : null}
               </div>
             </Panel>
           ) : null}
@@ -222,13 +233,24 @@ function AdminOrderDetailsPage() {
       <ConfirmModal
         confirmLabel={isArabic ? 'نعم، ارفض الطلب' : 'Yes, reject it'}
         description={isArabic ? 'سيُرفض الطلب ويُشعر العميل بالسبب. هذا الإجراء نهائي.' : 'The request will be rejected and the customer notified of the reason. This is final.'}
+        confirmDisabled={!rejectReason.trim()}
         loading={submitting === 'reject'}
         onClose={() => setConfirmReject(false)}
         onConfirm={handleReject}
         open={confirmReject}
         title={isArabic ? 'تأكيد رفض الطلب' : 'Confirm rejection'}
         variant="danger"
-      />
+      >
+        <label className="block text-sm font-bold text-ink" htmlFor="admin-reject-reason">{isArabic ? 'سبب الرفض (يظهر للعميل)' : 'Rejection reason (shown to the customer)'}</label>
+        <textarea
+          className="field mt-2 min-h-24"
+          id="admin-reject-reason"
+          maxLength={1000}
+          onChange={(event) => setRejectReason(event.target.value)}
+          placeholder={isArabic ? 'اشرح للعميل سبب رفض الطلب.' : 'Explain to the customer why the request is rejected.'}
+          value={rejectReason}
+        />
+      </ConfirmModal>
       <ConfirmModal
         confirmLabel={isArabic ? 'نعم، عيّن المزوّد' : 'Yes, assign'}
         description={isArabic ? 'هل تريد تعيين هذا المزوّد على الطلب الحالي؟' : 'Assign this provider to the current request?'}

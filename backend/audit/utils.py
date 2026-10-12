@@ -5,6 +5,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from audit.models import AuditLog
 
 
+from core.client_ip import get_client_ip
+
+
 def _as_json_safe(value):
     if value is None:
         return None
@@ -53,7 +56,7 @@ def create_audit_log(
     user_agent = ""
     request_id = ""
     if request is not None:
-        ip_address = request.META.get("REMOTE_ADDR")
+        ip_address = get_client_ip(request) or None
         user_agent = request.META.get("HTTP_USER_AGENT", "")
         request_id = request.META.get("HTTP_X_REQUEST_ID", "")
     AuditLog.objects.create(

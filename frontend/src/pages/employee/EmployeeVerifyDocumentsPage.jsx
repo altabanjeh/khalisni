@@ -31,16 +31,29 @@ function EmployeeVerifyDocumentsPage() {
   const selectedDocument = documents.find((d) => d.id === selectedDocumentId) || documents[0] || null
 
   useEffect(() => {
-    if (!selectedDocument?.id || !selectedDocument?.download_url) {
+    if (!selectedDocument?.id) {
       setTokenizedUrl(null)
       return undefined
     }
+    // Preview from an authorized download held in memory. A blob URL needs no
+    // token in the address, and it can be framed where the API response itself
+    // cannot (the API forbids framing and sends files as attachments).
     let cancelled = false
-    api.getDownloadToken(selectedDocument.id)
-      .then(({ token }) => { if (!cancelled) setTokenizedUrl(`${selectedDocument.download_url}?token=${encodeURIComponent(token)}`) })
+    let objectUrl = null
+    setTokenizedUrl(null)
+    api.downloadDocumentWithToken(selectedDocument.id)
+      .then((blob) => {
+        if (cancelled) return
+        const typed = blob?.type ? blob : new Blob([blob], { type: selectedDocument.mime_type || 'application/octet-stream' })
+        objectUrl = URL.createObjectURL(typed)
+        setTokenizedUrl(objectUrl)
+      })
       .catch(() => { if (!cancelled) setTokenizedUrl(null) })
-    return () => { cancelled = true }
-  }, [selectedDocument?.id, selectedDocument?.download_url])
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [selectedDocument?.id, selectedDocument?.mime_type])
 
   if (loading) return <LoadingSpinner />
   if (error) return <EmptyState description={getDisplayError(error)} title={isArabic ? 'تعذر تحميل الوثائق' : 'Could not load documents'} />
@@ -143,8 +156,10 @@ function EmployeeVerifyDocumentsPage() {
               </div>
             )}
             <a
-              className="btn-secondary mt-4 self-start"
-              href={tokenizedUrl || selectedDocument.download_url}
+              aria-disabled={!tokenizedUrl}
+              className={`btn-secondary mt-4 self-start ${tokenizedUrl ? '' : 'pointer-events-none opacity-60'}`}
+              download={selectedDocument.original_filename || true}
+              href={tokenizedUrl || undefined}
               rel="noreferrer"
               target="_blank"
             >

@@ -11,6 +11,7 @@ import { getDisplayError, isStaleActionError } from '../../api/client'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getOrderAllowedActions } from '../../utils/authz'
 import { formatDate, getStatusLabel } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
@@ -38,6 +39,7 @@ function ProviderOrderDetailsPage() {
   const { data: order, loading, error, reload } = useAsyncData(() => api.getProviderOrder(id), [id], null)
   const statusForm = useForm()
   const noteForm = useForm()
+  const { busy, exclusive } = useExclusiveAction()
   const uploadForm = useForm({ defaultValues: { document_type: 'FINAL_RESULT', verification_note: '' } })
 
   if (error) return <div className="rounded-[var(--radius-xl)] border border-red-200 bg-red-50 p-6 text-sm font-bold text-danger">{getDisplayError(error)}</div>
@@ -128,27 +130,28 @@ function ProviderOrderDetailsPage() {
 
         <div className="space-y-6">
           <Panel icon={FolderCheck} title={isArabic ? 'تحديث الحالة' : 'Update status'} description={isArabic ? 'حدّث الحالة فقط عندما تكون المرحلة التالية جاهزة فعلاً.' : 'Only update the status when the next stage is genuinely ready.'}>
-            <form className="space-y-3" onSubmit={statusForm.handleSubmit(handleStatus)}>
+            <form className="space-y-3" onSubmit={statusForm.handleSubmit(exclusive('status', handleStatus))}>
               <label className="block text-sm font-bold text-ink" htmlFor="provider-status">{isArabic ? 'حالة التنفيذ' : 'Processing status'}</label>
               <select className="field" id="provider-status" {...statusForm.register('status')}>
                 {!transitions.length ? <option value="">{isArabic ? 'لا توجد حالة انتقال متاحة حالياً' : 'No status transition available right now'}</option> : null}
                 {transitions.map((value) => <option key={value} value={value}>{getStatusLabel(value, language)}</option>)}
               </select>
               <textarea aria-label={isArabic ? 'ملاحظة التحديث' : 'Update note'} className="field min-h-20" placeholder={isArabic ? 'ملاحظة تقدم أو تحديث داخلي' : 'A progress or internal update note'} {...statusForm.register('note')} />
-              <button className="btn-secondary w-full" disabled={!transitions.length} type="submit">{isArabic ? 'تحديث الحالة' : 'Update status'}</button>
+              <button className="btn-secondary w-full" disabled={!transitions.length || Boolean(busy)} type="submit">{busy === 'status' ? (isArabic ? 'جارٍ التحديث...' : 'Updating...') : isArabic ? 'تحديث الحالة' : 'Update status'}</button>
             </form>
 
             {canNote ? (
-              <form className="mt-5 space-y-3 border-t border-border pt-5" onSubmit={noteForm.handleSubmit(handleNote)}>
+              <form className="mt-5 space-y-3 border-t border-border pt-5" onSubmit={noteForm.handleSubmit(exclusive('note', handleNote))}>
                 <label className="block text-sm font-bold text-ink" htmlFor="provider-note">{isArabic ? 'ملاحظة داخلية' : 'Internal note'}</label>
-                <textarea className="field min-h-20" id="provider-note" placeholder={isArabic ? 'ملاحظة داخلية للفريق' : 'An internal note for the team'} {...noteForm.register('note')} />
-                <button className="btn-secondary w-full" type="submit">{isArabic ? 'إضافة ملاحظة' : 'Add note'}</button>
+                <textarea className="field min-h-20" id="provider-note" placeholder={isArabic ? 'ملاحظة داخلية للفريق' : 'An internal note for the team'} {...noteForm.register('note', { validate: (value) => Boolean(String(value || '').trim()) || (isArabic ? 'الملاحظة مطلوبة' : 'A note is required') })} />
+                {noteForm.formState.errors.note ? <p className="text-sm font-bold text-danger" role="alert">{noteForm.formState.errors.note.message}</p> : null}
+                <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'note' ? (isArabic ? 'جارٍ الحفظ...' : 'Saving...') : isArabic ? 'إضافة ملاحظة' : 'Add note'}</button>
               </form>
             ) : null}
           </Panel>
 
           <Panel icon={UploadCloud} title={isArabic ? 'رفع النتيجة النهائية' : 'Upload the final result'} description={isArabic ? 'ارفع الملف النهائي المعتمد عند اكتمال التنفيذ؛ سيتحول الطلب إلى المراجعة الداخلية.' : 'Upload the approved final file once processing is done; the request moves to internal review.'}>
-            <form className="space-y-3" onSubmit={uploadForm.handleSubmit(handleUpload)}>
+            <form className="space-y-3" onSubmit={uploadForm.handleSubmit(exclusive('upload', handleUpload))}>
               <input type="hidden" {...uploadForm.register('document_type')} />
               <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3 text-sm text-slate-600">
                 {isArabic ? 'نوع الوثيقة النهائية' : 'Final document type'}: <span className="font-black text-ink">FINAL_RESULT</span>
@@ -162,7 +165,7 @@ function ProviderOrderDetailsPage() {
               />
               <textarea aria-label={isArabic ? 'ملاحظة التسليم' : 'Delivery note'} className="field min-h-20" placeholder={isArabic ? 'ملاحظة التحقق أو التسليم' : 'A verification or delivery note'} {...uploadForm.register('verification_note')} />
               {uploadForm.formState.errors.root?.server ? <p className="text-sm font-bold text-danger" role="alert">{uploadForm.formState.errors.root.server.message}</p> : null}
-              <button className="btn-primary w-full" disabled={!canUploadFinal} type="submit">{isArabic ? 'رفع النتيجة' : 'Upload result'}</button>
+              <button className="btn-primary w-full" disabled={!canUploadFinal || Boolean(busy)} type="submit">{busy === 'upload' ? (isArabic ? 'جارٍ الرفع...' : 'Uploading...') : isArabic ? 'رفع النتيجة' : 'Upload result'}</button>
               {!canUploadFinal ? (
                 <p className="text-xs font-semibold text-slate-500">{isArabic ? 'لا يمكن رفع النتيجة النهائية قبل السماح بذلك من مسار الطلب الحالي.' : 'The final result cannot be uploaded until the current workflow stage allows it.'}</p>
               ) : null}

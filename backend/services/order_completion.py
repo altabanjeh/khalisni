@@ -16,7 +16,10 @@ def get_completion_recommendation_relations(service):
             ServiceRelation.RelationType.OPTIONAL_BUNDLE,
         ],
         is_active=True,
+        # Recommend only what the customer could actually open and order.
         target_service__is_active=True,
+        target_service__is_deleted=False,
+        target_service__show_on_public_site=True,
     ).select_related("source_service", "target_service")
 
 
@@ -29,6 +32,25 @@ def _recommendation_message(*, order, relation):
         f"Your {order.service.name_ar} order is completed. "
         f"You may also need {relation.target_service.name_ar}."
     )
+
+
+def _recommendation_localized(*, order, relation):
+    """Arabic and English renderings; a staff-written message is shown as written."""
+    custom_message = (relation.message_to_customer or "").strip()
+    source, target = order.service, relation.target_service
+    return {
+        "ar": {
+            "title": "خدمة مرتبطة مقترحة",
+            "message": custom_message or f"اكتمل طلبك لخدمة {source.name_ar}. قد تحتاج أيضاً إلى {target.name_ar}.",
+        },
+        "en": {
+            "title": SERVICE_RECOMMENDATION_TITLE,
+            "message": custom_message or (
+                f"Your {source.name_en or source.name_ar} request is completed. "
+                f"You may also need {target.name_en or target.name_ar}."
+            ),
+        },
+    }
 
 
 def create_related_service_notifications(*, order, actor=None, request=None):
@@ -59,6 +81,7 @@ def create_related_service_notifications(*, order, actor=None, request=None):
                 "dedupe_key": dedupe_key,
                 "service_name": order.service.name_ar,
                 "target_service_name": relation.target_service.name_ar,
+                "localized": _recommendation_localized(order=order, relation=relation),
             },
             notification_type=Notification.NotificationType.ORDER,
         )

@@ -207,7 +207,18 @@ def send_notification_event(*, event_key, order=None, actor=None, document=None,
     return created_notifications
 
 
-def notify_client(*, order, title, message, actor=None, request=None, template_key="manual_order_update", dedupe_key=""):
+def notify_client(
+    *, order, title, message, actor=None, request=None, template_key="manual_order_update", dedupe_key="",
+    localized=None,
+):
+    """
+    ``localized`` carries the Arabic and English renderings, in the same
+    ``{"ar": {"title", "message"}, "en": {...}}`` shape event notifications
+    use, so the reader gets the notification in their own language.
+    """
+    context_data = {"dedupe_key": dedupe_key, "event_key": template_key}
+    if localized:
+        context_data["localized"] = localized
     return [
         create_notification(
             user=order.customer,
@@ -216,7 +227,7 @@ def notify_client(*, order, title, message, actor=None, request=None, template_k
             title=title,
             message=message,
             template_key=template_key,
-            context_data={"dedupe_key": dedupe_key, "event_key": template_key},
+            context_data=context_data,
         )
     ]
 

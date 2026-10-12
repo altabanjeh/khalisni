@@ -171,35 +171,41 @@ export function buildAcceptValue(requirement) {
   return getUploadRules(requirement).allowed_extensions.join(',')
 }
 
-export function buildUploadHint(requirement) {
+export function buildUploadHint(requirement, language = 'ar') {
   const rules = getUploadRules(requirement)
   const extensions = rules.allowed_extensions.map((extension) => extension.replace('.', '').toUpperCase()).join(', ')
-  return `الملفات المسموحة: ${extensions} | الحد الأقصى: ${formatBytes(rules.max_file_size)}`
+  return language === 'en'
+    ? `Allowed files: ${extensions} | Maximum size: ${formatBytes(rules.max_file_size)}`
+    : `الملفات المسموحة: ${extensions} | الحد الأقصى: ${formatBytes(rules.max_file_size)}`
 }
 
-export function validateFile(file, requirement) {
+export function validateFile(file, requirement, language = 'ar') {
   if (!file) return true
 
   const rules = getUploadRules(requirement)
   const extension = normalizeExtension(file.name.split('.').pop() ? `.${file.name.split('.').pop()}` : '')
 
   if (rules.allowed_extensions.length && extension && !rules.allowed_extensions.includes(extension)) {
-    return `صيغة الملف غير مدعومة. المسموح: ${rules.allowed_extensions.join(', ')}`
+    return language === 'en'
+      ? `Unsupported file type. Allowed: ${rules.allowed_extensions.join(', ')}`
+      : `صيغة الملف غير مدعومة. المسموح: ${rules.allowed_extensions.join(', ')}`
   }
 
   if (rules.max_file_size && file.size > rules.max_file_size) {
-    return `حجم الملف يتجاوز الحد المسموح (${formatBytes(rules.max_file_size)}).`
+    return language === 'en'
+      ? `The file is larger than the allowed size (${formatBytes(rules.max_file_size)}).`
+      : `حجم الملف يتجاوز الحد المسموح (${formatBytes(rules.max_file_size)}).`
   }
 
   return true
 }
 
-export function validateSingleFileList(fileList, requirement, requiredMessage) {
+export function validateSingleFileList(fileList, requirement, requiredMessage, language = 'ar') {
   const file = fileList?.[0]
   if (!file) {
     return requiredMessage || true
   }
-  return validateFile(file, requirement)
+  return validateFile(file, requirement, language)
 }
 
 export function validateMultipleFiles(fileList, requirement) {
@@ -221,30 +227,80 @@ export function findRequiredDocument(requiredDocuments, documentType) {
   )
 }
 
-export function applyServerFieldErrors({ error, setError, documents = [], fieldNameForDocumentIndex, fallbackField = 'root.server' }) {
+/**
+ * Put server validation errors where the user can see them.
+ *
+ * Document errors are matched to a form field by the document's own type
+ * (`document_errors` from the API), or, for older responses keyed by position,
+ * through `submittedDocuments`: the requirements actually sent, in the order
+ * they were sent. Position in the full requirement list is never used, because
+ * skipping an optional document shifts every later index.
+ *
+ * Any error that has no visible field (an unknown key, or a field that is not
+ * in `knownFields`) is shown in the general error area instead of being lost.
+ *
+ * Returns `{ fields, general }`: the field names that received an error and the
+ * general message, if any.
+ */
+export function applyServerFieldErrors({
+  error,
+  setError,
+  documents = [],
+  submittedDocuments,
+  fieldNameForDocumentIndex,
+  knownFields,
+  fallbackField = 'root.server',
+}) {
   const fieldErrors = error?.apiError?.fieldErrors || {}
-  let applied = false
+  const documentErrors = error?.apiError?.rawData?.document_errors
+  const known = knownFields ? new Set(knownFields) : null
+  const fields = []
+  const general = []
+
+  const firstMessage = (messages) => {
+    const message = Array.isArray(messages) ? messages[0] : messages
+    return typeof message === 'string' ? message : ''
+  }
+  const fieldForDocument = (document) => {
+    if (!document || typeof fieldNameForDocumentIndex !== 'function') return ''
+    const index = documents.indexOf(document)
+    return index >= 0 ? fieldNameForDocumentIndex(index, document, documents) : ''
+  }
+  const assign = (field, message) => {
+    if (!message) return
+    if (field && field !== fallbackField && (!known || known.has(field))) {
+      setError(field, { type: 'server', message })
+      fields.push(field)
+    } else if (!general.includes(message)) {
+      general.push(message)
+    }
+  }
+
+  const byType = documentErrors && typeof documentErrors === 'object' && !Array.isArray(documentErrors) ? documentErrors : null
+  if (byType) {
+    Object.entries(byType).forEach(([documentType, messages]) => {
+      assign(fieldForDocument(findRequiredDocument(documents, documentType)), firstMessage(messages))
+    })
+  }
 
   Object.entries(fieldErrors).forEach(([key, messages]) => {
-    const message = Array.isArray(messages) ? messages[0] : messages
+    if (key === 'document_errors') return
+    const message = firstMessage(messages)
     if (!message) return
 
     const documentIndexMatch = key.match(/^(documents|document_types)\[(\d+)\]$/)
-    if (documentIndexMatch && typeof fieldNameForDocumentIndex === 'function') {
-      const documentIndex = Number(documentIndexMatch[2])
-      const mappedField = fieldNameForDocumentIndex(documentIndex, documents[documentIndex], documents)
-      if (mappedField) {
-        setError(mappedField, { type: 'server', message })
-        applied = true
-      }
+    if (documentIndexMatch) {
+      if (byType) return // already placed by document type
+      const sent = Array.isArray(submittedDocuments) ? submittedDocuments : documents
+      assign(fieldForDocument(sent[Number(documentIndexMatch[2])]), message)
       return
     }
 
-    setError(key === 'documents' ? fallbackField : key, { type: 'server', message })
-    applied = true
+    assign(key === 'documents' || key === 'detail' || key === 'non_field_errors' ? '' : key, message)
   })
 
-  if (!applied) {
-    setError(fallbackField, { type: 'server', message: getDisplayError(error) })
-  }
+  if (!fields.length && !general.length) general.push(getDisplayError(error))
+  if (general.length) setError(fallbackField, { type: 'server', message: general.join(' ') })
+
+  return { fields, general: general.join(' ') }
 }

@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import secrets
+import threading
 from datetime import timedelta
 from urllib.parse import quote
 
@@ -8,9 +9,10 @@ from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
 from django.core.mail import send_mail
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 
+from core.client_ip import get_client_ip
 from accounts.models import CustomUser, PasswordResetToken
 from audit.utils import create_audit_log
 
@@ -31,10 +33,8 @@ def _normalize_email(email: str) -> str:
 
 
 def _get_request_ip(request) -> str:
-    forwarded_for = (request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")
-    if forwarded_for and forwarded_for[0].strip():
-        return forwarded_for[0].strip()
-    return request.META.get("REMOTE_ADDR", "")
+    # Never the left-most X-Forwarded-For entry: the caller writes that one.
+    return get_client_ip(request, when_unconfigured="header")
 
 
 def _hash_value(value: str) -> str:
@@ -110,6 +110,37 @@ def _send_password_changed_notification_safely(user_id: int) -> None:
         logger.exception("Failed to send password changed notification for user %s", user_id)
 
 
+def _deliver_password_reset_email(*, user, raw_token: str, token_pk):
+    """
+    Send the reset email off the request path.
+
+    Talking to the mail server takes far longer than the "no such account"
+    branch, so a synchronous send lets a caller tell registered addresses from
+    unregistered ones by response time. With the send on a background thread
+    both branches answer in the same time. If the send fails, the unusable
+    token is removed, exactly as before.
+    """
+
+    def deliver(*, close_connection):
+        try:
+            _send_password_reset_email(user=user, raw_token=raw_token)
+        except Exception:
+            PasswordResetToken.objects.filter(pk=token_pk).delete()
+            logger.exception("Failed to send password reset email for user %s", user.pk)
+        finally:
+            if close_connection:
+                connection.close()
+
+    if not settings.PASSWORD_RESET_EMAIL_ASYNC:
+        deliver(close_connection=False)
+        return None
+    thread = threading.Thread(
+        target=deliver, kwargs={"close_connection": True}, name="password-reset-email", daemon=True
+    )
+    thread.start()
+    return thread
+
+
 def request_password_reset(*, email: str, request) -> str:
     normalized_email = _normalize_email(email)
     request_ip = _get_request_ip(request)
@@ -145,11 +176,7 @@ def request_password_reset(*, email: str, request) -> str:
             request_ip=request_ip or None,
             user_agent=request.META.get("HTTP_USER_AGENT", "") or None,
         )
-        try:
-            _send_password_reset_email(user=user, raw_token=raw_token)
-        except Exception:
-            token_record.delete()
-            logger.exception("Failed to send password reset email for user %s", user.pk)
+        _deliver_password_reset_email(user=user, raw_token=raw_token, token_pk=token_record.pk)
     else:
         _hash_value(secrets.token_urlsafe(32))
 
