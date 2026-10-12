@@ -278,9 +278,18 @@ function CustomerCreateOrderPage() {
       localStorage.removeItem(ownedSubmissionKey)
     } catch (submitError) {
       if (submitError?.response?.status === 409 && ownedSubmissionKey) {
-        // The original payload may have completed before a retry. A changed
-        // draft is a new logical submission and needs its own key.
+        // An earlier attempt with this key already created a request (for
+        // example a submit that timed out here but completed on the server).
+        // Do not silently start a second request: tell the customer to check
+        // their requests first. The key is released so a deliberate new
+        // submission remains possible afterwards.
         localStorage.removeItem(ownedSubmissionKey)
+        const conflictMessage = isArabic
+          ? 'يبدو أن طلباً سابقاً بهذه البيانات قد أُرسل بالفعل. راجع «طلباتي» قبل الإرسال مرة أخرى حتى لا يتكرر الطلب.'
+          : 'An earlier attempt appears to have already submitted this request. Check “My requests” before sending again so it is not duplicated.'
+        setError('root.server', { type: 'server', message: conflictMessage })
+        toast(conflictMessage, 'error')
+        return
       }
       applyServerFieldErrors({
         error: submitError,

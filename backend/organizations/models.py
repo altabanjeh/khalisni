@@ -148,6 +148,17 @@ class OrganizationMembership(SoftDeleteModel):
     def id(self):
         return self.pk
 
+    def save(self, *args, **kwargs):
+        # Platform roles carry platform-wide authority. They may exist only on
+        # the platform organization, whichever code path writes the row.
+        if (
+            self.role in {self.MembershipRole.PLATFORM_SUPER_ADMIN, self.MembershipRole.PLATFORM_SUPPORT}
+            and self.organization_id
+            and self.organization.organization_type != Organization.OrganizationType.PLATFORM
+        ):
+            raise ValidationError({"role": "Platform roles are allowed only on the platform organization."})
+        super().save(*args, **kwargs)
+
     def clean(self):
         errors = {}
         if self.branch_id:

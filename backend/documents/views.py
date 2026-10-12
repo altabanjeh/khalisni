@@ -6,6 +6,7 @@ from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
@@ -19,7 +20,7 @@ from documents.serializers import (
     DocumentVerificationSerializer,
     StaffDocumentSerializer,
 )
-from documents.services import can_user_download_document, verify_document
+from documents.services import can_user_download_document, is_customer_visible_document, verify_document
 from orders.selectors import get_reviewable_orders_for_user
 
 _DOWNLOAD_TOKEN_MAX_AGE = 1800  # 30 minutes
@@ -61,10 +62,21 @@ class DocumentDownloadTokenAPIView(APIView):
 
 
 class DocumentDownloadAPIView(RetrieveAPIView):
-    queryset = Document.objects.select_related("order", "order__customer", "order__assigned_provider__user", "order__service")
+    queryset = Document.objects.select_related(
+        "order", "order__customer", "order__assigned_provider__user", "order__service"
+    ).filter(is_deleted=False)
     serializer_class = DocumentSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = "pk"
+
+    def get_throttles(self):
+        # The anonymous order-number + phone gate is a guessable secret; give it
+        # the same strict budget as public tracking. Signed-in users keep the
+        # normal user rate.
+        if not getattr(self.request.user, "is_authenticated", False) and not self.request.query_params.get("token"):
+            self.throttle_scope = "order_tracking"
+            return [ScopedRateThrottle()]
+        return super().get_throttles()
 
     def retrieve(self, request, *args, **kwargs):
         # Authenticated users: permission-checked access.
@@ -86,9 +98,16 @@ class DocumentDownloadAPIView(RetrieveAPIView):
 
         # Legacy order_number + phone gate for public final-document tracking.
         order = document.order
-        order_number = request.query_params.get("order_number")
-        phone = request.query_params.get("phone")
-        if order_number == order.order_number and phone == order.customer.phone and document.is_final_document:
+        order_number = (request.query_params.get("order_number") or "").strip()
+        phone = (request.query_params.get("phone") or "").strip()
+        if (
+            order_number
+            and phone
+            and order_number == order.order_number
+            and phone == (order.customer.phone or "").strip()
+            and document.is_final_document
+            and is_customer_visible_document(document)
+        ):
             return FileResponse(document.file.open("rb"), as_attachment=True, filename=document.original_filename)
         raise Http404
 

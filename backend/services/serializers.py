@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import Q
 from rest_framework import serializers
 
 from core.image_utils import optimize_image_upload
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from public_site.validators import PublicSiteImageValidator
 from providers.models import ProviderProfile
 from services.models import (
@@ -100,7 +101,7 @@ def _clear_file_field(instance, field_name):
     setattr(instance, field_name, None)
 
 
-class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
+class ServiceCategorySerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     name = serializers.CharField(source="name_ar", read_only=True)
     description = serializers.CharField(source="description_ar", read_only=True)
     parent_name = serializers.CharField(source="parent.name_ar", read_only=True)
@@ -152,7 +153,7 @@ class ServiceCategorySerializer(PkAsIdMixin, serializers.ModelSerializer):
         return _media_url(self.context.get("request"), obj.image, version=getattr(obj, "updated_at", None))
 
 
-class AdminCategoryRuleSerializer(serializers.ModelSerializer):
+class AdminCategoryRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     slug = serializers.CharField(required=False, allow_blank=True)
     name = serializers.CharField(source="name_ar", read_only=True)
     description = serializers.CharField(source="description_ar", read_only=True)
@@ -269,7 +270,7 @@ class AdminCategoryRuleSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class RelatedServiceSerializer(serializers.ModelSerializer):
+class RelatedServiceSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     image = serializers.ImageField(read_only=True)
     image_url = serializers.SerializerMethodField()
     # Defect D2: related services are rendered on the public (AllowAny) service
@@ -296,13 +297,13 @@ class RelatedServiceSerializer(serializers.ModelSerializer):
         return obj.delivery_time_payload()
 
 
-class ServiceRelationServiceSerializer(serializers.ModelSerializer):
+class ServiceRelationServiceSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = ("id", "name_ar", "name_en", "slug")
 
 
-class ServiceRelationAdminSerializer(serializers.ModelSerializer):
+class ServiceRelationAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     source_service = ServiceRelationServiceSerializer(read_only=True)
     target_service = ServiceRelationServiceSerializer(read_only=True)
     source_service_id = serializers.PrimaryKeyRelatedField(
@@ -370,7 +371,7 @@ class ServiceRelationAdminSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class CustomerServiceRelationSerializer(serializers.ModelSerializer):
+class CustomerServiceRelationSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     source_service = ServiceRelationServiceSerializer(read_only=True)
     target_service = ServiceRelationServiceSerializer(read_only=True)
     relation_type_label = serializers.CharField(source="get_relation_type_display", read_only=True)
@@ -404,7 +405,7 @@ class CustomerServiceRelationSerializer(serializers.ModelSerializer):
         return "completed" if self.get_is_completed(obj) else "missing"
 
 
-class ServiceListSerializer(serializers.ModelSerializer):
+class ServiceListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     category = ServiceCategorySerializer(read_only=True)
     organization_id = serializers.IntegerField(read_only=True)
     scope = serializers.CharField(read_only=True)
@@ -477,7 +478,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
         return _media_url(self.context.get("request"), obj.image, version=getattr(obj, "updated_at", None))
 
 
-class AdminServiceRuleSerializer(serializers.ModelSerializer):
+class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     slug = serializers.CharField(required=False, allow_blank=True)
     category = ServiceCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(source="category", queryset=ServiceCategory.objects.all(), write_only=True)
@@ -506,6 +507,36 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
         from organizations.models import Organization
 
         self.fields["organization_id"].queryset = Organization.objects.filter(is_active=True)
+
+    def validate_required_information_schema(self, value):
+        """
+        The request form is rendered from this schema. Reject shapes that would
+        silently drop or merge fields on the customer form.
+        """
+        if value in (None, ""):
+            return []
+        if not isinstance(value, list):
+            raise serializers.ValidationError("The form schema must be a list of fields.")
+        seen = set()
+        for index, field in enumerate(value, start=1):
+            if not isinstance(field, dict):
+                raise serializers.ValidationError(f"Field {index} must be an object.")
+            key = next((field.get(name) for name in ("name", "key", "field", "id") if field.get(name)), None)
+            if not isinstance(key, (str, int)) or not str(key).strip():
+                raise serializers.ValidationError(f"Field {index} needs a key.")
+            key = str(key).strip().lower()
+            if key in seen:
+                raise serializers.ValidationError(f"Field key '{key}' is used more than once.")
+            seen.add(key)
+            field_type = field.get("type", field.get("field_type", field.get("input_type")))
+            if field_type is not None and not isinstance(field_type, str):
+                raise serializers.ValidationError(f"Field {index} has an invalid type.")
+            options = field.get("options", field.get("choices", field.get("values")))
+            if options is not None and not isinstance(options, list):
+                raise serializers.ValidationError(f"Field {index} options must be a list.")
+            if not any(str(field.get(name) or "").strip() for name in ("label_ar", "label_en", "label")):
+                raise serializers.ValidationError(f"Field {index} needs a label.")
+        return value
 
     class Meta:
         model = Service
@@ -651,7 +682,7 @@ class AdminServiceRuleSerializer(serializers.ModelSerializer):
                 link.soft_delete(reason="Removed from service requirement selection")
 
 
-class RequiredDocumentDefinitionSerializer(serializers.ModelSerializer):
+class RequiredDocumentDefinitionSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = RequiredDocumentDefinition
         fields = (
@@ -675,7 +706,7 @@ class AdminRequiredDocumentDefinitionSerializer(RequiredDocumentDefinitionSerial
         fields = RequiredDocumentDefinitionSerializer.Meta.fields
 
 
-class ServiceRequiredDocumentSerializer(serializers.ModelSerializer):
+class ServiceRequiredDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     code = serializers.CharField(source="document_type", read_only=True)
     definition_id = serializers.IntegerField(source="document_definition_id", read_only=True)
 
@@ -707,7 +738,7 @@ class ServiceRequiredDocumentSerializer(serializers.ModelSerializer):
         )
 
 
-class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
+class AdminRequiredDocumentRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     document_definition = RequiredDocumentDefinitionSerializer(read_only=True)
     service_name = serializers.CharField(source="service.name_ar", read_only=True)
     service_id = serializers.PrimaryKeyRelatedField(source="service", queryset=Service.objects.all())
@@ -805,13 +836,13 @@ class AdminRequiredDocumentRuleSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ServiceProviderAssignmentSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class ServiceProviderAssignmentSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = ServiceProviderAssignment
         fields = "__all__"
 
 
-class AdminServiceProviderAssignmentSerializer(serializers.ModelSerializer):
+class AdminServiceProviderAssignmentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     service_name = serializers.CharField(source="service.name_ar", read_only=True)
     provider_name = serializers.CharField(source="provider.user.full_name", read_only=True)
     provider_city = serializers.CharField(source="provider.city", read_only=True)
@@ -835,7 +866,7 @@ class AdminServiceProviderAssignmentSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_at",)
 
 
-class AddressAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class AddressAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = "__all__"
@@ -889,7 +920,10 @@ class ServiceDetailSerializer(ServiceListSerializer):
         ]
 
     def get_related_services(self, obj):
-        related = obj.category.services.filter(is_active=True, is_deleted=False, show_on_public_site=True).exclude(pk=obj.pk)[:4]
+        # Same visibility as the catalog: another partner's private services are not "related".
+        related = obj.category.services.filter(is_active=True, is_deleted=False, show_on_public_site=True).filter(
+            Q(scope=Service.Scope.GLOBAL) | Q(organization_id=obj.organization_id, organization__isnull=False)
+        ).exclude(pk=obj.pk)[:4]
         return RelatedServiceSerializer(related, many=True).data
 
     def get_required_documents(self, obj):

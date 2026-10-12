@@ -3,6 +3,7 @@ import { api } from '../api/services'
 import { buildQuery } from '../api/client'
 import { useLanguage } from '../context/LanguageContext'
 import StatusBadge from './StatusBadge'
+import { findRequiredDocument, getRequiredDocumentLabel } from '../utils/serviceForms'
 
 function triggerBlobDownload(blob, filename) {
   const url = URL.createObjectURL(blob)
@@ -15,8 +16,17 @@ function triggerBlobDownload(blob, filename) {
   URL.revokeObjectURL(url)
 }
 
-function DocumentList({ documents = [], orderNumber, phone, variant = 'default' }) {
-  const { isArabic } = useLanguage()
+function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [], staff = false }) {
+  const { isArabic, language } = useLanguage()
+
+  // Customers see the configured document name, never the internal type code.
+  function documentLabel(document) {
+    if (document.is_final_document) return isArabic ? 'النتيجة النهائية' : 'Final result'
+    const requirement = findRequiredDocument(requiredDocuments, document.document_type)
+    if (requirement) return getRequiredDocumentLabel(requirement, language)
+    if (staff) return document.document_type
+    return isArabic ? 'مستند مرفوع' : 'Uploaded document'
+  }
   const [downloading, setDownloading] = useState({})
   const isPublic = variant === 'public'
 
@@ -59,7 +69,7 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default' 
           >
             <div className="min-w-0 flex-1">
               <p className={isPublic ? 'font-semibold text-ink' : 'font-semibold text-ink'}>{document.original_filename}</p>
-              <p className={isPublic ? 'mt-1 text-xs text-slate-500' : 'mt-1 text-xs text-slate-500'}>{document.document_type}</p>
+              <p className={isPublic ? 'mt-1 text-xs text-slate-500' : 'mt-1 text-xs text-slate-500'}>{documentLabel(document)}</p>
             </div>
             <div className="flex items-center gap-3">
               {document.status ? <StatusBadge status={document.status} /> : null}

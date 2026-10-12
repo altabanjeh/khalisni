@@ -5,6 +5,7 @@ import StatusBadge from '../../components/StatusBadge'
 import { EmptyState } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
+import { getDisplayError } from '../../api/client'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
@@ -14,10 +15,18 @@ const ACTIVE = new Set(['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITIN
 
 function ProviderDashboardHome() {
   const { language, isArabic } = useLanguage()
-  const { data, loading } = useAsyncData(() => api.getProviderDashboard(), [], null)
+  const { data, loading, error } = useAsyncData(() => api.getProviderDashboard(), [], null)
   const { data: orders = [] } = useAsyncData(() => api.getProviderOrders(), [], [])
 
-  if (loading || !data) return <LoadingSpinner />
+  if (loading) return <LoadingSpinner />
+  if (error || !data) {
+    return (
+      <EmptyState
+        description={error ? getDisplayError(error) : (isArabic ? 'تعذر تحميل لوحة المزوّد.' : 'The provider dashboard could not be loaded.')}
+        title={isArabic ? 'تعذر تحميل البيانات' : 'Could not load data'}
+      />
+    )
+  }
 
   const list = Array.isArray(orders) ? orders : []
   const attention = list.filter((o) => ATTENTION.has(String(o.status).toUpperCase()))

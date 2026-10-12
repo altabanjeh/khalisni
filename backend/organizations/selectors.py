@@ -37,6 +37,23 @@ def active_memberships_for_user(user):
     ).filter(Q(branch__isnull=True) | Q(branch__is_deleted=False))
 
 
+def platform_memberships_for_user(user, roles):
+    """Platform-role memberships count only on the platform organization itself."""
+    return active_memberships_for_user(user).filter(
+        role__in=roles,
+        organization__organization_type=Organization.OrganizationType.PLATFORM,
+    )
+
+
+def can_administer_organization(user, organization):
+    """True when the user may manage members and settings of this organization."""
+    if organization is None:
+        return False
+    if is_platform_super_admin(user):
+        return True
+    return active_memberships_for_user(user).filter(organization=organization, role__in=PARTNER_ADMIN_ROLES).exists()
+
+
 def membership_roles_for_user(user):
     return set(active_memberships_for_user(user).values_list("role", flat=True))
 
@@ -53,7 +70,7 @@ def has_scoped_memberships(user):
     memberships = active_memberships_for_user(user)
     if not memberships.exists():
         return False
-    return not memberships.filter(role__in=PLATFORM_STAFF_ROLES).exists()
+    return not platform_memberships_for_user(user, PLATFORM_STAFF_ROLES).exists()
 
 
 def is_platform_super_admin(user):
@@ -63,7 +80,7 @@ def is_platform_super_admin(user):
         return True
     if (getattr(user, "role", "") or "").lower() == "admin":
         return True
-    return active_memberships_for_user(user).filter(role__in=PLATFORM_ADMIN_ROLES).exists()
+    return platform_memberships_for_user(user, PLATFORM_ADMIN_ROLES).exists()
 
 
 def is_platform_support(user):
@@ -74,7 +91,7 @@ def is_platform_support(user):
     legacy_role = (getattr(user, "role", "") or "").lower()
     if legacy_role == "support":
         return True
-    return active_memberships_for_user(user).filter(role__in=PLATFORM_STAFF_ROLES).exists()
+    return platform_memberships_for_user(user, PLATFORM_STAFF_ROLES).exists()
 
 
 def is_partner_user(user):

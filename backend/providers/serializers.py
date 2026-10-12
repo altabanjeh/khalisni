@@ -1,11 +1,15 @@
 from rest_framework import serializers
 
+from organizations.selectors import is_platform_super_admin
+
+from core.serializer_mixins import SoftDeleteFieldsReadOnlyMixin
+
 from accounts.models import CustomUser
 from providers.models import ProviderProfile
 from services.models import ServiceCategory
 
 
-class ProviderProfileSerializer(serializers.ModelSerializer):
+class ProviderProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     phone = serializers.CharField(source="user.phone", read_only=True)
@@ -28,7 +32,7 @@ class ProviderProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class ProviderAdminListSerializer(serializers.ModelSerializer):
+class ProviderAdminListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     phone = serializers.CharField(source="user.phone", read_only=True)
@@ -76,7 +80,7 @@ class ProviderAdminListSerializer(serializers.ModelSerializer):
         return "No categories linked yet"
 
 
-class ProviderAdminSerializer(serializers.ModelSerializer):
+class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name")
     email = serializers.EmailField(source="user.email")
     phone = serializers.CharField(source="user.phone")
@@ -145,6 +149,25 @@ class ProviderAdminSerializer(serializers.ModelSerializer):
         profile.service_categories.set(categories)
         return profile
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        actor = getattr(self.context.get("request"), "user", None)
+        if self.instance is not None and not is_platform_super_admin(actor):
+            # Providers are shared across organizations. Their login identity
+            # and approval are decided by the platform, not by one tenant.
+            blocked = [
+                name for name, present in (
+                    ("password", "password" in attrs),
+                    ("email", "email" in attrs.get("user", {})),
+                    ("is_approved", "is_approved" in attrs),
+                ) if present
+            ]
+            if blocked:
+                raise serializers.ValidationError(
+                    {name: "Only a platform super admin can change this field." for name in blocked}
+                )
+        return attrs
+
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", {})
         categories = validated_data.pop("service_categories", None)
@@ -155,6 +178,8 @@ class ProviderAdminSerializer(serializers.ModelSerializer):
             setattr(instance.user, attr, value)
         if password:
             instance.user.set_password(password)
+            # A replaced password ends every session opened with the old one.
+            instance.user.token_version = (instance.user.token_version or 1) + 1
         instance.user.save()
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

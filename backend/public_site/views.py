@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
-from config.permissions import IsAdminRole, IsInternalStaffRole
+from config.permissions import IsAdminRole, IsInternalStaffRole, PlatformRecordWriteMixin
 from core.delete_guard import AdminDeleteGuardMixin
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT, DEFAULT_SITE_THEME
 from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
@@ -16,6 +16,7 @@ from public_site.selectors import (
     get_active_theme,
     get_current_important_alert,
     get_current_public_advertisements,
+    get_latest_public_page_content,
 )
 from public_site.serializers import (
     AdvertisementAdminSerializer,
@@ -52,14 +53,23 @@ def get_or_create_active_theme():
     return SiteTheme.objects.create(**DEFAULT_SITE_THEME)
 
 
-def get_or_create_active_content():
+def get_published_content():
+    """
+    Content for the public site. Reading never changes publish state: when the
+    administrator has unpublished the homepage, visitors get the built-in
+    defaults, not the unpublished version.
+    """
     content = get_active_public_page_content()
     if content:
-        if not content.active_content:
-            content.active_content = True
-            content.save(update_fields=["active_content", "updated_at"])
         return content
-    return PublicPageContent.objects.create(**DEFAULT_PUBLIC_PAGE_CONTENT)
+    if not PublicPageContent.objects.exists():
+        return PublicPageContent.objects.create(**DEFAULT_PUBLIC_PAGE_CONTENT)
+    return PublicPageContent(**{**DEFAULT_PUBLIC_PAGE_CONTENT, "active_content": False})
+
+
+def get_or_create_editable_content():
+    """Content for the admin editor: the published version, else the newest draft."""
+    return get_latest_public_page_content() or PublicPageContent.objects.create(**DEFAULT_PUBLIC_PAGE_CONTENT)
 
 
 class PublicHomepageAPIView(APIView):
@@ -67,7 +77,7 @@ class PublicHomepageAPIView(APIView):
 
     def get(self, request):
         payload = {
-            "content": get_or_create_active_content(),
+            "content": get_published_content(),
             "advertisements": list(get_current_public_advertisements()),
             "important_alert": get_current_important_alert(),
         }
@@ -214,11 +224,11 @@ class AdminPublicPageContentAPIView(AdminSingletonMixin, APIView):
     )
 
     def get(self, request):
-        serializer = self.serializer_class(get_or_create_active_content(), context=self.get_serializer_context())
+        serializer = self.serializer_class(get_or_create_editable_content(), context=self.get_serializer_context())
         return Response(serializer.data)
 
     def put(self, request):
-        instance = get_or_create_active_content()
+        instance = get_or_create_editable_content()
         old_value = _snapshot(instance, self.audit_fields)
         serializer = self.serializer_class(instance, data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
@@ -341,7 +351,7 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = Advertisement.objects.get(pk=pk)
+        instance = self.get_restore_instance(Advertisement, pk)
         old_value = _snapshot(instance, ("title_ar", "advertisement_type", "display_order", "start_date", "end_date", "is_active", "is_deleted"))
         instance.restore()
         create_audit_log(
@@ -357,7 +367,9 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         return Response(self.get_serializer(instance).data)
 
 
-class MissingServiceRequestViewSet(viewsets.ModelViewSet):
+class MissingServiceRequestViewSet(PlatformRecordWriteMixin, viewsets.ModelViewSet):
+    # Requester contact details from the public site: platform team only.
+    platform_only_reads = True
     serializer_class = MissingServiceRequestAdminSerializer
     queryset = MissingServiceRequest.objects.select_related("assigned_to", "matched_service", "created_by_user")
     permission_classes = [permissions.IsAuthenticated, IsInternalStaffRole]

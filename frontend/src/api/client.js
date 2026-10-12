@@ -49,11 +49,17 @@ export function clearStoredAuth({ notify = true } = {}) {
 }
 
 export function getStoredAuthMode() {
+  // A tab that signed in for this session keeps its own session, even if
+  // another tab later stores a remembered login for a different account.
+  if (hasStoredAuth(sessionStorage)) {
+    return AUTH_STORAGE_MODE_SESSION
+  }
+
   if (hasStoredAuth(localStorage) || getStorageModeValue(localStorage) === AUTH_STORAGE_MODE_LOCAL) {
     return AUTH_STORAGE_MODE_LOCAL
   }
 
-  if (hasStoredAuth(sessionStorage) || getStorageModeValue(sessionStorage) === AUTH_STORAGE_MODE_SESSION) {
+  if (getStorageModeValue(sessionStorage) === AUTH_STORAGE_MODE_SESSION) {
     return AUTH_STORAGE_MODE_SESSION
   }
 
@@ -264,6 +270,17 @@ export function getDisplayError(error) {
     return error.response.data.detail
   }
   return error.message || 'تعذر إتمام الطلب.'
+}
+
+// True when an action was refused because the record is no longer in the
+// state the screen shows (changed in another tab or by another user), so the
+// screen should refetch. Field validation errors are not stale-state errors.
+export function isStaleActionError(error) {
+  const status = error?.response?.status
+  if (status === 403 || status === 404 || status === 409) return true
+  if (status !== 400) return false
+  const data = error?.response?.data
+  return Boolean(data && typeof data === 'object' && (data.detail || data.status))
 }
 
 function createClientActionError(message) {

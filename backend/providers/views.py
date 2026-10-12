@@ -169,7 +169,7 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])
     def restore(self, request, pk=None):
-        provider = ProviderProfile.objects.select_related("user").get(pk=pk)
+        provider = generics.get_object_or_404(ProviderProfile.objects.select_related("user"), pk=pk)
         old_value = {
             "is_available": provider.is_available,
             "user_is_active": provider.user.is_active,
@@ -269,7 +269,14 @@ def provider_orders_queryset(user):
         .prefetch_related("documents", "status_logs", "notes__user")
     )
     return enforce_organization_scope(
-        queryset.filter(Q(assigned_provider__user=user) | Q(assigned_provider_organization__memberships__user=user)),
+        queryset.filter(
+            Q(assigned_provider__user=user)
+            | Q(
+                assigned_provider_organization__memberships__user=user,
+                assigned_provider_organization__memberships__is_active=True,
+                assigned_provider_organization__memberships__is_deleted=False,
+            )
+        ),
         user=user,
         organization_field="organization",
     ).distinct()
@@ -339,12 +346,15 @@ class ProviderOrderNoteAPIView(APIView):
 
     def post(self, request, pk):
         order = generics.get_object_or_404(provider_orders_queryset(request.user), pk=pk)
-        note = provider_add_internal_note(
-            order=order,
-            actor=request.user,
-            note_text=request.data.get("note", ""),
-            request=request,
-        )
+        try:
+            note = provider_add_internal_note(
+                order=order,
+                actor=request.user,
+                note_text=request.data.get("note", ""),
+                request=request,
+            )
+        except DjangoValidationError as exc:
+            _raise_drf_validation_error(exc)
         return response.Response({"id": note.pk}, status=status.HTTP_201_CREATED)
 
 

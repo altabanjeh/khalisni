@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from orders.models import Order
 from orders.selectors import get_orders_for_user
 from payment.models import Payment
 
 
-class PaymentSerializer(serializers.ModelSerializer):
+class PaymentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     order_number = serializers.CharField(source="order.order_number", read_only=True)
     customer_name = serializers.CharField(source="order.customer.full_name", read_only=True)
     organization_name = serializers.CharField(source="organization.name", read_only=True)
@@ -39,7 +39,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         read_only_fields = ("payment_number", "status", "paid_at", "refunded_at", "created_at", "updated_at")
 
 
-class AdminPaymentRuleListSerializer(serializers.ModelSerializer):
+class AdminPaymentRuleListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     order_number = serializers.CharField(source="order.order_number", read_only=True)
     customer_name = serializers.CharField(source="order.customer.full_name", read_only=True)
     organization_name = serializers.CharField(source="organization.name", read_only=True)
@@ -72,7 +72,7 @@ class AdminPaymentRuleListSerializer(serializers.ModelSerializer):
         )
 
 
-class CustomerPaymentCreateSerializer(serializers.ModelSerializer):
+class CustomerPaymentCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
 
     def __init__(self, *args, **kwargs):
@@ -94,9 +94,21 @@ class CustomerPaymentCreateSerializer(serializers.ModelSerializer):
             "reference_number",
             "notes",
         )
+        # Gateway details are written by the platform, never by the payer.
+        read_only_fields = ("gateway_name", "gateway_payment_url")
+
+    def validate_payment_type(self, value):
+        if value == Payment.PaymentType.REFUND:
+            raise serializers.ValidationError("Refunds are recorded by the operations team.")
+        return value
+
+    def validate_amount(self, value):
+        if value is None or value <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return value
 
 
-class AdminPaymentCreateSerializer(serializers.ModelSerializer):
+class AdminPaymentCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
 
     def __init__(self, *args, **kwargs):
@@ -117,7 +129,7 @@ class AdminPaymentStatusSerializer(serializers.Serializer):
     reference_number = serializers.CharField(required=False, allow_blank=True)
 
 
-class AdminPaymentSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class AdminPaymentSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"

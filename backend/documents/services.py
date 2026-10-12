@@ -4,6 +4,7 @@ from django.db import transaction
 from audit.utils import create_audit_log
 from notifications.services import send_notification_event
 from documents.models import Document
+from orders.locking import locked_order_action
 from orders.models import Order
 
 
@@ -41,11 +42,9 @@ def create_order_document(
     """
     requirement = None
     if order and getattr(order, "service_id", None):
-        requirement = order.service.document_requirements.filter(
-            document_type=document_type,
-            is_active=True,
-            is_deleted=False,
-        ).first()
+        from orders.readiness import order_requirement
+
+        requirement = order_requirement(order, document_type)
 
     initial_status = Document.DocumentStatus.UPLOADED
     initial_note = verification_note
@@ -89,6 +88,26 @@ def _clear_missing_document_type_if_resolved(*, document, actor, request=None):
         )
 
 
+def _document_order(kwargs):
+    return kwargs["document"].order
+
+
+def is_customer_visible_document(document):
+    """
+    A final result is customer material only once the order is completed and
+    the file was not rejected. Before that it is work in progress under review.
+    """
+    if not document.is_final_document:
+        return True
+    order = document.order
+    return (
+        document.status != Document.DocumentStatus.REJECTED
+        and order.completed_at is not None
+        and order.status in {Order.Status.COMPLETED, Order.Status.ARCHIVED}
+    )
+
+
+@locked_order_action(_document_order)
 def verify_document(*, document, actor, is_verified, note="", request=None):
     """
     Approve or reject a document after staff review.
@@ -97,6 +116,11 @@ def verify_document(*, document, actor, is_verified, note="", request=None):
     provider will use to correct the submission.
     """
     clean_note = (note or "").strip()
+    document.refresh_from_db()
+    if document.is_deleted:
+        raise ValidationError({"detail": "This document is no longer available."})
+    if document.order.is_final_state:
+        raise ValidationError({"detail": "Documents of a closed order cannot be reviewed."})
     with transaction.atomic():
         old_document_status = document.status
         if is_verified:
@@ -185,7 +209,7 @@ def can_user_download_document(*, user, document):
         return True
 
     if role == "customer":
-        return order.customer_id == user.id
+        return order.customer_id == user.id and is_customer_visible_document(document)
 
     if role == "provider":
         if not order.assigned_provider or order.assigned_provider.user_id != user.id:
@@ -196,11 +220,9 @@ def can_user_download_document(*, user, document):
         if document.is_final_document:
             return True
 
-        requirement = order.service.document_requirements.filter(
-            document_type=document.document_type,
-            is_active=True,
-            is_deleted=False,
-        ).first()
+        from orders.readiness import order_requirement
+
+        requirement = order_requirement(order, document.document_type)
         return bool(requirement and requirement.provider_can_view_file)
 
     return False

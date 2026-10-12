@@ -2,7 +2,7 @@ import re
 
 from rest_framework import serializers
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from notifications.event_map import ALLOWED_TEMPLATE_PLACEHOLDERS
 from notifications.models import Notification, NotificationTemplate
 
@@ -21,7 +21,7 @@ def _validate_safe_template_text(value):
     return text
 
 
-class NotificationSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class NotificationSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     message = serializers.SerializerMethodField()
     order_id = serializers.IntegerField(read_only=True)
@@ -61,13 +61,13 @@ class ManualNotificationSerializer(serializers.Serializer):
         return value
 
 
-class NotificationAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class NotificationAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = "__all__"
 
 
-class NotificationTemplateSerializer(serializers.ModelSerializer):
+class NotificationTemplateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     available_placeholders = serializers.SerializerMethodField()
 
     class Meta:
@@ -106,7 +106,7 @@ class NotificationTemplateSerializer(serializers.ModelSerializer):
         return _validate_safe_template_text(value)
 
 
-class EmployeeNotificationTemplateSerializer(serializers.ModelSerializer):
+class EmployeeNotificationTemplateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = NotificationTemplate
         fields = ("template_id", "key", "channel", "title_ar", "message_ar")

@@ -1,7 +1,8 @@
 import os
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
 
 from accounts.models import CustomUser
@@ -90,6 +91,11 @@ class Command(BaseCommand):
             "--include-demo-orders",
             action="store_true",
             help="Create demo orders. Implies --include-demo-users.",
+        )
+        parser.add_argument(
+            "--allow-non-debug",
+            action="store_true",
+            help="Explicitly allow demo users/orders on a non-DEBUG deployment (never use on production).",
         )
         parser.add_argument(
             "--reset-demo-passwords",
@@ -448,6 +454,13 @@ class Command(BaseCommand):
         include_demo_orders = bool(options["include_demo_orders"])
         include_demo_users = bool(options["include_demo_users"] or include_demo_orders)
         reset_demo_passwords = bool(options["reset_demo_passwords"])
+        if include_demo_users and not settings.DEBUG and not options.get("allow_non_debug"):
+            # Demo accounts use published default passwords and include a
+            # superuser. They must never appear on a live system by accident.
+            raise CommandError(
+                "Demo users and orders are refused when DJANGO_DEBUG is False. "
+                "Catalog-only seeding works without these flags; pass --allow-non-debug only on a disposable demo site."
+            )
 
         self._seed_catalog()
         seed_actor = self._get_seed_actor()

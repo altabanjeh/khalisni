@@ -180,6 +180,12 @@ class Order(models.Model):
         help_text="Requested customer uploads still required to move the order forward.",
     )
 
+    requirements_snapshot = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Document requirements frozen at order creation. Null on orders created before the snapshot existed.",
+    )
+
     internal_notes = models.TextField(
         blank=True,
         help_text="Private notes visible only to internal staff.",
@@ -393,6 +399,11 @@ class Order(models.Model):
         if self.assigned_provider_id and not self.assigned_provider_organization_id and self.assigned_provider.organization_id:
             self.assigned_provider_organization = self.assigned_provider.organization
 
+        if creating and self.service_id and self.requirements_snapshot is None:
+            from orders.readiness import snapshot_service_requirements
+
+            self.requirements_snapshot = snapshot_service_requirements(self.service)
+
         if self.service_id:
             if creating:
                 self.expected_delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
@@ -551,6 +562,9 @@ class Order(models.Model):
         old_status = self.status
 
         self.assigned_provider = provider
+        # Access follows the current assignment: never keep the previous
+        # provider's organization on the order.
+        self.assigned_provider_organization = provider.organization if provider.organization_id else None
         self.assigned_by = assigned_by
         self.status = self.Status.ASSIGNED
 

@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 from audit.models import AuditLog
 from documents.models import Document
 from organizations.models import Organization, OrganizationMembership
+from orders.readiness import snapshot_service_requirements
 from orders.models import Order
 from providers.models import ProviderProfile
 from services.models import Service, ServiceCategory, ServiceProviderAssignment, ServiceRequiredDocument
@@ -110,6 +111,10 @@ class ProviderPermissionsTests(APITestCase):
             display_order=1,
             provider_can_view_file=True,
         )
+        # The order was created before this rule existed; requirements are
+        # frozen at creation, so freeze the configured rule onto it.
+        self.visible_order.requirements_snapshot = snapshot_service_requirements(self.visible_order.service)
+        self.visible_order.save(update_fields=["requirements_snapshot"])
         self.visible_order.customer_notes = "Customer-facing work summary"
         self.visible_order.internal_notes = "Internal operations note"
         self.visible_order.save(update_fields=["customer_notes", "internal_notes", "updated_at"])

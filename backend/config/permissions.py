@@ -376,3 +376,22 @@ class CanManageHelpGuides(HasDjangoPermission):
         if is_platform_super_admin(request.user):
             return True
         return super().has_permission(request, view)
+
+
+class PlatformRecordWriteMixin:
+    """
+    View mixin for records that belong to the platform, not to one organization
+    (document registry, document rules, provider links, categories).
+
+    Users whose access is scoped to an organization may read these where the
+    view allows it, but cannot change them: a change would reach every tenant.
+    """
+
+    platform_only_reads = False
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        from organizations.selectors import has_scoped_memberships
+
+        if (self.platform_only_reads or request.method not in SAFE_METHODS) and has_scoped_memberships(request.user):
+            self.permission_denied(request, message="This record is managed by the platform team.")

@@ -10,10 +10,10 @@ from rest_framework.views import APIView
 
 from config.permissions import CanViewReportsDashboard, CanViewScopedReports
 from documents.models import Document
-from organizations.selectors import is_platform_super_admin, is_platform_support
+from organizations.selectors import is_provider_user, is_platform_super_admin, is_platform_support
 from orders.models import Order, OrderStatusLog
 from orders.selectors import get_orders_for_user, get_reviewable_orders_for_user
-from orders.serializers import OrderListSerializer
+from orders.serializers import OrderListSerializer, ProviderOrderListSerializer
 from payment.models import Payment
 
 
@@ -24,7 +24,10 @@ def _active_orders(queryset):
 
 
 def _employee_order_payload(queryset, request, *, limit=5):
-    return OrderListSerializer(queryset[:limit], many=True, context={"request": request}).data
+    # Providers get the provider projection of an order (no customer identity,
+    # no price), the same one their own order endpoints use.
+    serializer_class = ProviderOrderListSerializer if is_provider_user(getattr(request, "user", None)) else OrderListSerializer
+    return serializer_class(queryset[:limit], many=True, context={"request": request}).data
 
 
 def _final_order_states():
@@ -481,4 +484,10 @@ class OperationalSummaryReportAPIView(APIView):
             "service_volume": _service_volume(orders),
             "payment_summary": _payment_summary(orders),
         }
+        if is_provider_user(request.user):
+            # SRS: providers cannot access finance figures.
+            data.pop("payment_summary")
+            for key in ("orders_by_category", "orders_by_organization", "orders_by_branch"):
+                for row in data[key]:
+                    row.pop("revenue", None)
         return response.Response(data)

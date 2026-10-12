@@ -216,7 +216,7 @@ class NotificationTemplateAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelView
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        template = NotificationTemplate.objects.get(pk=pk)
+        template = self.get_restore_instance(NotificationTemplate, pk)
         old_value = {"is_active": template.is_active, "is_deleted": template.is_deleted}
         template.restore()
         create_audit_log(

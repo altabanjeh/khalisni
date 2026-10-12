@@ -4,46 +4,59 @@ import re
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 
 from accounts.models import CustomUser
 from core.choices import DocumentType
 from documents.file_validation import sniff_matches_extension
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
-from documents.services import can_user_download_document
+from documents.services import can_user_download_document, is_customer_visible_document
 from organizations.models import Branch
-from organizations.selectors import resolve_organization_by_ref
+from organizations.selectors import customer_organization_for_user, resolve_organization_by_ref
 from orders.models import Order, OrderIssue, OrderNote, OrderStatusLog, Rating
 from orders.allowed_actions import get_order_allowed_actions
+from orders.readiness import order_requirement_rows, order_requirements
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
 from services.models import Service
-from services.serializers import ServiceRequiredDocumentSerializer
 from services.selectors import visible_services_queryset
 from workflow.rules import get_transition_rule
 
 
-class ServiceBriefSerializer(serializers.ModelSerializer):
+class ServiceBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name_ar", read_only=True)
 
     class Meta:
         model = Service
         fields = ("id", "name_ar", "slug", "estimated_duration", "service_fee", "government_fee", "category_name")
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        user = getattr(self.context.get("request"), "user", None)
+        role = (getattr(user, "role", "") or "").lower()
+        if role not in {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT}:
+            # Fee components follow the service's public-visibility settings for
+            # everyone outside the operations team.
+            if not instance.show_company_fee_public:
+                data.pop("service_fee", None)
+            if not instance.show_government_fee_public:
+                data.pop("government_fee", None)
+        return data
 
-class CustomerBriefSerializer(serializers.ModelSerializer):
+
+class CustomerBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ("id", "full_name", "phone", "email", "national_id")
 
 
-class EmployeeBriefSerializer(serializers.ModelSerializer):
+class EmployeeBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ("id", "full_name", "email", "role")
 
 
-class ProviderBriefSerializer(serializers.ModelSerializer):
+class ProviderBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name", read_only=True)
 
     class Meta:
@@ -51,7 +64,7 @@ class ProviderBriefSerializer(serializers.ModelSerializer):
         fields = ("id", "full_name", "provider_type", "city", "rating", "is_available")
 
 
-class OrderStatusLogSerializer(serializers.ModelSerializer):
+class OrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     changed_by_name = serializers.CharField(source="changed_by.full_name", read_only=True)
 
     class Meta:
@@ -59,7 +72,32 @@ class OrderStatusLogSerializer(serializers.ModelSerializer):
         fields = ("id", "old_status", "new_status", "changed_by", "changed_by_name", "note", "created_at")
 
 
-class OrderNoteSerializer(serializers.ModelSerializer):
+# Transitions whose reason is written for the customer. Every other status-log
+# note is an operational remark between staff and providers.
+CUSTOMER_FACING_NOTE_STATUSES = frozenset(
+    {Order.Status.WAITING_CUSTOMER, Order.Status.REJECTED, Order.Status.CANCELLED}
+)
+
+
+class CustomerOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    """Timeline for the order owner and public tracking: no staff identity, no internal reasons."""
+
+    note = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderStatusLog
+        fields = ("id", "old_status", "new_status", "note", "created_at")
+
+    def get_note(self, obj):
+        return obj.note if obj.new_status in CUSTOMER_FACING_NOTE_STATUSES else ""
+
+
+def _is_customer_request(request):
+    user = getattr(request, "user", None)
+    return bool(getattr(user, "is_authenticated", False) and getattr(user, "role", "") == CustomUser.Role.CUSTOMER)
+
+
+class OrderNoteSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.full_name", read_only=True)
 
     class Meta:
@@ -67,13 +105,13 @@ class OrderNoteSerializer(serializers.ModelSerializer):
         fields = ("id", "user", "user_name", "note", "visibility", "created_at")
 
 
-class RatingSerializer(serializers.ModelSerializer):
+class RatingSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ("id", "score", "comment", "created_at")
 
 
-class OrderListSerializer(serializers.ModelSerializer):
+class OrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     service = ServiceBriefSerializer(read_only=True)
     customer = CustomerBriefSerializer(read_only=True)
     assigned_employee = EmployeeBriefSerializer(read_only=True)
@@ -110,7 +148,7 @@ class OrderListSerializer(serializers.ModelSerializer):
         return get_order_allowed_actions(user=user, order=obj, can_view=True)
 
 
-class OrderAdminSerializer(serializers.ModelSerializer):
+class OrderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     DANGEROUS_FIELDS = {
         "assigned_provider",
         "assigned_by",
@@ -153,7 +191,7 @@ class OrderAdminSerializer(serializers.ModelSerializer):
 class OrderDetailSerializer(OrderListSerializer):
     customer = CustomerBriefSerializer(read_only=True)
     documents = serializers.SerializerMethodField()
-    status_logs = OrderStatusLogSerializer(read_only=True, many=True)
+    status_logs = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
     required_documents = serializers.SerializerMethodField()
@@ -183,6 +221,12 @@ class OrderDetailSerializer(OrderListSerializer):
             data.pop("internal_notes", None)
         return data
 
+    def get_status_logs(self, obj):
+        request = self.context.get("request")
+        if self.context.get("public_track", False) or _is_customer_request(request):
+            return CustomerOrderStatusLogSerializer(obj.status_logs.all(), many=True).data
+        return OrderStatusLogSerializer(obj.status_logs.all(), many=True).data
+
     def get_documents(self, obj):
         request = self.context.get("request")
         public_track = self.context.get("public_track", False)
@@ -192,13 +236,12 @@ class OrderDetailSerializer(OrderListSerializer):
         user = getattr(request, "user", None)
         role = (getattr(user, "role", "") or "").lower()
         serializer_class = StaffDocumentSerializer if role in {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT} else DocumentSerializer
+        if public_track or _is_customer_request(request):
+            queryset = [document for document in queryset if is_customer_visible_document(document)]
         return serializer_class(queryset, many=True, context={"request": request}).data
 
     def get_required_documents(self, obj):
-        requirements = obj.service.document_requirements.filter(
-            is_active=True, is_deleted=False,
-        ).select_related("document_definition").order_by("display_order", "name_ar")
-        return ServiceRequiredDocumentSerializer(requirements, many=True, context=self.context).data
+        return order_requirement_rows(obj)
 
     def get_notes(self, obj):
         public_track = self.context.get("public_track", False)
@@ -217,13 +260,13 @@ class OrderDetailSerializer(OrderListSerializer):
         return RatingSerializer(rating).data
 
 
-class ProviderOrderStatusLogSerializer(serializers.ModelSerializer):
+class ProviderOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = OrderStatusLog
         fields = ("id", "old_status", "new_status", "note", "created_at")
 
 
-class ProviderOrderListSerializer(serializers.ModelSerializer):
+class ProviderOrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     service = ServiceBriefSerializer(read_only=True)
     allowed_actions = serializers.SerializerMethodField()
 
@@ -332,6 +375,18 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             visible_service_ids = visible_services_queryset(organization=organization).values_list("pk", flat=True)
             if attrs["service"].pk not in visible_service_ids:
                 raise serializers.ValidationError({"service": "This service is not available for the selected organization."})
+        else:
+            # Without an explicit organization the service must be one the
+            # customer can actually see in the catalog: published, active, in a
+            # published category. A known id is not an invitation to order.
+            request = self.context.get("request")
+            customer_organization = customer_organization_for_user(getattr(request, "user", None))
+            orderable = visible_services_queryset(organization=None).filter(pk=attrs["service"].pk).exists() or (
+                customer_organization is not None
+                and visible_services_queryset(organization=customer_organization).filter(pk=attrs["service"].pk).exists()
+            )
+            if not orderable:
+                raise serializers.ValidationError({"service": "This service is not currently available."})
         attrs["organization_obj"] = organization
 
         branch = attrs.get("branch_id")
@@ -427,8 +482,8 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(exc.messages)
 
 
-class TrackOrderSerializer(serializers.ModelSerializer):
-    timeline = OrderStatusLogSerializer(source="status_logs", many=True, read_only=True)
+class TrackOrderSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    timeline = CustomerOrderStatusLogSerializer(source="status_logs", many=True, read_only=True)
     missing_documents = serializers.SerializerMethodField()
     missing_document_details = serializers.SerializerMethodField()
     final_documents = serializers.SerializerMethodField()
@@ -448,14 +503,12 @@ class TrackOrderSerializer(serializers.ModelSerializer):
             return []
         requirements = {
             requirement.document_type: requirement
-            for requirement in obj.service.document_requirements.filter(
-                document_type__in=types, is_active=True, is_deleted=False,
-            ).select_related("document_definition")
+            for requirement in order_requirements(obj)
+            if requirement.document_type in types
         }
         def arabic_name(requirement):
-            for value in (requirement.name_ar, getattr(requirement.document_definition, "name_ar", "")):
-                if re.search(r"[\u0600-\u06ff]", value or ""):
-                    return value
+            if re.search(r"[\u0600-\u06ff]", requirement.name_ar or ""):
+                return requirement.name_ar
             return "\u0645\u0633\u062a\u0646\u062f \u0645\u0637\u0644\u0648\u0628"
 
         return [
@@ -463,9 +516,7 @@ class TrackOrderSerializer(serializers.ModelSerializer):
                 "document_type": document_type,
                 "name_ar": arabic_name(requirements[document_type]) if document_type in requirements else "\u0645\u0633\u062a\u0646\u062f \u0645\u0637\u0644\u0648\u0628",
                 "name_en": (
-                    requirements[document_type].name_en
-                    or getattr(requirements[document_type].document_definition, "name_en", "")
-                    or "Required document"
+                    requirements[document_type].name_en or "Required document"
                 ) if document_type in requirements else "Required document",
             }
             for document_type in types
@@ -473,7 +524,11 @@ class TrackOrderSerializer(serializers.ModelSerializer):
 
     def get_final_documents(self, obj):
         request = self.context.get("request")
-        docs = obj.documents.filter(is_deleted=False, is_final_document=True)
+        docs = [
+            document
+            for document in obj.documents.filter(is_deleted=False, is_final_document=True)
+            if is_customer_visible_document(document)
+        ]
         return DocumentSerializer(docs, many=True, context={"request": request}).data
 
 
@@ -482,7 +537,7 @@ class CustomerDocumentUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
 
 
-class RatingCreateSerializer(serializers.ModelSerializer):
+class RatingCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ("score", "comment")
@@ -518,25 +573,25 @@ class RequestDocumentsSerializer(serializers.Serializer):
     )
 
 
-class OrderNoteCreateSerializer(serializers.ModelSerializer):
+class OrderNoteCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = OrderNote
         fields = ("note", "visibility")
 
 
-class OrderNoteAdminSerializer(serializers.ModelSerializer):
+class OrderNoteAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = OrderNote
         fields = "__all__"
 
 
-class OrderIssueAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class OrderIssueAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = OrderIssue
         fields = "__all__"
 
 
-class RatingAdminSerializer(serializers.ModelSerializer):
+class RatingAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = "__all__"

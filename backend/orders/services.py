@@ -1,5 +1,6 @@
 ﻿from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F
 
 from accounts.models import CustomUser, CustomerProfile
 from audit.utils import create_audit_log
@@ -7,8 +8,10 @@ from documents.services import create_order_document
 from notifications.services import notify_client, send_notification_event
 from organizations.models import OrganizationMembership
 from organizations.services import resolve_order_organization
+from orders.allowed_actions import CUSTOMER_UPLOAD_STATUSES
+from orders.locking import defer_audit_log, locked_order_action
 from orders.models import MissingDocumentRequest, Order, OrderAssignmentHistory, OrderNote, OrderStatusLog, Rating
-from orders.readiness import unresolved_missing_request_types
+from orders.readiness import order_requirement, order_requirements, unresolved_missing_request_types
 from services.order_completion import create_related_service_notifications
 from services.order_validation import validate_order_prerequisites
 from workflow.rules import get_transition_rule
@@ -83,7 +86,8 @@ def _assert_required_documents_satisfied(order):
 
 
 def _audit_blocked_transition(*, request=None, actor=None, order, attempted_status, reason):
-    create_audit_log(
+    # Deferred so the refusal stays on record after the action rolls back.
+    defer_audit_log(
         request=request,
         user=actor,
         action="blocked_order_status_transition",
@@ -264,6 +268,7 @@ def create_customer_order(*, customer, data, request=None):
         return order
 
 
+@locked_order_action()
 def upload_customer_document(*, order, actor, validated_data, request=None):
     """
     Add a customer document and reopen review when the order was waiting on the
@@ -272,13 +277,18 @@ def upload_customer_document(*, order, actor, validated_data, request=None):
     if order.is_final_state:
         raise ValidationError({"detail": "Documents cannot be uploaded to a closed order."})
 
-    requirement = order.service.document_requirements.filter(
-        document_type=validated_data["document_type"],
-        is_active=True,
-        is_deleted=False,
-    ).first()
+    is_customer = getattr(actor, "role", "") == CustomUser.Role.CUSTOMER
+    requirement = order_requirement(order, validated_data["document_type"])
+    if is_customer:
+        # Customer uploads belong to intake. Once work is assigned, a new
+        # unreviewed file would silently undo the approved readiness.
+        if order.status not in CUSTOMER_UPLOAD_STATUSES:
+            raise ValidationError({"detail": "Documents can be uploaded only while the request is under review."})
+        reserved = str(validated_data["document_type"]).strip().lower() == "final_result"
+        if reserved or (requirement is None and order_requirements(order)):
+            raise ValidationError({"document_type": "This document is not part of this request."})
     if (
-        getattr(actor, "role", "") == CustomUser.Role.CUSTOMER
+        is_customer
         and requirement
         and not requirement.client_can_replace_file
         and order.documents.filter(
@@ -295,8 +305,10 @@ def upload_customer_document(*, order, actor, validated_data, request=None):
             uploaded_by=actor,
             file_obj=validated_data["file"],
             document_type=validated_data["document_type"],
-            is_final_document=validated_data.get("is_final_document", False),
-            verification_note=validated_data.get("verification_note", ""),
+            # Server-owned: only the provider/staff result endpoints create a
+            # final document, and review notes come from staff.
+            is_final_document=False if is_customer else validated_data.get("is_final_document", False),
+            verification_note="" if is_customer else validated_data.get("verification_note", ""),
         )
         if order.status == Order.Status.WAITING_CUSTOMER:
             current_missing = list(order.missing_document_types or [])
@@ -339,6 +351,7 @@ def upload_customer_document(*, order, actor, validated_data, request=None):
     return document
 
 
+@locked_order_action()
 def create_customer_rating(*, order, actor, validated_data, request=None):
     """
     Create the post-completion customer rating for an order.
@@ -353,6 +366,7 @@ def create_customer_rating(*, order, actor, validated_data, request=None):
     return rating
 
 
+@locked_order_action()
 def update_order_status(*, order, actor, new_status, note="", request=None):
     """
     Route safe generic status updates through explicit workflow actions only.
@@ -394,6 +408,7 @@ def update_order_status(*, order, actor, new_status, note="", request=None):
     raise ValidationError({"status": "No workflow action is configured for this transition."})
 
 
+@locked_order_action()
 def submit_order(*, order, actor, request=None):
     """
     Move a new order into the internal review queue.
@@ -412,6 +427,7 @@ def submit_order(*, order, actor, request=None):
     )
 
 
+@locked_order_action()
 def review_order(*, order, actor, note="Order under review", request=None):
     """
     Claim an order for internal review and store the current employee owner.
@@ -458,6 +474,7 @@ def review_order(*, order, actor, note="Order under review", request=None):
     return order
 
 
+@locked_order_action()
 def assign_provider_to_order(*, order, provider, actor, note="", request=None):
     """
     Assign a provider and trigger the provider notification.
@@ -471,9 +488,6 @@ def assign_provider_to_order(*, order, provider, actor, note="", request=None):
     old_status = order.status
     previous_provider_id = order.assigned_provider_id
     order.assign_provider(provider, assigned_by=actor, note=note)
-    if provider.organization_id and order.assigned_provider_organization_id != provider.organization_id:
-        order.assigned_provider_organization = provider.organization
-        order.save(update_fields=["assigned_provider_organization", "updated_at"])
     send_notification_event(
         event_key="provider_assigned",
         order=order,
@@ -500,6 +514,7 @@ def assign_provider(*, order, provider, actor, note="", request=None):
     return assign_provider_to_order(order=order, provider=provider, actor=actor, note=note, request=request)
 
 
+@locked_order_action()
 def request_missing_documents(*, order, actor, note_text, missing_document_types=None, request=None):
     """
     Record the customer-facing request note and move the order into the
@@ -514,23 +529,11 @@ def request_missing_documents(*, order, actor, note_text, missing_document_types
     )
     if not normalized_document_types:
         raise ValidationError({"document_types": "Select at least one configured document requirement."})
-    requirements = {
-        requirement.document_type: requirement
-        for requirement in order.service.document_requirements.filter(
-            is_active=True, is_deleted=False, document_type__in=normalized_document_types,
-        ).select_related("document_definition")
-    }
+    requirements = {requirement.document_type: requirement for requirement in order_requirements(order)}
     invalid = [
         document_type for document_type in normalized_document_types
         if document_type not in requirements
         or not (requirements[document_type].name_ar or requirements[document_type].name_en)
-        or (
-            requirements[document_type].document_definition_id
-            and (
-                not requirements[document_type].document_definition.is_active
-                or requirements[document_type].document_definition.is_deleted
-            )
-        )
     ]
     if invalid:
         raise ValidationError({"document_types": f"Unknown or inactive service document requirement: {', '.join(invalid)}."})
@@ -588,6 +591,7 @@ def request_missing_info(*, order, actor, note_text, missing_document_types=None
     )
 
 
+@locked_order_action()
 def add_order_note(*, order, actor, validated_data, request=None):
     """
     Create a note and notify the customer only when it is customer-visible.
@@ -607,6 +611,7 @@ def add_order_note(*, order, actor, validated_data, request=None):
     return note
 
 
+@locked_order_action()
 def upload_final_document(
     *,
     order,
@@ -669,6 +674,7 @@ def upload_final_document(
     return document
 
 
+@locked_order_action()
 def complete_order(*, order, actor, admin_confirmation=False, request=None):
     """
     Close the order after the final artifact has been confirmed.
@@ -709,9 +715,10 @@ def complete_order(*, order, actor, admin_confirmation=False, request=None):
             order.missing_document_types = []
             order.save(update_fields=["missing_document_types", "updated_at"])
         order.transition_status(Order.Status.COMPLETED, changed_by=actor, note="Order completed")
-        if order.assigned_provider:
-            order.assigned_provider.total_completed_orders += 1
-            order.assigned_provider.save(update_fields=["total_completed_orders"])
+        if order.assigned_provider_id:
+            type(order.assigned_provider).objects.filter(pk=order.assigned_provider_id).update(
+                total_completed_orders=F("total_completed_orders") + 1
+            )
         send_notification_event(
             event_key="order_completed",
             order=order,
@@ -746,6 +753,7 @@ def deliver_order(*, order, actor, admin_confirmation=False, request=None):
     return complete_order(order=order, actor=actor, admin_confirmation=admin_confirmation, request=request)
 
 
+@locked_order_action()
 def reject_order(*, order, actor, reason, request=None):
     """
     Reject the order with a mandatory reason and notify the customer.
@@ -782,6 +790,7 @@ def reject_order(*, order, actor, reason, request=None):
     return order
 
 
+@locked_order_action()
 def cancel_order(*, order, actor, reason, request=None):
     """
     Central cancellation rule shared by client and staff actions.
@@ -816,6 +825,7 @@ def cancel_order(*, order, actor, reason, request=None):
     return order
 
 
+@locked_order_action()
 def provider_update_status(*, order, actor, new_status, note="", request=None):
     """
     Apply the provider-owned status changes only.
@@ -882,20 +892,23 @@ def complete_provider_work(*, order, actor, validated_data, request=None):
     )
 
 
+@locked_order_action()
 def provider_add_internal_note(*, order, actor, note_text, request=None):
     """
     Attach a provider work note that remains internal to operations.
     """
+    clean_note = _require_text(note_text, field_name="note", message="A note is required.")
     note = OrderNote.objects.create(
         order=order,
         user=actor,
-        note=note_text,
+        note=clean_note,
         visibility=OrderNote.Visibility.INTERNAL,
     )
     create_audit_log(request=request, action="provider_add_note", entity_type="OrderNote", entity_id=note.pk)
     return note
 
 
+@locked_order_action()
 def resume_review(*, order, actor, note="", request=None):
     from django.utils import timezone as tz
 
@@ -926,6 +939,7 @@ def resume_review(*, order, actor, note="", request=None):
     )
 
 
+@locked_order_action()
 def return_to_provider(*, order, actor, reason, request=None):
     clean_reason = _require_text(
         reason,
@@ -953,6 +967,7 @@ def return_to_provider(*, order, actor, reason, request=None):
     return result
 
 
+@locked_order_action()
 def return_to_internal_review(*, order, actor, reason, request=None):
     clean_reason = _require_text(
         reason,
@@ -973,6 +988,7 @@ def return_to_internal_review(*, order, actor, reason, request=None):
     )
 
 
+@locked_order_action()
 def reopen_order(*, order, actor, reason, request=None):
     clean_reason = _require_text(
         reason,
@@ -1001,6 +1017,7 @@ def reopen_order(*, order, actor, reason, request=None):
     return result
 
 
+@locked_order_action()
 def archive_order(*, order, actor, note="", request=None):
     assert_order_transition_allowed(actor=actor, order=order, new_status=Order.Status.ARCHIVED)
     clean_note = (note or "").strip() or "Order archived"

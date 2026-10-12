@@ -5,6 +5,10 @@ from organizations.selectors import is_partner_admin, is_partner_operational_use
 from orders.selectors import can_view_order
 from orders.readiness import evaluate_order_requirements, unresolved_missing_request_types
 from workflow.rules import WORKFLOW_TRANSITIONS
+
+CUSTOMER_UPLOAD_STATUSES = frozenset(
+    {OrderStatus.NEW, OrderStatus.UNDER_REVIEW, OrderStatus.WAITING_CUSTOMER}
+)
 from workflow.transition_permissions import assert_can_cancel_order, assert_order_transition_allowed
 
 
@@ -45,9 +49,7 @@ def _workflow_transitions(*, user, order, readiness):
             reasons.append(str(error.messages[0]))
         if not reasons and rule.action == "assign_provider" and not readiness["requirements_complete"]:
             reasons.append("Required documents are incomplete.")
-        if not reasons and rule.action == "request_missing_documents" and not order.service.document_requirements.filter(
-            is_active=True, is_deleted=False
-        ).exists():
+        if not reasons and rule.action == "request_missing_documents" and not readiness["documents"]:
             reasons.append("This service has no uploadable document requirements.")
         if not reasons and rule.action == "resume_review":
             unresolved = unresolved_missing_request_types(order)
@@ -109,7 +111,7 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         "workflow_transitions": workflow_transitions,
         "readiness": readiness,
         "can_cancel": can_view and _can_cancel(user=user, order=order),
-        "can_upload_customer_document": can_view and role == UserRole.CUSTOMER and not order.is_final_state,
+        "can_upload_customer_document": can_view and role == UserRole.CUSTOMER and order.status in CUSTOMER_UPLOAD_STATUSES,
         "can_view_missing_documents_form": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.WAITING_CUSTOMER,
         "can_submit_rating": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.COMPLETED and not hasattr(order, "rating"),
         "can_request_documents": "request_missing_documents" in available_actions

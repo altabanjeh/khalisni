@@ -3,6 +3,7 @@ import re
 from datetime import timedelta
 
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth.models import Permission
@@ -583,6 +584,16 @@ class PublicAuthTests(TestCase):
 
 
 class SeedCommandTests(TestCase):
+    def test_demo_seed_is_refused_outside_debug(self):
+        # KHS-020: published demo credentials (including a superuser) must not
+        # reach a live system through a mistyped command.
+        with self.assertRaises(CommandError):
+            call_command("seed_demo")
+        with self.assertRaises(CommandError):
+            call_command("seed_initial_data", include_demo_users=True)
+        self.assertFalse(CustomUser.objects.filter(email="admin@khalisni.local").exists())
+        self.assertFalse(Order.objects.exists())
+
     def test_baseline_seed_does_not_create_public_demo_users(self):
         call_command("seed_initial_data")
 
@@ -591,6 +602,7 @@ class SeedCommandTests(TestCase):
         self.assertFalse(CustomUser.objects.filter(email="admin@khalisni.local").exists())
         self.assertEqual(Order.objects.count(), 0)
 
+    @override_settings(DEBUG=True)
     def test_seed_demo_creates_demo_users_orders_and_public_site_content(self):
         call_command("seed_demo")
 
@@ -603,6 +615,7 @@ class SeedCommandTests(TestCase):
         self.assertGreater(PublicPageContent.objects.count(), 0)
         self.assertGreater(Advertisement.objects.count(), 0)
 
+    @override_settings(DEBUG=True)
     def test_seed_demo_does_not_reset_existing_passwords_without_flag(self):
         call_command("seed_demo")
         admin_user = CustomUser.objects.get(email="admin@khalisni.local")
@@ -615,6 +628,7 @@ class SeedCommandTests(TestCase):
         self.assertTrue(admin_user.check_password("ChangedPassword@123"))
         self.assertFalse(admin_user.check_password("Admin@123"))
 
+    @override_settings(DEBUG=True)
     def test_seed_demo_can_reset_existing_passwords_when_requested(self):
         call_command("seed_demo")
         admin_user = CustomUser.objects.get(email="admin@khalisni.local")

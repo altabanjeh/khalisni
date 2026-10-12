@@ -7,7 +7,7 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
-import { getDisplayError } from '../../api/client'
+import { getDisplayError, isStaleActionError } from '../../api/client'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
@@ -54,7 +54,7 @@ function ProviderOrderDetailsPage() {
       statusForm.reset({ status: values.status, note: '' })
       reload()
       toast(isArabic ? 'تم تحديث حالة التنفيذ.' : 'Processing status updated.', 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleNote(values) {
     try {
@@ -62,7 +62,7 @@ function ProviderOrderDetailsPage() {
       noteForm.reset({ note: '' })
       reload()
       toast(isArabic ? 'تمت إضافة الملاحظة الداخلية.' : 'Internal note added.', 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleUpload(values) {
     uploadForm.clearErrors('root.server')
@@ -79,6 +79,7 @@ function ProviderOrderDetailsPage() {
       const message = getDisplayError(e)
       uploadForm.setError('root.server', { type: 'server', message })
       toast(message, 'error')
+      if (isStaleActionError(e)) reload()
     }
   }
 
@@ -118,7 +119,7 @@ function ProviderOrderDetailsPage() {
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-6">
           <Panel icon={FileText} title={isArabic ? 'مستندات الطلب' : 'Request documents'} description={isArabic ? 'راجع ملفّات الطلب والمرفقات قبل إرسال النتيجة.' : 'Review the request files and attachments before sending the result.'}>
-            <DocumentList documents={order.documents || []} />
+            <DocumentList documents={order.documents || []} staff />
           </Panel>
           <Panel icon={MessageSquare} title={isArabic ? 'سجل التنفيذ' : 'Processing history'} description={isArabic ? 'سجل زمني لكل تحديثات التنفيذ.' : 'A timeline of every processing update.'}>
             <OrderTimeline items={order.status_logs || []} />

@@ -2,7 +2,7 @@ from django.templatetags.static import static
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
 from help_guides.screen_registry import HELP_SCREEN_REGISTRY, get_help_screen_label
 from orders.models import Order
@@ -245,7 +245,7 @@ def serialize_workflow_guide(obj):
     }
 
 
-class BaseGuideAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class BaseGuideAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     created_by_name = serializers.SerializerMethodField()
     updated_by_name = serializers.SerializerMethodField()
 
@@ -428,7 +428,7 @@ class HelpGuideWorkflowAdminSerializer(BaseGuideAdminSerializer):
         return _normalize_status_label(obj.next_status)
 
 
-class HelpGuideScreenshotAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class HelpGuideScreenshotAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     help_guide_title = serializers.CharField(source="help_guide.title", read_only=True)
     help_guide_slug = serializers.CharField(source="help_guide.slug", read_only=True)
 

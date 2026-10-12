@@ -170,5 +170,8 @@
   "upload.removeFile": "Remove file {name}",
   "upload.selectedMany": "{count} files selected",
   "upload.selectedOne": "Selected file: {name}",
-  "upload.title": "Upload the required document"
+  "upload.title": "Upload the required document",
+  "common.loading": "Loading...",
+  "notifications.loadError": "Notifications could not be loaded.",
+  "notifications.markAllRead": "Mark all as read"
 }

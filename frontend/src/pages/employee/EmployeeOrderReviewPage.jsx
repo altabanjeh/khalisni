@@ -9,7 +9,7 @@ import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
-import { getDisplayError } from '../../api/client'
+import { getDisplayError, isStaleActionError } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
@@ -126,7 +126,7 @@ function EmployeeOrderReviewPage() {
       await api.assignEmployeeOrder(id, values)
       assignForm.reset(); reload()
       toast(tr('تم تعيين المزوّد بنجاح.', 'Provider assigned.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleMissingDocs(values) {
     const documentTypes = Array.isArray(values.document_types)
@@ -137,14 +137,14 @@ function EmployeeOrderReviewPage() {
       await api.requestEmployeeDocuments(id, { note: values.note, document_types: documentTypes })
       docsRequestForm.reset(); reload()
       toast(tr('تم إرسال طلب المستندات الناقصة للعميل.', 'Missing-document request sent to the customer.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleNote(values) {
     try {
       await api.addEmployeeNote(id, { note: values.note, visibility: 'INTERNAL' })
       noteForm.reset(); reload()
       toast(tr('تم حفظ الملاحظة الداخلية.', 'Internal note saved.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleReject() {
     setConfirmReject(false)
@@ -152,42 +152,42 @@ function EmployeeOrderReviewPage() {
       await api.rejectOrder(id, { reason: tr('تعذر استيفاء متطلبات المراجعة الحالية.', 'The current review requirements could not be met.') })
       reload()
       toast(tr('تم رفض الطلب وتوثيق السبب.', 'Request rejected and the reason recorded.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleStartReview() {
     try {
       await api.updateEmployeeStatus(id, { status: 'UNDER_REVIEW', note: REVIEW_STARTED_NOTE_AR })
       reload()
       toast(tr('تم نقل الطلب إلى قيد المراجعة.', 'Request moved to under review.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleReturnToProvider(values) {
     try {
       await api.updateEmployeeStatus(id, { status: 'IN_PROGRESS', note: values.note })
       returnProviderForm.reset(); reload()
       toast(tr('تمت إعادة الطلب إلى المزوّد مع السبب.', 'Request returned to the provider with the reason.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleReturnToInternal(values) {
     try {
       await api.updateEmployeeStatus(id, { status: 'UNDER_REVIEW', note: values.note })
       returnInternalForm.reset(); reload()
       toast(tr('تمت إعادة الطلب إلى المراجعة الداخلية.', 'Request returned to internal review.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleComplete() {
     try {
       await api.completeEmployeeOrder(id, { admin_confirmation: false })
       reload()
       toast(tr('تم إكمال الطلب عبر المسار الآمن.', 'Request completed via the safe path.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleManualNotification(values) {
     try {
       await api.sendManualOrderNotification(id, { template_id: Number(values.template_id) })
       manualNotificationForm.reset()
       toast(tr('تم إرسال الإشعار اليدوي من القالب المعتمد.', 'Manual notification sent from the approved template.'), 'success')
-    } catch (e) { toast(getDisplayError(e), 'error') }
+    } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
 
   return (
@@ -241,7 +241,7 @@ function EmployeeOrderReviewPage() {
                 </Link>
               ) : null}
             </div>
-            <div className="mt-5"><DocumentList documents={order.documents || []} /></div>
+            <div className="mt-5"><DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} staff /></div>
           </SectionCard>
 
           <SectionCard icon={FileText} title={tr('سجل الملاحظات', 'Notes log')} description={tr('الملاحظات الداخلية ورسائل العميل وملاحظات المزوّد في مكان واحد.', 'Internal notes, customer messages and provider notes in one place.')}>
@@ -399,7 +399,7 @@ function EmployeeOrderReviewPage() {
 
           {finalDocuments.length ? (
             <SectionCard icon={FileText} title={tr('مراجعة نتيجة المزوّد', 'Review the provider result')} description={tr('اعتمد النتيجة بعد التحقق، أو أعدها للمزوّد أو للمراجعة الداخلية بسبب واضح.', 'Approve the result after verifying it, or return it to the provider or internal review with a clear reason.')}>
-              <DocumentList documents={finalDocuments} />
+              <DocumentList documents={finalDocuments} staff />
               {allowedActions.can_complete ? (
                 <button className="btn-primary mt-4 w-full" onClick={handleComplete} type="button">{tr('اعتماد النتيجة وإكمال الطلب', 'Approve result & complete request')}</button>
               ) : null}

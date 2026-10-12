@@ -290,7 +290,7 @@ class BaseAdminGuideViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = self.queryset.model.objects.get(pk=pk)
+        instance = self.get_restore_instance(self.queryset.model, pk)
         old_value = {"is_active": instance.is_active, "is_deleted": instance.is_deleted}
         instance.restore()
         if hasattr(instance, "updated_by_id"):

@@ -82,7 +82,7 @@ class OrganizationViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        organization = Organization.objects.get(pk=pk)
+        organization = self.get_restore_instance(Organization, pk)
         old_value = {"name": organization.name, "is_active": organization.is_active, "is_deleted": organization.is_deleted}
         organization.restore()
         create_audit_log(
@@ -157,7 +157,7 @@ class BranchViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        branch = Branch.objects.get(pk=pk)
+        branch = self.get_restore_instance(Branch, pk)
         old_value = {"name": branch.name, "is_active": branch.is_active, "is_deleted": branch.is_deleted}
         branch.restore()
         create_audit_log(
@@ -230,7 +230,7 @@ class OrganizationMembershipViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        membership = OrganizationMembership.objects.get(pk=pk)
+        membership = self.get_restore_instance(OrganizationMembership, pk)
         old_value = {"role": membership.role, "branch_id": membership.branch_id, "is_active": membership.is_active, "is_deleted": membership.is_deleted}
         membership.restore()
         create_audit_log(
@@ -341,7 +341,7 @@ class PartnerServiceConfigViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        config = PartnerServiceConfig.objects.get(pk=pk)
+        config = self.get_restore_instance(PartnerServiceConfig, pk)
         old_value = {
             "is_enabled": config.is_enabled,
             "visible_to_customers": config.visible_to_customers,

@@ -8,9 +8,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from audit.utils import create_audit_log
-from config.permissions import CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
+from config.permissions import PlatformRecordWriteMixin, CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
 from core.delete_guard import AdminDeleteGuardMixin
-from organizations.selectors import active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
+from organizations.selectors import can_administer_organization, has_scoped_memberships, active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
 from services.models import (
     Address,
     RequiredDocumentDefinition,
@@ -222,6 +222,25 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
             return AdminServiceRuleSerializer
         return AdminServiceRuleSerializer
 
+    def _assert_tenant_boundary(self, serializer):
+        """An organization-scoped editor manages only that organization's own services."""
+        user = self.request.user
+        if not has_scoped_memberships(user):
+            return
+        instance = serializer.instance
+        organization = serializer.validated_data.get("organization", getattr(instance, "organization", None))
+        scope = serializer.validated_data.get("scope", getattr(instance, "scope", None))
+        if organization is None or scope == Service.Scope.GLOBAL or not can_administer_organization(user, organization):
+            raise PermissionDenied("You can manage only your own organization's services.")
+
+    def perform_create(self, serializer):
+        self._assert_tenant_boundary(serializer)
+        return super().perform_create(serializer)
+
+    def perform_update(self, serializer):
+        self._assert_tenant_boundary(serializer)
+        return super().perform_update(serializer)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
@@ -239,7 +258,7 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = Service.objects.get(pk=pk)
+        instance = self.get_restore_instance(Service, pk)
         old_value = _snapshot(instance, self.audit_fields)
         instance.restore()
         self._log_change(request, "restore_service", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
@@ -296,7 +315,7 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = ServiceCategory.objects.get(pk=pk)
+        instance = self.get_restore_instance(ServiceCategory, pk)
         old_value = _snapshot(instance, self.audit_fields)
         instance.restore()
         self._log_change(request, "restore_service_category", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
@@ -355,7 +374,7 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
         return Response({"detail": "Categories reordered."})
 
 
-class RequiredDocumentDefinitionAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
+class RequiredDocumentDefinitionAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminRequiredDocumentDefinitionSerializer
     queryset = RequiredDocumentDefinition.objects.all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -386,14 +405,14 @@ class RequiredDocumentDefinitionAdminViewSet(AdminDeleteGuardMixin, AdminAuditMi
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = RequiredDocumentDefinition.objects.get(pk=pk)
+        instance = self.get_restore_instance(RequiredDocumentDefinition, pk)
         old_value = _snapshot(instance, self.audit_fields)
         instance.restore()
         self._log_change(request, "restore_required_document_definition", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(self.get_serializer(instance).data)
 
 
-class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
+class RequiredDocumentAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminRequiredDocumentRuleSerializer
     queryset = ServiceRequiredDocument.objects.select_related("service", "document_definition").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -434,7 +453,7 @@ class RequiredDocumentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, views
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = ServiceRequiredDocument.objects.get(pk=pk)
+        instance = self.get_restore_instance(ServiceRequiredDocument, pk)
         old_value = _snapshot(instance, self.audit_fields)
         instance.restore()
         self._log_change(request, "restore_service_document_rule", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
@@ -535,7 +554,7 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        relation = ServiceRelation.objects.get(pk=pk)
+        relation = self.get_restore_instance(ServiceRelation, pk)
         old_value = relation_snapshot(relation)
         relation.restore()
         create_audit_log(
@@ -550,7 +569,7 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         return Response(self.get_serializer(relation).data)
 
 
-class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
+class ServiceProviderAssignmentAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMixin, AdminAuditMixin, viewsets.ModelViewSet):
     serializer_class = AdminServiceProviderAssignmentSerializer
     queryset = ServiceProviderAssignment.objects.select_related("service", "provider", "provider__user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]
@@ -584,14 +603,16 @@ class ServiceProviderAssignmentAdminViewSet(AdminDeleteGuardMixin, AdminAuditMix
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        instance = ServiceProviderAssignment.objects.get(pk=pk)
+        instance = self.get_restore_instance(ServiceProviderAssignment, pk)
         old_value = _snapshot(instance, self.audit_fields)
         instance.restore()
         self._log_change(request, "restore_service_provider_assignment", instance, old_value=old_value, new_value=_snapshot(instance, self.audit_fields))
         return Response(self.get_serializer(instance).data)
 
 
-class AddressAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
+class AddressAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMixin, viewsets.ModelViewSet):
+    # Customer addresses are personal data with no organization boundary.
+    platform_only_reads = True
     serializer_class = AddressAdminSerializer
     queryset = Address.objects.select_related("user").all()
     permission_classes = [permissions.IsAuthenticated, CanViewOrManageServiceCatalog]

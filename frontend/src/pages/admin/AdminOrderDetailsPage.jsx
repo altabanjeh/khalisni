@@ -8,7 +8,7 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
-import { getDisplayError } from '../../api/client'
+import { getDisplayError, isStaleActionError } from '../../api/client'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
@@ -67,6 +67,7 @@ function AdminOrderDetailsPage() {
       toast(successMessage, 'success')
     } catch (submitError) {
       toast(getDisplayError(submitError), 'error')
+      if (isStaleActionError(submitError)) reload()
     } finally {
       setSubmitting('')
     }
@@ -145,7 +146,7 @@ function AdminOrderDetailsPage() {
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <Panel icon={FileText} title={isArabic ? 'الوثائق المرفوعة' : 'Uploaded documents'} description={isArabic ? 'راجع كل الوثائق قبل تحديث الحالة أو اتخاذ قرار نهائي.' : 'Review every document before changing status or making a final decision.'}>
-            <DocumentList documents={order.documents || []} />
+            <DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} staff />
           </Panel>
           <Panel icon={MessageSquare} title={isArabic ? 'الخط الزمني' : 'Timeline'} description={isArabic ? 'تسلسل كامل لكل التحديثات والحركات على الطلب.' : 'A complete sequence of every update and action on the request.'}>
             <OrderTimeline items={order.status_logs || []} />

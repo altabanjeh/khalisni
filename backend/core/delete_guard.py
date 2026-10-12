@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from accounts.models import SystemSetting
@@ -231,9 +232,14 @@ class AdminDeleteGuardMixin:
             old_value=old_value,
         )
 
+    def get_restore_instance(self, model, pk):
+        """Load a record for the restore action; unknown ids are a 404, not a 500."""
+        return get_object_or_404(model.objects.all(), pk=pk)
+
     def check_permissions(self, request):
         super().check_permissions(request)
-        if request.method != "DELETE":
+        # Restore undoes a guarded delete, so it is limited to the same actors.
+        if request.method != "DELETE" and getattr(self, "action", None) != "restore":
             return
 
         if is_admin_delete_user(getattr(request, "user", None)):

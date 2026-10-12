@@ -2,6 +2,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import F, Q
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -59,6 +60,7 @@ class RegisterAPIView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "auth_register"
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -74,6 +76,7 @@ class RegisterAPIView(generics.CreateAPIView):
 
 class LoginAPIView(TokenObtainPairView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "auth_login"
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -242,7 +245,7 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def restore(self, request, pk=None):
-        user = CustomUser.objects.get(pk=pk)
+        user = self.get_restore_instance(CustomUser, pk)
         old_value = {"role": user.role, "is_active": user.is_active, "is_deleted": user.is_deleted}
         user.restore()
         create_audit_log(
@@ -270,6 +273,9 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             )
 
         # PATCH — replace direct permissions with the supplied list.
+        # Granting permissions is granting authority: platform super admin only.
+        if not is_platform_super_admin(request.user):
+            raise PermissionDenied("Only a platform super admin can change user permissions.")
         perm_codenames = request.data.get("permissions", [])
         if not isinstance(perm_codenames, list):
             return response.Response(
@@ -285,6 +291,9 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
                 unknown.append(full_codename)
                 continue
             app_label, codename = parts
+            if app_label not in _PERMISSION_APPS:
+                unknown.append(full_codename)
+                continue
             try:
                 perm = Permission.objects.get(content_type__app_label=app_label, codename=codename)
                 resolved.append(perm)
@@ -320,7 +329,8 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 class SystemSettingViewSet(viewsets.ModelViewSet):
     serializer_class = SafeSystemSettingSerializer
     queryset = SystemSetting.objects.all().order_by("key")
-    permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
+    # Platform-wide settings (including the published contact details).
+    permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     pagination_class = None
 
     def get_serializer_context(self):

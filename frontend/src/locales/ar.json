@@ -161,5 +161,8 @@
   "topbar.manual": "الدليل",
   "topbar.notifications": "الإشعارات",
   "topbar.openSidebar": "فتح القائمة الجانبية",
-  "topbar.publicSite": "الموقع العام"
+  "topbar.publicSite": "الموقع العام",
+  "common.loading": "جارٍ التحميل...",
+  "notifications.loadError": "تعذر تحميل الإشعارات.",
+  "notifications.markAllRead": "تعليم الكل كمقروء"
 }

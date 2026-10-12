@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
+import EmptyState from '../../components/EmptyState'
 import FileUploader from '../../components/FileUploader'
 import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -57,7 +58,7 @@ function CustomerOrderDetailsPage() {
   const { id } = useParams()
   const { toast } = useToast()
   const [confirmCancel, setConfirmCancel] = useState(false)
-  const { data: order, loading, reload } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
+  const { data: order, loading, error, reload } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
   const uploadForm = useForm({
     defaultValues: {
       document_type: '',
@@ -71,11 +72,21 @@ function CustomerOrderDetailsPage() {
   )
   useRegisterPageHelp({ workflowStatus: order?.status || '', serviceId: order?.service?.id || '' })
 
-  if (loading || !order) return <LoadingSpinner />
+  if (loading) return <LoadingSpinner />
+  if (error || !order) {
+    return (
+      <EmptyState
+        action={<Link className="btn-secondary" to="/customer/orders">العودة إلى طلباتي</Link>}
+        description={error ? getDisplayError(error) : 'تعذر العثور على الطلب المطلوب.'}
+        title="الطلب غير متاح"
+      />
+    )
+  }
 
   const allowedActions = getOrderAllowedActions(order)
   const missingDocumentTypes = order.missing_document_types || []
-  const requiredDocuments = serviceDetails?.required_documents || []
+  // The order carries the requirements that applied when it was created.
+  const requiredDocuments = order.required_documents?.length ? order.required_documents : serviceDetails?.required_documents || []
   const selectedDocumentType = uploadForm.watch('document_type')
   const selectedRequirement = findRequiredDocument(requiredDocuments, selectedDocumentType)
   const customerActionRequired = allowedActions.can_view_missing_documents_form
@@ -206,7 +217,7 @@ function CustomerOrderDetailsPage() {
             title="الوثائق المرفوعة"
             description="جميع الملفات التي أرفقتها لهذا الطلب مع حالة كل مستند."
           >
-            <DocumentList documents={order.documents || []} />
+            <DocumentList documents={order.documents || []} requiredDocuments={requiredDocuments} />
           </SectionCard>
 
           <SectionCard

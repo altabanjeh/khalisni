@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from public_site.models import Advertisement, ContactInquiry, PublicPageContent, SiteTheme
 from public_site.models import MissingServiceRequest
 
 
-class ContactInquiryCreateSerializer(serializers.ModelSerializer):
+class ContactInquiryCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = ContactInquiry
         fields = ("inquiry_id", "name", "phone", "email", "message", "created_at")
@@ -23,7 +23,7 @@ def build_media_url(request, file_field):
     return request.build_absolute_uri(url)
 
 
-class SiteThemePublicSerializer(serializers.ModelSerializer):
+class SiteThemePublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
     favicon_url = serializers.SerializerMethodField()
 
@@ -50,7 +50,7 @@ class SiteThemePublicSerializer(serializers.ModelSerializer):
         return build_media_url(self.context.get("request"), obj.favicon)
 
 
-class PublicPageContentPublicSerializer(serializers.ModelSerializer):
+class PublicPageContentPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -87,7 +87,7 @@ class PublicPageContentPublicSerializer(serializers.ModelSerializer):
         return build_media_url(self.context.get("request"), obj.hero_image)
 
 
-class AdvertisementPublicSerializer(serializers.ModelSerializer):
+class AdvertisementPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     is_currently_public = serializers.BooleanField(read_only=True)
 
@@ -117,7 +117,7 @@ class AdvertisementPublicSerializer(serializers.ModelSerializer):
         return build_media_url(self.context.get("request"), obj.image)
 
 
-class SiteThemeAdminSerializer(serializers.ModelSerializer):
+class SiteThemeAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
     favicon_url = serializers.SerializerMethodField()
 
@@ -149,7 +149,7 @@ class SiteThemeAdminSerializer(serializers.ModelSerializer):
         return build_media_url(self.context.get("request"), obj.favicon)
 
 
-class PublicPageContentAdminSerializer(serializers.ModelSerializer):
+class PublicPageContentAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -190,7 +190,7 @@ class PublicPageContentAdminSerializer(serializers.ModelSerializer):
         return build_media_url(self.context.get("request"), obj.hero_image)
 
 
-class AdvertisementAdminSerializer(serializers.ModelSerializer):
+class AdvertisementAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     is_currently_public = serializers.BooleanField(read_only=True)
 
@@ -233,7 +233,7 @@ class HomepagePayloadSerializer(serializers.Serializer):
     important_alert = AdvertisementPublicSerializer(allow_null=True)
 
 
-class MissingServiceRequestPublicSerializer(serializers.ModelSerializer):
+class MissingServiceRequestPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     matched_service_id = serializers.PrimaryKeyRelatedField(
         queryset=MissingServiceRequest._meta.get_field("matched_service").remote_field.model.objects.filter(is_deleted=False),
         source="matched_service",
@@ -270,7 +270,7 @@ class MissingServiceRequestPublicSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class MissingServiceRequestAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class MissingServiceRequestAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     assigned_to_name = serializers.CharField(source="assigned_to.full_name", read_only=True)
     matched_service_name = serializers.CharField(source="matched_service.name_ar", read_only=True)
     created_by_user_name = serializers.CharField(source="created_by_user.full_name", read_only=True)

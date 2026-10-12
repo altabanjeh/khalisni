@@ -1,13 +1,14 @@
+from organizations.services import assert_can_assign_membership
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
 from core.delete_guard import get_delete_guard_setting, update_delete_guard_password
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from organizations.models import Branch, Organization, OrganizationMembership
 from organizations.serializers import MembershipSummarySerializer
-from organizations.selectors import active_memberships_for_user, is_platform_super_admin
+from organizations.selectors import platform_memberships_for_user, active_memberships_for_user, is_platform_super_admin
 
 try:
     from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -62,7 +63,7 @@ SAFE_SYSTEM_SETTINGS = {
 }
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
     memberships = serializers.SerializerMethodField()
 
@@ -90,8 +91,19 @@ class UserSerializer(serializers.ModelSerializer):
         return MembershipSummarySerializer(memberships, many=True).data
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        # Same password policy as password reset (AUTH_PASSWORD_VALIDATORS).
+        candidate = CustomUser(
+            email=attrs.get("email", ""), full_name=attrs.get("full_name", ""), phone=attrs.get("phone", "")
+        )
+        try:
+            validate_password(attrs["password"], user=candidate)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)})
+        return attrs
 
     class Meta:
         model = CustomUser
@@ -147,19 +159,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class CustomerProfileSerializer(serializers.ModelSerializer):
+class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ("full_name", "phone", "email", "national_id")
 
 
-class CustomerProfileAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class CustomerProfileAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = CustomerProfile
         fields = "__all__"
 
 
-class AdminUserSerializer(serializers.ModelSerializer):
+class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, allow_blank=False)
     organization_id = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.filter(is_active=True, is_deleted=False), required=False, allow_null=True, write_only=True)
     branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True, is_deleted=False), required=False, allow_null=True, write_only=True)
@@ -226,8 +238,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
             return False
         if getattr(user, "is_superuser", False):
             return True
-        return active_memberships_for_user(user).filter(
-            role=OrganizationMembership.MembershipRole.PLATFORM_SUPER_ADMIN
+        return platform_memberships_for_user(
+            user, {OrganizationMembership.MembershipRole.PLATFORM_SUPER_ADMIN}
         ).exists()
 
     def validate_role(self, value):
@@ -256,7 +268,32 @@ class AdminUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"branch_id": "Branch must belong to the selected organization."})
         if membership_role and not organization:
             raise serializers.ValidationError({"organization_id": "Organization is required when assigning a membership role."})
+        if organization:
+            request = self.context.get("request")
+            try:
+                assert_can_assign_membership(
+                    actor=getattr(request, "user", None),
+                    organization=organization,
+                    role=membership_role,
+                    field="membership_role",
+                )
+                if membership_role:
+                    OrganizationMembership(organization=organization, branch=branch, role=membership_role).clean()
+            except DjangoValidationError as exc:
+                errors = exc.message_dict if hasattr(exc, "message_dict") else {"detail": exc.messages}
+                if "organization" in errors:
+                    errors["organization_id"] = errors.pop("organization")
+                if "role" in errors:
+                    errors["membership_role"] = errors.pop("role")
+                raise serializers.ValidationError(errors)
         return attrs
+
+    def validate_password(self, value):
+        try:
+            validate_password(value, user=self.instance)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        return value
 
     def create(self, validated_data):
         organization = validated_data.pop("organization_id", None)
@@ -282,6 +319,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         if password:
             instance.set_password(password)
+            # A replaced password ends every session opened with the old one.
+            instance.token_version = (instance.token_version or 1) + 1
         instance.save()
         if organization and membership_role:
             membership, _ = OrganizationMembership.objects.get_or_create(
@@ -296,7 +335,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class SafeSystemSettingSerializer(serializers.ModelSerializer):
+class SafeSystemSettingSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     label = serializers.SerializerMethodField()
     help_text = serializers.SerializerMethodField()
     warning = serializers.SerializerMethodField()

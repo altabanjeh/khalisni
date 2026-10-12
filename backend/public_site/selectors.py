@@ -11,10 +11,13 @@ def get_active_theme():
 
 
 def get_active_public_page_content():
-    return (
-        PublicPageContent.objects.filter(active_content=True).order_by("-updated_at", "-content_id").first()
-        or PublicPageContent.objects.order_by("-updated_at", "-content_id").first()
-    )
+    """The published homepage content, or None. Unpublished versions are never a fallback."""
+    return PublicPageContent.objects.filter(active_content=True).order_by("-updated_at", "-content_id").first()
+
+
+def get_latest_public_page_content():
+    """Editor view: the published version if any, otherwise the newest draft."""
+    return get_active_public_page_content() or PublicPageContent.objects.order_by("-updated_at", "-content_id").first()
 
 
 def get_current_public_advertisements(now=None):

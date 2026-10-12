@@ -3,12 +3,12 @@ import os
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from core.serializer_mixins import PkAsIdMixin
+from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from documents.file_validation import sniff_matches_extension
 from documents.models import Document
 
 
-class DocumentSerializer(serializers.ModelSerializer):
+class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -34,7 +34,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         return reverse("document-download", kwargs={"pk": obj.pk}, request=request)
 
 
-class ProviderDocumentSerializer(serializers.ModelSerializer):
+class ProviderDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -57,7 +57,7 @@ class ProviderDocumentSerializer(serializers.ModelSerializer):
         return reverse("document-download", kwargs={"pk": obj.pk}, request=request)
 
 
-class DocumentUploadSerializer(serializers.ModelSerializer):
+class DocumentUploadSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     file = serializers.FileField()
 
     class Meta:
@@ -99,7 +99,7 @@ class DocumentVerificationSerializer(serializers.Serializer):
     note = serializers.CharField(required=False, allow_blank=True)
 
 
-class StaffDocumentSerializer(serializers.ModelSerializer):
+class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
     order = serializers.SerializerMethodField()
     uploaded_by_name = serializers.CharField(source="uploaded_by.full_name", read_only=True)
@@ -145,7 +145,7 @@ class StaffDocumentSerializer(serializers.ModelSerializer):
         }
 
 
-class DocumentAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+class DocumentAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = "__all__"

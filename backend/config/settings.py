@@ -273,6 +273,9 @@ if HAS_DRF:
             "rest_framework.throttling.UserRateThrottle",
             "rest_framework.throttling.ScopedRateThrottle",
         ),
+        # Number of trusted reverse proxies in front of Django. Without it DRF
+        # keys rate limits on the whole client-supplied X-Forwarded-For header.
+        "NUM_PROXIES": int(os.environ["API_THROTTLE_NUM_PROXIES"]) if os.getenv("API_THROTTLE_NUM_PROXIES", "").strip().isdigit() else None,
         "DEFAULT_THROTTLE_RATES": {
             "anon": _get_str_env("API_THROTTLE_ANON_RATE", "120/minute"),
             "user": _get_str_env("API_THROTTLE_USER_RATE", "600/minute"),
@@ -280,6 +283,8 @@ if HAS_DRF:
             "missing_service_request": _get_str_env("API_THROTTLE_MISSING_SERVICE_REQUEST_RATE", "5/hour"),
             "public_contact": _get_str_env("API_THROTTLE_PUBLIC_CONTACT_RATE", "5/hour"),
             "auth_password_reset": _get_str_env("API_THROTTLE_AUTH_PASSWORD_RESET_RATE", "5/hour"),
+            "auth_login": _get_str_env("API_THROTTLE_AUTH_LOGIN_RATE", "20/minute"),
+            "auth_register": _get_str_env("API_THROTTLE_AUTH_REGISTER_RATE", "20/hour"),
         },
     }
 

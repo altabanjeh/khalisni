@@ -44,7 +44,11 @@ def get_orders_for_user(user):
     if is_provider_user(user):
         return queryset.filter(
             Q(assigned_provider__user=user)
-            | Q(assigned_provider_organization__memberships__user=user, assigned_provider_organization__memberships__is_active=True)
+            | Q(
+                assigned_provider_organization__memberships__user=user,
+                assigned_provider_organization__memberships__is_active=True,
+                assigned_provider_organization__memberships__is_deleted=False,
+            )
         ).distinct()
     return enforce_organization_scope(queryset, user=user, organization_field="organization", branch_field="branch").distinct()
 

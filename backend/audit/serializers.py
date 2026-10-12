@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
+from core.serializer_mixins import SoftDeleteFieldsReadOnlyMixin
+
 from audit.models import AuditLog
 
 
-class AuditLogSerializer(serializers.ModelSerializer):
+class AuditLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     id = serializers.IntegerField(source="pk", read_only=True)
     user_name = serializers.CharField(source="user.full_name", read_only=True)
     module = serializers.CharField(source="entity_type", read_only=True)

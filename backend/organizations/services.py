@@ -3,10 +3,32 @@ from django.db import transaction
 
 from audit.utils import create_audit_log
 from organizations.models import Branch, Organization, OrganizationBranding, OrganizationMembership, PartnerServiceConfig
-from organizations.selectors import customer_organization_for_user, resolve_organization_by_ref
+from organizations.selectors import (
+    PLATFORM_STAFF_ROLES,
+    can_administer_organization,
+    customer_organization_for_user,
+    is_platform_super_admin,
+    resolve_organization_by_ref,
+)
 
 
 @transaction.atomic
+def assert_can_assign_membership(*, actor, organization, role, field="role"):
+    """
+    One rule for every path that attaches a user to an organization.
+
+    Platform super admins may assign anything the model allows. Everyone else
+    may assign only non-platform roles, and only inside an organization they
+    administer.
+    """
+    if is_platform_super_admin(actor):
+        return
+    if role in PLATFORM_STAFF_ROLES:
+        raise ValidationError({field: "Only a platform super admin can assign platform roles."})
+    if not can_administer_organization(actor, organization):
+        raise ValidationError({"organization": "You can manage members only in an organization you administer."})
+
+
 def onboard_partner_organization(*, actor, organization_data, owner_user, branch_data=None, request=None):
     organization = Organization.objects.create(**organization_data)
     branch = None

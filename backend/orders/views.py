@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
 from django.db.models import Q
+from django.http import Http404
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -105,11 +106,9 @@ class CreateOrderAPIView(generics.CreateAPIView):
             except (ValueError, AttributeError):
                 raise DRFValidationError({"idempotency_key": "Use a UUID submission key."})
             fingerprint = _submission_fingerprint(request.data)
-            existing = Order.objects.filter(customer=request.user, submission_key=submission_key).first()
-            if existing:
-                if existing.submission_fingerprint != fingerprint:
-                    return response.Response({"detail": "This submission key was used for different request data."}, status=status.HTTP_409_CONFLICT)
-                return response.Response(self._order_response(existing), status=status.HTTP_200_OK)
+            replay = self._replay(request.user, submission_key, fingerprint)
+            if replay is not None:
+                return replay
 
         serializer = self.get_serializer(data=request.data, context={
             "request": request,
@@ -119,16 +118,31 @@ class CreateOrderAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         try:
             order = serializer.save()
-        except IntegrityError:
-            if not submission_key:
+        except (IntegrityError, DRFValidationError):
+            # A concurrent request with the same key may have won the race after
+            # the check above. Depending on timing the loser fails on the unique
+            # constraint in the database or in model validation; both are the
+            # same retry and must return the original order.
+            replay = self._replay(request.user, submission_key, fingerprint) if submission_key else None
+            if replay is None:
                 raise
-            existing = Order.objects.filter(customer=request.user, submission_key=submission_key).first()
-            if not existing:
-                raise
-            if existing.submission_fingerprint != fingerprint:
-                return response.Response({"detail": "This submission key was used for different request data."}, status=status.HTTP_409_CONFLICT)
-            return response.Response(self._order_response(existing), status=status.HTTP_200_OK)
+            return replay
         return response.Response(self._order_response(order), status=status.HTTP_201_CREATED)
+
+    @staticmethod
+    def _existing_submission(customer, submission_key):
+        return Order.objects.filter(customer=customer, submission_key=submission_key).first()
+
+    def _replay(self, customer, submission_key, fingerprint):
+        existing = self._existing_submission(customer, submission_key)
+        if existing is None:
+            return None
+        if existing.submission_fingerprint != fingerprint:
+            return response.Response(
+                {"detail": "This submission key was used for different request data.", "code": "submission_key_conflict"},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return response.Response(self._order_response(existing), status=status.HTTP_200_OK)
 
     @staticmethod
     def _order_response(order):
@@ -145,8 +159,12 @@ class TrackOrderAPIView(APIView):
     throttle_scope = "order_tracking"
 
     def get(self, request):
-        order_number = request.query_params.get("order_number")
-        phone = request.query_params.get("phone")
+        order_number = (request.query_params.get("order_number") or "").strip()
+        phone = (request.query_params.get("phone") or "").strip()
+        # Both secrets are mandatory: an account without a phone number must
+        # not become trackable by its (sequential) order number alone.
+        if not order_number or not phone:
+            raise Http404
         order = generics.get_object_or_404(
             Order.objects.select_related("customer", "service", "service__category", "assigned_provider", "assigned_provider__user")
             .prefetch_related("documents", "status_logs", "notes__user"),

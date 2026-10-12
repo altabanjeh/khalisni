@@ -75,6 +75,8 @@ export default defineConfig({
             DJANGO_CSRF_TRUSTED_ORIGINS: BASE_URL,
             API_THROTTLE_ANON_RATE: '100000/min',
             API_THROTTLE_USER_RATE: '100000/min',
+            API_THROTTLE_AUTH_LOGIN_RATE: '100000/min',
+            API_THROTTLE_AUTH_REGISTER_RATE: '100000/min',
           },
           port: Number(API_PORT),
           reuseExistingServer: !process.env.CI,

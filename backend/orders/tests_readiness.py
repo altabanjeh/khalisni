@@ -38,12 +38,14 @@ class OrderReadinessTests(TestCase):
             email="reviewer@example.test", password=None, full_name="QA Reviewer",
             role=CustomUser.Role.EMPLOYEE,
         )
-        self.order = Order.objects.create(customer=self.customer, service=service, city="Amman")
+        # Requirements are frozen onto the order at creation, so the catalog
+        # must be configured first (as it is in production).
         for code, required in (("mandatory", True), ("optional", False)):
             ServiceRequiredDocument.objects.create(
                 service=service, document_type=code, name_ar=code,
                 is_required=required, requires_verification=True,
             )
+        self.order = Order.objects.create(customer=self.customer, service=service, city="Amman")
 
     def upload(self):
         return create_order_document(

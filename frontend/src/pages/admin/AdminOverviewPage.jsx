@@ -15,15 +15,25 @@ import PageHeader from '../../components/PageHeader'
 import StatCard from '../../components/StatCard'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
+import EmptyState from '../../components/EmptyState'
+import { getDisplayError } from '../../api/client'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatCurrency } from '../../utils/format'
 
 function AdminOverviewPage() {
   const { language, isArabic } = useLanguage()
-  const { data, loading } = useAsyncData(() => api.getAdminDashboard(), [], null)
+  const { data, loading, error } = useAsyncData(() => api.getAdminDashboard(), [], null)
 
-  if (loading || !data) {
+  if (loading) {
     return <LoadingSpinner />
+  }
+  if (error || !data) {
+    return (
+      <EmptyState
+        description={error ? getDisplayError(error) : (isArabic ? 'تعذر تحميل لوحة الإدارة.' : 'The admin dashboard could not be loaded.')}
+        title={isArabic ? 'تعذر تحميل البيانات' : 'Could not load data'}
+      />
+    )
   }
 
   return (

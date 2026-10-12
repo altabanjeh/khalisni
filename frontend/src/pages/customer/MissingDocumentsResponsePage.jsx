@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, CircleAlert, Info, UploadCloud } from 'lucide-react'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
@@ -28,6 +29,10 @@ function MissingDocumentsResponsePage() {
   const { toast } = useToast()
   const { language, isArabic } = useLanguage()
   const { data: order, loading } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
+  // Document types this page already uploaded. A retry after a partial failure
+  // must not send them again (the server refuses a second copy and the
+  // remaining files would never be reached).
+  const uploadedTypesRef = useRef(new Set())
   const {
     register,
     handleSubmit,
@@ -74,11 +79,17 @@ function MissingDocumentsResponsePage() {
     try {
       for (let index = 0; index < requestedDocuments.length; index += 1) {
         const file = formValues[`file_${index}`]?.[0]
-        if (!file) continue
+        if (!file || uploadedTypesRef.current.has(requestedDocuments[index])) continue
         const formData = new FormData()
         formData.append('document_type', requestedDocuments[index])
         formData.append('file', file)
-        await api.uploadCustomerDocument(id, formData)
+        try {
+          await api.uploadCustomerDocument(id, formData)
+        } catch (uploadError) {
+          uploadError.failedDocumentIndex = index
+          throw uploadError
+        }
+        uploadedTypesRef.current.add(requestedDocuments[index])
       }
       toast(isArabic ? 'تم رفع المستندات وإعادة إرسال الطلب للمراجعة.' : 'Documents uploaded and the request was resubmitted for review.', 'success')
       navigate(`/customer/orders/${id}`)
@@ -87,7 +98,7 @@ function MissingDocumentsResponsePage() {
         error: submitError,
         setError,
         documents: requestedDocuments,
-        fallbackField: 'root.server',
+        fallbackField: Number.isInteger(submitError.failedDocumentIndex) ? `file_${submitError.failedDocumentIndex}` : 'root.server',
         fieldNameForDocumentIndex: (index) => `file_${index}`,
       })
       toast(getDisplayError(submitError), 'error')
