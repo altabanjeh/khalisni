@@ -6,7 +6,7 @@ from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.throttling import ScopedRateThrottle
+from core.throttling import ResilientScopedRateThrottle
 from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
@@ -75,7 +75,7 @@ class DocumentDownloadAPIView(RetrieveAPIView):
         # normal user rate.
         if not getattr(self.request.user, "is_authenticated", False) and not self.request.query_params.get("token"):
             self.throttle_scope = "order_tracking"
-            return [ScopedRateThrottle()]
+            return [ResilientScopedRateThrottle()]
         return super().get_throttles()
 
     def retrieve(self, request, *args, **kwargs):

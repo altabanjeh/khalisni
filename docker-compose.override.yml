@@ -1,14 +1,17 @@
-# Applied automatically by Docker Compose when running locally (docker compose up).
-# Coolify only reads docker-compose.yml and ignores this file.
+# LOCAL DEVELOPMENT ONLY. Docker Compose applies this file automatically on a
+# plain `docker compose up`. Coolify reads only docker-compose.yml.
+# On a server always run:  docker compose -f docker-compose.yml up -d --build
+# Ports are bound to loopback so a mistaken run cannot expose the database or
+# the backend to the network.
 
 services:
   db:
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
   backend:
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       DJANGO_SEED_INITIAL_DATA: "True"
     volumes:
@@ -18,4 +21,4 @@ services:
 
   frontend:
     ports:
-      - "4173:80"
+      - "127.0.0.1:4173:80"

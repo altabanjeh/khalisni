@@ -31,9 +31,11 @@ python manage.py migrate --noinput
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 echo "Syncing roles..."
-python manage.py setup_roles || true
+python manage.py setup_roles || echo "WARNING: setup_roles failed; role groups may be out of date." >&2
 echo "Creating admin user if configured..."
-python manage.py create_admin || true
+python manage.py create_admin || echo "WARNING: create_admin failed; see the message above." >&2
+# Expired refresh tokens accumulate in the blacklist tables; trim them on start.
+python manage.py flushexpiredtokens >/dev/null 2>&1 || true
 
 if [ "${DJANGO_SEED_INITIAL_DATA:-False}" = "True" ]; then
     echo "Seeding initial data..."

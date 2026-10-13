@@ -5,3 +5,11 @@ dist/
 coverage/
 .env
 npm-debug.log*
+
+.env*
+e2e/
+e2e-results/
+playwright-report/
+test-results/
+dist-acceptance/
+*.log

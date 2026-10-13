@@ -13,3 +13,6 @@ media/
 staticfiles/
 logs/
 .env
+
+.env*
+service-import-source/

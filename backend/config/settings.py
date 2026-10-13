@@ -55,6 +55,9 @@ if not _secret_key:
     else:
         from django.core.exceptions import ImproperlyConfigured
         raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set in production.")
+if not _debug and _secret_key.lower().startswith(("replace-", "change-me", "changeme", "dev-only")):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY still holds the template placeholder. Generate a real secret.")
 SECRET_KEY = _secret_key
 DEBUG = _debug
 _cors_allowed_origins = _get_list_env(
@@ -224,11 +227,12 @@ STORAGES = {
 
 if _AWS_BUCKET:
     AWS_STORAGE_BUCKET_NAME = _AWS_BUCKET
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "")
-    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL", "")  # set for MinIO
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-    AWS_DEFAULT_ACL = os.getenv("AWS_DEFAULT_ACL", "private")
+    # Empty values (unset Compose variables) must be None: boto3 rejects "".
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME") or None
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL") or None  # set for MinIO
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID") or None
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") or None
+    AWS_DEFAULT_ACL = os.getenv("AWS_DEFAULT_ACL") or "private"
     AWS_S3_FILE_OVERWRITE = False
 
 # Trust Coolify's Traefik proxy for HTTPS detection
@@ -266,15 +270,23 @@ if HAS_DRF:
         filter_backends.insert(0, "django_filters.rest_framework.DjangoFilterBackend")
 
     REST_FRAMEWORK = {
+        # The HTML browsable API is a development aid; production answers JSON only.
+        "DEFAULT_RENDERER_CLASSES": (
+            ("rest_framework.renderers.JSONRenderer", "rest_framework.renderers.BrowsableAPIRenderer")
+            if DEBUG
+            else ("rest_framework.renderers.JSONRenderer",)
+        ),
         "DEFAULT_AUTHENTICATION_CLASSES": tuple(authentication_classes),
         "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
         "DEFAULT_FILTER_BACKENDS": tuple(filter_backends),
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 20,
+        # Same limits as the DRF classes; a cache outage is logged and does not
+        # turn every request into a 500 (core/throttling.py).
         "DEFAULT_THROTTLE_CLASSES": (
-            "rest_framework.throttling.AnonRateThrottle",
-            "rest_framework.throttling.UserRateThrottle",
-            "rest_framework.throttling.ScopedRateThrottle",
+            "core.throttling.ResilientAnonRateThrottle",
+            "core.throttling.ResilientUserRateThrottle",
+            "core.throttling.ResilientScopedRateThrottle",
         ),
         # Number of trusted reverse proxies in front of Django. Without it DRF
         # keys rate limits on the whole client-supplied X-Forwarded-For header.
@@ -314,7 +326,8 @@ if _redis_url:
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
             "LOCATION": _redis_url,
-            "OPTIONS": {"db": "0"},
+            # Bounded waits: an unreachable Redis must not hang the workers.
+            "OPTIONS": {"db": "0", "socket_connect_timeout": 2, "socket_timeout": 2},
             "TIMEOUT": 300,
         }
     }
@@ -356,6 +369,29 @@ EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = _get_bool_env("DJANGO_EMAIL_USE_TLS", False)
 EMAIL_USE_SSL = _get_bool_env("DJANGO_EMAIL_USE_SSL", False)
+EMAIL_TIMEOUT = int(os.getenv("DJANGO_EMAIL_TIMEOUT", "10"))
+
+# Without this, production has no handler for errors: Django's default console
+# handler is debug-only and mail_admins has no recipients, so an unhandled
+# exception left no trace anywhere. Everything goes to stderr, which the
+# container runtime collects.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "root": {"handlers": ["console"], "level": os.getenv("DJANGO_LOG_LEVEL", "INFO")},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"), "propagate": False},
+        # 4xx responses are expected traffic; 5xx tracebacks are logged at ERROR.
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+    },
+}
 
 PASSWORD_RESET_TOKEN_TTL_SECONDS = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_SECONDS", "1800"))
 PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", "1800"))

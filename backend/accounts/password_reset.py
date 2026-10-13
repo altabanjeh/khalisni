@@ -13,6 +13,7 @@ from django.db import connection, transaction
 from django.utils import timezone
 
 from core.client_ip import get_client_ip
+from core.throttling import mark_store_down, store_marked_down
 from accounts.models import CustomUser, PasswordResetToken
 from audit.utils import create_audit_log
 
@@ -57,15 +58,23 @@ def _mask_email(email: str) -> str:
 
 
 def _increment_rate_limit(cache_key: str, *, max_attempts: int, window_seconds: int) -> bool:
-    added = cache.add(cache_key, 1, timeout=window_seconds)
-    if added:
-        current = 1
-    else:
-        try:
-            current = cache.incr(cache_key)
-        except ValueError:
-            cache.set(cache_key, 1, timeout=window_seconds)
+    if store_marked_down():
+        return False
+    try:
+        added = cache.add(cache_key, 1, timeout=window_seconds)
+        if added:
             current = 1
+        else:
+            try:
+                current = cache.incr(cache_key)
+            except ValueError:
+                cache.set(cache_key, 1, timeout=window_seconds)
+                current = 1
+    except Exception:
+        # Counter store down: the endpoint throttle has failed open too. Keep
+        # the reset flow working and leave a trace.
+        mark_store_down("password_reset", "")
+        return False
     return current > max_attempts
 
 
