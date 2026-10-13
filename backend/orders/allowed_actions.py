@@ -60,7 +60,10 @@ def _workflow_transitions(*, user, order, readiness):
         if not reasons and rule.action in {"mark_ready_for_delivery", "complete_order"} and not readiness["requirements_complete"]:
             reasons.append("Required documents are incomplete.")
         if not reasons and rule.action == "complete_order" and _role(user) != UserRole.ADMIN:
-            if not order.documents.filter(is_deleted=False, is_final_document=True, is_verified=True).exists():
+            latest_final = (
+                order.documents.filter(is_deleted=False, is_final_document=True).order_by("-created_at", "-pk").first()
+            )
+            if latest_final is None or not latest_final.is_verified:
                 reasons.append("A verified final result is required before completion.")
         options.append({
             "to_status": rule.to_status,

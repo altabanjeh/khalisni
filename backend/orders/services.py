@@ -1,4 +1,4 @@
-﻿from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F
 
@@ -704,7 +704,10 @@ def complete_order(*, order, actor, admin_confirmation=False, request=None):
             reason="Final document is required before completion.",
         )
         raise ValidationError({"detail": "Completed order must have final document or admin confirmation."})
-    if has_final_document and not final_documents.filter(is_verified=True).exists() and not admin_confirmation:
+    # The newest result is the one being delivered: an earlier verified file
+    # does not vouch for a later upload nobody has reviewed.
+    latest_final_document = final_documents.order_by("-created_at", "-pk").first()
+    if has_final_document and not latest_final_document.is_verified and not admin_confirmation:
         _audit_blocked_transition(
             request=request,
             actor=actor,

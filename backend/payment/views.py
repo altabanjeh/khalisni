@@ -1,5 +1,7 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from rest_framework import generics, permissions, response, status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.views import APIView
 
 from config.permissions import CanCreatePaymentRecord, CanRefundPayment, CanViewPaymentStatus, IsCustomerRole
@@ -106,13 +108,17 @@ class AdminPaymentStatusAPIView(APIView):
         )
         serializer = AdminPaymentStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        payment = update_payment_status(
-            payment=payment,
-            actor=request.user,
-            status_value=serializer.validated_data["status"],
-            failure_reason=serializer.validated_data.get("failure_reason", ""),
-            notes=serializer.validated_data.get("notes", ""),
-            reference_number=serializer.validated_data.get("reference_number", ""),
-            request=request,
-        )
+        try:
+            with transaction.atomic():
+                payment = update_payment_status(
+                    payment=payment,
+                    actor=request.user,
+                    status_value=serializer.validated_data["status"],
+                    failure_reason=serializer.validated_data.get("failure_reason", ""),
+                    notes=serializer.validated_data.get("notes", ""),
+                    reference_number=serializer.validated_data.get("reference_number", ""),
+                    request=request,
+                )
+        except DjangoValidationError as exc:
+            raise DRFValidationError(exc.message_dict if hasattr(exc, "message_dict") else exc.messages)
         return response.Response(AdminPaymentRuleListSerializer(payment).data, status=status.HTTP_200_OK)

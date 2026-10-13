@@ -100,11 +100,18 @@ def is_customer_visible_document(document):
     if not document.is_final_document:
         return True
     order = document.order
-    return (
-        document.status != Document.DocumentStatus.REJECTED
-        and order.completed_at is not None
-        and order.status in {Order.Status.COMPLETED, Order.Status.ARCHIVED}
-    )
+    if (
+        document.status == Document.DocumentStatus.REJECTED
+        or order.completed_at is None
+        or order.status not in {Order.Status.COMPLETED, Order.Status.ARCHIVED}
+    ):
+        return False
+    if document.is_verified:
+        return True
+    # An unverified file is delivered only when the order was closed by
+    # administrator confirmation with no verified result at all. Next to a
+    # verified result it is a superseded or unreviewed draft.
+    return not order.documents.filter(is_deleted=False, is_final_document=True, is_verified=True).exists()
 
 
 @locked_order_action(_document_order)
