@@ -147,6 +147,13 @@ class OrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
         # Queryset already filtered to orders this user can see — skip the extra existence check.
         return get_order_allowed_actions(user=user, order=obj, can_view=True)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if _is_customer_request(self.context.get("request")):
+            # Who inside the operations team holds the order is not customer data.
+            data["assigned_employee"] = None
+        return data
+
 
 class OrderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     DANGEROUS_FIELDS = {

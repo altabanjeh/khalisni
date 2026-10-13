@@ -6,6 +6,7 @@ from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from rest_framework import permissions, response
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
 from config.permissions import CanViewReportsDashboard, CanViewScopedReports
@@ -426,8 +427,11 @@ class EmployeeWorkflowReportAPIView(APIView):
         today = timezone.localdate()
         date_from = request.query_params.get("date_from")
         date_to = request.query_params.get("date_to")
-        start_date = date.fromisoformat(date_from) if date_from else today - timedelta(days=29)
-        end_date = date.fromisoformat(date_to) if date_to else today
+        try:
+            start_date = date.fromisoformat(date_from) if date_from else today - timedelta(days=29)
+            end_date = date.fromisoformat(date_to) if date_to else today
+        except ValueError:
+            raise ValidationError({"detail": "Use YYYY-MM-DD for date_from and date_to."})
 
         reviewable_orders = get_reviewable_orders_for_user(request.user)
         review_logs = OrderStatusLog.objects.filter(
@@ -484,6 +488,10 @@ class OperationalSummaryReportAPIView(APIView):
             "service_volume": _service_volume(orders),
             "payment_summary": _payment_summary(orders),
         }
+        if role == "customer":
+            # A customer's own summary: no staff or provider names.
+            data.pop("employee_workload")
+            data.pop("provider_performance")
         if is_provider_user(request.user):
             # SRS: providers cannot access finance figures.
             data.pop("payment_summary")

@@ -30,7 +30,7 @@ from accounts.serializers import (
 )
 from audit.utils import create_audit_log
 from core.delete_guard import AdminDeleteGuardMixin, get_delete_guard_setting
-from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole
+from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole, PlatformRecordWriteMixin
 from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
 
 # Apps whose permissions are surfaced in the admin permission-assignment UI.
@@ -219,7 +219,12 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         if is_platform_super_admin(self.request.user):
             return queryset
         org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
-        return queryset.filter(organization_memberships__organization_id__in=org_ids).distinct()
+        # Current members only: a removed member is no longer this organization's to manage.
+        return queryset.filter(
+            organization_memberships__organization_id__in=org_ids,
+            organization_memberships__is_active=True,
+            organization_memberships__is_deleted=False,
+        ).distinct()
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -388,7 +393,9 @@ class SystemSettingViewSet(viewsets.ModelViewSet):
         return response.Response({"detail": "System settings cannot be deleted from this screen."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class CustomerProfileAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
+class CustomerProfileAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMixin, viewsets.ModelViewSet):
+    # Which organization a customer belongs to decides where their orders go:
+    # organization administrators may read their own customers, not move them.
     serializer_class = CustomerProfileAdminSerializer
     queryset = CustomerProfile.objects.select_related("user").order_by("pk")
     permission_classes = [permissions.IsAuthenticated, CanManageUserRoles]
@@ -456,3 +463,14 @@ class DeleteGuardSettingAPIView(APIView):
             new_value={"is_configured": True},
         )
         return response.Response(DeleteGuardSettingSerializer(instance=setting, context={"request": request}).data)
+
+try:
+    from rest_framework_simplejwt.views import TokenRefreshView
+
+    from accounts.serializers import VersionedTokenRefreshSerializer
+
+    class VersionedTokenRefreshView(TokenRefreshView):
+        serializer_class = VersionedTokenRefreshSerializer
+        throttle_scope = "auth_login"
+except ImportError:  # pragma: no cover - depends on optional dependency
+    VersionedTokenRefreshView = TokenObtainPairView

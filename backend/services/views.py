@@ -297,6 +297,27 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
             "sort_order", "display_order", "name_ar"
         )
 
+    def _assert_tenant_boundary(self, category):
+        """
+        Categories are shared by every organization. An organization-scoped
+        editor may change one only while it holds nothing but that
+        organization's own services; a category that also carries platform
+        or other tenants' services is changed by the platform team.
+        """
+        user = self.request.user
+        if not has_scoped_memberships(user):
+            return
+        administered = set(
+            active_memberships_for_user(user).values_list("organization_id", flat=True)
+        )
+        owners = set(category.services.filter(is_deleted=False).values_list("organization_id", flat=True))
+        if not owners or None in owners or not owners <= administered or not is_partner_admin(user):
+            raise PermissionDenied("This category is shared and is managed by the platform team.")
+
+    def perform_update(self, serializer):
+        self._assert_tenant_boundary(serializer.instance)
+        return super().perform_update(serializer)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         old_value = _snapshot(instance, self.audit_fields)
@@ -352,6 +373,9 @@ class CategoryAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Mode
                 {"items": f"Categories are invalid or outside your scope: {missing_ids}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        for category in visible_categories.values():
+            self._assert_tenant_boundary(category)
 
         with transaction.atomic():
             for category_id, item in parsed_items:
@@ -503,7 +527,22 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=active)
         return queryset
 
+    def _assert_tenant_boundary(self, *services):
+        """
+        A relation changes what customers may order. An organization-scoped
+        editor may link only services that their own organization owns.
+        """
+        user = self.request.user
+        if not has_scoped_memberships(user):
+            return
+        for service in services:
+            if service is None or service.organization_id is None or not can_administer_organization(user, service.organization):
+                raise PermissionDenied("You can link only your own organization's services.")
+
     def perform_create(self, serializer):
+        self._assert_tenant_boundary(
+            serializer.validated_data.get("source_service"), serializer.validated_data.get("target_service")
+        )
         relation = serializer.save(created_by=self.request.user)
         create_audit_log(
             request=self.request,
@@ -516,6 +555,12 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         relation = self.get_object()
+        self._assert_tenant_boundary(
+            relation.source_service,
+            relation.target_service,
+            serializer.validated_data.get("source_service", relation.source_service),
+            serializer.validated_data.get("target_service", relation.target_service),
+        )
         old_value = relation_snapshot(relation)
         relation = serializer.save()
         create_audit_log(
@@ -530,6 +575,7 @@ class ServiceRelationAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         relation = self.get_object()
+        self._assert_tenant_boundary(relation.source_service, relation.target_service)
         old_value = relation_snapshot(relation)
         self.enforce_delete_guard(request, instance=relation, old_value=old_value)
         if request.user.role == request.user.Role.SUPPORT and not request.user.has_perm("services.manage_service_prices"):

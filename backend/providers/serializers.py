@@ -152,6 +152,9 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
     def validate(self, attrs):
         attrs = super().validate(attrs)
         actor = getattr(self.context.get("request"), "user", None)
+        if self.instance is None and not is_platform_super_admin(actor):
+            # A provider added by an organization waits for platform approval.
+            attrs["is_approved"] = False
         if self.instance is not None and not is_platform_super_admin(actor):
             # Providers are shared across organizations. Their login identity
             # and approval are decided by the platform, not by one tenant.
@@ -160,6 +163,7 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
                     ("password", "password" in attrs),
                     ("email", "email" in attrs.get("user", {})),
                     ("is_approved", "is_approved" in attrs),
+                    ("account_active", "is_active" in attrs.get("user", {})),
                 ) if present
             ]
             if blocked:

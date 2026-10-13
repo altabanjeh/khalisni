@@ -302,6 +302,10 @@ class CanViewPaymentStatus(HasDjangoPermission):
     permission_name = "payment.view_payment_status"
 
     def has_permission(self, request, view):
+        # The customer group holds this permission for the customer's own
+        # payments endpoint; it must not open the operations ledger.
+        if is_customer_user(request.user) or is_provider_user(request.user):
+            return False
         if is_platform_super_admin(request.user) or is_platform_support(request.user):
             return True
         if is_partner_user(request.user):
@@ -313,6 +317,8 @@ class CanCreatePaymentRecord(HasDjangoPermission):
     permission_name = "payment.create_payment_record"
 
     def has_permission(self, request, view):
+        if is_customer_user(request.user) or is_provider_user(request.user):
+            return False
         if is_platform_super_admin(request.user):
             return True
         if is_partner_admin(request.user):

@@ -121,6 +121,11 @@ class AdminPaymentCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mo
         model = Payment
         fields = ("order", "payment_type", "method", "amount", "currency", "reference_number", "notes")
 
+    def validate_amount(self, value):
+        if value is None or value <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return value
+
 
 class AdminPaymentStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=Payment.PaymentStatus.choices)

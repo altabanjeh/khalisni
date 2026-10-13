@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, permissions, response, status, viewsets
-from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -13,7 +13,12 @@ from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
 from core.delete_guard import AdminDeleteGuardMixin
 from documents.serializers import DocumentUploadSerializer
-from organizations.selectors import active_memberships_for_user, enforce_organization_scope, has_scoped_memberships
+from organizations.selectors import (
+    active_memberships_for_user,
+    enforce_organization_scope,
+    has_scoped_memberships,
+    is_platform_super_admin,
+)
 from orders.models import Order
 from orders.serializers import ProviderOrderDetailSerializer, ProviderOrderListSerializer
 from orders.selectors import get_reviewable_orders_for_user
@@ -53,6 +58,12 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         service_id = params.get("service")
         approved = params.get("is_approved")
         active = params.get("is_active")
+
+        # The assignment pickers (?order= / ?service=) list eligible providers
+        # across the platform. They are list filters only: every other action
+        # resolves its object inside the caller's own scope.
+        if self.action != "list":
+            order_id = service_id = None
 
         if order_id:
             queryset = base_queryset
@@ -110,6 +121,13 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context["request"] = self.request
         return context
+
+    @staticmethod
+    def _require_platform_admin(request):
+        # Providers are shared by every organization: whether one is approved
+        # or may sign in at all is decided by the platform.
+        if not is_platform_super_admin(request.user):
+            raise PermissionDenied("Only a platform super admin can approve or activate providers.")
 
     def perform_create(self, serializer):
         provider = serializer.save()
@@ -193,6 +211,7 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])
     def approval(self, request, pk=None):
         provider = self.get_object()
+        self._require_platform_admin(request)
         serializer = ProviderApprovalDecisionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -232,6 +251,7 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated, CanManageUserRoles])
     def activation(self, request, pk=None):
         provider = self.get_object()
+        self._require_platform_admin(request)
         serializer = ProviderActivationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -292,10 +312,11 @@ class ProviderDashboardAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProviderRole]
 
     def get(self, request):
-        provider = request.user.provider_profile
+        # Members of a provider organization work its orders without a personal profile.
+        provider = getattr(request.user, "provider_profile", None)
         queryset = provider_orders_queryset(request.user)
         data = {
-            "provider": ProviderProfileSerializer(provider).data,
+            "provider": ProviderProfileSerializer(provider).data if provider else None,
             "assigned_orders": queryset.count(),
             "in_progress": queryset.filter(status=Order.Status.IN_PROGRESS).count(),
             "ready_for_delivery": queryset.filter(status=Order.Status.READY_FOR_DELIVERY).count(),

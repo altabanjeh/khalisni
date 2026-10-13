@@ -8,7 +8,14 @@ from core.delete_guard import get_delete_guard_setting, update_delete_guard_pass
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from organizations.models import Branch, Organization, OrganizationMembership
 from organizations.serializers import MembershipSummarySerializer
-from organizations.selectors import platform_memberships_for_user, active_memberships_for_user, is_platform_super_admin
+from organizations.selectors import (
+    active_memberships_for_user,
+    can_manage_user_account,
+    is_platform_super_admin,
+    platform_memberships_for_user,
+)
+
+PLATFORM_LEVEL_ROLES = frozenset({CustomUser.Role.ADMIN, CustomUser.Role.SUPPORT})
 
 try:
     from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -250,13 +257,9 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
         return bool(obj.is_superuser)
 
     def get_role_options(self, obj):
-        base_options = [
-            CustomUser.Role.EMPLOYEE,
-            CustomUser.Role.SUPPORT,
-            CustomUser.Role.PROVIDER,
-        ]
+        base_options = [CustomUser.Role.EMPLOYEE, CustomUser.Role.PROVIDER]
         if self._is_super_admin_request():
-            base_options = [CustomUser.Role.ADMIN, *base_options]
+            base_options = [CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT, CustomUser.Role.PROVIDER]
         if getattr(obj, "role", "") == CustomUser.Role.CUSTOMER:
             return [CustomUser.Role.CUSTOMER, *base_options]
         return base_options
@@ -278,8 +281,9 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
 
         if self._is_super_admin_request():
             return value
-        if value == CustomUser.Role.ADMIN:
-            raise serializers.ValidationError("Only super admin can create or assign admin users.")
+        # "admin" and "support" carry platform-wide authority on their own.
+        if value in PLATFORM_LEVEL_ROLES and value != getattr(self.instance, "role", None):
+            raise serializers.ValidationError("Only a platform super admin can assign this role.")
         return value
 
     def validate(self, attrs):
@@ -289,9 +293,21 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
         target_role = attrs.get("role", getattr(self.instance, "role", ""))
         if self.instance and self.instance.role != CustomUser.Role.CUSTOMER and target_role == CustomUser.Role.CUSTOMER:
             raise serializers.ValidationError({"role": "Customer users are created automatically and cannot be assigned manually."})
-        if not self._is_super_admin_request() and self.instance:
-            if self.instance.is_superuser or self.instance.role == CustomUser.Role.ADMIN:
-                raise serializers.ValidationError({"detail": "Only super admin can change admin-level users."})
+        actor = getattr(self.context.get("request"), "user", None)
+        if not self._is_super_admin_request():
+            if self.instance:
+                if self.instance.is_superuser or self.instance.role == CustomUser.Role.ADMIN:
+                    raise serializers.ValidationError({"detail": "Only super admin can change admin-level users."})
+                if not can_manage_user_account(actor, self.instance):
+                    raise serializers.ValidationError(
+                        {"detail": "This account is shared with another organization or the platform and can be changed only by a platform super admin."}
+                    )
+            elif not (organization and membership_role):
+                # A user created by an organization must start inside it. An
+                # employee with no membership would be unscoped internal staff.
+                raise serializers.ValidationError(
+                    {"organization_id": "Choose the organization and membership role for the new user."}
+                )
         if not self.instance and not attrs.get("password"):
             raise serializers.ValidationError({"password": "Password is required when creating a user."})
         if branch and organization and branch.organization_id != organization.id:
@@ -513,3 +529,33 @@ class DeleteGuardSettingSerializer(serializers.Serializer):
             "is_configured": bool(setting and isinstance(setting.value, dict) and setting.value.get("password_hash")),
             "updated_at": getattr(setting, "updated_at", None),
         }
+
+
+if SIMPLEJWT_AVAILABLE:
+    from rest_framework_simplejwt.exceptions import InvalidToken
+    from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+    from rest_framework_simplejwt.tokens import RefreshToken as _RefreshToken
+
+    class VersionedTokenRefreshSerializer(TokenRefreshSerializer):
+        """
+        Refuse a refresh token issued before the account's sessions were revoked.
+
+        The access token it would mint is rejected anyway, but answering 200
+        here keeps a revoked client retrying and hides the revocation from it.
+        """
+
+        def validate(self, attrs):
+            refresh = _RefreshToken(attrs["refresh"])
+            user = CustomUser.objects.filter(pk=refresh.payload.get("user_id")).first()
+            claimed = refresh.payload.get("token_version")
+            current = int(getattr(user, "token_version", 1) or 1)
+            revoked = (
+                user is None
+                or not user.is_active
+                or user.is_deleted
+                or (claimed is None and current != 1)
+                or (claimed is not None and int(claimed) != current)
+            )
+            if revoked:
+                raise InvalidToken("Token has been revoked. Please sign in again.")
+            return super().validate(attrs)

@@ -5,7 +5,7 @@ from core.serializer_mixins import SoftDeleteFieldsReadOnlyMixin
 
 from accounts.models import CustomUser
 from organizations.models import Branch, Organization, OrganizationBranding, OrganizationMembership, PartnerServiceConfig
-from organizations.selectors import can_administer_organization, is_platform_super_admin
+from organizations.selectors import can_administer_organization, can_manage_user_account, is_platform_super_admin
 from organizations.services import assert_can_assign_membership
 from services.models import Service
 
@@ -103,6 +103,14 @@ class OrganizationMembershipSerializer(SoftDeleteFieldsReadOnlyMixin, serializer
             if instance is not None and not is_platform_super_admin(actor):
                 # The existing row must also be one the caller may manage.
                 assert_can_assign_membership(actor=actor, organization=instance.organization, role=instance.role)
+                if user is not None and user.pk != instance.user_id:
+                    raise DjangoValidationError({"user": "A membership cannot be moved to another user."})
+            if instance is None and not can_manage_user_account(actor, user):
+                # Attaching an outside account would put it within reach of the
+                # organization's user management (password and email changes).
+                raise DjangoValidationError(
+                    {"user": "Only accounts that already belong to your organization can be given a role here."}
+                )
             OrganizationMembership(user=user, organization=organization, branch=branch, role=role).clean()
         except DjangoValidationError as exc:
             raise serializers.ValidationError(exc.message_dict if hasattr(exc, "message_dict") else exc.messages)

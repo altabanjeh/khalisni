@@ -1,8 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from rest_framework_simplejwt.views import TokenRefreshView
-
 from accounts.views import (
     AdminUserViewSet,
     AvailablePermissionsAPIView,
@@ -16,6 +14,7 @@ from accounts.views import (
     RegisterAPIView,
     ResetPasswordAPIView,
     SystemSettingViewSet,
+    VersionedTokenRefreshView,
 )
 
 router = DefaultRouter()
@@ -30,7 +29,7 @@ urlpatterns = [
     path("auth/logout/", LogoutAPIView.as_view()),
     path("auth/forgot-password/", ForgotPasswordAPIView.as_view()),
     path("auth/reset-password/<str:token>/", ResetPasswordAPIView.as_view()),
-    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("auth/token/refresh/", VersionedTokenRefreshView.as_view(), name="token-refresh"),
     path("auth/me/", MeAPIView.as_view()),
     path("customer/profile/", CustomerProfileAPIView.as_view()),
     path("admin/available-permissions/", AvailablePermissionsAPIView.as_view(), name="admin-available-permissions"),

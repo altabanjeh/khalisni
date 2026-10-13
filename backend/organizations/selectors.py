@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Q
 
 from organizations.models import Branch, Organization, OrganizationMembership
@@ -83,13 +84,63 @@ def is_platform_super_admin(user):
     return platform_memberships_for_user(user, PLATFORM_ADMIN_ROLES).exists()
 
 
+def has_tenant_membership_history(user):
+    """
+    True when the user was ever attached to a non-platform organization.
+
+    Such an account belongs to a tenant. Losing its membership (deactivated,
+    removed, organization closed) must leave it with no access, never with the
+    platform-wide access of an unscoped internal employee.
+    """
+    if not user or not getattr(user, "pk", None):
+        return False
+    return (
+        OrganizationMembership.objects.filter(user=user)
+        .exclude(organization__organization_type=Organization.OrganizationType.PLATFORM)
+        .exists()
+    )
+
+
+def can_manage_user_account(actor, target):
+    """
+    May ``actor`` change the login identity, role or memberships of ``target``?
+
+    A platform super admin may. An organization administrator may only for an
+    account that lives entirely inside the organizations they administer: no
+    platform authority, and no active membership anywhere else. Otherwise
+    resetting a shared user's password would hand over that user's access to
+    other tenants or to the platform.
+    """
+    if is_platform_super_admin(actor):
+        return True
+    if target is None or not getattr(target, "pk", None):
+        return False
+    if getattr(target, "is_superuser", False) or getattr(target, "is_staff", False):
+        return False
+    if (getattr(target, "role", "") or "").lower() in {"admin", "support"}:
+        return False
+    administered = set(
+        active_memberships_for_user(actor)
+        .filter(role__in=PARTNER_ADMIN_ROLES)
+        .values_list("organization_id", flat=True)
+    )
+    if not administered:
+        return False
+    target_orgs = set(
+        OrganizationMembership.objects.filter(user=target, is_active=True, is_deleted=False).values_list(
+            "organization_id", flat=True
+        )
+    )
+    return bool(target_orgs) and target_orgs <= administered
+
+
 def is_platform_support(user):
     if not user or not getattr(user, "is_authenticated", False):
         return False
     if is_platform_super_admin(user):
         return True
     legacy_role = (getattr(user, "role", "") or "").lower()
-    if legacy_role == "support":
+    if legacy_role == "support" and not has_tenant_membership_history(user):
         return True
     return platform_memberships_for_user(user, PLATFORM_STAFF_ROLES).exists()
 
@@ -159,16 +210,32 @@ def resolve_organization_by_ref(ref):
     return queryset.filter(slug=str(ref)).first()
 
 
+def _has_model_field(queryset, name):
+    try:
+        queryset.model._meta.get_field(name)
+    except FieldDoesNotExist:
+        return False
+    return True
+
+
 def enforce_organization_scope(queryset, *, user, organization_field="organization", branch_field=None):
     if is_platform_super_admin(user):
         return queryset
 
     if is_provider_user(user):
         provider_org_ids = organizations_for_user(user, organization_type=Organization.OrganizationType.PROVIDER).values_list("pk", flat=True)
-        if not provider_org_ids:
-            return queryset
-        provider_filters = Q(assigned_provider_organization__in=provider_org_ids)
-        return queryset.filter(provider_filters).distinct()
+        if _has_model_field(queryset, "assigned_provider_organization"):
+            # Work rows (orders): what is assigned to the provider, never the table.
+            if provider_org_ids:
+                return queryset.filter(assigned_provider_organization__in=provider_org_ids).distinct()
+            if not is_partner_user(user):
+                return queryset.filter(assigned_provider__user=user).distinct()
+        elif not is_partner_user(user):
+            # Organization-owned rows: only the provider's own organizations.
+            if not organization_field:
+                return queryset.none()
+            return queryset.filter(**{f"{organization_field}__in": provider_org_ids}).distinct()
+        # A provider-role account that is also partner staff is scoped as partner staff below.
 
     if is_partner_user(user):
         org_ids = organizations_for_user(user, organization_type=Organization.OrganizationType.PARTNER).values_list("pk", flat=True)
@@ -189,7 +256,9 @@ def enforce_organization_scope(queryset, *, user, organization_field="organizati
         return queryset
 
     legacy_role = (getattr(user, "role", "") or "").lower()
-    if legacy_role in {"employee", "support"} and not active_memberships_for_user(user).exists():
+    # Unscoped internal staff: an employee account that was never part of a
+    # tenant. A tenant employee whose membership ended falls through to none().
+    if legacy_role in {"employee", "support"} and not has_tenant_membership_history(user):
         return queryset
 
     return queryset.none()

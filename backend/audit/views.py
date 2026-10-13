@@ -5,7 +5,12 @@ from audit.models import AuditLog
 from audit.serializers import AuditLogSerializer
 from config.permissions import IsAdminRole
 from orders.selectors import get_orders_for_user
-from orders.serializers import OrderStatusLogSerializer
+from organizations.selectors import is_customer_user, is_provider_user
+from orders.serializers import (
+    CustomerOrderStatusLogSerializer,
+    OrderStatusLogSerializer,
+    ProviderOrderStatusLogSerializer,
+)
 
 
 class AuditLogListAPIView(generics.ListAPIView):
@@ -38,4 +43,12 @@ class OrderTimelineAPIView(APIView):
     def get(self, request, pk):
         order = generics.get_object_or_404(get_orders_for_user(request.user), pk=pk)
         timeline = order.status_logs.select_related("changed_by")
-        return response.Response(OrderStatusLogSerializer(timeline, many=True).data)
+        # Same audience rule as the order payloads: staff identity and internal
+        # reasons are for the operations team only.
+        if is_customer_user(request.user):
+            serializer_class = CustomerOrderStatusLogSerializer
+        elif is_provider_user(request.user):
+            serializer_class = ProviderOrderStatusLogSerializer
+        else:
+            serializer_class = OrderStatusLogSerializer
+        return response.Response(serializer_class(timeline, many=True).data)
