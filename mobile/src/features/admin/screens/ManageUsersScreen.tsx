@@ -19,7 +19,7 @@ export function ManageUsersScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('customer');
+  const [role, setRole] = useState('employee');
   const [password, setPassword] = useState('');
 
   const mutation = useMutation({
@@ -41,7 +41,7 @@ export function ManageUsersScreen() {
         <AppInput label="الاسم" value={fullName} onChangeText={setFullName} />
         <AppInput label="البريد الإلكتروني" value={email} onChangeText={setEmail} autoCapitalize="none" />
         <AppInput label="الهاتف" value={phone} onChangeText={setPhone} />
-        <AppInput label="الدور" value={role} onChangeText={setRole} hint="customer / employee / provider / admin" />
+        <AppInput label="الدور" value={role} onChangeText={setRole} hint="employee / provider / admin" />
         <AppInput label="كلمة المرور" value={password} onChangeText={setPassword} secureTextEntry />
         <AppButton label="إنشاء مستخدم" onPress={() => mutation.mutate()} loading={mutation.isPending} />
       </AppCard>

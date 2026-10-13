@@ -51,13 +51,16 @@ export function ManagePublicContentScreen() {
   }, [themeJson, themeQuery.data]);
 
   const contentMutation = useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => adminApi.updateAdminPublicContent(payload),
+    // The endpoint is a full update (PUT): send the loaded object with the edits applied.
+    mutationFn: async (payload: Record<string, unknown>) =>
+      adminApi.updateAdminPublicContent({ ...((contentQuery.data as Record<string, unknown> | undefined) ?? {}), ...payload }),
     onSuccess: () => Alert.alert('تم', 'تم تحديث محتوى الموقع.'),
     onError: (error) => Alert.alert('تعذر الحفظ', getDisplayError(error)),
   });
 
   const themeMutation = useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => adminApi.updateAdminTheme(payload),
+    mutationFn: async (payload: Record<string, unknown>) =>
+      adminApi.updateAdminTheme({ ...((themeQuery.data as Record<string, unknown> | undefined) ?? {}), ...payload }),
     onSuccess: () => Alert.alert('تم', 'تم تحديث السمة العامة.'),
     onError: (error) => Alert.alert('تعذر الحفظ', getDisplayError(error)),
   });

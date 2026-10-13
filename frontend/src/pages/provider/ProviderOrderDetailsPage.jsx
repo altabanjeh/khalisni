@@ -53,7 +53,7 @@ function ProviderOrderDetailsPage() {
   async function handleStatus(values) {
     try {
       await api.providerChangeStatus(id, values)
-      statusForm.reset({ status: values.status, note: '' })
+      statusForm.reset({ status: '', note: '' })
       reload()
       toast(isArabic ? 'تم تحديث حالة التنفيذ.' : 'Processing status updated.', 'success')
     } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
@@ -154,14 +154,14 @@ function ProviderOrderDetailsPage() {
             <form className="space-y-3" onSubmit={uploadForm.handleSubmit(exclusive('upload', handleUpload))}>
               <input type="hidden" {...uploadForm.register('document_type')} />
               <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3 text-sm text-slate-600">
-                {isArabic ? 'نوع الوثيقة النهائية' : 'Final document type'}: <span className="font-black text-ink">FINAL_RESULT</span>
+                {isArabic ? 'نوع الوثيقة النهائية' : 'Final document type'}: <span className="font-black text-ink">{isArabic ? 'النتيجة النهائية' : 'Final result'}</span>
               </div>
               <FileUploader
                 accept={buildAcceptValue()}
                 error={uploadForm.formState.errors.file}
-                hint={buildUploadHint()}
+                hint={buildUploadHint(undefined, language)}
                 label={isArabic ? 'الملف النهائي' : 'Final file'}
-                registration={uploadForm.register('file', { validate: (fileList) => validateSingleFileList(fileList, null, isArabic ? 'الملف النهائي مطلوب' : 'The final file is required') })}
+                registration={uploadForm.register('file', { validate: (fileList) => validateSingleFileList(fileList, null, isArabic ? 'الملف النهائي مطلوب' : 'The final file is required', language) })}
               />
               <textarea aria-label={isArabic ? 'ملاحظة التسليم' : 'Delivery note'} className="field min-h-20" placeholder={isArabic ? 'ملاحظة التحقق أو التسليم' : 'A verification or delivery note'} {...uploadForm.register('verification_note')} />
               {uploadForm.formState.errors.root?.server ? <p className="text-sm font-bold text-danger" role="alert">{uploadForm.formState.errors.root.server.message}</p> : null}

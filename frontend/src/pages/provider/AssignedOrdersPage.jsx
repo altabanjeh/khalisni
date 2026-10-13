@@ -14,7 +14,7 @@ const ACTIVE = ['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITING_PROVID
 
 function AssignedOrdersPage() {
   const { language, isArabic } = useLanguage()
-  const { data: orders = [], loading } = useAsyncData(() => api.getProviderOrders(), [], [])
+  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getProviderOrders(), [], [])
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
 
@@ -95,7 +95,9 @@ function AssignedOrdersPage() {
         columns={columns}
         emptyDescription={isArabic ? 'ستظهر هنا الطلبات المسندة إليك، أو بعد تعديل البحث والتصفية.' : 'Assigned requests will appear here, or after adjusting the search and filters.'}
         emptyTitle={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
+        error={error}
         loading={loading}
+        onRetry={reload}
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">

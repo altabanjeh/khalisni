@@ -16,7 +16,7 @@ const IN_EXECUTION = ['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITING_
 
 function OrdersManagementPage() {
   const { language, isArabic } = useLanguage()
-  const { data: orders = [], loading } = useAsyncData(() => api.getAdminOrders(), [], [])
+  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getAdminOrders(), [], [])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
@@ -113,7 +113,9 @@ function OrdersManagementPage() {
         columns={columns}
         emptyDescription={isArabic ? 'ستظهر هنا الطلبات عند توفرها أو بعد تعديل البحث والتصفية.' : 'Requests will appear here, or after adjusting the search and filters.'}
         emptyTitle={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
+        error={error}
         loading={loading}
+        onRetry={reload}
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">

@@ -17,7 +17,8 @@ import { useLanguage } from '../../context/LanguageContext'
 import { getDefaultDashboardPath } from '../../utils/authz'
 
 function getSafeNextPath(value) {
-  return value && value.startsWith('/') ? value : ''
+  // A single leading slash only: `//host` and `/\host` leave this site.
+  return value && /^\/(?![/\\])/.test(value) ? value : ''
 }
 
 function LoginPage() {

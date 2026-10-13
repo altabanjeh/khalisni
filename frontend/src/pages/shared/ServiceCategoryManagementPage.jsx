@@ -13,6 +13,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { hasPermission } from '../../utils/authz'
 import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
 
@@ -73,6 +74,7 @@ function ServiceCategoryManagementPage() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const { busy, exclusive } = useExclusiveAction()
 
   const canManage = user?.role === 'admin' || hasPermission(user, 'services.manage_service_prices')
 
@@ -291,10 +293,10 @@ function ServiceCategoryManagementPage() {
                 <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
                   {isArabic ? 'تعديل' : 'Edit'}
                 </button>
-                <button aria-label={isArabic ? 'تحريك لأعلى' : 'Move up'} className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, -1)} type="button">
+                <button aria-label={isArabic ? 'تحريك لأعلى' : 'Move up'} className="btn-secondary px-3 py-2 text-xs" disabled={Boolean(busy)} onClick={exclusive('move', () => handleMove(row, -1))} type="button">
                   <ArrowUp className="h-3.5 w-3.5" />
                 </button>
-                <button aria-label={isArabic ? 'تحريك لأسفل' : 'Move down'} className="btn-secondary px-3 py-2 text-xs" onClick={() => handleMove(row, 1)} type="button">
+                <button aria-label={isArabic ? 'تحريك لأسفل' : 'Move down'} className="btn-secondary px-3 py-2 text-xs" disabled={Boolean(busy)} onClick={exclusive('move', () => handleMove(row, 1))} type="button">
                   <ArrowDown className="h-3.5 w-3.5" />
                 </button>
                 <button

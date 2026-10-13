@@ -8,6 +8,7 @@ import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { broadcastPublicSiteUpdate } from '../../utils/publicSiteSync'
 import {
   ColorPickerField,
@@ -74,6 +75,7 @@ function AdvertisementManagerPage() {
   const [feedback, setFeedback] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const form = useForm({ defaultValues })
+  const { busy, exclusive } = useExclusiveAction()
   const imageFile = form.watch('image')
   const backgroundColor = form.watch('background_color')
   const textColor = form.watch('text_color')
@@ -223,7 +225,7 @@ function AdvertisementManagerPage() {
       render: (row) => (
         <div className="flex gap-2">
           {row.is_deleted ? (
-            <button className="btn-secondary px-3 py-2 text-xs" onClick={() => handleRestore(row.id)} type="button">
+            <button className="btn-secondary px-3 py-2 text-xs" disabled={Boolean(busy)} onClick={exclusive(`restore:${row.id}`, () => handleRestore(row.id))} type="button">
               {tr('استعادة', 'Restore')}
             </button>
           ) : (
@@ -231,7 +233,7 @@ function AdvertisementManagerPage() {
               <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openEditForm(row.id)} type="button">
                 {tr('تعديل', 'Edit')}
               </button>
-              <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger" onClick={() => handleDelete(row.id)} type="button">
+              <button className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:opacity-60" disabled={Boolean(busy)} onClick={exclusive(`delete:${row.id}`, () => handleDelete(row.id))} type="button">
                 {tr('حذف', 'Delete')}
               </button>
             </>
@@ -294,7 +296,7 @@ function AdvertisementManagerPage() {
             <button className="btn-secondary" onClick={closeForm} type="button">
               {tr('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" form="advertisement-form" type="submit">
+            <button className="btn-primary min-w-40" disabled={form.formState.isSubmitting} form="advertisement-form" type="submit">
               {selectedAdvertisement ? tr('حفظ التعديلات', 'Save changes') : tr('إضافة الإعلان', 'Add advertisement')}
             </button>
           </div>

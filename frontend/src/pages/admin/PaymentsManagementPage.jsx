@@ -10,7 +10,7 @@ import { getDisplayError } from '../../api/client'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { formatDateTime } from '../../utils/format'
+import { formatDateTime, getPaymentStatusKey } from '../../utils/format'
 
 const PAGE_SIZE = 20
 
@@ -24,16 +24,6 @@ const statusOptions = [
   { value: 'partially_refunded', label_ar: 'مسترجع جزئياً', label_en: 'Partially refunded' },
   { value: 'cancelled', label_ar: 'ملغي', label_en: 'Cancelled' },
 ]
-
-const statusMap = {
-  pending: 'PENDING_REVIEW',
-  processing: 'UNDER_REVIEW',
-  paid: 'COMPLETED',
-  failed: 'REJECTED',
-  refunded: 'CANCELLED',
-  partially_refunded: 'WAITING_CUSTOMER',
-  cancelled: 'CANCELLED',
-}
 
 function Field({ label, children }) {
   return (
@@ -124,7 +114,7 @@ function PaymentsManagementPage() {
     {
       key: 'status',
       label: tr('الحالة', 'Status'),
-      render: (row) => <StatusBadge status={statusMap[row.status] || row.status} />,
+      render: (row) => <StatusBadge status={getPaymentStatusKey(row.status)} />,
     },
     {
       key: 'amount',
@@ -173,7 +163,7 @@ function PaymentsManagementPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold text-ink">{row.payment_number}</p>
-              <StatusBadge status={statusMap[row.status] || row.status} />
+              <StatusBadge status={getPaymentStatusKey(row.status)} />
             </div>
             <p className="text-sm text-slate-600">{row.order_number} — {row.customer_name}</p>
             <p className="text-sm font-medium text-ink">{row.amount} {row.currency || 'JOD'}</p>

@@ -18,6 +18,16 @@ interface AdminProviderListRecord extends ProviderProfileBrief {
   };
 }
 
+// Uploaded files cannot be sent back as JSON strings; leaving them out of the
+// full update keeps the stored file unchanged.
+function withoutFileFields(payload: Record<string, unknown>, fileFields: string[]) {
+  const next = { ...payload };
+  fileFields.forEach((field) => {
+    delete next[field];
+  });
+  return next;
+}
+
 export const adminApi = {
   getSystemSettings() {
     return apiClient.get('/admin/system-settings/').then((res) => res.data);
@@ -59,13 +69,13 @@ export const adminApi = {
     return apiClient.get('/admin/public-site/content/').then((res) => res.data);
   },
   updateAdminPublicContent(payload: Record<string, unknown>) {
-    return apiClient.patch('/admin/public-site/content/', payload).then((res) => res.data);
+    return apiClient.put('/admin/public-site/content/', withoutFileFields(payload, ['hero_image'])).then((res) => res.data);
   },
   getAdminTheme() {
     return apiClient.get<PublicSiteTheme>('/admin/public-site/theme/').then((res) => res.data);
   },
   updateAdminTheme(payload: Record<string, unknown>) {
-    return apiClient.patch('/admin/public-site/theme/', payload).then((res) => res.data);
+    return apiClient.put('/admin/public-site/theme/', withoutFileFields(payload, ['logo', 'favicon'])).then((res) => res.data);
   },
   getPayments(params: ApiListParams = {}) {
     return apiClient.get('/admin/payments/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));

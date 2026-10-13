@@ -86,6 +86,7 @@ describe('client auth storage', () => {
     expect(axiosMockState.post).toHaveBeenCalledWith(
       'http://localhost:8000/api/auth/token/refresh/',
       { refresh: 'session-refresh-token' },
+      expect.objectContaining({ timeout: 30000 }),
     )
     expect(sessionStorage.getItem(client.ACCESS_TOKEN_KEY)).toBe('new-session-access')
     expect(localStorage.getItem(client.ACCESS_TOKEN_KEY)).toBeNull()
@@ -97,6 +98,97 @@ describe('client auth storage', () => {
         }),
       }),
     )
+  })
+
+  function expiredTokenError(config = { url: '/orders/', headers: {} }) {
+    return {
+      isAxiosError: true,
+      config,
+      response: { status: 401, data: { code: 'token_not_valid', detail: 'token_not_valid' } },
+    }
+  }
+
+  function storeSession(client) {
+    sessionStorage.setItem(client.ACCESS_TOKEN_KEY, 'stale-access')
+    sessionStorage.setItem(client.REFRESH_TOKEN_KEY, 'refresh-token')
+    sessionStorage.setItem(client.AUTH_STORAGE_MODE_KEY, client.AUTH_STORAGE_MODE_SESSION)
+  }
+
+  test('a refresh that fails without an answer keeps the session and reports a network error', async () => {
+    const client = await import('./client.js')
+    storeSession(client)
+    axiosMockState.post.mockRejectedValueOnce({ isAxiosError: true, message: 'Network Error' })
+
+    const rejection = await axiosMockState.responseRejected(expiredTokenError()).catch((error) => error)
+
+    expect(rejection.status).toBe(0)
+    expect(rejection.displayMessage).toBe('تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.')
+    expect(client.getStoredRefreshToken()).toBe('refresh-token')
+    expect(client.getStoredAccessToken()).toBe('stale-access')
+  })
+
+  test('a refresh that fails with a server fault keeps the session', async () => {
+    const client = await import('./client.js')
+    storeSession(client)
+    axiosMockState.post.mockRejectedValueOnce({ isAxiosError: true, response: { status: 503, data: {} } })
+
+    const rejection = await axiosMockState.responseRejected(expiredTokenError()).catch((error) => error)
+
+    expect(rejection.status).toBe(503)
+    expect(client.getStoredRefreshToken()).toBe('refresh-token')
+  })
+
+  test('a refused refresh token ends the session', async () => {
+    const client = await import('./client.js')
+    storeSession(client)
+    axiosMockState.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 401, data: { code: 'token_not_valid' } },
+    })
+
+    const rejection = await axiosMockState.responseRejected(expiredTokenError()).catch((error) => error)
+
+    expect(rejection.status).toBe(401)
+    expect(client.getStoredRefreshToken()).toBeNull()
+    expect(client.getStoredAccessToken()).toBeNull()
+  })
+
+  test.each(['token_revoked', 'user_inactive', 'user_not_found'])('401 %s ends the session without a refresh', async (code) => {
+    const client = await import('./client.js')
+    storeSession(client)
+
+    await axiosMockState.responseRejected({
+      isAxiosError: true,
+      config: { url: '/orders/', headers: {} },
+      response: { status: 401, data: { code, detail: 'gone' } },
+    }).catch(() => null)
+
+    expect(axiosMockState.post).not.toHaveBeenCalled()
+    expect(client.getStoredRefreshToken()).toBeNull()
+  })
+
+  test('a request already retried after a refresh is not refreshed again', async () => {
+    const client = await import('./client.js')
+    storeSession(client)
+
+    const rejection = await axiosMockState
+      .responseRejected(expiredTokenError({ url: '/orders/', headers: {}, _retried: true }))
+      .catch((error) => error)
+
+    expect(axiosMockState.post).not.toHaveBeenCalled()
+    expect(rejection.status).toBe(401)
+  })
+
+  test('default error messages follow the stored language', async () => {
+    localStorage.setItem('khalisni-language', 'en')
+    const client = await import('./client.js')
+
+    const rejection = await axiosMockState
+      .responseRejected({ isAxiosError: true, config: { url: '/orders/' }, message: 'timeout of 30000ms exceeded' })
+      .catch((error) => error)
+
+    expect(rejection.displayMessage).toBe('Could not reach the server. Check your connection and try again.')
+    expect(client.getDisplayError(null)).toBe('The request could not be completed.')
   })
 
   test('unwrapList supports paginated DRF responses', async () => {

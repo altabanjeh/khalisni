@@ -11,6 +11,37 @@ export function submissionKeyStorageKeyForUser(user) {
   return `${draftStorageKeyForUser(user)}:submission-key`
 }
 
+// Drafts contain personal data (national ID, phone). Remove every stored
+// draft and submission key, for any account, when the user signs out.
+export function clearStoredOrderDrafts(storage = typeof window !== 'undefined' ? window.localStorage : null) {
+  if (!storage) return
+  try {
+    const keys = []
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index)
+      if (key && key.startsWith(`${draftStorageKey}:`)) keys.push(key)
+    }
+    keys.forEach((key) => storage.removeItem(key))
+  } catch {
+    // Storage can be unavailable (private mode); nothing to clean up then.
+  }
+}
+
+const draftMessages = {
+  outdated: {
+    ar: 'تم تجاهل المسودة المحفوظة لأن تنسيقها قديم. يمكنك المتابعة بمسودة جديدة.',
+    en: 'The saved draft was ignored because its format is outdated. You can continue with a new draft.',
+  },
+  expired: {
+    ar: 'انتهت صلاحية المسودة المحفوظة وتمت إزالتها. يمكنك إنشاء مسودة جديدة.',
+    en: 'The saved draft expired and was removed. You can start a new draft.',
+  },
+}
+
+function draftMessage(code, language) {
+  return draftMessages[code][language === 'en' ? 'en' : 'ar']
+}
+
 export function buildBaseDraftValues({ requestedServiceId, user }) {
   return {
     category_slug: '',
@@ -24,7 +55,7 @@ export function buildBaseDraftValues({ requestedServiceId, user }) {
   }
 }
 
-export function parseStoredDraft(storedDraft, now = Date.now()) {
+export function parseStoredDraft(storedDraft, now = Date.now(), language = 'ar') {
   const parsedDraft = JSON.parse(storedDraft)
 
   if (!parsedDraft || typeof parsedDraft !== 'object' || Array.isArray(parsedDraft)) {
@@ -35,7 +66,7 @@ export function parseStoredDraft(storedDraft, now = Date.now()) {
     if (parsedDraft.version !== draftSchemaVersion) {
       return {
         values: null,
-        message: 'تم تجاهل المسودة المحفوظة لأن تنسيقها قديم. يمكنك المتابعة بمسودة جديدة.',
+        message: draftMessage('outdated', language),
       }
     }
 
@@ -48,7 +79,7 @@ export function parseStoredDraft(storedDraft, now = Date.now()) {
       if (Number.isFinite(savedAt) && now - savedAt > draftMaxAgeMs) {
         return {
           values: null,
-          message: 'انتهت صلاحية المسودة المحفوظة وتمت إزالتها. يمكنك إنشاء مسودة جديدة.',
+          message: draftMessage('expired', language),
         }
       }
     }

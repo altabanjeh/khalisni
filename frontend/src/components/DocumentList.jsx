@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { api } from '../api/services'
-import { buildQuery } from '../api/client'
+import { buildQuery, getDisplayError } from '../api/client'
 import { useLanguage } from '../context/LanguageContext'
+import { useToast } from '../context/ToastContext'
 import StatusBadge from './StatusBadge'
 import { findRequiredDocument, getRequiredDocumentLabel } from '../utils/serviceForms'
 
@@ -18,6 +19,7 @@ function triggerBlobDownload(blob, filename) {
 
 function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [], staff = false }) {
   const { isArabic, language } = useLanguage()
+  const { toast } = useToast()
 
   // Customers see the configured document name, never the internal type code.
   function documentLabel(document) {
@@ -36,8 +38,11 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default',
     try {
       const blob = await api.downloadDocumentWithToken(document.id)
       triggerBlobDownload(blob, document.original_filename)
-    } catch {
-      window.open(document.download_url, '_blank', 'noreferrer')
+    } catch (downloadError) {
+      // Never fall back to opening the raw API URL: without the token it shows
+      // an error page. Say what went wrong and let the user try again.
+      const reason = downloadError?.response ? '' : ` ${getDisplayError(downloadError)}`
+      toast(`${isArabic ? 'تعذر تنزيل الملف. حاول مرة أخرى.' : 'The file could not be downloaded. Please try again.'}${reason}`, 'error')
     } finally {
       setDownloading((prev) => ({ ...prev, [document.id]: false }))
     }

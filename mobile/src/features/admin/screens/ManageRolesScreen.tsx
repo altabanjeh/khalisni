@@ -24,7 +24,7 @@ export function ManageRolesScreen() {
     .map((item) => item.trim())
     .filter(Boolean);
   const availablePermissions = useMemo(
-    () => Object.values(permissionsQuery.data ?? {}).flatMap((items) => items ?? []),
+    () => Object.values(permissionsQuery.data ?? {}).flatMap((items) => (items ?? []).map((item) => item.full_codename)),
     [permissionsQuery.data],
   );
   const invalidPermissions = parsedPermissions.filter((item) => !availablePermissions.includes(item));

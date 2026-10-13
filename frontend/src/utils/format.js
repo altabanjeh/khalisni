@@ -33,6 +33,39 @@ export const statusMeta = {
   not_uploaded: { label: { ar: 'لم يُرفع بعد', en: 'Not uploaded' }, className: 'bg-slate-100 text-slate-700', icon: SearchCheck },
   approved: { label: { ar: 'معتمد', en: 'Approved' }, className: 'bg-green-100 text-green-700', icon: ShieldCheck },
   rejected: { label: { ar: 'مرفوض', en: 'Rejected' }, className: 'bg-red-100 text-red-700', icon: XCircle },
+  // Remaining document statuses (backend documents.Document.DocumentStatus).
+  pending_scan: { label: { ar: 'بانتظار الفحص الأمني', en: 'Pending security scan' }, className: 'bg-amber-100 text-amber-800', icon: Clock3 },
+  safe: { label: { ar: 'آمن', en: 'Safe' }, className: 'bg-green-100 text-green-700', icon: ShieldCheck },
+  unsafe: { label: { ar: 'غير آمن', en: 'Unsafe' }, className: 'bg-red-100 text-red-700', icon: TriangleAlert },
+  archived: { label: { ar: 'مؤرشف', en: 'Archived' }, className: 'bg-stone-200 text-stone-700', icon: Ban },
+  // Payment statuses (backend core.choices.PaymentStatus). They are namespaced
+  // so a payment never borrows an order status label.
+  payment_pending: { label: { ar: 'معلق', en: 'Pending' }, className: 'bg-amber-100 text-amber-800', icon: Clock3 },
+  payment_processing: { label: { ar: 'قيد المعالجة', en: 'Processing' }, className: 'bg-cyan-100 text-cyan-700', icon: Clock3 },
+  payment_paid: { label: { ar: 'مدفوع', en: 'Paid' }, className: 'bg-green-100 text-green-700', icon: CheckCircle2 },
+  payment_failed: { label: { ar: 'فشل', en: 'Failed' }, className: 'bg-red-100 text-red-700', icon: XCircle },
+  payment_cancelled: { label: { ar: 'ملغي', en: 'Cancelled' }, className: 'bg-red-100 text-red-700', icon: Ban },
+  payment_refunded: { label: { ar: 'مسترجع', en: 'Refunded' }, className: 'bg-violet-100 text-violet-700', icon: CircleAlert },
+  payment_partially_refunded: { label: { ar: 'مسترجع جزئياً', en: 'Partially refunded' }, className: 'bg-violet-100 text-violet-700', icon: CircleAlert },
+}
+
+export function getPaymentStatusKey(status) {
+  const key = `payment_${String(status || '').toLowerCase()}`
+  return statusMeta[key] ? key : status
+}
+
+const roleLabels = {
+  admin: { ar: 'مدير', en: 'Admin' },
+  customer: { ar: 'عميل', en: 'Customer' },
+  employee: { ar: 'موظف', en: 'Employee' },
+  provider: { ar: 'مزود', en: 'Provider' },
+  support: { ar: 'دعم', en: 'Support' },
+  guest: { ar: 'زائر', en: 'Guest' },
+}
+
+export function getRoleLabel(role, language) {
+  const label = roleLabels[String(role || '').toLowerCase()]
+  return label ? label[normalizeLanguage(language)] : role || ''
 }
 
 export function normalizeRole(role) {

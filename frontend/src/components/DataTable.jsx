@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 import EmptyState from './EmptyState'
+import LoadError from './LoadError'
 import Pagination from './Pagination'
 
 function SkeletonRows({ columns, count = 5 }) {
@@ -28,6 +29,8 @@ function DataTable({
   pagination,
   rowClassName,
   mobileCardClassName,
+  error = null,
+  onRetry,
 }) {
   const { direction, t } = useLanguage()
   const [isTableLayout, setIsTableLayout] = useState(() =>
@@ -79,7 +82,10 @@ function DataTable({
         </div>
       ) : null}
 
-      {isEmpty ? (
+      {error && !loading ? (
+        // A failed load is not an empty list.
+        <LoadError error={error} onRetry={onRetry} />
+      ) : isEmpty ? (
         <EmptyState
           action={emptyAction}
           description={emptyDescription}

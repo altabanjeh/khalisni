@@ -27,5 +27,6 @@ export interface OptionItem {
 export interface ApiError {
   message: string;
   status?: number;
+  code?: string;
   fieldErrors?: Record<string, string[]>;
 }

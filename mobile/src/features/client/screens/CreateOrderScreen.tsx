@@ -1,6 +1,6 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { AppButton } from '../../../components/AppButton';
@@ -12,7 +12,7 @@ import { LoadingState } from '../../../components/LoadingState';
 import { PublicServiceCard } from '../../../components/public/PublicServiceCard';
 import { ordersApi } from '../../../api/orders.api';
 import { servicesApi } from '../../../api/services.api';
-import { getDisplayError } from '../../../api/client';
+import { getDisplayError, normalizeApiError } from '../../../api/client';
 import { useAuthStore } from '../../../state/authStore';
 import { theme } from '../../../theme';
 import type { UploadableDocument } from '../../../types/document';
@@ -26,6 +26,7 @@ import {
   getServiceSchemaFields,
   validateUploadableFile,
 } from '../../../utils/serviceForms';
+import { uuidv4 } from '../../../utils/uuid';
 
 function getKeyboardType(type: string) {
   if (type === 'number') return 'number-pad' as const;
@@ -60,6 +61,9 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
   const [generalDocuments, setGeneralDocuments] = useState<UploadableDocument[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
+  // One Idempotency-Key per form attempt: reused while the same unchanged form
+  // is retried, replaced when the content changes or the order is created.
+  const submissionRef = useRef<{ key: string; fingerprint: string } | null>(null);
 
   const servicesQuery = useQuery({ queryKey: ['services'], queryFn: () => servicesApi.getServices() });
 
@@ -125,13 +129,34 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
         throw new Error('validation');
       }
 
+      const builtNotes = buildDynamicNotes(notes, schemaFields, dynamicValues);
+      const describeFile = (file: UploadableDocument) => [file.uri, file.name, file.size ?? null];
+      const fingerprint = JSON.stringify([
+        selectedServiceId,
+        fullName.trim(),
+        phone.trim(),
+        nationalId.trim(),
+        city.trim(),
+        builtNotes,
+        consent,
+        requiredDocuments.length
+          ? requiredDocuments.map((document, index) => {
+              const file = selectedDocuments[getDocumentFieldName(document, index)];
+              return file ? [getRequiredDocumentType(document, index), ...describeFile(file)] : null;
+            })
+          : generalDocuments.map(describeFile),
+      ]);
+      if (submissionRef.current?.fingerprint !== fingerprint) {
+        submissionRef.current = { key: uuidv4(), fingerprint };
+      }
+
       const formData = new FormData();
       formData.append('service', String(selectedServiceId));
       formData.append('full_name', fullName.trim());
       formData.append('phone', phone.trim());
       formData.append('national_id', nationalId.trim());
       formData.append('city', city.trim());
-      formData.append('notes', buildDynamicNotes(notes, schemaFields, dynamicValues));
+      formData.append('notes', builtNotes);
       formData.append('consent', consent ? 'true' : 'false');
 
       if (requiredDocuments.length) {
@@ -143,21 +168,27 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
           formData.append('documents', buildDocumentPart(file));
         });
       } else {
+        // Untyped files are accepted only when document_types is not sent at all.
         generalDocuments.forEach((file) => {
-          formData.append('document_types', 'customer_upload');
           formData.append('documents', buildDocumentPart(file));
         });
       }
 
-      return ordersApi.createOrder(formData);
+      return ordersApi.createOrder(formData, submissionRef.current.key);
     },
     onSuccess: async (order) => {
+      submissionRef.current = null;
       await queryClient.invalidateQueries({ queryKey: ['client-orders'] });
       Alert.alert('تم إنشاء الطلب', `رقم الطلب ${order.order_number}`);
       navigation.replace('ClientOrderDetail', { orderId: order.id });
     },
     onError: (error) => {
       if (error instanceof Error && error.message === 'validation') return;
+      if (normalizeApiError(error).code === 'submission_key_conflict') {
+        submissionRef.current = null;
+        setServerError('تم استخدام مفتاح هذا الإرسال مع بيانات مختلفة. تحقق من قائمة طلباتك أولاً، ثم اضغط إرسال مرة أخرى إذا لم يظهر الطلب.');
+        return;
+      }
       setServerError(getDisplayError(error));
     },
   });

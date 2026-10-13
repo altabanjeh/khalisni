@@ -34,7 +34,7 @@ export function ProviderTaskUpdateScreen({ route, navigation }: { route: any; na
   return (
     <AppScreen title="تحديث حالة العمل">
       <AppCard>
-        <AppInput label="الحالة الجديدة" value={status} onChangeText={setStatus} hint="مثال: IN_PROGRESS أو READY_FOR_DELIVERY" />
+        <AppInput label="الحالة الجديدة" value={status} onChangeText={setStatus} hint="القيم المسموحة: IN_PROGRESS أو WAITING_GOVERNMENT" />
         <AppInput label="ملاحظة" value={note} onChangeText={setNote} multiline />
         <AppButton label="حفظ" onPress={() => mutation.mutate()} loading={mutation.isPending} />
       </AppCard>

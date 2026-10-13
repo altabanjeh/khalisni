@@ -140,3 +140,38 @@ test('permissions tab shows empty state when user has no current permissions', a
   expect(screen.getByLabelText('Can assign order')).not.toBeChecked()
   expect(screen.getByLabelText('Can verify document')).not.toBeChecked()
 })
+
+test('an organization admin creates a user inside the organization they administer', async () => {
+  vi.spyOn(api, 'getAdminUsers').mockResolvedValue([
+    { ...mockUsers[0], role: 'employee', role_options: ['employee', 'provider'] },
+  ])
+  vi.spyOn(api, 'getMyMemberships').mockResolvedValue([
+    { id: 1, organization: 7, organization_name: 'Partner A', role: 'partner_admin', is_active: true },
+    { id: 2, organization: 8, organization_name: 'Partner B', role: 'partner_employee', is_active: true },
+  ])
+  const createUserSpy = vi.spyOn(api, 'createAdminUser').mockResolvedValue({ id: 9 })
+
+  const user = userEvent.setup()
+  render(<AdminUsersRolesPage />)
+  await waitFor(() => expect(screen.getByText('Existing User')).toBeInTheDocument())
+
+  await user.click(screen.getByRole('button', { name: openCreateLabel }))
+  await user.type(screen.getByPlaceholderText(fullNamePlaceholder), 'Partner Staff')
+  await user.type(screen.getByPlaceholderText(emailPlaceholder), 'staff@partner-a.example')
+  await user.type(screen.getByPlaceholderText(passwordPlaceholder), 'Password123')
+
+  // Only the organization the caller administers is offered.
+  expect(screen.getByRole('option', { name: 'Partner A' })).toBeInTheDocument()
+  expect(screen.queryByRole('option', { name: 'Partner B' })).not.toBeInTheDocument()
+  await user.selectOptions(screen.getByLabelText('الدور داخل الجهة'), 'finance')
+  await user.click(screen.getByRole('button', { name: addUserLabel }))
+
+  await waitFor(() => {
+    expect(createUserSpy).toHaveBeenCalledWith(expect.objectContaining({
+      email: 'staff@partner-a.example',
+      role: 'employee',
+      organization_id: 7,
+      membership_role: 'finance',
+    }))
+  })
+})

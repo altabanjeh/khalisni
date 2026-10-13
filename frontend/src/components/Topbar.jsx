@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { getRoleLabel } from '../utils/format'
 import HelpGuidePanel from './HelpGuidePanel'
 import LanguageSwitcher from './LanguageSwitcher'
 import NotificationPanel from './NotificationPanel'
@@ -11,7 +12,7 @@ import { KhalsniAppIcon } from './brand/KhalsniLogo'
 function Topbar({ title, onMenuClick }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const { t, isArabic } = useLanguage()
+  const { t, isArabic, language } = useLanguage()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
@@ -110,7 +111,7 @@ function Topbar({ title, onMenuClick }) {
           <div className="min-w-0 flex-1">
             <p className="font-bold text-ink">{user?.full_name || t('topbar.guest', 'زائر')}</p>
             {/* D-A11Y-1: slate-600 (not 500) to clear 4.5:1 on the brand-50 chip. */}
-            <p className="truncate text-xs font-semibold text-slate-600">{user?.role || 'guest'}</p>
+            <p className="truncate text-xs font-semibold text-slate-600">{getRoleLabel(user?.role || 'guest', language)}</p>
           </div>
           <ChevronDown className="h-4 w-4 text-slate-400" />
         </div>

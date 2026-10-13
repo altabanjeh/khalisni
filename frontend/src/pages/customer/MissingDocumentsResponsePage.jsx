@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
 import FileUploader from '../../components/FileUploader'
+import LoadError from '../../components/LoadError'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
@@ -28,7 +29,7 @@ function MissingDocumentsResponsePage() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const { language, isArabic } = useLanguage()
-  const { data: order, loading } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
+  const { data: order, loading, error, reload } = useAsyncData(() => api.getCustomerOrder(id), [id], null)
   // Document types this page already uploaded. A retry after a partial failure
   // must not send them again (the server refuses a second copy and the
   // remaining files would never be reached).
@@ -43,6 +44,11 @@ function MissingDocumentsResponsePage() {
   } = useForm()
 
   if (loading) return <LoadingSpinner />
+
+  // A failed load is not a missing order: say what happened and offer a retry.
+  if (error) {
+    return <LoadError error={error} onRetry={reload} title={isArabic ? 'تعذر تحميل الطلب' : 'Could not load the request'} />
+  }
 
   if (!order) {
     return <EmptyState description={isArabic ? 'تعذر العثور على الطلب المطلوب.' : 'The requested order could not be found.'} title={isArabic ? 'الطلب غير متاح' : 'Order not available'} />
@@ -98,6 +104,11 @@ function MissingDocumentsResponsePage() {
         error: submitError,
         setError,
         documents: requestedDocuments,
+        // Only these inputs exist on the form. An error keyed by anything else
+        // (`file`, `document_type`) must go to the fallback: react-hook-form
+        // never clears an error on a field it does not know, and that would
+        // block every later submit.
+        knownFields: requestedDocuments.map((_, index) => `file_${index}`),
         fallbackField: Number.isInteger(submitError.failedDocumentIndex) ? `file_${submitError.failedDocumentIndex}` : 'root.server',
         fieldNameForDocumentIndex: (index) => `file_${index}`,
       })
@@ -163,7 +174,7 @@ function MissingDocumentsResponsePage() {
                   </span>
                   <div>
                     <h2 className="text-base font-black text-ink">{label}</h2>
-                    <p className="text-xs font-semibold text-slate-500">{buildUploadHint(requirement)}</p>
+                    <p className="text-xs font-semibold text-slate-500">{buildUploadHint(requirement, language)}</p>
                   </div>
                 </div>
                 {state && !providedNow ? <StatusBadge status={state} /> : null}
@@ -177,9 +188,9 @@ function MissingDocumentsResponsePage() {
                 <FileUploader
                   accept={buildAcceptValue(requirement)}
                   error={errors[`file_${index}`]}
-                  hint={buildUploadHint(requirement)}
+                  hint={buildUploadHint(requirement, language)}
                   registration={register(`file_${index}`, {
-                    validate: (fileList) => validateSingleFileList(fileList, requirement, isArabic ? 'هذا المستند مطلوب قبل إعادة الإرسال' : 'This document is required before resubmitting'),
+                    validate: (fileList) => validateSingleFileList(fileList, requirement, isArabic ? 'هذا المستند مطلوب قبل إعادة الإرسال' : 'This document is required before resubmitting', language),
                   })}
                 />
               </div>

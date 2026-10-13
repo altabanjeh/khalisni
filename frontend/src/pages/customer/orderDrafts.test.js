@@ -1,5 +1,6 @@
 import {
   buildBaseDraftValues,
+  clearStoredOrderDrafts,
   draftStorageKeyForUser,
   submissionKeyStorageKeyForUser,
   draftMaxAgeMs,
@@ -66,4 +67,27 @@ test('draft storage is isolated by customer account', () => {
   expect(draftStorageKeyForUser({ id: 10 })).not.toBe(draftStorageKeyForUser({ id: 11 }))
   expect(submissionKeyStorageKeyForUser({ id: 10 })).not.toBe(submissionKeyStorageKeyForUser({ id: 11 }))
   expect(() => draftStorageKeyForUser(null)).toThrow()
+})
+
+test('clearStoredOrderDrafts removes every stored draft and submission key, and nothing else', () => {
+  localStorage.setItem(draftStorageKeyForUser({ id: 10 }), serializeDraft({ national_id: '1234567890' }))
+  localStorage.setItem(draftStorageKeyForUser({ id: 11 }), serializeDraft({ phone: '0790000000' }))
+  localStorage.setItem(submissionKeyStorageKeyForUser({ id: 10 }), 'submission-key')
+  localStorage.setItem('khalisni-language', 'en')
+
+  clearStoredOrderDrafts()
+
+  expect(localStorage.getItem(draftStorageKeyForUser({ id: 10 }))).toBeNull()
+  expect(localStorage.getItem(draftStorageKeyForUser({ id: 11 }))).toBeNull()
+  expect(localStorage.getItem(submissionKeyStorageKeyForUser({ id: 10 }))).toBeNull()
+  expect(localStorage.getItem('khalisni-language')).toBe('en')
+  localStorage.clear()
+})
+
+test('draft notices follow the requested language', () => {
+  const now = new Date('2026-06-16T12:00:00.000Z').getTime()
+  const stale = serializeDraft({ city: 'Amman' }, new Date(now - draftMaxAgeMs - 1000).toISOString())
+
+  expect(parseStoredDraft(stale, now, 'en').message).toBe('The saved draft expired and was removed. You can start a new draft.')
+  expect(parseStoredDraft(stale, now).message).toBe('انتهت صلاحية المسودة المحفوظة وتمت إزالتها. يمكنك إنشاء مسودة جديدة.')
 })

@@ -208,12 +208,12 @@ export function validateSingleFileList(fileList, requirement, requiredMessage, l
   return validateFile(file, requirement, language)
 }
 
-export function validateMultipleFiles(fileList, requirement) {
+export function validateMultipleFiles(fileList, requirement, language = 'ar') {
   const files = Array.from(fileList || [])
   if (!files.length) return true
 
   for (const file of files) {
-    const validationResult = validateFile(file, requirement)
+    const validationResult = validateFile(file, requirement, language)
     if (validationResult !== true) return validationResult
   }
 

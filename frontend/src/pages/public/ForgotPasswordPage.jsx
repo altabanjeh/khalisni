@@ -14,7 +14,8 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 
 function getSafeNextPath(value) {
-  return value && value.startsWith('/') ? value : ''
+  // A single leading slash only: `//host` and `/\host` leave this site.
+  return value && /^\/(?![/\\])/.test(value) ? value : ''
 }
 
 function ForgotPasswordPage() {

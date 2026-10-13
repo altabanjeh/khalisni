@@ -7,6 +7,7 @@ import { useHelpGuideContext } from '../context/HelpGuideContext'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { getManualScreenshots } from '../help/manualAssets'
+import { getRoleLabel } from '../utils/format'
 import { getHelpScreenLabel, matchHelpScreen } from '../help/screenRegistry'
 
 function splitLines(value) {
@@ -536,7 +537,7 @@ function HelpGuidePanel({ onClose, open }) {
                 </select>
               ) : (
                 <div className="rounded-2xl border border-border bg-white px-4 py-3 text-sm text-slate-600">
-                  {t('manual.role', 'الدور')}: <span className="font-semibold text-ink">{user.role}</span>
+                  {t('manual.role', 'الدور')}: <span className="font-semibold text-ink">{getRoleLabel(user.role, language)}</span>
                 </div>
               )}
               {panelView === 'library' ? (

@@ -1,6 +1,7 @@
 import { ClipboardList, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import LoadError from '../../components/LoadError'
 import PageHeader from '../../components/PageHeader'
 import RequestCard from '../../components/RequestCard'
 import { EmptyState, LoadingSkeleton } from '../../components/public/PublicPage'
@@ -21,7 +22,7 @@ function MyOrdersPage() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [visible, setVisible] = useState(PAGE_SIZE)
-  const { data: orders = [], loading } = useAsyncData(() => api.getCustomerOrders(), [], [])
+  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getCustomerOrders(), [], [])
 
   const filters = [
     { key: 'all', label: isArabic ? 'الكل' : 'All' },
@@ -109,6 +110,8 @@ function MyOrdersPage() {
         <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
           {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton className="h-64" key={index} />)}
         </div>
+      ) : error ? (
+        <LoadError error={error} onRetry={reload} title={isArabic ? 'تعذر تحميل طلباتك' : 'Could not load your requests'} />
       ) : filtered.length ? (
         <>
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">

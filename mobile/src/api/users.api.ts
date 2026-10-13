@@ -2,6 +2,13 @@ import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './clie
 import type { ApiListParams } from '../types/common';
 import type { AdminUser, User } from '../types/user';
 
+export interface AvailablePermission {
+  id: number;
+  codename: string;
+  full_codename: string;
+  name: string;
+}
+
 export const usersApi = {
   getUsers(params: ApiListParams = {}) {
     return apiClient.get<AdminUser[]>('/admin/users/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
@@ -16,10 +23,10 @@ export const usersApi = {
     return secureAdminDelete(`/admin/users/${userId}/`, deletePassword);
   },
   getAvailablePermissions() {
-    return apiClient.get<Record<string, string[]>>('/admin/available-permissions/').then((res) => res.data);
+    return apiClient.get<Record<string, AvailablePermission[]>>('/admin/available-permissions/').then((res) => res.data);
   },
   getUserPermissions(userId: number | string) {
-    return apiClient.get<string[]>(`/admin/users/${userId}/permissions/`).then((res) => res.data);
+    return apiClient.get<{ permissions: string[] }>(`/admin/users/${userId}/permissions/`).then((res) => res.data);
   },
   setUserPermissions(userId: number | string, permissions: string[]) {
     return apiClient.patch(`/admin/users/${userId}/permissions/`, { permissions }).then((res) => res.data);

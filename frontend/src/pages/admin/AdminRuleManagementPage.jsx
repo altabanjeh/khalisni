@@ -20,6 +20,7 @@ import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getLocalizedField } from '../../utils/i18n'
 
 const SERVICE_TABS = [
@@ -260,6 +261,8 @@ function TabButton({ active, icon: Icon, label, onClick }) {
 
 function AdminRuleManagementPage() {
   const { isArabic, language, locale } = useLanguage()
+  // One save at a time: a double click must not send the request twice.
+  const { busy: saving, exclusive } = useExclusiveAction()
   const tx = (ar, en) => (isArabic ? ar : en)
   const localizeSettingValue = (value) => (typeof value === 'string' ? value : tx(value?.ar || '', value?.en || ''))
   const getLocalizedName = (record, arField = 'name_ar', enField = 'name_en', fallback = '') =>
@@ -857,7 +860,7 @@ function AdminRuleManagementPage() {
         </Field>
       </div>
       <div className="mt-4 flex flex-wrap gap-3">
-        <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
+        <button className="btn-primary" disabled={Boolean(saving)} onClick={exclusive('delete-guard', handleDeleteGuardSave)} type="button">
           {tx('حفظ كلمة المرور', 'Save delete password')}
         </button>
         <button className="btn-secondary" onClick={() => setDeleteGuardForm(DEFAULT_DELETE_GUARD_FORM)} type="button">
@@ -1411,7 +1414,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closeServiceEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleServiceSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('service', handleServiceSave)} type="button">
               {tx('حفظ الخدمة', 'Save service')}
             </button>
           </div>
@@ -1509,7 +1512,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closeDocumentEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleDocumentSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('document', handleDocumentSave)} type="button">
               {tx('حفظ قاعدة المستند', 'Save document rule')}
             </button>
           </div>
@@ -1581,7 +1584,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closeAssignmentEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleAssignmentSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('assignment', handleAssignmentSave)} type="button">
               {tx('حفظ قاعدة الإسناد', 'Save assignment rule')}
             </button>
           </div>
@@ -1643,14 +1646,14 @@ function AdminRuleManagementPage() {
             <Field label={tx('سبب الاعتماد أو الرفض', 'Approval reason')} help={tx('مطلوب فقط عند رفض المزود.', 'Required only when rejecting a provider.')}>
               <textarea className="field min-h-24" value={providerActionForm.approval_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, approval_reason: event.target.value })} />
             </Field>
-            <button className="btn-primary" onClick={handleProviderApproval} type="button">
+            <button className="btn-primary" disabled={Boolean(saving)} onClick={exclusive('provider-approval', handleProviderApproval)} type="button">
               {tx('حفظ قرار الاعتماد', 'Save approval decision')}
             </button>
             <ToggleField checked={providerActionForm.is_active} help={tx('أوقف الوصول بأمان دون حذف ملف المزود.', 'Turn off access safely without deleting the provider profile.')} label={tx('حساب المزود نشط', 'Provider account is active')} onChange={(value) => setProviderActionForm({ ...providerActionForm, is_active: value })} />
             <Field label={tx('سبب التفعيل أو التعطيل', 'Activation reason')} help={tx('مطلوب فقط عند تعطيل المزود.', 'Required only when deactivating a provider.')}>
               <textarea className="field min-h-24" value={providerActionForm.activation_reason} onChange={(event) => setProviderActionForm({ ...providerActionForm, activation_reason: event.target.value })} />
             </Field>
-            <button className="btn-secondary" onClick={handleProviderActivation} type="button">
+            <button className="btn-secondary" disabled={Boolean(saving)} onClick={exclusive('provider-activation', handleProviderActivation)} type="button">
               {tx('حفظ التفعيل', 'Save activation')}
             </button>
             <SectionMessage message={feedback.providers} />
@@ -1672,7 +1675,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={handleTemplatePreview} type="button">
               {tx('معاينة', 'Preview')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleTemplateSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('template', handleTemplateSave)} type="button">
               {tx('حفظ القالب', 'Save template')}
             </button>
           </div>
@@ -1725,7 +1728,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closePaymentEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handlePaymentSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('payment', handlePaymentSave)} type="button">
               {tx('تحديث حالة الدفع', 'Update payment status')}
             </button>
           </div>
@@ -1768,7 +1771,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closeUserEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleUserSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('user', handleUserSave)} type="button">
               {tx('حفظ المستخدم', 'Save user')}
             </button>
           </div>
@@ -1818,7 +1821,7 @@ function AdminRuleManagementPage() {
             <button className="btn-secondary" onClick={closeSettingEditor} type="button">
               {tx('إلغاء', 'Cancel')}
             </button>
-            <button className="btn-primary min-w-40" onClick={handleSettingSave} type="button">
+            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('setting', handleSettingSave)} type="button">
               {tx('حفظ الإعداد', 'Save setting')}
             </button>
           </div>

@@ -12,6 +12,7 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 
 const defaultProviderValues = {
   full_name: '',
@@ -64,6 +65,10 @@ function ProvidersManagementPage() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  // Row actions: `busy` is `row:<provider id>` while one is in flight.
+  const { busy, exclusive } = useExclusiveAction()
+  // Unapprove / suspend wait here for an explicit confirmation.
+  const [pendingRowAction, setPendingRowAction] = useState(null)
   const providerForm = useForm({ defaultValues: defaultProviderValues })
 
   const selectedProvider = useMemo(
@@ -168,6 +173,29 @@ function ProvidersManagementPage() {
     }
   }
 
+  function runRowAction(provider, action) {
+    return exclusive(`row:${provider.id}`, async () => {
+      if (action === 'approve' || action === 'reject') await handleApprovalChange(provider, action)
+      else await handleActivationChange(provider, action === 'activate')
+    })()
+  }
+
+  function requestRowAction(provider, action) {
+    // Removing approval or suspending an account takes the provider out of
+    // service, so ask first. Approving and activating run directly.
+    if (action === 'reject' || action === 'suspend') {
+      setPendingRowAction({ provider, action })
+      return
+    }
+    runRowAction(provider, action)
+  }
+
+  async function handleRowActionConfirm() {
+    if (!pendingRowAction) return
+    await runRowAction(pendingRowAction.provider, pendingRowAction.action)
+    setPendingRowAction(null)
+  }
+
   async function handleDeleteConfirm() {
     if (!pendingDelete) return
     const provider = pendingDelete
@@ -254,14 +282,16 @@ function ProvidersManagementPage() {
               </button>
               <button
                 className="btn-secondary px-3 py-2 text-xs"
-                onClick={() => handleApprovalChange(row, row.is_approved ? 'reject' : 'approve')}
+                disabled={Boolean(busy)}
+                onClick={() => requestRowAction(row, row.is_approved ? 'reject' : 'approve')}
                 type="button"
               >
                 {row.is_approved ? tr('إلغاء الاعتماد', 'Unapprove') : tr('اعتماد', 'Approve')}
               </button>
               <button
                 className="btn-secondary px-3 py-2 text-xs"
-                onClick={() => handleActivationChange(row, !row.account_active)}
+                disabled={Boolean(busy)}
+                onClick={() => requestRowAction(row, row.account_active ? 'suspend' : 'activate')}
                 type="button"
               >
                 {row.account_active ? tr('إيقاف الحساب', 'Suspend account') : tr('تفعيل الحساب', 'Activate account')}
@@ -450,6 +480,25 @@ function ProvidersManagementPage() {
           </div>
         </form>
       </FormModal>
+
+      <ConfirmModal
+        confirmLabel={pendingRowAction?.action === 'suspend' ? tr('نعم، أوقف الحساب', 'Yes, suspend') : tr('نعم، ألغِ الاعتماد', 'Yes, unapprove')}
+        description={pendingRowAction?.action === 'suspend'
+          ? tr(
+            `سيتم إيقاف حساب "${pendingRowAction?.provider?.full_name || ''}" ولن يتمكن من الدخول حتى إعادة تفعيله.`,
+            `The account "${pendingRowAction?.provider?.full_name || ''}" will be suspended and cannot sign in until it is activated again.`,
+          )
+          : tr(
+            `سيتم إلغاء اعتماد "${pendingRowAction?.provider?.full_name || ''}" ولن تُسند إليه طلبات جديدة.`,
+            `Approval will be removed from "${pendingRowAction?.provider?.full_name || ''}" and no new requests will be assigned to them.`,
+          )}
+        loading={Boolean(busy)}
+        onClose={() => setPendingRowAction(null)}
+        onConfirm={handleRowActionConfirm}
+        open={!!pendingRowAction}
+        title={pendingRowAction?.action === 'suspend' ? tr('تأكيد إيقاف الحساب', 'Confirm account suspension') : tr('تأكيد إلغاء الاعتماد', 'Confirm approval removal')}
+        variant="danger"
+      />
 
       <ConfirmModal
         confirmLabel={tr('استعادة', 'Restore')}

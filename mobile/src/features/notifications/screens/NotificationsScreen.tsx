@@ -1,5 +1,5 @@
 import { Alert, FlatList, Text, View, StyleSheet } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { AppCard } from '../../../components/AppCard';
 import { AppScreen } from '../../../components/AppScreen';
@@ -15,6 +15,8 @@ import { theme } from '../../../theme';
 
 export function NotificationsScreen({ navigation }: { navigation: any }) {
   const role = useAuthStore((state) => state.role);
+  const userId = useAuthStore((state) => state.user?.id);
+  const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['notifications', role],
     queryFn: () => role === 'admin' ? notificationsApi.getAdminNotifications() : notificationsApi.getNotifications(),
@@ -36,16 +38,23 @@ export function NotificationsScreen({ navigation }: { navigation: any }) {
             <Text style={styles.meta}>{formatDateTime(item.created_at)}</Text>
             <View style={styles.actions}>
               {item.order ? <AppButton label="فتح الطلب" onPress={() => navigation.navigate('OrderDetailResolver', { orderId: item.order })} style={styles.button} /> : null}
-              <AppButton
-                label="تمييز كمقروء"
-                variant="secondary"
-                onPress={() => {
-                  notificationsApi.markAsRead(item.id).catch((error) => {
-                    Alert.alert('غير مدعوم حالياً', getDisplayError(error));
-                  });
-                }}
-                style={styles.button}
-              />
+              {/* Read state is personal: the admin log also lists other users' notifications,
+                  which the mark-read endpoint answers with 404. */}
+              {!item.is_read && (role !== 'admin' || item.recipient === userId) ? (
+                <AppButton
+                  label="تمييز كمقروء"
+                  variant="secondary"
+                  onPress={() => {
+                    notificationsApi
+                      .markAsRead(item.id)
+                      .then(() => queryClient.invalidateQueries({ queryKey: ['notifications'] }))
+                      .catch((error) => {
+                        Alert.alert('تعذر التحديث', getDisplayError(error));
+                      });
+                  }}
+                  style={styles.button}
+                />
+              ) : null}
             </View>
           </AppCard>
         )}

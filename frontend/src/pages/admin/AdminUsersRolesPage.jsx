@@ -19,6 +19,17 @@ const defaultUserValues = {
   role: 'employee', national_id: '', is_active: true, is_verified: false,
 }
 const fallbackRoleOptions = ['employee', 'support', 'provider']
+// An organization admin creates accounts inside an organization they administer.
+// The server requires both values from anyone who is not a platform super admin.
+const organizationAdminRoles = ['partner_owner', 'partner_admin']
+const assignableMembershipRoles = ['partner_employee', 'finance', 'auditor', 'partner_admin']
+
+function membershipRoleLabel(role, isArabic) {
+  return (isArabic
+    ? { partner_employee: 'موظف الجهة', finance: 'مالية', auditor: 'مدقق', partner_admin: 'مدير الجهة' }
+    : { partner_employee: 'Organization employee', finance: 'Finance', auditor: 'Auditor', partner_admin: 'Organization admin' }
+  )[role] || role
+}
 
 function roleLabel(role, isArabic) {
   return (isArabic
@@ -119,7 +130,7 @@ function AdminUsersRolesPage() {
   const { toast } = useToast()
   const { isArabic } = useLanguage()
   const [statusFilter, setStatusFilter] = useState('active')
-  const { data: users = [], loading, reload } = useAsyncData(() => api.getAdminUsers({ status: statusFilter }), [statusFilter], [])
+  const { data: users = [], loading, error, reload } = useAsyncData(() => api.getAdminUsers({ status: statusFilter }), [statusFilter], [])
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [activeTab, setActiveTab] = useState('info')
   const [search, setSearch] = useState('')
@@ -139,6 +150,16 @@ function AdminUsersRolesPage() {
     return availableRoleOptions
   }, [availableRoleOptions, selectedUser?.role])
   const canManageAdminUsers = availableRoleOptions.includes('admin')
+  const { data: myMemberships = [] } = useAsyncData(() => api.getMyMemberships(), [], [])
+  const administeredOrganizations = useMemo(() => {
+    const byId = new Map()
+    myMemberships
+      .filter((item) => item.is_active !== false && organizationAdminRoles.includes(item.role))
+      .forEach((item) => byId.set(item.organization, item.organization_name || String(item.organization)))
+    return [...byId].map(([id, name]) => ({ id, name }))
+  }, [myMemberships])
+  // Platform super admins may create unscoped staff; everyone else must place the new user.
+  const mustChooseOrganization = !loading && !canManageAdminUsers && administeredOrganizations.length > 0
 
   useEffect(() => {
     reset(selectedUser ? {
@@ -163,8 +184,12 @@ function AdminUsersRolesPage() {
   async function handleUserSubmit(values) {
     setSubmitting(true)
     try {
-      const payload = { ...values }
+      const { organization_id: organizationId, membership_role: membershipRole, ...payload } = values
       if (!payload.password) delete payload.password
+      if (!selectedUser && mustChooseOrganization) {
+        payload.organization_id = Number(organizationId || administeredOrganizations[0].id)
+        payload.membership_role = membershipRole || assignableMembershipRoles[0]
+      }
       if (selectedUser) {
         await api.updateAdminUser(selectedUser.id, payload)
         toast(tr('تم تحديث المستخدم.', 'User updated.'), 'success')
@@ -305,7 +330,9 @@ function AdminUsersRolesPage() {
           columns={tableColumns}
           emptyDescription={tr('أضف أول مستخدم تشغيلي من هذه الشاشة. حسابات العملاء تُنشأ تلقائياً.', 'Add the first operational user from this screen. Customer accounts are created automatically.')}
           emptyTitle={tr('لا يوجد مستخدمون', 'No users')}
+          error={error}
           loading={loading}
+          onRetry={reload}
           mobileCard={renderMobileCard}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
           pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
@@ -376,6 +403,20 @@ function AdminUsersRolesPage() {
                   <input className="field" placeholder={tr('الرقم الوطني', 'National ID')} {...userForm.register('national_id')} />
                 </Field>
               </div>
+              {!selectedUser && mustChooseOrganization ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label={tr('الجهة', 'Organization')}>
+                    <select className="field" {...userForm.register('organization_id')}>
+                      {administeredOrganizations.map((organization) => <option key={organization.id} value={organization.id}>{organization.name}</option>)}
+                    </select>
+                  </Field>
+                  <Field label={tr('الدور داخل الجهة', 'Role in the organization')}>
+                    <select className="field" {...userForm.register('membership_role')}>
+                      {assignableMembershipRoles.map((option) => <option key={option} value={option}>{membershipRoleLabel(option, isArabic)}</option>)}
+                    </select>
+                  </Field>
+                </div>
+              ) : null}
               <div className="space-y-3">
                 <p className="text-sm font-bold text-ink">{tr('إعدادات الحساب', 'Account settings')}</p>
                 <div className="grid gap-3 md:grid-cols-2">

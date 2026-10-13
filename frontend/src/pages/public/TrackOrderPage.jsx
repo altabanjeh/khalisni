@@ -19,6 +19,7 @@ import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { formatDateTime } from '../../utils/format'
+import { getLocalizedField } from '../../utils/i18n'
 
 function labelClass() {
   return 'mb-2 block text-sm font-bold text-ink'
@@ -143,7 +144,7 @@ function TrackOrderPage() {
                 <div className="mt-4 space-y-3">
                   {result.missing_document_details.map((item) => (
                     <div key={item.document_type} className="rounded-md border border-amber-200 bg-white px-4 py-3 text-sm font-semibold text-amber-800">
-                      {isArabic ? item.name_ar : item.name_en}
+                      {getLocalizedField(item, { ar: 'name_ar', en: 'name_en' }, language, isArabic ? 'مستند مطلوب' : 'Required document')}
                     </div>
                   ))}
                 </div>

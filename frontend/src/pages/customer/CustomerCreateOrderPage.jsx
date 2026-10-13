@@ -5,11 +5,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import ApplicationStepper from '../../components/ApplicationStepper'
 import DynamicServiceFields from '../../components/DynamicServiceFields'
 import FileUploader from '../../components/FileUploader'
+import LoadError from '../../components/LoadError'
 import { api } from '../../api/services'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getLocalizedField } from '../../utils/i18n'
 import { getServiceName, getServiceDescription, getServiceDuration, getServicePublicPrice } from '../../utils/servicePresentation'
 import {
   buildBaseDraftValues,
@@ -69,10 +71,20 @@ function CustomerCreateOrderPage() {
   const [submittedOrder, setSubmittedOrder] = useState(null)
   const [maxReached, setMaxReached] = useState(0)
   const topRef = useRef(null)
+  // Read by the draft-restore effect, which must not rerun on a language switch.
+  const languageRef = useRef(language)
+  useEffect(() => {
+    languageRef.current = language
+  }, [language])
   const submitInFlightRef = useRef(false)
 
-  const { data: categories = [] } = useAsyncData(() => api.getCategories(), [], [])
-  const { data: services = [] } = useAsyncData(() => api.getServices(), [], [])
+  const { data: categories = [], error: categoriesError, reload: reloadCategories } = useAsyncData(() => api.getCategories(), [], [])
+  const { data: services = [], error: servicesError, reload: reloadServices } = useAsyncData(() => api.getServices(), [], [])
+  const catalogError = servicesError || categoriesError
+  function reloadCatalog() {
+    if (categoriesError) reloadCategories()
+    if (servicesError) reloadServices()
+  }
   const requestedServiceId = searchParams.get('service') || ''
 
   const {
@@ -105,11 +117,25 @@ function CustomerCreateOrderPage() {
     ? services.filter((service) => service.category?.slug === selectedCategorySlug)
     : services
   const selectedService = services.find((service) => String(service.id) === String(selectedServiceId))
-  const { data: selectedServiceDetails } = useAsyncData(
+  const {
+    data: loadedServiceDetails,
+    loading: serviceDetailsLoading,
+    error: serviceDetailsError,
+    reload: reloadServiceDetails,
+  } = useAsyncData(
     () => (selectedService?.slug ? api.getService(selectedService.slug) : Promise.resolve(null)),
     [selectedService?.slug],
     null,
   )
+  // After a failed load the hook still holds the previously selected service's
+  // details. Never build this request's documents and fields from those.
+  const selectedServiceDetails = serviceDetailsError ? null : loadedServiceDetails
+  // Without the service details the required documents are unknown, so the
+  // wizard must not continue (it would fall back to the generic uploader).
+  const serviceStepBlocked = Boolean(catalogError || (selectedService && (serviceDetailsError || serviceDetailsLoading)))
+  const categoryLabel = (category) => (isArabic
+    ? category?.full_path_name || getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'ar')
+    : getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'en', category?.full_path_name || ''))
   const requiredDocuments = selectedServiceDetails?.required_documents || []
   const schemaFields = getServiceSchemaFields(selectedServiceDetails, language)
   const startedFromService = Boolean(requestedServiceId && selectedService)
@@ -175,7 +201,7 @@ function CustomerCreateOrderPage() {
     const baseValues = buildBaseDraftValues({ requestedServiceId, user })
     if (storedDraft) {
       try {
-        const { values: parsedDraft, message } = parseStoredDraft(storedDraft)
+        const { values: parsedDraft, message } = parseStoredDraft(storedDraft, Date.now(), languageRef.current)
         if (message) {
           localStorage.removeItem(ownedDraftKey)
           toast(message, 'info')
@@ -215,6 +241,7 @@ function CustomerCreateOrderPage() {
     // The same nav slot becomes a submit button on the review step. Prevent
     // the current click's native action before React can replace that button.
     event?.preventDefault()
+    if (step === 0 && serviceStepBlocked) return
     const ok = await trigger(stepFieldNames[step] || [])
     if (!ok) return
     const next = Math.min(step + 1, 3)
@@ -240,6 +267,10 @@ function CustomerCreateOrderPage() {
 
   async function onSubmit(values) {
     if (submitInFlightRef.current) return
+    if (serviceStepBlocked) {
+      setStep(0)
+      return
+    }
     submitInFlightRef.current = true
     clearErrors('root.server')
     const formData = new FormData()
@@ -392,14 +423,20 @@ function CustomerCreateOrderPage() {
             {errors.root?.server && step < 2 ? <p className="mb-4 text-sm font-bold text-danger" role="alert">{errors.root.server.message}</p> : null}
             {step === 0 ? (
               <StepPanel eyebrow={`${isArabic ? 'الخطوة' : 'Step'} 1`} title={T.steps[0]} description={isArabic ? 'اختر الخدمة التي تريد طلبها.' : 'Choose the service you want to request.'}>
-                {startedFromService ? (
+                {catalogError ? (
+                  <LoadError
+                    error={catalogError}
+                    onRetry={reloadCatalog}
+                    title={isArabic ? 'تعذر تحميل الخدمات' : 'Could not load the services'}
+                  />
+                ) : startedFromService ? (
                   <div className="rounded-[var(--radius-lg)] border border-brand-100 bg-brand-50 p-5">
                     <input type="hidden" {...register('category_slug', { required: true })} />
                     <input type="hidden" {...register('service', { required: true })} />
                     <p className="text-xs font-bold text-brand-700">{T.lockedFromService}</p>
                     <h3 className="mt-2 text-lg font-black text-ink">{getServiceName(selectedService, language)}</h3>
                     <p className="mt-1 text-sm font-semibold text-slate-600">
-                      {selectedService.category?.full_path_name || selectedService.category?.name_ar || selectedService.category?.name_en}
+                      {categoryLabel(selectedService.category)}
                     </p>
                   </div>
                 ) : (
@@ -408,7 +445,7 @@ function CustomerCreateOrderPage() {
                       <select className="field" {...register('category_slug', { required: isArabic ? 'اختر التصنيف' : 'Select a category' })}>
                         <option value="">{T.pickCategory}</option>
                         {categories.map((category) => (
-                          <option key={category.id} value={category.slug}>{category.full_path_name || category.name_ar || category.name_en}</option>
+                          <option key={category.id} value={category.slug}>{categoryLabel(category)}</option>
                         ))}
                       </select>
                     </Field>
@@ -422,6 +459,16 @@ function CustomerCreateOrderPage() {
                     </Field>
                   </div>
                 )}
+                {!catalogError && selectedService && serviceDetailsError ? (
+                  <div className="mt-4">
+                    <LoadError
+                      compact
+                      error={serviceDetailsError}
+                      onRetry={reloadServiceDetails}
+                      title={isArabic ? 'تعذر تحميل متطلبات الخدمة. لا يمكن المتابعة قبل تحميلها.' : 'Could not load the service requirements. You cannot continue until they load.'}
+                    />
+                  </div>
+                ) : null}
               </StepPanel>
             ) : null}
 
@@ -475,10 +522,10 @@ function CustomerCreateOrderPage() {
                             <FileUploader
                               accept={buildAcceptValue(document)}
                               error={errors[fieldName]}
-                              hint={buildUploadHint(document)}
+                              hint={buildUploadHint(document, language)}
                               registration={register(fieldName, {
                                 validate: (fileList) =>
-                                  validateSingleFileList(fileList, document, optional ? undefined : isArabic ? `الملف "${label}" مطلوب` : `"${label}" is required`),
+                                  validateSingleFileList(fileList, document, optional ? undefined : isArabic ? `الملف "${label}" مطلوب` : `"${label}" is required`, language),
                               })}
                             />
                           </div>
@@ -489,10 +536,10 @@ function CustomerCreateOrderPage() {
                     <FileUploader
                       accept={buildAcceptValue()}
                       error={errors.documents}
-                      hint={buildUploadHint()}
+                      hint={buildUploadHint(undefined, language)}
                       label={T.generalUpload}
                       multiple
-                      registration={register('documents', { validate: (fileList) => validateMultipleFiles(fileList) })}
+                      registration={register('documents', { validate: (fileList) => validateMultipleFiles(fileList, undefined, language) })}
                     />
                   )}
 
@@ -572,7 +619,7 @@ function CustomerCreateOrderPage() {
                   {T.back}
                 </button>
                 {step < 3 ? (
-                  <button className="btn-primary" key="next-step" onClick={goNext} type="button">
+                  <button className="btn-primary" disabled={step === 0 && serviceStepBlocked} key="next-step" onClick={goNext} type="button">
                     {T.next}
                     <NextIcon className="h-4 w-4" />
                   </button>

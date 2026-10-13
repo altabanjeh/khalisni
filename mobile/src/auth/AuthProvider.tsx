@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, type PropsWithChildren }
 import { authApi } from '../api/auth.api';
 import { applyAccessToken, getDisplayError } from '../api/client';
 import { clearSessionStorage, readSession, saveSession } from './authStorage';
+import { queryClient } from '../services/queryClient';
 import { useAuthStore } from '../state/authStore';
 import type { LoginPayload } from '../types/auth';
 
@@ -24,6 +25,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const value = useMemo<AuthContextValue>(() => ({
     async signIn(payload) {
       const session = await authApi.login(payload);
+      // Never show a previous user's cached data to the account signing in now.
+      queryClient.clear();
       setSession(session);
       applyAccessToken(session.access);
       await saveSession(session);
@@ -40,6 +43,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       await clearSessionStorage();
       applyAccessToken(null);
       clearSession();
+      queryClient.clear();
     },
     async restore() {
       const session = await readSession();
@@ -54,11 +58,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
       try {
         const user = await authApi.me();
         updateUser(user);
-        await saveSession({ ...session, user });
-      } catch {
-        await clearSessionStorage();
-        applyAccessToken(null);
-        clearSession();
+        // Re-read: the tokens may have been rotated while /auth/me/ was in flight.
+        const current = await readSession();
+        await saveSession({ ...(current ?? session), user });
+      } catch (error) {
+        // Only a rejected credential ends the session. On a timeout, a server
+        // error or no network keep the stored session so the app still opens.
+        if ((error as { status?: number } | null)?.status === 401) {
+          await clearSessionStorage();
+          applyAccessToken(null);
+          clearSession();
+        }
       } finally {
         setBootstrapped();
       }

@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { LoginPayload, LoginResponse } from '../types/auth';
+import type { AuthTokens, LoginPayload, LoginResponse } from '../types/auth';
 import type { User } from '../types/user';
 
 export const authApi = {
@@ -15,7 +15,10 @@ export const authApi = {
   me() {
     return apiClient.get<User>('/auth/me/').then((res) => res.data);
   },
-  updateCustomerProfile(payload: Partial<User>) {
-    return apiClient.patch<User>('/customer/profile/', payload).then((res) => res.data);
+  // Changing phone or email requires current_password; an email change returns a fresh token pair.
+  updateCustomerProfile(payload: Partial<User> & { current_password?: string }) {
+    return apiClient
+      .patch<Partial<User> & { tokens?: AuthTokens }>('/customer/profile/', payload)
+      .then((res) => res.data);
   },
 };

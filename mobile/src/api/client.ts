@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios'
 
 import { env } from '../config/env';
 import { clearSessionStorage, readSession, saveSession } from '../auth/authStorage';
+import { queryClient } from '../services/queryClient';
 import { useAuthStore } from '../state/authStore';
 import type { ApiError, PaginatedResponse } from '../types/common';
 
@@ -38,19 +39,19 @@ async function refreshAccessToken() {
       const refresh = store.tokens?.refresh ?? session?.refresh;
       if (!refresh) return null;
 
-      const response = await axios.post<{ access: string }>(
+      const response = await axios.post<{ access: string; refresh?: string }>(
         `${env.apiBaseUrl}/auth/token/refresh/`,
         { refresh },
         { timeout: 15_000 },
       );
 
       const access = response.data.access;
+      // The backend rotates refresh tokens and blacklists the old one.
+      const nextRefresh = response.data.refresh || refresh;
       const currentUser = store.user ?? session?.user;
       if (currentUser) {
-        store.setSession({ access, refresh, user: currentUser });
-      }
-      if (session) {
-        await saveSession({ ...session, access });
+        store.setSession({ access, refresh: nextRefresh, user: currentUser });
+        await saveSession({ access, refresh: nextRefresh, user: currentUser });
       }
       setAuthorizationHeader(access);
       return access;
@@ -78,10 +79,18 @@ apiClient.interceptors.response.use(
           originalRequest.headers = headers;
           return apiClient(originalRequest);
         }
-      } catch {
-        await clearSessionStorage();
-        useAuthStore.getState().clearSession();
-        setAuthorizationHeader(null);
+      } catch (refreshError) {
+        const refreshStatus = axios.isAxiosError(refreshError) ? refreshError.response?.status : undefined;
+        if (refreshStatus === 400 || refreshStatus === 401) {
+          // The server rejected the refresh token: the session is really over.
+          await clearSessionStorage();
+          useAuthStore.getState().clearSession();
+          setAuthorizationHeader(null);
+          queryClient.clear();
+        } else {
+          // Timeout, offline or 5xx: keep the session so the request can be retried later.
+          return Promise.reject(normalizeApiError(refreshError));
+        }
       }
     }
 
@@ -89,10 +98,30 @@ apiClient.interceptors.response.use(
   },
 );
 
+function firstErrorMessage(value: unknown): string | undefined {
+  if (typeof value === 'string') return value.trim() ? value : undefined;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = firstErrorMessage(item);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, item] of Object.entries(value)) {
+      if (key === 'code') continue;
+      const found = firstErrorMessage(item);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
+
 export function normalizeApiError(error: unknown): ApiError {
   if (axios.isAxiosError(error)) {
-    const responseData = error.response?.data as
-      | { detail?: string; message?: string; [key: string]: unknown }
+    const rawData: unknown = error.response?.data;
+    const responseData = (rawData && typeof rawData === 'object' && !Array.isArray(rawData) ? rawData : undefined) as
+      | { detail?: string; message?: string; code?: unknown; [key: string]: unknown }
       | undefined;
     const detail = typeof responseData?.detail === 'string'
       ? responseData.detail
@@ -102,7 +131,7 @@ export function normalizeApiError(error: unknown): ApiError {
 
     const fieldErrors = Object.entries(responseData ?? {}).reduce<Record<string, string[]>>(
       (acc, [key, value]) => {
-        if (key === 'detail' || key === 'message') return acc;
+        if (key === 'detail' || key === 'message' || key === 'code') return acc;
         if (Array.isArray(value)) {
           acc[key] = value.map(String);
         } else if (typeof value === 'string') {
@@ -114,8 +143,13 @@ export function normalizeApiError(error: unknown): ApiError {
     );
 
     return {
-      message: detail ?? error.message ?? 'حدث خطأ غير متوقع.',
+      message:
+        detail
+        ?? firstErrorMessage(responseData ?? (Array.isArray(rawData) ? rawData : undefined))
+        ?? error.message
+        ?? 'حدث خطأ غير متوقع.',
       status: error.response?.status,
+      code: typeof responseData?.code === 'string' ? responseData.code : undefined,
       fieldErrors: Object.keys(fieldErrors).length ? fieldErrors : undefined,
     };
   }

@@ -1,6 +1,7 @@
-import { AlertTriangle, ArrowUpRight, Bell, CheckCircle2, ClipboardList, Clock3, Compass, FilePlus2, LifeBuoy } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Bell, CheckCircle2, Clock3, Compass, FilePlus2, LifeBuoy } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import LoadError from '../../components/LoadError'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import RequestCard from '../../components/RequestCard'
 import { EmptyState } from '../../components/public/PublicPage'
@@ -9,6 +10,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useNotifications } from '../../context/NotificationContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getServiceName } from '../../utils/servicePresentation'
 
 const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'CANCELLED', 'REJECTED', 'VERIFIED'])
 
@@ -28,8 +30,8 @@ function SectionTitle({ children, count, action }) {
 
 function CustomerDashboardHome() {
   const { user } = useAuth()
-  const { isArabic } = useLanguage()
-  const { data: orders = [], loading, error } = useAsyncData(() => api.getCustomerOrders(), [], [])
+  const { isArabic, language } = useLanguage()
+  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getCustomerOrders(), [], [])
   const { notifications } = useNotifications()
 
   const buckets = useMemo(() => {
@@ -106,15 +108,15 @@ function CustomerDashboardHome() {
       </section>
 
       {error ? (
-        <EmptyState
-          icon={ClipboardList}
+        <LoadError
+          error={error}
+          onRetry={reload}
           title={isArabic ? 'تعذر تحميل طلباتك' : 'Could not load your requests'}
-          description={isArabic ? 'حدث خطأ أثناء الاتصال. حدّث الصفحة للمحاولة مرة أخرى.' : 'Something went wrong. Refresh the page to try again.'}
         />
       ) : null}
 
       {/* Action required — prominent highlighted band */}
-      {buckets.actionRequired.length ? (
+      {!error && buckets.actionRequired.length ? (
         <section className="overflow-hidden rounded-[var(--radius-xl)] border-2 border-amber-300 bg-amber-50 shadow-soft">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-amber-200 bg-amber-100/60 px-5 py-4 sm:px-6">
             <div className="flex items-center gap-3">
@@ -140,7 +142,8 @@ function CustomerDashboardHome() {
         </section>
       ) : null}
 
-      {/* Active requests */}
+      {/* Active requests (a failed load must not read as "no requests") */}
+      {error ? null : (
       <section>
         <SectionTitle
           count={buckets.active.length || undefined}
@@ -180,6 +183,7 @@ function CustomerDashboardHome() {
           </p>
         )}
       </section>
+      )}
 
       {/* Recent activity + notifications + support */}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_360px]">
@@ -193,12 +197,14 @@ function CustomerDashboardHome() {
           >
             {isArabic ? 'آخر التحديثات' : 'Recently updated'}
           </SectionTitle>
-          {buckets.recent.length ? (
+          {error ? (
+            <p className="text-sm font-semibold text-slate-500">{isArabic ? 'تعذر تحميل آخر التحديثات.' : 'Recent updates could not be loaded.'}</p>
+          ) : buckets.recent.length ? (
             <ul className="divide-y divide-border">
               {buckets.recent.map((order) => (
                 <li key={order.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-ink">{order.service?.name_ar || order.service?.name_en || (isArabic ? 'خدمة' : 'Service')}</p>
+                    <p className="truncate text-sm font-bold text-ink">{getServiceName(order.service, language)}</p>
                     <p className="mt-0.5 text-xs font-semibold text-slate-500">#{order.order_number}</p>
                   </div>
                   <Link className="btn-ghost shrink-0 px-3 py-1.5 text-xs" to={`/customer/orders/${order.id}`}>

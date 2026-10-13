@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
+import LoadError from '../../components/LoadError'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
@@ -18,6 +19,10 @@ function EmployeeVerifyDocumentsPage() {
   const { isArabic, language } = useLanguage()
   const [selectedDocumentId, setSelectedDocumentId] = useState(null)
   const [tokenizedUrl, setTokenizedUrl] = useState(null)
+  // A failed download is not "no preview for this type": the reviewer has not
+  // seen the file, so no decision may be recorded until it loads.
+  const [previewError, setPreviewError] = useState(null)
+  const [previewAttempt, setPreviewAttempt] = useState(0)
   const [busy, setBusy] = useState(false)
   const verifyForm = useForm({ defaultValues: { note: '' } })
   const orderId = searchParams.get('order')
@@ -33,6 +38,7 @@ function EmployeeVerifyDocumentsPage() {
   useEffect(() => {
     if (!selectedDocument?.id) {
       setTokenizedUrl(null)
+      setPreviewError(null)
       return undefined
     }
     // Preview from an authorized download held in memory. A blob URL needs no
@@ -41,6 +47,7 @@ function EmployeeVerifyDocumentsPage() {
     let cancelled = false
     let objectUrl = null
     setTokenizedUrl(null)
+    setPreviewError(null)
     api.downloadDocumentWithToken(selectedDocument.id)
       .then((blob) => {
         if (cancelled) return
@@ -48,20 +55,28 @@ function EmployeeVerifyDocumentsPage() {
         objectUrl = URL.createObjectURL(typed)
         setTokenizedUrl(objectUrl)
       })
-      .catch(() => { if (!cancelled) setTokenizedUrl(null) })
+      .catch((downloadError) => {
+        if (cancelled) return
+        setTokenizedUrl(null)
+        setPreviewError(downloadError)
+      })
     return () => {
       cancelled = true
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [selectedDocument?.id, selectedDocument?.mime_type])
+  }, [selectedDocument?.id, selectedDocument?.mime_type, previewAttempt])
 
   if (loading) return <LoadingSpinner />
-  if (error) return <EmptyState description={getDisplayError(error)} title={isArabic ? 'تعذر تحميل الوثائق' : 'Could not load documents'} />
+  if (error) return <LoadError error={error} onRetry={reload} title={isArabic ? 'تعذر تحميل الوثائق' : 'Could not load documents'} />
   if (!selectedDocument) {
     return <EmptyState icon={ShieldCheck} description={isArabic ? 'لا توجد وثائق بانتظار التحقق حالياً.' : 'No documents are waiting for verification right now.'} title={isArabic ? 'قائمة التحقق فارغة' : 'Verification queue is empty'} />
   }
 
+  // The file must be in hand (downloaded) before a decision can be recorded.
+  const previewReady = Boolean(tokenizedUrl)
+
   async function submitVerification(isVerified) {
+    if (!previewReady) return
     const note = verifyForm.getValues('note').trim()
     if (!isVerified && !note) {
       verifyForm.setError('note', { message: isArabic ? 'سبب الرفض مطلوب.' : 'A rejection reason is required.' })
@@ -146,6 +161,19 @@ function EmployeeVerifyDocumentsPage() {
               <img alt={selectedDocument.original_filename} className="h-full w-full rounded-[var(--radius-lg)] object-contain" src={tokenizedUrl} />
             ) : isPdf && tokenizedUrl ? (
               <iframe className="min-h-[24rem] w-full rounded-[var(--radius-lg)] border border-border bg-white" src={tokenizedUrl} title={selectedDocument.original_filename} />
+            ) : previewError ? (
+              <div className="flex flex-1 flex-col items-center justify-center">
+                <LoadError
+                  compact
+                  error={previewError}
+                  onRetry={() => setPreviewAttempt((current) => current + 1)}
+                  title={isArabic ? 'تعذر تنزيل الملف للمعاينة. لا يمكن اعتماده أو رفضه قبل فتحه.' : 'The file could not be downloaded for preview. It cannot be approved or rejected until it opens.'}
+                />
+              </div>
+            ) : !tokenizedUrl ? (
+              <div className="flex flex-1 flex-col items-center justify-center text-center" role="status">
+                <p className="text-sm font-semibold text-slate-500">{isArabic ? 'جارٍ تحميل الملف...' : 'Loading the file...'}</p>
+              </div>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center text-center">
                 <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600"><Eye className="h-6 w-6" /></span>
@@ -196,12 +224,17 @@ function EmployeeVerifyDocumentsPage() {
               {verifyForm.formState.errors.note ? (
                 <p className="mt-1 text-xs font-bold text-danger" role="alert">{verifyForm.formState.errors.note.message}</p>
               ) : null}
+              {previewError ? (
+                <p className="mt-2 text-xs font-bold text-danger">
+                  {isArabic ? 'القرار معطّل حتى يتم تحميل الملف.' : 'Decisions are disabled until the file loads.'}
+                </p>
+              ) : null}
               <div className="mt-3 grid gap-2">
-                <button className="btn-primary" disabled={busy} onClick={() => submitVerification(true)} type="button">
+                <button className="btn-primary" disabled={busy || !previewReady} onClick={() => submitVerification(true)} type="button">
                   <CheckCircle2 className="h-4 w-4" />
                   {isArabic ? 'اعتماد الوثيقة' : 'Approve document'}
                 </button>
-                <button className="btn-secondary border-red-200 text-danger hover:bg-red-50" disabled={busy} onClick={() => submitVerification(false)} type="button">
+                <button className="btn-secondary border-red-200 text-danger hover:bg-red-50" disabled={busy || !previewReady} onClick={() => submitVerification(false)} type="button">
                   <XCircle className="h-4 w-4" />
                   {isArabic ? 'رفض وطلب استبدال' : 'Reject & request replacement'}
                 </button>

@@ -9,6 +9,7 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 
 const defaultValues = {
   key: '',
@@ -118,6 +119,7 @@ function AdminCmsPage() {
   const [selectedSettingId, setSelectedSettingId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const { busy, exclusive } = useExclusiveAction()
   const [deleteGuardForm, setDeleteGuardForm] = useState(defaultDeleteGuardForm)
   const form = useForm({ defaultValues })
 
@@ -346,7 +348,7 @@ function AdminCmsPage() {
         </div>
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <button className="btn-primary" onClick={handleDeleteGuardSave} type="button">
+          <button className="btn-primary" disabled={Boolean(busy)} onClick={exclusive('delete-guard', handleDeleteGuardSave)} type="button">
             {tr('حفظ كلمة مرور الحذف', 'Save delete password')}
           </button>
           <button className="btn-secondary" onClick={() => setDeleteGuardForm(defaultDeleteGuardForm)} type="button">

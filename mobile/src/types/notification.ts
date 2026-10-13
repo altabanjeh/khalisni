@@ -4,6 +4,7 @@ export interface AppNotification extends BaseEntity {
   title?: string;
   message: string;
   is_read?: boolean;
+  recipient?: number | null;
   order?: number | null;
   order_number?: string;
 }

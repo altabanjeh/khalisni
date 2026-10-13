@@ -258,6 +258,10 @@ export const servicesApi = {
     return http.post('/admin/users/', payload)
   },
 
+  async getMyMemberships() {
+    return unwrapList(await http.get('/me/memberships/'))
+  },
+
   updateAdminUser(id, payload) {
     return http.patch(`/admin/users/${id}/`, payload)
   },

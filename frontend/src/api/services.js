@@ -544,6 +544,7 @@ export const api = {
   restoreAdminService: async (id) => withTestValue(() => servicesApi.restoreAdminService(id), null),
   getAdminUsers: async (params = {}) => withTestValue(() => servicesApi.getAdminUsers(params), filterSoftDeleted(mockUsers, params)),
   createAdminUser: servicesApi.createAdminUser,
+  getMyMemberships: async () => withTestValue(() => servicesApi.getMyMemberships(), []),
   updateAdminUser: servicesApi.updateAdminUser,
   deleteAdminUser: async (id, payload = {}) =>
     withTestValue(

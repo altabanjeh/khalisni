@@ -33,7 +33,7 @@ function SummaryCard({ icon: Icon, label, value, tone = 'brand' }) {
 function EmployeeReviewQueuePage() {
   const { language, isArabic } = useLanguage()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
-  const { data: orders = [], loading, error } = useAsyncData(() => api.getEmployeeOrders(filters), [filters], [])
+  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getEmployeeOrders(filters), [filters], [])
   const { data: services = [] } = useAsyncData(() => api.getServices(), [], [])
 
   const statusOptions = [
@@ -108,9 +108,11 @@ function EmployeeReviewQueuePage() {
 
       <DataTable
         columns={columns}
-        emptyDescription={error ? error.message : isArabic ? 'لا توجد طلبات مطابقة للفلاتر الحالية.' : 'No requests match the current filters.'}
+        emptyDescription={isArabic ? 'لا توجد طلبات مطابقة للفلاتر الحالية.' : 'No requests match the current filters.'}
         emptyTitle={isArabic ? 'القائمة فارغة' : 'The queue is empty'}
+        error={error}
         loading={loading}
+        onRetry={reload}
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">

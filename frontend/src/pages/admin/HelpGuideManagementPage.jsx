@@ -11,6 +11,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { getHelpScreenLabel } from '../../help/screenRegistry'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 
 const DEFAULT_VALUES = {
   screens: {
@@ -203,6 +204,7 @@ function HelpGuideManagementPage() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const { busy, exclusive } = useExclusiveAction()
   const form = useForm({ defaultValues: DEFAULT_VALUES.screens })
 
   const { data: metadata = { screens: [], roles: [], workflow_statuses: [] }, loading: metadataLoading } = useAsyncData(
@@ -822,8 +824,9 @@ function HelpGuideManagementPage() {
       <ConfirmModal
         confirmLabel="Deactivate entry"
         description={`This will hide "${pendingDelete ? currentConfig.summary(pendingDelete) : ''}" from normal users while keeping it for audit history.`}
+        loading={busy === 'delete'}
         onClose={() => setPendingDelete(null)}
-        onConfirm={handleDelete}
+        onConfirm={exclusive('delete', handleDelete)}
         open={!!pendingDelete}
         title={`Deactivate ${currentConfig.title}`}
         variant="danger"
@@ -831,8 +834,9 @@ function HelpGuideManagementPage() {
       <ConfirmModal
         confirmLabel="Restore"
         description={`This will restore "${pendingRestore ? currentConfig.summary(pendingRestore) : ''}" back to active help content.`}
+        loading={busy === 'restore'}
         onClose={() => setPendingRestore(null)}
-        onConfirm={handleRestore}
+        onConfirm={exclusive('restore', handleRestore)}
         open={!!pendingRestore}
         title={`Restore ${currentConfig.title}`}
       />

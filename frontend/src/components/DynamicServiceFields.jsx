@@ -2,7 +2,7 @@ import { getServiceSchemaFields } from '../utils/serviceForms'
 import { useLanguage } from '../context/LanguageContext'
 
 function DynamicServiceFields({ service, register, errors = {} }) {
-  const { language } = useLanguage()
+  const { language, isArabic } = useLanguage()
   const fields = getServiceSchemaFields(service, language)
 
   if (!fields.length) return null
@@ -10,13 +10,14 @@ function DynamicServiceFields({ service, register, errors = {} }) {
   return (
     <div className="space-y-4">
       {fields.map((field) => {
+        const requiredMessage = isArabic ? `الحقل ${field.label} مطلوب` : `${field.label} is required`
         const validationRules =
           field.type === 'checkbox'
             ? {
-                validate: field.required ? (value) => value || `الحقل ${field.label} مطلوب` : undefined,
+                validate: field.required ? (value) => value || requiredMessage : undefined,
               }
             : {
-                required: field.required ? `الحقل ${field.label} مطلوب` : false,
+                required: field.required ? requiredMessage : false,
               }
 
         return (
@@ -27,7 +28,7 @@ function DynamicServiceFields({ service, register, errors = {} }) {
             ) : null}
             {field.type === 'select' ? (
               <select className="field" {...register(field.inputName, validationRules)}>
-                <option value="">اختر القيمة</option>
+                <option value="">{isArabic ? 'اختر القيمة' : 'Select a value'}</option>
                 {field.options.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}

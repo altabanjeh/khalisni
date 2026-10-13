@@ -163,7 +163,7 @@ function ThemeSettingsPage() {
           </div>
 
           <div className="glass-panel space-y-4 p-6">
-            <button className="btn-primary w-full" type="submit">
+            <button className="btn-primary w-full" disabled={form.formState.isSubmitting} type="submit">
               <Save className="h-4 w-4" />
               {isArabic ? 'حفظ إعدادات المظهر' : 'Save theme settings'}
             </button>

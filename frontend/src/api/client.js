@@ -12,6 +12,9 @@ export const API_BASE_URL = String(
   import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL,
 ).replace(/\/+$/, '')
 
+export const DEFAULT_REQUEST_TIMEOUT_MS = 30000
+export const UPLOAD_REQUEST_TIMEOUT_MS = 120000
+
 const USE_CREDENTIALS = String(import.meta.env.VITE_API_WITH_CREDENTIALS || '').toLowerCase() === 'true'
 
 function isFormData(value) {
@@ -218,12 +221,23 @@ function normalizeErrorPayload(data, status) {
 }
 
 function getDefaultErrorMessage(status) {
-  if (status === 400) return 'تعذر تنفيذ الطلب بسبب بيانات غير صالحة.'
-  if (status === 401) return 'انتهت الجلسة أو بيانات الدخول غير صالحة.'
-  if (status === 403) return 'لا تملك الصلاحية لتنفيذ هذا الإجراء.'
-  if (status === 404) return 'العنصر المطلوب غير موجود.'
-  if (status >= 500) return 'حدث خطأ داخلي في الخادم. حاول مرة أخرى لاحقاً.'
-  return 'تعذر إتمام الطلب.'
+  const isEnglish = getStoredLanguage() === 'en'
+  // No status means the server never answered (offline, DNS, timeout).
+  if (!status) {
+    return isEnglish
+      ? 'Could not reach the server. Check your connection and try again.'
+      : 'تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.'
+  }
+  if (status === 400) return isEnglish ? 'The request could not be processed because the data is invalid.' : 'تعذر تنفيذ الطلب بسبب بيانات غير صالحة.'
+  if (status === 401) return isEnglish ? 'Your session has expired or the sign-in details are invalid.' : 'انتهت الجلسة أو بيانات الدخول غير صالحة.'
+  if (status === 403) return isEnglish ? 'You do not have permission to perform this action.' : 'لا تملك الصلاحية لتنفيذ هذا الإجراء.'
+  if (status === 404) return isEnglish ? 'The requested item was not found.' : 'العنصر المطلوب غير موجود.'
+  if (status >= 500) return isEnglish ? 'An internal server error occurred. Please try again later.' : 'حدث خطأ داخلي في الخادم. حاول مرة أخرى لاحقاً.'
+  return getGenericErrorMessage()
+}
+
+function getGenericErrorMessage() {
+  return getStoredLanguage() === 'en' ? 'The request could not be completed.' : 'تعذر إتمام الطلب.'
 }
 
 function createApiError(error) {
@@ -262,14 +276,14 @@ function createApiError(error) {
 }
 
 export function getDisplayError(error) {
-  if (!error) return 'تعذر إتمام الطلب.'
+  if (!error) return getGenericErrorMessage()
   if (typeof error === 'string') return error
   if (error.displayMessage) return error.displayMessage
   if (error.apiError?.displayMessage) return error.apiError.displayMessage
   if (error.response?.data?.detail && typeof error.response.data.detail === 'string') {
     return error.response.data.detail
   }
-  return error.message || 'تعذر إتمام الطلب.'
+  return error.message || getGenericErrorMessage()
 }
 
 // True when an action was refused because the record is no longer in the
@@ -329,6 +343,7 @@ export function withId(record, ...keys) {
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: USE_CREDENTIALS,
+  timeout: DEFAULT_REQUEST_TIMEOUT_MS,
   headers: {
     Accept: 'application/json',
   },
@@ -347,6 +362,15 @@ apiClient.interceptors.request.use((config) => {
     headers['Accept-Language'] = getStoredLanguage()
   }
 
+  // File uploads and downloads need longer than the default; an explicit
+  // per-call timeout wins.
+  if (
+    (isFormData(nextConfig.data) || nextConfig.responseType === 'blob')
+    && (nextConfig.timeout == null || nextConfig.timeout === DEFAULT_REQUEST_TIMEOUT_MS)
+  ) {
+    nextConfig.timeout = UPLOAD_REQUEST_TIMEOUT_MS
+  }
+
   if (isFormData(nextConfig.data)) {
     delete headers['Content-Type']
   } else if (nextConfig.data !== undefined && !headers['Content-Type']) {
@@ -356,6 +380,8 @@ apiClient.interceptors.request.use((config) => {
   nextConfig.headers = headers
   return nextConfig
 })
+
+const DEAD_SESSION_CODES = ['token_revoked', 'user_inactive', 'user_not_found']
 
 let _isRefreshing = false
 let _refreshQueue = []
@@ -375,7 +401,8 @@ apiClient.interceptors.response.use(
 
     // Defect D4: a revoked token (password reset / "log out everywhere") cannot
     // be refreshed -- force a clean re-login instead of a silent retry loop.
-    if (status === 401 && code === 'token_revoked') {
+    // A deactivated or deleted account is a dead session for the same reason.
+    if (status === 401 && DEAD_SESSION_CODES.includes(code)) {
       clearStoredAuth()
       return Promise.reject(createApiError(error))
     }
@@ -399,11 +426,17 @@ apiClient.interceptors.response.use(
       return Promise.reject(createApiError(error))
     }
 
+    // This request already went out with a refreshed token once. Refreshing
+    // again would loop, so report the failure instead.
+    if (error?.config?._retried) {
+      return Promise.reject(createApiError(error))
+    }
+
     if (_isRefreshing) {
       return new Promise((resolve, reject) => {
         _refreshQueue.push({ resolve, reject })
       }).then((newAccess) => {
-        const retryConfig = { ...error.config }
+        const retryConfig = { ...error.config, _retried: true }
         retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccess}` }
         return apiClient.request(retryConfig)
       })
@@ -411,19 +444,32 @@ apiClient.interceptors.response.use(
 
     _isRefreshing = true
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, { refresh })
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/token/refresh/`,
+        { refresh },
+        { timeout: DEFAULT_REQUEST_TIMEOUT_MS },
+      )
       const newAccess = response.data.access
       updateStoredAccessToken(newAccess)
       // Persist the rotated refresh token when the backend returns one.
       updateStoredRefreshToken(response.data.refresh)
       _processRefreshQueue(null, newAccess)
-      const retryConfig = { ...error.config }
+      const retryConfig = { ...error.config, _retried: true }
       retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccess}` }
       return apiClient.request(retryConfig)
     } catch (refreshError) {
-      _processRefreshQueue(refreshError)
-      clearStoredAuth()
-      return Promise.reject(createApiError(error))
+      const refreshStatus = refreshError?.response?.status
+      if (refreshStatus === 400 || refreshStatus === 401) {
+        // The refresh token itself was refused: the session is over.
+        _processRefreshQueue(createApiError(error))
+        clearStoredAuth()
+        return Promise.reject(createApiError(error))
+      }
+      // Offline, timeout or a server fault says nothing about the session.
+      // Keep the tokens and report the transport failure so the caller can retry.
+      const transportError = createApiError(refreshError)
+      _processRefreshQueue(transportError)
+      return Promise.reject(transportError)
     } finally {
       _isRefreshing = false
     }

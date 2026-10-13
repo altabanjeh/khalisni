@@ -1,5 +1,7 @@
 import { Bell, BellRing } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useToast } from '../context/ToastContext'
+import { useExclusiveAction } from '../hooks/useExclusiveAction'
 import { useLanguage } from '../context/LanguageContext'
 import { useNotifications } from '../context/NotificationContext'
 import { hasPermission } from '../utils/authz'
@@ -7,19 +9,33 @@ import { formatDateTime } from '../utils/format'
 import EmptyState from './EmptyState'
 
 function NotificationPanel({ user, onNavigate }) {
-  const { t } = useLanguage()
+  const { t, isArabic } = useLanguage()
   const { notifications, markRead, markAllRead, loading, error } = useNotifications()
   const unreadCount = notifications.filter((item) => !item.is_read).length
   const notificationPath = hasPermission(user, 'accounts.manage_user_roles') ? '/admin/notifications' : null
 
-  async function handleMarkAllRead() {
-    await markAllRead()
-  }
+  const { toast } = useToast()
+  const { busy, exclusive } = useExclusiveAction()
 
-  async function handleOpen(notification) {
-    if (!notification.is_read) await markRead(notification.id)
+  const handleMarkAllRead = exclusive('mark-all', async () => {
+    try {
+      await markAllRead()
+    } catch {
+      toast(t('notifications.markReadError', isArabic ? 'تعذر تعليم الإشعارات كمقروءة. حاول مرة أخرى.' : 'Could not mark notifications as read. Please try again.'), 'error')
+    }
+  })
+
+  const handleOpen = exclusive('open', async (notification) => {
+    if (!notification.is_read) {
+      try {
+        await markRead(notification.id)
+      } catch {
+        // Opening the notification matters more than its read flag: it stays
+        // unread and is marked on a later attempt.
+      }
+    }
     onNavigate?.(notification)
-  }
+  })
 
   if (loading && !notifications.length) return <div className="p-4 text-sm" role="status">{t('common.loading', 'جارٍ التحميل...')}</div>
   if (error && !notifications.length) return <div className="p-4 text-sm text-danger" role="alert">{t('notifications.loadError', 'تعذر تحميل الإشعارات.')}</div>
@@ -45,7 +61,8 @@ function NotificationPanel({ user, onNavigate }) {
         <div className="flex items-center gap-2">
           {unreadCount > 0 ? (
             <button
-              className="text-xs font-semibold text-brand-600 hover:text-brand-700"
+              className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-60"
+              disabled={Boolean(busy)}
               onClick={handleMarkAllRead}
               type="button"
             >
@@ -62,7 +79,8 @@ function NotificationPanel({ user, onNavigate }) {
         {notifications.slice(0, 5).map((notification) => (
           <button
             key={notification.id}
-            className="w-full rounded-2xl border border-border px-4 py-3 text-start transition hover:bg-brand-50"
+            className="w-full rounded-2xl border border-border px-4 py-3 text-start transition hover:bg-brand-50 disabled:opacity-60"
+            disabled={Boolean(busy)}
             onClick={() => handleOpen(notification)}
             type="button"
           >

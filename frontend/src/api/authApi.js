@@ -17,8 +17,8 @@ export const authApi = {
     return http.post(`/auth/reset-password/${encodeURIComponent(token)}/`, payload)
   },
 
-  logout(refresh) {
-    return http.post('/auth/logout/', { refresh })
+  logout(refresh, config) {
+    return http.post('/auth/logout/', { refresh }, config)
   },
 
   me() {
