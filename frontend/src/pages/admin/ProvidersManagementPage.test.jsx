@@ -14,7 +14,7 @@ const openCreateLabel = '+ مزود جديد'
 const addProviderLabel = 'إضافة المزود'
 
 test('providers management page can create a provider from the admin flow', async () => {
-  vi.spyOn(api, 'getProviders').mockResolvedValue([])
+  vi.spyOn(api, 'getProvidersPage').mockResolvedValue({ results: [], count: 0, hasNext: false, hasPrevious: false })
   vi.spyOn(api, 'getAdminServiceAssignments').mockResolvedValue([])
   vi.spyOn(api, 'getAdminCategories').mockResolvedValue([])
   const createProviderSpy = vi.spyOn(api, 'createProvider').mockResolvedValue({ id: 5 })

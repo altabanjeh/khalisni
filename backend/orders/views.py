@@ -13,6 +13,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError as DRFVa
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 
+from accounts.validators import phones_match
 from config.permissions import (
     CanAssignOrders,
     CanCancelOrders,
@@ -167,22 +168,87 @@ class TrackOrderAPIView(APIView):
         # not become trackable by its (sequential) order number alone.
         if not order_number or not phone:
             raise Http404
-        order = generics.get_object_or_404(
-            Order.objects.select_related("customer", "service", "service__category", "assigned_provider", "assigned_provider__user")
-            .prefetch_related("documents", "status_logs", "notes__user"),
-            order_number=order_number,
-            customer__phone=phone,
+        order = (
+            Order.objects.select_related("customer", "service", "service__category")
+            .prefetch_related("documents", "status_logs")
+            .filter(order_number=order_number)
+            .first()
         )
+        # The phone is compared as a canonical number, not as typed: 079...,
+        # +96279... and 0096279... are the same phone (owner phone policy).
+        if order is None or not phones_match(phone, order.customer.phone):
+            raise Http404
         serializer = TrackOrderSerializer(order, context={"request": request})
         return response.Response(serializer.data)
 
 
-class CustomerOrderListAPIView(generics.ListAPIView):
-    serializer_class = OrderListSerializer
-    permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
+def _query_flag(value):
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+class StatusGroupListMixin:
+    """A paged order list whose status chips are answered by the server.
+
+    ``?status_group=<key>`` narrows the list to one of ``status_groups`` on the
+    server, so the filtered rows and their count are right across every page.
+    ``?include_status_counts=true`` adds ``status_counts`` (``all`` plus one
+    count per group) to the paged answer, computed on the same scope and search
+    as the list but before the group filter -- never from one page of rows.
+    Subclasses implement ``get_scoped_queryset`` (scope + every other filter).
+    """
+
+    status_groups = {}
+
+    def get_scoped_queryset(self):  # pragma: no cover - subclasses implement it
+        raise NotImplementedError
 
     def get_queryset(self):
-        return get_orders_for_user(self.request.user)
+        queryset = self.get_scoped_queryset()
+        group = (self.request.query_params.get("status_group") or "").strip()
+        if group and group != "all":
+            condition = self.status_groups.get(group)
+            if condition is None:
+                raise DRFValidationError({"status_group": f"Unknown status group: {group}."})
+            queryset = queryset.filter(condition)
+        return queryset
+
+    def status_counts(self):
+        queryset = self.filter_queryset(self.get_scoped_queryset())
+        counts = {"all": queryset.count()}
+        for key, condition in self.status_groups.items():
+            counts[key] = queryset.filter(condition).count()
+        return counts
+
+    def list(self, request, *args, **kwargs):
+        result = super().list(request, *args, **kwargs)
+        if _query_flag(request.query_params.get("include_status_counts")) and isinstance(result.data, dict):
+            result.data["status_counts"] = self.status_counts()
+        return result
+
+
+_CUSTOMER_TERMINAL_STATUSES = [
+    Order.Status.COMPLETED,
+    Order.Status.CANCELLED,
+    Order.Status.REJECTED,
+    Order.Status.ARCHIVED,
+]
+_CUSTOMER_ACTION_REQUIRED = Q(status=Order.Status.WAITING_CUSTOMER) | ~Q(missing_document_types=[])
+
+
+class CustomerOrderListAPIView(StatusGroupListMixin, generics.ListAPIView):
+    serializer_class = OrderListSerializer
+    permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
+    search_fields = ["order_number", "service__name_ar", "service__name_en"]
+    # The customer's own chips: something to do, still running, finished.
+    status_groups = {
+        "action": _CUSTOMER_ACTION_REQUIRED,
+        "active": ~Q(status__in=_CUSTOMER_TERMINAL_STATUSES) & ~_CUSTOMER_ACTION_REQUIRED,
+        "done": Q(status=Order.Status.COMPLETED),
+    }
+
+    def get_scoped_queryset(self):
+        # Most recently touched first; pk breaks ties so rows never move between pages.
+        return get_orders_for_user(self.request.user).order_by("-updated_at", "-pk")
 
 
 class CustomerOrderDetailAPIView(generics.RetrieveAPIView):
@@ -260,19 +326,29 @@ class CustomerOrderCancelAPIView(APIView):
         return response.Response({"status": order.status, "reason": order.cancellation_reason})
 
 
-class AdminDashboardOrderListAPIView(generics.ListAPIView):
+class AdminDashboardOrderListAPIView(StatusGroupListMixin, generics.ListAPIView):
     serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAuthenticated, CanReviewOrders]
+    # The admin requests chips (OrdersManagementPage), answered over every row.
+    status_groups = {
+        "action": Q(status__in=[Order.Status.NEW, Order.Status.UNDER_REVIEW, Order.Status.WAITING_CUSTOMER]),
+        "execution": Q(status__in=[Order.Status.ASSIGNED, Order.Status.IN_PROGRESS, Order.Status.WAITING_GOVERNMENT]),
+        "completed": Q(status=Order.Status.COMPLETED),
+    }
 
-    def get_queryset(self):
-        queryset = get_reviewable_orders_for_user(self.request.user)
+    def get_scoped_queryset(self):
+        # Newest first; pk breaks ties so rows never move between pages.
+        queryset = get_reviewable_orders_for_user(self.request.user).order_by("-created_at", "-pk")
         params = self.request.query_params
-        search = params.get("search")
+        search = (params.get("search") or "").strip()
         if search:
             queryset = queryset.filter(
                 Q(order_number__icontains=search)
                 | Q(customer__full_name__icontains=search)
                 | Q(service__name_ar__icontains=search)
+                | Q(service__name_en__icontains=search)
+                | Q(assigned_provider__user__full_name__icontains=search)
+                | Q(city__icontains=search)
             )
         for field in ("status", "priority"):
             value = params.get(field)

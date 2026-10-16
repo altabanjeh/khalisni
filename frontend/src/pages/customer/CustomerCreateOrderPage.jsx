@@ -31,7 +31,9 @@ import {
   getServiceSchemaFields,
   validateMultipleFiles,
   validateSingleFileList,
+  visibleSchemaFields,
 } from '../../utils/serviceForms'
+import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../utils/orderConsent'
 
 function StepPanel({ eyebrow, title, description, children }) {
   return (
@@ -159,7 +161,7 @@ function CustomerCreateOrderPage() {
           docsIntro: 'ارفع كل مستند مطلوب. الملفات المسموحة: PDF و JPG و PNG و DOC، بحد أقصى 10 ميغابايت.',
           generalUpload: 'ارفع المستندات الداعمة',
           notes: 'ملاحظات إضافية (اختياري)',
-          consent: 'أوافق على استخدام بياناتي ومستنداتي لإنجاز هذه الخدمة فقط، وإشعاري بأي نواقص.',
+          consent: ORDER_CONSENT_TEXT.ar,
           reviewIntro: 'تأكد من صحة كل شيء قبل الإرسال. يمكنك الرجوع لأي خطوة للتعديل.',
           edit: 'تعديل', notSet: 'غير محدد', docsUploaded: 'مرفوعة',
           successTitle: 'تم استلام طلبك', requestNo: 'رقم الطلب',
@@ -184,7 +186,7 @@ function CustomerCreateOrderPage() {
           docsIntro: 'Upload every required document. Allowed: PDF, JPG, PNG, DOC — up to 10 MB.',
           generalUpload: 'Upload supporting documents',
           notes: 'Additional notes (optional)',
-          consent: 'I agree that my details and documents are used only to complete this service, and to be notified of anything missing.',
+          consent: ORDER_CONSENT_TEXT.en,
           reviewIntro: 'Make sure everything is correct before submitting. You can go back to any step to edit.',
           edit: 'Edit', notSet: 'Not set', docsUploaded: 'uploaded',
           successTitle: 'Your request was received', requestNo: 'Request number',
@@ -232,7 +234,7 @@ function CustomerCreateOrderPage() {
   const docFieldNames = requiredDocuments.map((doc, i) => getDocumentFieldName(doc, i))
   const stepFieldNames = {
     0: startedFromService ? [] : ['category_slug', 'service'],
-    1: ['full_name', 'phone', 'city', ...schemaFields.filter((f) => f.required).map((f) => f.inputName)],
+    1: ['full_name', 'phone', 'city', ...visibleSchemaFields(schemaFields, getValues()).filter((f) => f.required).map((f) => f.inputName)],
     2: [...(requiredDocuments.length ? docFieldNames : ['documents']), 'consent'],
     3: [],
   }
@@ -281,6 +283,9 @@ function CustomerCreateOrderPage() {
     formData.append('city', values.city)
     formData.append('notes', buildDynamicNotes(values.notes, schemaFields, values))
     formData.append('consent', values.consent ? 'true' : 'false')
+    // Names the statement shown above so the server records exactly what was accepted.
+    formData.append('consent_version', ORDER_CONSENT_VERSION)
+    formData.append('consent_source', 'web')
 
     // The requirements actually sent, in order. Server errors that refer to a
     // position are resolved through this list, not the full requirement list.
@@ -492,7 +497,7 @@ function CustomerCreateOrderPage() {
                 {schemaFields.length ? (
                   <div className="mt-6 rounded-[var(--radius-lg)] border border-border bg-brand-50/40 p-4">
                     <p className="mb-3 text-sm font-black text-ink">{T.extra}</p>
-                    <DynamicServiceFields errors={errors} register={register} service={selectedServiceDetails} />
+                    <DynamicServiceFields errors={errors} register={register} service={selectedServiceDetails} watch={watch} />
                   </div>
                 ) : null}
               </StepPanel>

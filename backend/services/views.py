@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from audit.utils import create_audit_log
 from config.permissions import PlatformRecordWriteMixin, CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
 from core.delete_guard import AdminDeleteGuardMixin
-from organizations.selectors import can_administer_organization, has_scoped_memberships, active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
+from organizations.selectors import resolve_organization_by_ref, can_administer_organization, has_scoped_memberships, active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
 from services.models import (
     Address,
     RequiredDocumentDefinition,
@@ -26,6 +26,7 @@ from services.selectors import (
     resolve_service_organization_from_request,
     visible_service_categories_queryset,
     visible_services_queryset,
+    service_counts,
 )
 from services.serializers import (
     AddressAdminSerializer,
@@ -227,6 +228,13 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
         if self.action in {"list", "retrieve"}:
             return AdminServiceRuleSerializer
         return AdminServiceRuleSerializer
+
+    @action(detail=False, methods=["get"])
+    def counts(self, request):
+        """Total / active / published / visible-to-customer counts, computed by the same filters the API uses."""
+        scoped = enforce_organization_scope(Service.objects.all(), user=request.user, organization_field="organization")
+        organization = resolve_organization_by_ref(request.query_params.get("organization"))
+        return Response({**service_counts(scoped, organization=organization), "customer_scope": getattr(organization, "slug", None) or "platform"})
 
     def _assert_tenant_boundary(self, serializer):
         """An organization-scoped editor manages only that organization's own services."""

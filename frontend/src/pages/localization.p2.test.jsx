@@ -53,7 +53,9 @@ test('admin dashboard chart labels statuses in Arabic', async () => {
 
 // 15. verify queue shows localized document names
 test('verify queue shows configured document names, never codes', async () => {
-  vi.spyOn(api, 'getStaffDocuments').mockResolvedValue([
+  // The verify queue reads one server page.
+  vi.spyOn(api, 'getStaffDocumentsPage').mockImplementation(async () => {
+    const results = [
     {
       id: 1, document_type: 'client-audit-qa-202610-authorization', document_type_label: { ar: 'تفويض تجريبي', en: 'Test authorization' },
       original_filename: 'a.pdf', status: 'pending_review', mime_type: 'application/pdf', order: { order_number: 'KH-2026-000005' },
@@ -62,7 +64,9 @@ test('verify queue shows configured document names, never codes', async () => {
       id: 2, document_type: 'final-result', is_final_document: true, document_type_label: { ar: 'النتيجة النهائية', en: 'Final result' },
       original_filename: 'r.pdf', status: 'pending_review', mime_type: 'application/pdf', order: { order_number: 'KH-2026-000008' },
     },
-  ])
+    ]
+    return { results, count: results.length, hasNext: false, hasPrevious: false }
+  })
   vi.spyOn(api, 'downloadDocumentWithToken').mockResolvedValue(new Blob(['%PDF']))
   render(<MemoryRouter><EmployeeVerifyDocumentsPage /></MemoryRouter>)
   expect(await screen.findByText('#KH-2026-000005 · تفويض تجريبي')).toBeInTheDocument()

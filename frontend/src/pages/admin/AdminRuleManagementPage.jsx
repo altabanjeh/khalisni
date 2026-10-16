@@ -138,7 +138,9 @@ const DOCUMENT_SIZE_OPTIONS = [1, 2, 5, 10, 15, 20].map((sizeInMb) => ({
   label: `${sizeInMb} MB`,
 }))
 const PAYMENT_STATUS_OPTIONS = ['pending', 'processing', 'paid', 'failed', 'cancelled', 'refunded', 'partially_refunded']
-const SYSTEM_SETTING_KEYS = ['site.homepage', 'site.contact']
+// Public contact details are edited only in the public-site content screen
+// (one runtime source); the old `site.contact` setting is retired.
+const SYSTEM_SETTING_KEYS = ['site.homepage']
 const SETTING_DEFINITIONS = {
   'site.homepage': {
     label: { ar: 'محتوى الصفحة الرئيسية', en: 'Homepage content' },
@@ -156,25 +158,6 @@ const SETTING_DEFINITIONS = {
         label: { ar: 'النص الداعم', en: 'Supporting text' },
         control: 'textarea',
         help_text: { ar: 'وصف داعم قصير أسفل العنوان.', en: 'Short supporting description below the title.' },
-      },
-    ],
-  },
-  'site.contact': {
-    label: { ar: 'بيانات التواصل', en: 'Contact details' },
-    help_text: { ar: 'بيانات التواصل العامة التي يستخدمها العملاء عند الحاجة للمساعدة.', en: 'Public contact details used by clients when they need help.' },
-    warning: { ar: 'تظهر التغييرات للعملاء فوراً.', en: 'Changes appear to clients immediately.' },
-    fields: [
-      {
-        key: 'phone',
-        label: { ar: 'رقم الهاتف', en: 'Phone number' },
-        control: 'text',
-        help_text: { ar: 'رقم هاتف دعم العملاء الظاهر للجمهور.', en: 'Visible customer support phone number.' },
-      },
-      {
-        key: 'email',
-        label: { ar: 'البريد الإلكتروني', en: 'Email address' },
-        control: 'email',
-        help_text: { ar: 'بريد دعم العملاء الظاهر للجمهور.', en: 'Visible customer support email address.' },
       },
     ],
   },

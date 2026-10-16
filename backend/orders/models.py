@@ -950,3 +950,38 @@ class MissingDocumentRequest(models.Model):
 
     def __str__(self):
         return f"MissingDocRequest #{self.pk} for {self.order_id} ({len(self.document_types)} types)"
+
+
+class OrderConsent(models.Model):
+    """Append-only evidence that the customer accepted the order consent statement.
+
+    Rows are written once at order submission and never edited or deleted.
+    Orders submitted before this table existed have no row: their consent is
+    unknown and is not reconstructed (see ``orders/consent.py``).
+    """
+
+    consent_id = models.BigAutoField(primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="consents")
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="order_consents")
+    accepted = models.BooleanField()
+    consent_version = models.CharField(max_length=64)
+    consent_text = models.TextField(blank=True)
+    language = models.CharField(max_length=8, blank=True)
+    source = models.CharField(max_length=16)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "consent_id"]
+        indexes = [models.Index(fields=["order", "created_at"])]
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None and not self._state.adding:
+            raise ValidationError("Consent evidence is append-only and cannot be changed.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Consent evidence is append-only and cannot be deleted.")
+
+    @property
+    def id(self):
+        return self.pk

@@ -16,8 +16,6 @@ const defaultValues = {
   description: '',
   hero_title: '',
   hero_subtitle: '',
-  phone: '',
-  email: '',
 }
 
 const defaultDeleteGuardForm = {
@@ -32,13 +30,6 @@ const safeSettingDefinitions = [
     label_en: 'Homepage content',
     description_ar: 'العنوان الرئيسي والنص التعريفي المختصر.',
     description_en: 'The hero title and the short introductory text.',
-  },
-  {
-    key: 'site.contact',
-    label_ar: 'بيانات التواصل',
-    label_en: 'Contact details',
-    description_ar: 'الهاتف والبريد الظاهرين للعملاء.',
-    description_en: 'The phone and email shown to customers.',
   },
 ]
 
@@ -89,19 +80,6 @@ function SettingFields({ settingKey, form, selectedSetting, isArabic }) {
         </Field>
         <Field label={tr('النص التعريفي', 'Intro text')}>
           <textarea className="field min-h-28" {...form.register('hero_subtitle', { required: true })} />
-        </Field>
-      </>
-    )
-  }
-
-  if (settingKey === 'site.contact') {
-    return (
-      <>
-        <Field label={tr('رقم الهاتف', 'Phone')}>
-          <input className="field" {...form.register('phone', { required: true })} />
-        </Field>
-        <Field label={tr('البريد الإلكتروني', 'Email')}>
-          <input className="field" type="email" {...form.register('email', { required: true })} />
         </Field>
       </>
     )
@@ -188,11 +166,6 @@ function AdminCmsPage() {
     if (values.key === 'site.homepage') {
       payload.hero_title = values.hero_title?.trim() || ''
       payload.hero_subtitle = values.hero_subtitle?.trim() || ''
-    }
-
-    if (values.key === 'site.contact') {
-      payload.phone = values.phone?.trim() || ''
-      payload.email = values.email?.trim() || ''
     }
 
     return payload

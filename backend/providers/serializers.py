@@ -5,6 +5,7 @@ from organizations.selectors import is_platform_super_admin
 from core.i18n import pick, request_language
 from core.serializer_mixins import SoftDeleteFieldsReadOnlyMixin
 
+from accounts.fields import CanonicalPhoneField
 from accounts.models import CustomUser
 from providers.models import ProviderProfile
 from services.models import ServiceCategory
@@ -95,7 +96,7 @@ class ProviderAdminListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mod
 class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name")
     email = serializers.EmailField(source="user.email")
-    phone = serializers.CharField(source="user.phone")
+    phone = CanonicalPhoneField(source="user.phone")
     password = serializers.CharField(write_only=True, required=False, allow_blank=False)
     service_category_ids = serializers.PrimaryKeyRelatedField(
         source="service_categories",
@@ -182,6 +183,12 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
                 raise serializers.ValidationError(
                     {name: "Only a platform super admin can change this field." for name in blocked}
                 )
+        phone = attrs.get("user", {}).get("phone")
+        if phone:
+            # Canonical numbers: 079... and +96279... are the same phone.
+            owner_pk = self.instance.user_id if self.instance is not None else None
+            if CustomUser._base_manager.filter(phone=phone).exclude(pk=owner_pk).exists():
+                raise serializers.ValidationError({"phone": "This phone number is already used by another account."})
         return attrs
 
     def update(self, instance, validated_data):

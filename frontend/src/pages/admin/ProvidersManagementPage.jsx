@@ -52,12 +52,32 @@ function Field({ label, children, hint }) {
   )
 }
 
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
+
 function ProvidersManagementPage() {
   const { toast } = useToast()
   const { isArabic } = useLanguage()
   const tr = (ar, en) => (isArabic ? ar : en)
   const [statusFilter, setStatusFilter] = useState('active')
-  const { data: providers = [], loading, reload } = useAsyncData(() => api.getProviders({ status: statusFilter }), [statusFilter], [])
+  // The table pages on the server: every provider is reachable and the status
+  // filter applies to all providers, not to one page.
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  const { data: pageData, loading, error, reload } = useAsyncData(
+    () => api.getProvidersPage({ page, status: statusFilter }),
+    [page, statusFilter],
+    EMPTY_PAGE,
+  )
+  const providers = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  useEffect(() => {
+    // The last row of the last page went away: go back to a page that exists.
+    if (error?.response?.status === 404 && page > 1) setPage((current) => Math.max(1, current - 1))
+  }, [error, page])
   const { data: assignments = [], loading: assignmentsLoading } = useAsyncData(() => api.getAdminServiceAssignments(), [], [])
   const { data: categories = [], loading: categoriesLoading } = useAsyncData(() => api.getAdminCategories(), [], [])
   const [selectedProviderId, setSelectedProviderId] = useState(null)
@@ -367,7 +387,10 @@ function ProvidersManagementPage() {
         columns={tableColumns}
         emptyDescription={tr('أضف مزود خدمة جديداً ليظهر في مسار التعيين والمراجعة.', 'Add a new service provider so it appears in the assignment and review flow.')}
         emptyTitle={tr('لا يوجد مزودون', 'No providers')}
+        ariaLabel={tr('جدول المزودين', 'Providers table')}
+        error={error?.response?.status === 404 ? null : error}
         loading={loading || assignmentsLoading || categoriesLoading}
+        onRetry={reload}
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
@@ -379,10 +402,11 @@ function ProvidersManagementPage() {
           </div>
         )}
         mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+        pagination={{ page, pageSize, total, onChange: setPage }}
         rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
         rows={providers}
         toolbar={
-          <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field max-w-56" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}>
+          <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field max-w-56" onChange={(event) => { setStatusFilter(event.target.value); setPage(1) }} value={statusFilter}>
             <option value="active">{tr('نشط', 'Active')}</option>
             <option value="deleted">{tr('محذوف', 'Deleted')}</option>
             <option value="all">{tr('الكل', 'All')}</option>

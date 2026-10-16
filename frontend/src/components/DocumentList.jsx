@@ -77,6 +77,14 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default',
             <div className="min-w-0 flex-1">
               <p className={isPublic ? 'font-semibold text-ink' : 'font-semibold text-ink'}>{document.original_filename}</p>
               <p className={isPublic ? 'mt-1 text-xs text-slate-500' : 'mt-1 text-xs text-slate-500'}>{documentLabel(document)}</p>
+              {/* Owner decision F04: the API sends the staff reason only to the
+                  order's customer and to staff, so it is shown whenever present. */}
+              {String(document.status || '').toUpperCase() === 'REJECTED' && document.rejection_reason ? (
+                <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold leading-6 text-red-800">
+                  <span className="font-black">{isArabic ? 'سبب الرفض: ' : 'Rejection reason: '}</span>
+                  {document.rejection_reason}
+                </p>
+              ) : null}
             </div>
             <div className="flex items-center gap-3">
               {document.status ? <StatusBadge status={document.status} /> : null}

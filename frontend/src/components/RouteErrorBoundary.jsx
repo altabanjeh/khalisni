@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext'
 function RouteErrorFallback() {
   const { isArabic } = useLanguage()
   return (
-    <div className="container-shell py-10">
+    <div className="container-shell py-10" data-route-error="">
       <div className="glass-panel mx-auto max-w-2xl p-8 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-3xl bg-red-50 text-danger">
           <TriangleAlert className="h-7 w-7" />

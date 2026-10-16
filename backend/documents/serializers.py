@@ -26,9 +26,19 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
             "is_final_document",
             "is_verified",
             "verification_note",
+            "rejection_reason",
             "created_at",
             "download_url",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Owner decision F04: the staff rejection reason is shown to the
+        # customer who owns the order (and to staff). Anyone else -- another
+        # customer, anonymous public tracking -- gets no reason at all.
+        if not _may_read_rejection_reason(self.context.get("request"), instance):
+            data.pop("rejection_reason", None)
+        return data
 
     def get_download_url(self, obj):
         request = self.context.get("request")
@@ -38,6 +48,16 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
 
     def get_document_type_label(self, obj):
         return document_type_label(obj)
+
+
+def _may_read_rejection_reason(request, document):
+    user = getattr(request, "user", None)
+    if not getattr(user, "is_authenticated", False):
+        return False
+    role = (getattr(user, "role", "") or "").lower()
+    if role in {"admin", "employee", "support"}:
+        return True
+    return role == "customer" and document.order.customer_id == user.pk
 
 
 class ProviderDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):

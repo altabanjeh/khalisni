@@ -15,6 +15,7 @@ export interface ServiceSchemaField {
   placeholder: string;
   helpText: string;
   options: Array<{ value: string; label: string }>;
+  visibleWhen: { field: string; equals: string } | null;
 }
 
 function normalizeExtension(value: string) {
@@ -31,7 +32,7 @@ function normalizeOptions(options: unknown): Array<{ value: string; label: strin
       if (option && typeof option === 'object') {
         const record = option as Record<string, unknown>;
         const value = record.value ?? record.id ?? record.key ?? record.slug;
-        const label = record.label ?? record.name_ar ?? record.name ?? record.title ?? value;
+        const label = record.label_ar ?? record.label ?? record.name_ar ?? record.name ?? record.title ?? value;
         if (value == null || value === '') return null;
         return { value: String(value), label: String(label) };
       }
@@ -125,11 +126,35 @@ export function getServiceSchemaFields(service?: Service | null): ServiceSchemaF
         type: normalizeSchemaType(record.type || record.field_type || record.input_type),
         required: Boolean(record.required),
         placeholder: String(record.placeholder || ''),
-        helpText: String(record.help_text || record.description || ''),
+        helpText: String(record.help_text_ar || record.help_text || record.description || ''),
         options: normalizeOptions(record.options || record.choices || record.values),
+        visibleWhen: normalizeVisibleWhen(record.visible_when),
       };
     })
     .filter((field): field is ServiceSchemaField => Boolean(field));
+}
+
+function normalizeVisibleWhen(condition: unknown): ServiceSchemaField['visibleWhen'] {
+  if (!condition || typeof condition !== 'object') return null;
+  const record = condition as Record<string, unknown>;
+  if (record.field == null) return null;
+  return { field: String(record.field), equals: String(record.equals ?? '') };
+}
+
+/**
+ * A field with `visible_when` is shown only while the field it names holds the
+ * expected answer (parcel and basin numbers appear after "yes" to "do you know
+ * them?"). A hidden field is neither required nor sent. Same rule as the web app.
+ */
+export function isSchemaFieldVisible(
+  field: ServiceSchemaField,
+  schemaFields: ServiceSchemaField[],
+  values: Record<string, string | boolean>,
+): boolean {
+  if (!field.visibleWhen) return true;
+  const controller = schemaFields.find((candidate) => candidate.key === field.visibleWhen?.field);
+  if (!controller || !isSchemaFieldVisible(controller, schemaFields, values)) return false;
+  return String(values[controller.inputName] ?? '') === field.visibleWhen.equals;
 }
 
 export function buildDynamicNotes(
@@ -138,10 +163,15 @@ export function buildDynamicNotes(
   values: Record<string, string | boolean>,
 ) {
   const extraLines = schemaFields
+    .filter((field) => isSchemaFieldVisible(field, schemaFields, values))
     .map((field) => {
       const rawValue = values[field.inputName];
       if (field.type === 'checkbox') {
         return rawValue ? `${field.label}: نعم` : '';
+      }
+      if (field.type === 'select') {
+        const option = field.options.find((candidate) => candidate.value === String(rawValue ?? ''));
+        if (option) return `${field.label}: ${option.label}`;
       }
 
       if (rawValue == null) return '';

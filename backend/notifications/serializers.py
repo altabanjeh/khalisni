@@ -48,6 +48,18 @@ class NotificationSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, seriali
             return legacy_arabic(field, stored) or stored
         return stored
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if getattr(user, "is_authenticated", False) and getattr(user, "role", "") == "customer":
+            # The actor of a customer's notification is usually a provider or a
+            # staff member; their identity is not customer data (owner decision B06).
+            if instance.actor_id != user.pk:
+                data["actor"] = None
+                data["actor_name"] = None
+        return data
+
     def get_title(self, obj):
         return self._localized_value(obj, "title")
 

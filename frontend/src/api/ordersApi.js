@@ -1,4 +1,28 @@
-import { buildQuery, http, unwrapList } from './client'
+import { buildQuery, fetchAllPages, http, unwrapList } from './client'
+
+// One server page plus what a pager needs, and the per-chip counts the server
+// adds when asked (include_status_counts): counts over every row, not one page.
+export async function fetchPageWithCounts(path, params = {}) {
+  const data = await http.get(`${path}${buildQuery(params)}`)
+  if (Array.isArray(data)) return { results: data, count: data.length, hasNext: false, hasPrevious: false, statusCounts: null }
+  return {
+    results: data?.results || [],
+    count: Number(data?.count ?? 0),
+    hasNext: Boolean(data?.next),
+    hasPrevious: Boolean(data?.previous),
+    statusCounts: data?.status_counts || null,
+  }
+}
+
+// Chips map to ?status_group= on the server; "all" means no group.
+export function statusGroupParams({ page = 1, statusGroup = 'all', search = '' } = {}) {
+  return {
+    page,
+    status_group: statusGroup && statusGroup !== 'all' ? statusGroup : '',
+    search: String(search || '').trim(),
+    include_status_counts: true,
+  }
+}
 
 export const ordersApi = {
   createOrder(formData, submissionKey) {
@@ -9,8 +33,14 @@ export const ordersApi = {
     return http.get(`/orders/track/${buildQuery(payload)}`)
   },
 
+  // Every order of the signed-in customer (dashboard summaries).
   async getCustomerOrders() {
-    return unwrapList(await http.get('/customer/orders/'))
+    return fetchAllPages('/customer/orders/')
+  },
+
+  // One page of "My requests"; chip, search and counts are answered by the server.
+  getCustomerOrdersPage(params = {}) {
+    return fetchPageWithCounts('/customer/orders/', statusGroupParams(params))
   },
 
   getCustomerOrder(id) {
@@ -71,6 +101,11 @@ export const ordersApi = {
 
   async getAdminOrders() {
     return unwrapList(await http.get('/admin/orders/'))
+  },
+
+  // One page of the admin requests table; chip, search and counts are answered by the server.
+  getAdminOrdersPage(params = {}) {
+    return fetchPageWithCounts('/admin/orders/', statusGroupParams(params))
   },
 
   getAdminOrder(id) {

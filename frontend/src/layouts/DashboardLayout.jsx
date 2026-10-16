@@ -18,9 +18,10 @@ function DashboardLayout({ title, links }) {
         />
         <div className="min-w-0 space-y-4 lg:space-y-6">
           <Topbar onMenuClick={() => setMobileSidebarOpen(true)} title={title} />
-          <div className="min-w-0 space-y-4 lg:space-y-6">
+          {/* The page content landmark; same classes as before, so the layout does not move. */}
+          <main className="min-w-0 space-y-4 lg:space-y-6" id="main-content">
             <Outlet />
-          </div>
+          </main>
         </div>
         </div>
       </div>

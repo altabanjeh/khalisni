@@ -121,6 +121,12 @@ export const servicesApi = {
 
   // One page of the services table; status, category and search are applied
   // by the server so counts and pages stay right (audit B10-6).
+  // Total / active / published / visible-to-customer, computed by the
+  // server with the same filters the catalogue uses (audit B10-7).
+  async getAdminServiceCounts() {
+    return http.get('/admin/services/counts/')
+  },
+
   async getAdminServicesPage({ page = 1, status = 'active', category = '', search = '' } = {}) {
     const params = { page, category, search }
     if (status === 'all' || status === 'deleted') params.include_deleted = true

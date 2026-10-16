@@ -538,6 +538,24 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
                 raise serializers.ValidationError(f"Field {index} options must be a list.")
             if not any(str(field.get(name) or "").strip() for name in ("label_ar", "label_en", "label")):
                 raise serializers.ValidationError(f"Field {index} needs a label.")
+        # Conditional fields (owner decision B10-1/2/3): ``visible_when`` names
+        # another field of this form and the answer that shows this field. A
+        # hidden field is never required.
+        for index, field in enumerate(value, start=1):
+            condition = field.get("visible_when")
+            if condition is None:
+                continue
+            key = str(next(field.get(name) for name in ("name", "key", "field", "id") if field.get(name))).strip().lower()
+            if (
+                not isinstance(condition, dict)
+                or not isinstance(condition.get("field"), str)
+                or not isinstance(condition.get("equals"), str)
+                or set(condition) - {"field", "equals"}
+            ):
+                raise serializers.ValidationError(f"Field {index} visible_when must be {{\"field\": <key>, \"equals\": <value>}}.")
+            target = condition["field"].strip().lower()
+            if target == key or target not in seen:
+                raise serializers.ValidationError(f"Field {index} visible_when refers to an unknown field.")
         return value
 
     class Meta:

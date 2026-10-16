@@ -26,12 +26,13 @@ from accounts.serializers import (
     ForgotPasswordRequestSerializer,
     RegisterSerializer,
     ResetPasswordSerializer,
+    RETIRED_SYSTEM_SETTINGS,
     SafeSystemSettingSerializer,
     UserSerializer,
 )
 from audit.utils import create_audit_log
 from core.i18n import request_language
-from core.delete_guard import AdminDeleteGuardMixin, get_delete_guard_setting
+from core.delete_guard import AdminDeleteGuardMixin, _include_deleted, get_delete_guard_setting
 from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole, PlatformRecordWriteMixin
 from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
 
@@ -223,15 +224,25 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if is_platform_super_admin(self.request.user):
-            return queryset
-        org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
-        # Current members only: a removed member is no longer this organization's to manage.
-        return queryset.filter(
-            organization_memberships__organization_id__in=org_ids,
-            organization_memberships__is_active=True,
-            organization_memberships__is_deleted=False,
-        ).distinct()
+        if not is_platform_super_admin(self.request.user):
+            org_ids = active_memberships_for_user(self.request.user).values_list("organization_id", flat=True)
+            # Current members only: a removed member is no longer this organization's to manage.
+            queryset = queryset.filter(
+                organization_memberships__organization_id__in=org_ids,
+                organization_memberships__is_active=True,
+                organization_memberships__is_deleted=False,
+            ).distinct()
+        params = self.request.query_params
+        # With include_deleted, is_deleted narrows the list on the server so a
+        # paged "deleted only" view counts and pages correctly.
+        deleted = params.get("is_deleted")
+        if deleted is not None and _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=str(deleted).strip().lower() in {"1", "true", "yes", "on"})
+        role = (params.get("role") or "").strip()
+        if role:
+            queryset = queryset.filter(role=role)
+        # Unique tiebreak: equal names must not move between pages.
+        return queryset.order_by("full_name", "pk")
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -361,8 +372,8 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
 
 class SystemSettingViewSet(viewsets.ModelViewSet):
     serializer_class = SafeSystemSettingSerializer
-    queryset = SystemSetting.objects.all().order_by("key")
-    # Platform-wide settings (including the published contact details).
+    queryset = SystemSetting.objects.exclude(key__in=RETIRED_SYSTEM_SETTINGS).order_by("key")
+    # Platform-wide settings. Published contact details live in the public-site content.
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     pagination_class = None
 

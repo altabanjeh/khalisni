@@ -34,7 +34,7 @@ test('phone is labelled required, uses a phone keypad and shows an example', asy
 })
 
 test('the server phone error is shown under the field', async () => {
-  const message = 'أدخل رقم هاتف صحيحاً من 8 إلى 15 رقماً، مثل 0791234567 أو ‎+962791234567.'
+  const message = 'أدخل رقم هاتف صحيحاً، مثل 0791234567 أو ‎+962791234567. للأرقام من خارج الأردن أضف رمز الدولة مسبوقاً بـ + أو 00.'
   vi.spyOn(api, 'register').mockRejectedValueOnce({ fieldErrors: { phone: [message] } })
   const user = userEvent.setup()
   renderPage()

@@ -492,6 +492,8 @@ function ServicesManagementPage() {
     // The last row of the last page was removed: go back to a page that exists.
     if (servicesError?.response?.status === 404 && servicePage > 1) setServicePage((page) => Math.max(1, page - 1))
   }, [servicesError, servicePage])
+  // Reloaded with the service list so a save, delete or restore updates it.
+  const { data: serviceCounts } = useAsyncData(() => api.getAdminServiceCounts(), [servicePageData], null)
   const { data: definitions = [], loading: definitionsLoading, reload: reloadDefinitions } = useAsyncData(
     () => api.getAdminRequiredDocumentDefinitions({ status: definitionStatus }),
     [definitionStatus],
@@ -1164,6 +1166,26 @@ function ServicesManagementPage() {
           }
         />
       </SectionCard>
+
+      {serviceCounts ? (
+        <section aria-label={tr('أعداد الخدمات', 'Service counts')} className="panel-muted p-4">
+          {/* The counts differ on purpose; each label says what it counts. */}
+          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { key: 'total', label: tr('إجمالي الخدمات', 'Total services'), hint: tr('كل الخدمات غير المحذوفة', 'All services that are not deleted') },
+              { key: 'active', label: tr('نشطة', 'Active'), hint: tr('الخدمات المفعّلة', 'Services switched on') },
+              { key: 'published', label: tr('منشورة للعامة', 'Published'), hint: tr('نشطة وظاهرة في الموقع العام ضمن فئة نشطة وظاهرة', 'Active and shown on the public site, in an active, shown category') },
+              { key: 'customer_visible', label: tr('ظاهرة للعميل', 'Visible to customer'), hint: tr('المنشورة التي يراها عميل المنصة بعد قواعد الجهة', 'Published services a platform customer sees after organization rules') },
+            ].map((item) => (
+              <div className="rounded-2xl border border-border bg-white px-4 py-3" key={item.key}>
+                <dt className="text-xs font-bold text-slate-600">{item.label}</dt>
+                <dd className="mt-1 text-2xl font-black text-ink" data-testid={`service-count-${item.key}`}>{serviceCounts[item.key] ?? 0}</dd>
+                <dd className="mt-1 text-xs leading-5 text-slate-600">{item.hint}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       <SectionCard
         action={

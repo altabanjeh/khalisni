@@ -1,4 +1,5 @@
-import { buildQuery, http, secureAdminDelete, unwrapList } from './client'
+import { buildQuery, fetchAllPages, fetchPage, http, secureAdminDelete, unwrapList } from './client'
+import { fetchPageWithCounts, statusGroupParams } from './ordersApi'
 
 function normalizeSoftDeleteParams(params = {}) {
   const nextParams = { ...params }
@@ -34,6 +35,15 @@ export const providersApi = {
     return filterSoftDeleted(records, normalized.status)
   },
 
+  // One page of the providers table; the active / deleted / all filter is
+  // applied by the server so counts and pages stay right.
+  getProvidersPage({ page = 1, status = 'active' } = {}) {
+    const params = { page }
+    if (status === 'all' || status === 'deleted') params.include_deleted = true
+    if (status === 'deleted') params.is_deleted = true
+    return fetchPage('/admin/providers/', params)
+  },
+
   createProvider(payload) {
     return http.post('/admin/providers/', payload)
   },
@@ -62,8 +72,14 @@ export const providersApi = {
     return http.get('/provider/dashboard/')
   },
 
+  // Every order assigned to the signed-in provider (dashboard summaries).
   async getProviderOrders() {
-    return unwrapList(await http.get('/provider/orders/'))
+    return fetchAllPages('/provider/orders/')
+  },
+
+  // One page of the assigned requests table; chip, search and counts are answered by the server.
+  getProviderOrdersPage(params = {}) {
+    return fetchPageWithCounts('/provider/orders/', statusGroupParams(params))
   },
 
   getProviderOrder(id) {

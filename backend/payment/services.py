@@ -3,29 +3,6 @@ from notifications.services import send_notification_event
 from payment.models import Payment
 
 
-def create_customer_payment(*, actor, validated_data, request=None):
-    """
-    Create a payment record initiated by the customer for their own order.
-
-    The payment starts in `pending` so gateway confirmation or manual review
-    can move it forward later.
-    """
-    payment = Payment.objects.create(
-        paid_by=actor,
-        status=Payment.PaymentStatus.PENDING,
-        **validated_data,
-    )
-    create_audit_log(
-        request=request,
-        user=actor,
-        action="create_customer_payment",
-        entity_type="Payment",
-        entity_id=payment.pk,
-        new_value={"status": payment.status, "amount": str(payment.amount)},
-    )
-    return payment
-
-
 def create_admin_payment(*, actor, validated_data, request=None):
     """
     Create a payment record on behalf of operations/admin staff.

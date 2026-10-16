@@ -1,10 +1,11 @@
 import { CheckCircle2, Download, Eye, FileText, ShieldCheck, XCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState'
 import LoadError from '../../components/LoadError'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import Pagination from '../../components/Pagination'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError } from '../../api/client'
@@ -13,6 +14,8 @@ import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
 import { getDocumentTypeLabel } from '../../utils/documentPresentation'
+
+const EMPTY_QUEUE_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
 
 function EmployeeVerifyDocumentsPage() {
   const [searchParams] = useSearchParams()
@@ -28,11 +31,27 @@ function EmployeeVerifyDocumentsPage() {
   const verifyForm = useForm({ defaultValues: { note: '' } })
   const orderId = searchParams.get('order')
 
-  const { data: documents = [], loading, error, setData: setDocuments, reload } = useAsyncData(
-    () => api.getStaffDocuments(orderId ? { order: orderId } : {}),
-    [orderId],
-    [],
+  // The queue pages on the server so every waiting document is reachable.
+  const [queuePage, setQueuePage] = useState(1)
+  const [queuePageSize, setQueuePageSize] = useState(20)
+  useEffect(() => setQueuePage(1), [orderId])
+  const { data: queueData, loading, error, setData: setQueueData, reload } = useAsyncData(
+    () => api.getStaffDocumentsPage({ page: queuePage, order: orderId || '' }),
+    [queuePage, orderId],
+    EMPTY_QUEUE_PAGE,
   )
+  const documents = useMemo(() => queueData?.results || [], [queueData])
+  const queueTotal = queueData?.count || 0
+  const setDocuments = (update) => setQueueData((current) => ({ ...current, results: update(current?.results || []) }))
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (queueData?.hasNext && queueData.results.length) setQueuePageSize(queueData.results.length)
+  }, [queueData])
+  // The last document of the last page was decided: go back to a page that exists.
+  const queuePageGone = error?.response?.status === 404 && queuePage > 1
+  useEffect(() => {
+    if (queuePageGone) setQueuePage((page) => Math.max(1, page - 1))
+  }, [queuePageGone])
 
   const selectedDocument = documents.find((d) => d.id === selectedDocumentId) || documents[0] || null
 
@@ -67,7 +86,7 @@ function EmployeeVerifyDocumentsPage() {
     }
   }, [selectedDocument?.id, selectedDocument?.mime_type, previewAttempt])
 
-  if (loading) return <LoadingSpinner />
+  if (loading || queuePageGone) return <LoadingSpinner />
   if (error) return <LoadError error={error} onRetry={reload} title={isArabic ? 'تعذر تحميل الوثائق' : 'Could not load documents'} />
   if (!selectedDocument) {
     return <EmptyState icon={ShieldCheck} description={isArabic ? 'لا توجد وثائق بانتظار التحقق حالياً.' : 'No documents are waiting for verification right now.'} title={isArabic ? 'قائمة التحقق فارغة' : 'Verification queue is empty'} />
@@ -100,7 +119,8 @@ function EmployeeVerifyDocumentsPage() {
   const mime = selectedDocument.mime_type || ''
   const isImage = mime.startsWith('image/')
   const isPdf = mime.includes('pdf')
-  const pending = documents.filter((d) => ['pending_review', 'uploaded', 'PENDING', 'SUBMITTED'].includes(String(d.status))).length
+  // The server counts the whole queue, not the page in view.
+  const pending = queueTotal
 
   const meta = [
     { label: isArabic ? 'الطلب' : 'Request', value: selectedDocument.order?.order_number },
@@ -153,6 +173,7 @@ function EmployeeVerifyDocumentsPage() {
               </p>
             </button>
           ))}
+          <Pagination onChange={setQueuePage} page={queuePage} pageSize={queuePageSize} total={queueTotal} />
         </aside>
 
         {/* workspace */}
@@ -217,12 +238,20 @@ function EmployeeVerifyDocumentsPage() {
 
             <div className="rounded-[var(--radius-xl)] border border-border bg-card p-4 shadow-soft">
               <h2 className="text-sm font-black text-ink">{isArabic ? 'قرار التحقق' : 'Verification decision'}</h2>
+              <label className="mt-3 block text-xs font-bold text-slate-600" htmlFor="verify-note">
+                {isArabic ? 'ملاحظة الاعتماد أو سبب الرفض' : 'Approval note or rejection reason'}
+              </label>
               <textarea
-                aria-label={isArabic ? 'ملاحظة التحقق' : 'Verification note'}
-                className="field mt-3 min-h-24"
-                placeholder={isArabic ? 'ملاحظة داخلية عند الاعتماد، أو سبب واضح عند الرفض' : 'Internal note on approval, or a clear reason on rejection'}
+                aria-describedby="verify-note-visibility"
+                className="field mt-1 min-h-24"
+                id="verify-note"
+                placeholder={isArabic ? 'اكتب سبباً واضحاً يساعد العميل على تصحيح الوثيقة عند الرفض' : 'On rejection, write a clear reason that helps the customer correct the document'}
                 {...verifyForm.register('note')}
               />
+              {/* Owner decision F04: the rejection reason is shown to the customer. */}
+              <p className="mt-1 text-xs font-bold text-amber-800" id="verify-note-visibility">
+                {isArabic ? 'سيظهر هذا السبب للعميل' : 'This reason will be shown to the customer'}
+              </p>
               {verifyForm.formState.errors.note ? (
                 <p className="mt-1 text-xs font-bold text-danger" role="alert">{verifyForm.formState.errors.note.message}</p>
               ) : null}

@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from rest_framework import generics, permissions, response, status
-from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.views import APIView
 
 from config.permissions import CanCreatePaymentRecord, CanRefundPayment, CanViewPaymentStatus, IsCustomerRole
@@ -11,36 +11,28 @@ from payment.serializers import (
     AdminPaymentCreateSerializer,
     AdminPaymentRuleListSerializer,
     AdminPaymentStatusSerializer,
-    CustomerPaymentCreateSerializer,
     PaymentSerializer,
 )
-from payment.services import create_admin_payment, create_customer_payment, update_payment_status
+from payment.services import create_admin_payment, update_payment_status
 
 
 def customer_payments_queryset(user):
     return Payment.objects.select_related("order", "order__customer", "paid_by", "recorded_by").filter(order__customer=user)
 
 
-class CustomerPaymentListCreateAPIView(generics.ListCreateAPIView):
+class CustomerPaymentListAPIView(generics.ListAPIView):
+    """Read-only list of the payment records staff keep for the customer's orders.
+
+    Online payment is out of the current release (owner decision B05), so a
+    customer cannot create payment records: POST answers 405.
+    """
+
+    serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated, IsCustomerRole]
     pagination_class = None
 
     def get_queryset(self):
         return customer_payments_queryset(self.request.user)
-
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return CustomerPaymentCreateSerializer
-        return PaymentSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        order = serializer.validated_data["order"]
-        if order.customer_id != request.user.id:
-            raise PermissionDenied("You can only create payment records for your own orders.")
-        payment = create_customer_payment(actor=request.user, validated_data=serializer.validated_data, request=request)
-        return response.Response(PaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
 
 
 class CustomerPaymentDetailAPIView(generics.RetrieveAPIView):

@@ -90,9 +90,11 @@ const ProviderDashboardHome = lazy(() => import('../pages/provider/ProviderDashb
 const AssignedOrdersPage = lazy(() => import('../pages/provider/AssignedOrdersPage'))
 const ProviderOrderDetailsPage = lazy(() => import('../pages/provider/ProviderOrderDetailsPage'))
 
+// `data-page-loading` / `data-route-error` mark route-level states so tests can
+// wait for a page that is really ready instead of any heading on screen.
 function PageLoader() {
   return (
-    <div className="flex min-h-[40vh] items-center justify-center">
+    <div className="flex min-h-[40vh] items-center justify-center" data-page-loading="route-chunk">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
     </div>
   )

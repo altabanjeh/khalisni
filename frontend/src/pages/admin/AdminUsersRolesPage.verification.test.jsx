@@ -2,6 +2,11 @@ import { render, screen, within } from '@testing-library/react'
 import AdminUsersRolesPage from './AdminUsersRolesPage'
 import { api } from '../../api/services'
 
+// The users table reads one server page (release hardening: latent pagination).
+function mockAdminUsersPage(rows) {
+  return vi.spyOn(api, 'getAdminUsersPage').mockResolvedValue({ results: rows, count: rows.length, hasNext: false, hasPrevious: false })
+}
+
 afterEach(() => vi.restoreAllMocks())
 
 const base = { phone: '', role: 'employee', national_id: '', is_super_admin: false, role_options: ['employee'], current_permissions: [] }
@@ -22,7 +27,7 @@ function facts(row) {
 }
 
 test('an active user is not shown as verified, and each verification fact is separate', async () => {
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue(users)
+  mockAdminUsersPage(users)
   render(<AdminUsersRolesPage />)
   await screen.findByText('Active Unverified')
 
@@ -52,7 +57,7 @@ test('an active user is not shown as verified, and each verification fact is sep
 })
 
 test('a missing verification field is reported as not available, never as verified', async () => {
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue([{ ...base, id: 9, full_name: 'Old Payload', email: 'd@example.test', is_active: true }])
+  mockAdminUsersPage([{ ...base, id: 9, full_name: 'Old Payload', email: 'd@example.test', is_active: true }])
   render(<AdminUsersRolesPage />)
   await screen.findByText('Old Payload')
   expect(facts(rowOf('Old Payload')).is_email_verified).toBe('البريد الإلكتروني مؤكَّد:غير متاح')

@@ -56,7 +56,7 @@ Use `python manage.py seed_demo` only on non-public demo environments when you e
 - The public entrypoint is the `frontend` container. The base Compose file publishes no ports; the platform proxy (Coolify/Traefik) routes to it. On a plain server put a TLS reverse proxy in front and forward to the frontend container.
 - Set `API_THROTTLE_NUM_PROXIES` to the number of proxies in front of Django (see `docs/hardening/KHALSNI_PRODUCTION_ENV_REQUIREMENTS.md`). Without it rate limits can be bypassed.
 - Errors are written to the backend container log (stderr). `docker compose logs backend | grep ERROR` shows unhandled exceptions with tracebacks.
-- Backups are not automatic. Set them up before go-live: `docs/total-audit/RECOVERY_RUNBOOK.md`.
+- Backups are not automatic until scheduled on the server. Schedule `scripts/backup_scheduled.sh` (backup, verification, optional off-server copy and rotation) before go-live: `docs/total-audit/RECOVERY_RUNBOOK.md`. Retention has no default; it follows the client's data-retention policy.
 - `create_admin` creates the admin from `DJANGO_ADMIN_*` on first start. On later starts it changes nothing unless `DJANGO_ADMIN_RESET_PASSWORD=True`, and it refuses to promote an existing non-admin account.
 - Django migrations, `collectstatic`, role setup, admin creation, and seed initialization run automatically on backend startup.
 - Uploaded files and collected static assets are persisted through Docker named volumes.
@@ -76,4 +76,5 @@ docker compose -f docker-compose.yml logs -f backend
 docker compose -f docker-compose.yml logs -f frontend
 docker compose -f docker-compose.yml exec backend python manage.py check --deploy
 sh scripts/backup.sh /srv/khalsni-backups
+sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
 ```

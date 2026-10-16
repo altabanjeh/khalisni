@@ -11,7 +11,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
-const PAGE_SIZE = 20
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
 
 const defaultUserValues = {
   full_name: '', email: '', phone: '', password: '',
@@ -164,11 +164,38 @@ function AdminUsersRolesPage() {
   const { toast } = useToast()
   const { isArabic } = useLanguage()
   const [statusFilter, setStatusFilter] = useState('active')
-  const { data: users = [], loading, error, reload } = useAsyncData(() => api.getAdminUsers({ status: statusFilter }), [statusFilter], [])
-  const [selectedUserId, setSelectedUserId] = useState(null)
-  const [activeTab, setActiveTab] = useState('info')
+  // The table pages on the server: every user is reachable, and the status
+  // filter and the search apply to all users, not to one page.
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  useEffect(() => {
+    const next = searchInput.trim()
+    if (next === search) return undefined
+    const timer = setTimeout(() => {
+      setSearch(next)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput, search])
+  const { data: pageData, loading, error, reload } = useAsyncData(
+    () => api.getAdminUsersPage({ page, status: statusFilter, search }),
+    [page, statusFilter, search],
+    EMPTY_PAGE,
+  )
+  const users = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  useEffect(() => {
+    // The last row of the last page went away: go back to a page that exists.
+    if (error?.response?.status === 404 && page > 1) setPage((current) => Math.max(1, current - 1))
+  }, [error, page])
+  const [selectedUserId, setSelectedUserId] = useState(null)
+  const [activeTab, setActiveTab] = useState('info')
   const [pendingDelete, setPendingDelete] = useState(null)
   const [pendingRestore, setPendingRestore] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -206,14 +233,6 @@ function AdminUsersRolesPage() {
   function closeForm() { setIsFormOpen(false); setSelectedUserId(null); setActiveTab('info'); reset(defaultUserValues) }
   function openCreateForm() { setSelectedUserId(null); setActiveTab('info'); reset(defaultUserValues); setIsFormOpen(true) }
   function openEditForm(id) { setSelectedUserId(id); setActiveTab('info'); setIsFormOpen(true) }
-
-  const filtered = users.filter((u) => {
-    const q = search.trim().toLowerCase()
-    if (!q) return true
-    return u.full_name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.phone?.toLowerCase().includes(q)
-  })
-  const total = filtered.length
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   async function handleUserSubmit(values) {
     setSubmitting(true)
@@ -264,9 +283,9 @@ function AdminUsersRolesPage() {
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
       <div className="relative">
         <Search className="pointer-events-none absolute inset-inline-start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input aria-label={tr('بحث', 'Search')} className="field ps-9 text-sm" onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder={tr('بحث بالاسم أو البريد أو الهاتف...', 'Search by name, email or phone…')} value={search} />
+        <input aria-label={tr('بحث', 'Search')} className="field ps-9 text-sm" onChange={(e) => setSearchInput(e.target.value)} placeholder={tr('بحث بالاسم أو البريد أو الهاتف...', 'Search by name, email or phone…')} type="search" value={searchInput} />
       </div>
-      <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field text-sm" onChange={(e) => setStatusFilter(e.target.value)} value={statusFilter}>
+      <select aria-label={tr('تصفية حسب الحالة', 'Filter by status')} className="field text-sm" onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }} value={statusFilter}>
         <option value="active">{tr('نشط', 'Active')}</option>
         <option value="deleted">{tr('محذوف', 'Deleted')}</option>
         <option value="all">{tr('الكل', 'All')}</option>
@@ -366,14 +385,15 @@ function AdminUsersRolesPage() {
           columns={tableColumns}
           emptyDescription={tr('أضف أول مستخدم تشغيلي من هذه الشاشة. حسابات العملاء تُنشأ تلقائياً.', 'Add the first operational user from this screen. Customer accounts are created automatically.')}
           emptyTitle={tr('لا يوجد مستخدمون', 'No users')}
-          error={error}
+          ariaLabel={tr('جدول المستخدمين', 'Users table')}
+          error={error?.response?.status === 404 ? null : error}
           loading={loading}
           onRetry={reload}
           mobileCard={renderMobileCard}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
-          pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
+          pagination={{ page, pageSize, total, onChange: setPage }}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
-          rows={paginated}
+          rows={users}
           toolbar={filtersToolbar}
         />
       ) : null}

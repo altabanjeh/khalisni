@@ -8,7 +8,7 @@ function ProtectedRoute({ roles }) {
   const { user, loading, authError, retryAuth } = useAuth()
   const location = useLocation()
 
-  if (loading) return <LoadingSpinner />
+  if (loading) return <div data-page-loading="auth"><LoadingSpinner /></div>
   // The profile request failed without the session being refused (offline,
   // server fault): keep the session and offer a retry, do not send to login.
   if (!user && authError) {

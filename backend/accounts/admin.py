@@ -2,10 +2,24 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from accounts.models import CustomUser, CustomerProfile, PasswordResetToken, SystemSetting
+from accounts.validators import normalize_phone
+
+
+class CanonicalPhoneSearchMixin:
+    """Admin search also matches a phone number typed in another format."""
+
+    phone_lookup = "phone"
+
+    def get_search_results(self, request, queryset, search_term):
+        results, may_have_duplicates = super().get_search_results(request, queryset, search_term)
+        canonical = normalize_phone(search_term)
+        if canonical:
+            results = results | queryset.filter(**{self.phone_lookup: canonical})
+        return results, may_have_duplicates
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(CanonicalPhoneSearchMixin, UserAdmin):
     model = CustomUser
     list_display = ("email", "full_name", "phone", "role", "is_active")
     list_filter = ("role", "is_active")
@@ -30,7 +44,8 @@ class CustomUserAdmin(UserAdmin):
 
 
 @admin.register(CustomerProfile)
-class CustomerProfileAdmin(admin.ModelAdmin):
+class CustomerProfileAdmin(CanonicalPhoneSearchMixin, admin.ModelAdmin):
+    phone_lookup = "user__phone"
     list_display = ("user",)
     search_fields = ("user__full_name", "user__email", "user__phone")
 

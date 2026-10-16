@@ -13,6 +13,10 @@ async function settle(page) {
   await page.waitForTimeout(600)
 }
 
+async function waitForAnimations(page) {
+  await page.waitForFunction(() => document.getAnimations().filter((animation) => animation instanceof CSSTransition).every((animation) => animation.playState !== 'running'))
+}
+
 async function violations(page, rules) {
   const results = await new AxeBuilderReal({ page }).withTags(TAGS).withRules(rules).analyze()
   return results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html.slice(0, 120)).join(' | ')}`)
@@ -38,6 +42,9 @@ test('admin orders: active status filter chip count has enough contrast', async 
   for (let index = 0; index < Math.min(await chips.count(), 4); index += 1) {
     await chips.nth(index).click()
     await expect(chips.nth(index)).toHaveAttribute('aria-pressed', 'true')
+    // The chips fade their colours (CSS `transition`); measure the settled
+    // colours, not a frame of the fade, which is all axe saw before.
+    await waitForAnimations(page)
     expect(await violations(page, ['color-contrast'])).toEqual([])
   }
 })

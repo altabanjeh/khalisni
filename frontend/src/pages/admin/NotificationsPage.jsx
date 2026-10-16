@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import DataTable from '../../components/DataTable'
 import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
@@ -7,15 +7,24 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
 
-const PAGE_SIZE = 20
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
 
 function NotificationsPage() {
   const { language, isArabic } = useLanguage()
-  const { data: notifications = [], loading } = useAsyncData(() => api.getNotifications(), [], [])
+  // The log pages on the server so every notification is reachable.
   const [page, setPage] = useState(1)
-
-  const total = notifications.length
-  const paginated = notifications.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const [pageSize, setPageSize] = useState(20)
+  const { data: pageData, loading, error, reload } = useAsyncData(() => api.getNotificationsPage({ page }), [page], EMPTY_PAGE)
+  const notifications = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  useEffect(() => {
+    // The last row of the last page went away: go back to a page that exists.
+    if (error?.response?.status === 404 && page > 1) setPage((current) => Math.max(1, current - 1))
+  }, [error, page])
 
   const columns = [
     { key: 'title', label: isArabic ? 'العنوان' : 'Title' },
@@ -37,9 +46,12 @@ function NotificationsPage() {
         columns={columns}
         emptyDescription={isArabic ? 'سيظهر سجل الإشعارات المرسلة والفاشلة هنا.' : 'The log of sent and failed notifications will appear here.'}
         emptyTitle={isArabic ? 'لا توجد إشعارات' : 'No notifications'}
+        ariaLabel={isArabic ? 'جدول الإشعارات' : 'Notifications table'}
+        error={error?.response?.status === 404 ? null : error}
         loading={loading}
-        pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
-        rows={paginated}
+        onRetry={reload}
+        pagination={{ page, pageSize, total, onChange: setPage }}
+        rows={notifications}
       />
     </div>
   )

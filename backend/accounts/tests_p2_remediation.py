@@ -85,12 +85,20 @@ class RegistrationValidationTests(UnthrottledAuthMixin, APITestCase):
 
     # 4. valid phone -> accepted
     def test_valid_local_and_international_phones_accepted(self):
-        for index, value in enumerate(("0791234567", "+962 79 123 4567", "00962-78-1234567", "(06) 5512345")):
+        # Owner phone policy: stored in canonical E.164 form (distinct numbers,
+        # because equivalent spellings of one number are now one identity).
+        cases = (
+            ("0791234567", "+962791234567"),
+            ("+962 79 123 4568", "+962791234568"),
+            ("00962-78-1234567", "+962781234567"),
+            ("(06) 5512345", "+96265512345"),
+        )
+        for index, (value, canonical) in enumerate(cases):
             with self.subTest(value=value):
                 response = self.register(payload(phone=value, email=f"ok-{index}@example.test"))
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
                 user = CustomUser.objects.get(email=f"ok-{index}@example.test")
-                self.assertEqual(user.phone, value)
+                self.assertEqual(user.phone, canonical)
                 self.assertEqual(user.role, CustomUser.Role.CUSTOMER)
 
     def test_canonical_validator_rule(self):
@@ -144,7 +152,7 @@ class RegistrationValidationTests(UnthrottledAuthMixin, APITestCase):
         response = self.client.patch("/api/customer/profile/", {"phone": "abc", "current_password": STRONG_PASSWORD}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         user.refresh_from_db()
-        self.assertEqual(user.phone, "0795555555")
+        self.assertEqual(user.phone, "+962795555555")  # unchanged (stored canonical since the phone policy)
 
 
 class PasswordGuidanceTests(APITestCase):

@@ -25,7 +25,9 @@ import {
   getRequiredDocumentType,
   getServiceSchemaFields,
   validateUploadableFile,
+  isSchemaFieldVisible,
 } from '../../../utils/serviceForms';
+import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../../utils/orderConsent';
 import { uuidv4 } from '../../../utils/uuid';
 
 function getKeyboardType(type: string) {
@@ -104,7 +106,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
 
       schemaFields.forEach((field) => {
         const value = dynamicValues[field.inputName];
-        if (!field.required) return;
+        if (!field.required || !isSchemaFieldVisible(field, schemaFields, dynamicValues)) return;
         if (field.type === 'checkbox' && !value) {
           validationErrors[field.inputName] = `${field.label} مطلوب.`;
           return;
@@ -158,6 +160,9 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       formData.append('city', city.trim());
       formData.append('notes', builtNotes);
       formData.append('consent', consent ? 'true' : 'false');
+      // Names the consent statement shown on this screen (backend/orders/consent.py).
+      formData.append('consent_version', ORDER_CONSENT_VERSION);
+      formData.append('consent_source', 'mobile');
 
       if (requiredDocuments.length) {
         requiredDocuments.forEach((document, index) => {
@@ -283,7 +288,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
         {schemaFields.length ? (
           <AppCard style={styles.stack}>
             <Text style={styles.sectionTitle}>البيانات الإضافية المطلوبة</Text>
-            {schemaFields.map((field) => (
+            {schemaFields.filter((field) => isSchemaFieldVisible(field, schemaFields, dynamicValues)).map((field) => (
               <View key={field.inputName} style={styles.stack}>
                 {field.type === 'checkbox' ? (
                   <View style={styles.toggleRow}>
@@ -383,7 +388,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
           <View style={styles.toggleRow}>
             <Switch value={consent} onValueChange={setConsent} />
             <View style={styles.toggleText}>
-              <Text style={styles.toggleTitle}>أوافق على استخدام بياناتي ووثائقي لأغراض تنفيذ الخدمة فقط.</Text>
+              <Text style={styles.toggleTitle}>{ORDER_CONSENT_TEXT}</Text>
             </View>
           </View>
           {errors.consent ? <Text style={styles.errorText}>{errors.consent}</Text> : null}

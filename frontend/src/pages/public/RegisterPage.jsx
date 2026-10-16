@@ -108,7 +108,7 @@ function RegisterPage() {
               {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })}
             />
             <p className="mt-1 text-xs font-semibold text-slate-600" id="reg-phone-hint">
-              {isArabic ? 'مثال: 0791234567 أو ‎+962791234567 (من 8 إلى 15 رقماً).' : 'Example: 0791234567 or +962791234567 (8 to 15 digits).'}
+              {isArabic ? 'مثال: 0791234567 أو ‎+962791234567. للأرقام من خارج الأردن أضف رمز الدولة مسبوقاً بـ +.' : 'Example: 0791234567 or +962791234567. For a number outside Jordan, add the country code after +.'}
             </p>
             {fieldError('phone')}
           </div>

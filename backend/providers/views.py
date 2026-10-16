@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
-from core.delete_guard import AdminDeleteGuardMixin
+from core.delete_guard import AdminDeleteGuardMixin, _include_deleted
 from documents.serializers import DocumentUploadSerializer
 from organizations.selectors import (
     active_memberships_for_user,
@@ -22,6 +22,7 @@ from organizations.selectors import (
 from orders.models import Order
 from orders.serializers import ProviderOrderDetailSerializer, ProviderOrderListSerializer
 from orders.selectors import get_reviewable_orders_for_user
+from orders.views import StatusGroupListMixin
 from orders.services import complete_provider_work, provider_add_internal_note, provider_update_status
 from providers.models import ProviderProfile
 from providers.serializers import (
@@ -100,8 +101,14 @@ class ProviderAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
             queryset = queryset.filter(is_approved=str(approved).strip().lower() in {"1", "true", "yes", "on"})
         if active is not None:
             queryset = queryset.filter(user__is_active=str(active).strip().lower() in {"1", "true", "yes", "on"})
+        # With include_deleted, is_deleted narrows the list on the server so a
+        # paged "deleted only" view counts and pages correctly.
+        deleted = params.get("is_deleted")
+        if deleted is not None and _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=str(deleted).strip().lower() in {"1", "true", "yes", "on"})
 
-        return queryset
+        # Unique tiebreak: equal ratings and names must not move between pages.
+        return queryset.order_by("-rating", "user__full_name", "pk")
 
     def get_permissions(self):
         if self.action in {"list", "retrieve"}:
@@ -328,12 +335,20 @@ class ProviderDashboardAPIView(APIView):
         return response.Response(data)
 
 
-class ProviderOrderListAPIView(generics.ListAPIView):
+class ProviderOrderListAPIView(StatusGroupListMixin, generics.ListAPIView):
     serializer_class = ProviderOrderListSerializer
     permission_classes = [permissions.IsAuthenticated, IsProviderRole]
+    search_fields = ["order_number", "service__name_ar", "service__name_en", "city"]
+    # The provider's work-queue chips (AssignedOrdersPage), answered over every row.
+    status_groups = {
+        "active": Q(status__in=[Order.Status.ASSIGNED, Order.Status.IN_PROGRESS, Order.Status.WAITING_GOVERNMENT]),
+        "ready": Q(status=Order.Status.READY_FOR_DELIVERY),
+        "done": Q(status=Order.Status.COMPLETED),
+    }
 
-    def get_queryset(self):
-        return provider_orders_queryset(self.request.user)
+    def get_scoped_queryset(self):
+        # Newest first; pk breaks ties so rows never move between pages.
+        return provider_orders_queryset(self.request.user).order_by("-created_at", "-pk")
 
 
 class ProviderOrderDetailAPIView(generics.RetrieveAPIView):

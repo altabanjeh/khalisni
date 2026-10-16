@@ -1,11 +1,16 @@
 from rest_framework import serializers
 
+from accounts.fields import CanonicalPhoneField
+
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from public_site.models import Advertisement, ContactInquiry, PublicPageContent, SiteTheme
 from public_site.models import MissingServiceRequest
 
 
 class ContactInquiryCreateSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    # Stored canonical so staff can match the inquiry to a customer's number.
+    phone = CanonicalPhoneField()
+
     class Meta:
         model = ContactInquiry
         fields = ("inquiry_id", "name", "phone", "email", "message", "created_at")
@@ -234,6 +239,7 @@ class HomepagePayloadSerializer(serializers.Serializer):
 
 
 class MissingServiceRequestPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    requester_phone = CanonicalPhoneField(required=False, allow_blank=True)
     matched_service_id = serializers.PrimaryKeyRelatedField(
         queryset=MissingServiceRequest._meta.get_field("matched_service").remote_field.model.objects.filter(is_deleted=False),
         source="matched_service",

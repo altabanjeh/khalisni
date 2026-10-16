@@ -9,7 +9,7 @@ Written 2026-10-13. For the operator of the Docker Compose deployment (Coolify o
 | `scripts/backup.sh`, `scripts/restore.sh` | Run on a local Compose stack built from this release (PostgreSQL 16, production settings). **Not run against the deployed stack.** |
 | Backup failure handling | Tested locally: with the database container stopped, and separately with the backend container stopped, the script exits 1 and leaves only a `.partial` directory. |
 | Restore drill, database and media | Done locally on 2026-10-13 into a separate Compose project: 12 s, row counts identical, the test document readable, `check_system_consistency` clean. Local seeded data, not a production copy. |
-| Scheduled backups, off-server copy | **Do not exist.** Nothing in the repository schedules a backup. Until this is set up, losing the server disk loses every order and every customer document. |
+| Scheduled backups, off-server copy | `scripts/backup_scheduled.sh` and `scripts/verify_backup.sh` exist (section 3, Schedule). **Nothing is scheduled on any server yet**: until the cron entry and the off-server copy are set up on production, losing the server disk loses every order and every customer document. |
 
 ## 1. Where the data lives
 
@@ -86,11 +86,26 @@ If `manifest.txt` shows a bucket name instead of `object_storage_bucket=none`, u
 
 Nightly is the minimum for a service that holds customer identity documents:
 
+`scripts/backup_scheduled.sh` runs one scheduled cycle: `backup.sh`, then `verify_backup.sh` on the new backup, then an optional off-server copy, then optional rotation. It exits non-zero if any step fails.
+
 ```cron
-15 2 * * * cd /srv/khalsni && sh scripts/backup.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
+15 2 * * * cd /srv/khalsni && KHALSNI_BACKUP_COPY_COMMAND="<copy command>" sh scripts/backup_scheduled.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
 ```
 
-Add the off-server copy and a retention rule (for example 14 daily, 8 weekly). How long backups of identity documents may be kept is a client policy decision, not an engineering one.
+| Variable | Meaning | Default |
+|---|---|---|
+| `KHALSNI_BACKUP_COPY_COMMAND` | Command that copies one finished backup off the server; the backup directory is appended as the last argument (for example an `rclone copy` or `rsync` invocation). | Unset: a warning is logged and the backup stays only on this server. |
+| `KHALSNI_BACKUP_KEEP` | Number of newest complete local backups to keep. Older complete backups are deleted; `.partial` directories are never deleted. | Unset: nothing is deleted. |
+
+There is deliberately no default retention. How long backups of identity documents may be kept is a client policy decision (D06), not an engineering one; set `KHALSNI_BACKUP_KEEP` (and the retention of the off-server copy) once that policy exists. Production schedule confirmation remains a release gate.
+
+### Verify a backup
+
+```sh
+sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
+```
+
+Needs no running stack, so it can be run on the off-server copy as well. It checks the checksums, that the media archive is readable, that the database file is a PostgreSQL custom-format dump, and that the manifest records the time, commit and row counts. It does not prove the backup restores; only the restore drill (section 4) does.
 
 ### Restore
 
