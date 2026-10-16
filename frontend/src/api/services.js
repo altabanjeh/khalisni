@@ -509,6 +509,10 @@ export const api = {
   recoverMissingDocumentRequest: ordersApi.recoverMissingDocumentRequest,
 
   getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), filterSoftDeleted(mockServices, params)),
+  getAdminServicesPage: async (params = {}) => {
+    const rows = filterSoftDeleted(mockServices, params)
+    return withTestValue(() => servicesApi.getAdminServicesPage(params), { results: rows, count: rows.length, hasNext: false, hasPrevious: false })
+  },
   getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), filterSoftDeleted(mockCategories, params)),
   reorderAdminCategories: servicesApi.reorderAdminCategories,
   getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), filterSoftDeleted([], params)),

@@ -1,6 +1,7 @@
 import { AlertTriangle, Check, CircleDot, X } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { formatDateTime } from '../utils/format'
+import { describeTimelineNote } from '../utils/timelinePresentation'
 import StatusBadge from './StatusBadge'
 
 const NEGATIVE = new Set(['REJECTED', 'CANCELLED'])
@@ -67,12 +68,12 @@ function OrderTimeline({ items = [], variant = 'default' }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <StatusBadge status={item.new_status || item.status} />
-                  <span className="text-[0.7rem] font-bold uppercase tracking-wide text-slate-500">{stageLabel}</span>
+                  <span className="text-[0.7rem] font-bold uppercase tracking-wide text-slate-600">{stageLabel}</span>
                 </div>
-                <span className="text-xs font-semibold text-slate-500">{formatDateTime(item.created_at, language)}</span>
+                <span className="text-xs font-semibold text-slate-600">{formatDateTime(item.created_at, language)}</span>
               </div>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                {item.note || (isArabic ? 'لا توجد ملاحظات إضافية لهذا التحديث.' : 'No additional notes for this update.')}
+                {describeTimelineNote(item, language) || (isArabic ? 'لا توجد ملاحظات إضافية لهذا التحديث.' : 'No additional notes for this update.')}
               </p>
             </article>
           </li>

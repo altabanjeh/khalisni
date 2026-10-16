@@ -31,6 +31,7 @@
   "common.required": "إلزامي",
   "common.save": "حفظ",
   "common.visibleItems": "عدد العناصر الظاهرة: {count}",
+  "common.dataTable": "جدول البيانات",
   "customer.browseServices": "تصفح الخدمات",
   "customer.dashboard": "لوحتي",
   "customer.myOrders": "طلباتي",

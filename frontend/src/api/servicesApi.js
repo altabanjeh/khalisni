@@ -1,4 +1,4 @@
-import { buildQuery, http, secureAdminDelete, unwrapList, withId } from './client'
+import { buildQuery, fetchAllPages, fetchPage, http, secureAdminDelete, unwrapList, withId } from './client'
 
 function normalizeCategory(record) {
   return withId(record, 'category_id')
@@ -112,10 +112,21 @@ export const servicesApi = {
     return http.get(`/services/${slug}/`)
   },
 
+  // Every service (all pages): pickers and the rules screen need the full catalogue.
   async getAdminServices(params = {}) {
     const normalized = normalizeSoftDeleteParams(params)
-    const records = unwrapList(await http.get(`/admin/services/${buildQuery(normalized.params)}`)).map(normalizeService)
+    const records = (await fetchAllPages('/admin/services/', normalized.params)).map(normalizeService)
     return filterSoftDeleted(records, normalized.status)
+  },
+
+  // One page of the services table; status, category and search are applied
+  // by the server so counts and pages stay right (audit B10-6).
+  async getAdminServicesPage({ page = 1, status = 'active', category = '', search = '' } = {}) {
+    const params = { page, category, search }
+    if (status === 'all' || status === 'deleted') params.include_deleted = true
+    if (status === 'deleted') params.is_deleted = true
+    const data = await fetchPage('/admin/services/', params)
+    return { ...data, results: data.results.map(normalizeService) }
   },
 
   async getAdminCategories(params = {}) {
@@ -130,7 +141,7 @@ export const servicesApi = {
 
   async getAdminServiceDocuments(params = {}) {
     const normalized = normalizeSoftDeleteParams(params)
-    const records = unwrapList(await http.get(`/admin/service-documents/${buildQuery(normalized.params)}`))
+    const records = await fetchAllPages('/admin/service-documents/', normalized.params)
     return filterSoftDeleted(records, normalized.status)
   },
 

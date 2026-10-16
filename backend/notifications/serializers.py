@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from notifications.event_map import ALLOWED_TEMPLATE_PLACEHOLDERS
+from notifications.legacy_content import legacy_arabic
 from notifications.models import Notification, NotificationTemplate
 
 
@@ -39,7 +40,13 @@ class NotificationSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsIdMixin, seriali
         language = (request.headers.get("Accept-Language", "ar") if request else "ar").split(",", 1)[0].lower()
         language = "en" if language.startswith("en") else "ar"
         localized = (obj.context_data or {}).get("localized") or {}
-        return (localized.get(language) or {}).get(field) or getattr(obj, field)
+        value = (localized.get(language) or {}).get(field)
+        if value:
+            return value
+        stored = getattr(obj, field)
+        if language == "ar" and not localized:
+            return legacy_arabic(field, stored) or stored
+        return stored
 
     def get_title(self, obj):
         return self._localized_value(obj, "title")

@@ -12,6 +12,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime } from '../../utils/format'
+import { getDocumentTypeLabel } from '../../utils/documentPresentation'
 
 function EmployeeVerifyDocumentsPage() {
   const [searchParams] = useSearchParams()
@@ -105,7 +106,7 @@ function EmployeeVerifyDocumentsPage() {
     { label: isArabic ? 'الطلب' : 'Request', value: selectedDocument.order?.order_number },
     { label: isArabic ? 'الخدمة' : 'Service', value: selectedDocument.order?.service_name || (isArabic ? 'غير محدد' : 'Not set') },
     { label: isArabic ? 'العميل' : 'Customer', value: selectedDocument.order?.customer_name || selectedDocument.uploaded_by_name || '—' },
-    { label: isArabic ? 'نوع المستند' : 'Document type', value: selectedDocument.document_type },
+    { label: isArabic ? 'نوع المستند' : 'Document type', value: getDocumentTypeLabel(selectedDocument, language) },
     { label: isArabic ? 'اسم الملف' : 'File name', value: selectedDocument.original_filename },
     { label: isArabic ? 'رفع بواسطة' : 'Uploaded by', value: selectedDocument.uploaded_by_name || selectedDocument.uploaded_by_role || '—' },
     { label: isArabic ? 'تاريخ الرفع' : 'Uploaded at', value: formatDateTime(selectedDocument.created_at, language) },
@@ -146,8 +147,9 @@ function EmployeeVerifyDocumentsPage() {
                 <p className="min-w-0 truncate text-sm font-black text-ink">{document.original_filename}</p>
                 <StatusBadge status={document.status} />
               </div>
-              <p className="mt-1 text-xs font-semibold text-slate-500">
-                #{document.order?.order_number} · {document.document_type}
+              {/* slate-600: readable on the selected item's brand-50 fill too (axe color-contrast). */}
+              <p className="mt-1 text-xs font-semibold text-slate-600">
+                #{document.order?.order_number} · {getDocumentTypeLabel(document, language)}
               </p>
             </button>
           ))}

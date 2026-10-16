@@ -5,7 +5,6 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
 import PageHeader from '../../components/PageHeader'
-import StatusBadge from '../../components/StatusBadge'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
@@ -123,6 +122,41 @@ function PermissionsPanel({ user, onSaved }) {
         {isArabic ? 'حفظ الصلاحيات' : 'Save permissions'}
       </button>
     </div>
+  )
+}
+
+// Account state comes from is_deleted / is_active only. Being active says
+// nothing about verification, which is shown from its own fields, each one
+// separately: no combined "verified" value is derived here (audit B10-8).
+function AccountStateBadge({ row, tr }) {
+  const [label, className] = row.is_deleted
+    ? [tr('محذوف', 'Deleted'), 'border-danger/20 bg-danger/10 text-danger']
+    : row.is_active
+      ? [tr('نشط', 'Active'), 'border-green-200 bg-green-50 text-green-800']
+      : [tr('غير نشط', 'Inactive'), 'border-slate-300 bg-slate-100 text-slate-700']
+  return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${className}`} data-testid="user-account-state">{label}</span>
+}
+
+function VerificationFacts({ row, tr }) {
+  const facts = [
+    ['is_verified', tr('الحساب موثّق', 'Account verified')],
+    ['is_email_verified', tr('البريد الإلكتروني مؤكَّد', 'Email confirmed')],
+    ['is_phone_verified', tr('رقم الهاتف مؤكَّد', 'Phone confirmed')],
+  ]
+  return (
+    <ul className="space-y-1 text-xs" data-testid="user-verification">
+      {facts.map(([field, label]) => {
+        const value = row[field]
+        const state = value === true ? tr('نعم', 'Yes') : value === false ? tr('لا', 'No') : tr('غير متاح', 'Not available')
+        return (
+          <li className="flex items-center gap-1.5" data-field={field} key={field}>
+            <span className={`h-2 w-2 shrink-0 rounded-full ${value === true ? 'bg-green-600' : 'bg-slate-400'}`} aria-hidden="true" />
+            <span className="text-slate-700">{label}:</span>
+            <span className={value === true ? 'font-bold text-green-800' : 'font-semibold text-slate-700'}>{state}</span>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
@@ -253,7 +287,8 @@ function AdminUsersRolesPage() {
         </div>
       ),
     },
-    { key: 'status_display', label: tr('الحالة', 'Status'), render: (row) => <StatusBadge status={row.is_deleted ? 'REJECTED' : row.is_active ? 'VERIFIED' : 'PENDING_REVIEW'} /> },
+    { key: 'status_display', label: tr('حالة الحساب', 'Account status'), render: (row) => <AccountStateBadge row={row} tr={tr} /> },
+    { key: 'verification_display', label: tr('التحقق', 'Verification'), render: (row) => <VerificationFacts row={row} tr={tr} /> },
     {
       key: 'actions_display', label: tr('الإجراءات', 'Actions'),
       render: (row) => {
@@ -279,10 +314,11 @@ function AdminUsersRolesPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <p className="font-bold text-ink">{row.full_name}</p>
-          <StatusBadge status={row.is_deleted ? 'REJECTED' : row.is_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
+          <AccountStateBadge row={row} tr={tr} />
         </div>
         <p className="text-sm text-slate-600">{row.email}</p>
-        <p className="text-sm text-slate-500">{roleLabel(row.role, isArabic)}</p>
+        <p className="text-sm text-slate-600">{roleLabel(row.role, isArabic)}</p>
+        <VerificationFacts row={row} tr={tr} />
       </div>
     )
   }

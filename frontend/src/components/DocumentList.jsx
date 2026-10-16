@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext'
 import { useToast } from '../context/ToastContext'
 import StatusBadge from './StatusBadge'
 import { findRequiredDocument, getRequiredDocumentLabel } from '../utils/serviceForms'
+import { getDocumentTypeLabel } from '../utils/documentPresentation'
 
 function triggerBlobDownload(blob, filename) {
   const url = URL.createObjectURL(blob)
@@ -17,7 +18,7 @@ function triggerBlobDownload(blob, filename) {
   URL.revokeObjectURL(url)
 }
 
-function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [], staff = false }) {
+function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [] }) {
   const { isArabic, language } = useLanguage()
   const { toast } = useToast()
 
@@ -26,7 +27,8 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default',
     if (document.is_final_document) return isArabic ? 'النتيجة النهائية' : 'Final result'
     const requirement = findRequiredDocument(requiredDocuments, document.document_type)
     if (requirement) return getRequiredDocumentLabel(requirement, language)
-    if (staff) return document.document_type
+    // Server-provided name (requirement or master definition); never the raw code.
+    if (document.document_type_label) return getDocumentTypeLabel(document, language)
     return isArabic ? 'مستند مرفوع' : 'Uploaded document'
   }
   const [downloading, setDownloading] = useState({})

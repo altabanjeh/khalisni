@@ -215,7 +215,13 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
             queryset = queryset.filter(category_id=category_id)
         if active is not None:
             queryset = queryset.filter(is_active=active)
-        return queryset
+        # With include_deleted, is_deleted narrows the list on the server so a
+        # paginated "deleted only" view counts and pages correctly (audit B10-6).
+        deleted = _as_bool(self.request.query_params.get("is_deleted"))
+        if deleted is not None and _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=deleted)
+        # Unique tiebreak: equal names must not move between pages.
+        return queryset.order_by("display_order", "name_ar", "pk")
 
     def get_serializer_class(self):
         if self.action in {"list", "retrieve"}:
@@ -464,7 +470,9 @@ class RequiredDocumentAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMix
             queryset = queryset.filter(service_id=service_id)
         if active is not None:
             queryset = queryset.filter(is_active=active)
-        return queryset
+        # Model order plus a unique tiebreak, so reading every page returns
+        # each rule exactly once (audit B10-6).
+        return queryset.order_by(*ServiceRequiredDocument._meta.ordering, "pk")
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

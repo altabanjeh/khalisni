@@ -245,6 +245,14 @@ function SectionMessage({ message }) {
   return <p className={`text-sm ${message.type === 'error' ? 'text-danger' : 'text-success'}`}>{message.text}</p>
 }
 
+const RULES_TABLE_PAGE_SIZE = 20
+
+function pageOf(rows, page) {
+  const lastPage = Math.max(1, Math.ceil(rows.length / RULES_TABLE_PAGE_SIZE))
+  const current = Math.min(page, lastPage)
+  return rows.slice((current - 1) * RULES_TABLE_PAGE_SIZE, current * RULES_TABLE_PAGE_SIZE)
+}
+
 function TabButton({ active, icon: Icon, label, onClick }) {
   return (
     <button
@@ -320,6 +328,10 @@ function AdminRuleManagementPage() {
   }
 
   const [activeTab, setActiveTab] = useState('services')
+  // Services and document rules are loaded in full (every server page) and
+  // paged here, so nothing past the first 20 rows is hidden (audit B10-6).
+  const [servicesTablePage, setServicesTablePage] = useState(1)
+  const [documentsTablePage, setDocumentsTablePage] = useState(1)
   const [feedback, setFeedback] = useState({})
   const [confirmState, setConfirmState] = useState({
     open: false,
@@ -875,7 +887,11 @@ function AdminRuleManagementPage() {
     { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
     { key: 'category_name', label: tx('التصنيف', 'Category') },
     { key: 'base_price', label: tx('السعر الأساسي', 'Base price'), render: (row) => formatPriceWithCurrency(row.base_price) },
-    { key: 'duration_display', label: tx('المدة التقديرية', 'Estimated duration') },
+    {
+      key: 'duration_display',
+      label: tx('المدة التقديرية', 'Estimated duration'),
+      render: (row) => (isArabic ? row.duration_display_ar : row.duration_display_en) || row.duration_display || '—',
+    },
     { key: 'provider_required', label: tx('يتطلب مزوداً', 'Provider required'), render: (row) => (row.provider_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'requires_manual_review', label: tx('مراجعة الموظف', 'Employee review'), render: (row) => (row.requires_manual_review ? tx('مطلوبة', 'Required') : tx('غير مطلوبة', 'Not required')) },
     { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
@@ -1160,10 +1176,13 @@ function AdminRuleManagementPage() {
             </button>
           </div>
           <DataTable
+            ariaLabel={tabLabels.services}
             columns={serviceColumns}
             emptyDescription={tx('أنشئ أول خدمة لبدء استقبال الطلبات.', 'Create the first service to start taking orders.')}
             emptyTitle={tx('لا توجد خدمات', 'No services found')}
-            rows={services}
+            loading={servicesLoading}
+            pagination={{ page: servicesTablePage, pageSize: RULES_TABLE_PAGE_SIZE, total: services.length, onChange: setServicesTablePage }}
+            rows={pageOf(services, servicesTablePage)}
           />
           <SectionMessage message={feedback.services} />
         </section>
@@ -1185,10 +1204,13 @@ function AdminRuleManagementPage() {
             </button>
           </div>
           <DataTable
+            ariaLabel={tabLabels.documents}
             columns={documentColumns}
             emptyDescription={tx('أضف أول قاعدة مستند لخدمة ما.', 'Add the first document rule for a service.')}
             emptyTitle={tx('لا توجد قواعد مستندات', 'No document rules found')}
-            rows={documents}
+            loading={documentsLoading}
+            pagination={{ page: documentsTablePage, pageSize: RULES_TABLE_PAGE_SIZE, total: documents.length, onChange: setDocumentsTablePage }}
+            rows={pageOf(documents, documentsTablePage)}
           />
           <SectionMessage message={feedback.documents} />
         </section>

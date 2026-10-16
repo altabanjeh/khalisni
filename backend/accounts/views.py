@@ -2,6 +2,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import F, Q
+from django.utils import translation
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, permissions, response, status, viewsets
 from rest_framework.decorators import action
@@ -29,6 +30,7 @@ from accounts.serializers import (
     UserSerializer,
 )
 from audit.utils import create_audit_log
+from core.i18n import request_language
 from core.delete_guard import AdminDeleteGuardMixin, get_delete_guard_setting
 from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole, PlatformRecordWriteMixin
 from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
@@ -61,6 +63,11 @@ class RegisterAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
     throttle_scope = "auth_register"
+
+    def create(self, request, *args, **kwargs):
+        # Built-in field and password-validator messages follow the screen language.
+        with translation.override(request_language(request)):
+            return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         user = serializer.save()

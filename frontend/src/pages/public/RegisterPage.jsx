@@ -13,6 +13,7 @@ import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { KhalsniLockup } from '../../components/brand/KhalsniLogo'
 import { useLanguage } from '../../context/LanguageContext'
+import { getPasswordRules, PASSWORD_MIN_LENGTH } from '../../utils/passwordPolicy'
 
 function getSafeNextPath(value) {
   // A single leading slash only: `//host` and `/\host` leave this site.
@@ -93,7 +94,22 @@ function RegisterPage() {
 
           <div>
             <label htmlFor="reg-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'رقم الهاتف' : 'Phone number'}<RequirementHint isArabic={isArabic} required /></label>
-            <PublicInput aria-required="true" id="reg-phone" {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })} />
+            {/* Format rules live on the server (accounts/validators.py); its message is shown under the field. */}
+            <PublicInput
+              aria-describedby="reg-phone-hint"
+              aria-invalid={errors.phone ? 'true' : undefined}
+              aria-required="true"
+              autoComplete="tel"
+              dir="ltr"
+              id="reg-phone"
+              inputMode="tel"
+              placeholder="0791234567"
+              type="tel"
+              {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })}
+            />
+            <p className="mt-1 text-xs font-semibold text-slate-600" id="reg-phone-hint">
+              {isArabic ? 'مثال: 0791234567 أو ‎+962791234567 (من 8 إلى 15 رقماً).' : 'Example: 0791234567 or +962791234567 (8 to 15 digits).'}
+            </p>
             {fieldError('phone')}
           </div>
 
@@ -119,12 +135,18 @@ function RegisterPage() {
               {...register('password', {
                 required: isArabic ? 'كلمة المرور مطلوبة' : 'Password is required',
                 minLength: {
-                  value: 8,
-                  message: isArabic ? 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' : 'Password must be at least 8 characters',
+                  value: PASSWORD_MIN_LENGTH,
+                  message: isArabic ? `كلمة المرور يجب أن تكون ${PASSWORD_MIN_LENGTH} أحرف على الأقل` : `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
                 },
               })}
             />
-            <p className="mt-1 text-xs font-semibold text-slate-600" id="reg-password-hint">{isArabic ? 'ثمانية أحرف على الأقل.' : 'At least eight characters.'}</p>
+            {/* The same rules the server enforces (utils/passwordPolicy.js). */}
+            <div className="mt-1 text-xs font-semibold text-slate-600" id="reg-password-hint">
+              <p>{isArabic ? 'يجب أن تكون كلمة المرور:' : 'Your password must be:'}</p>
+              <ul className="mt-1 list-disc space-y-0.5 ps-5" data-testid="password-rules">
+                {getPasswordRules(isArabic ? 'ar' : 'en').map((rule) => <li key={rule}>{rule}</li>)}
+              </ul>
+            </div>
             {fieldError('password')}
           </div>
 

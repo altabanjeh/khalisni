@@ -622,6 +622,10 @@ class OrderStatusLog(models.Model):
 
     note = models.TextField(blank=True)
 
+    # Code of a system-written note (orders/system_events.py) so screens can
+    # render it in their language; empty for text a person typed.
+    system_event = models.CharField(max_length=64, blank=True, default="")
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
@@ -639,6 +643,13 @@ class OrderStatusLog(models.Model):
 
     def __str__(self):
         return f"{self.order} | {self.old_status} -> {self.new_status}"
+
+    def save(self, *args, **kwargs):
+        if not self.system_event:
+            from orders.system_events import system_event_for_note
+
+            self.system_event = system_event_for_note(self.note)[0]
+        super().save(*args, **kwargs)
 
 
 class OrderNote(SoftDeleteModel):

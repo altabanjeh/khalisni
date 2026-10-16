@@ -31,6 +31,7 @@
   "common.required": "Required",
   "common.save": "Save",
   "common.visibleItems": "Visible items: {count}",
+  "common.dataTable": "Data table",
   "customer.browseServices": "Browse services",
   "customer.dashboard": "My dashboard",
   "customer.myOrders": "My requests",

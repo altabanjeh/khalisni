@@ -7,6 +7,7 @@ import { formatDate, formatDateTime } from '../utils/format'
 import { getCover } from '../utils/cover'
 import { getServiceName } from '../utils/servicePresentation'
 import StatusBadge from './StatusBadge'
+import { describeTimelineNote } from '../utils/timelinePresentation'
 
 const ACTION_REQUIRED = new Set(['WAITING_CUSTOMER'])
 const DONE = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'])
@@ -34,7 +35,7 @@ function RequestCard({ order, className = '', to }) {
   const serviceName = order?.service ? getServiceName(order.service, language) : isArabic ? 'خدمة غير محددة' : 'Unspecified service'
   const href = to || `/customer/orders/${order?.id}`
   const lastLog = Array.isArray(order?.status_logs) && order.status_logs.length ? order.status_logs[order.status_logs.length - 1] : null
-  const latestUpdate = lastLog?.note || order?.latest_update || ''
+  const latestUpdate = (lastLog && describeTimelineNote(lastLog, language)) || order?.latest_update || ''
   const updatedAt = order?.updated_at || lastLog?.created_at || order?.created_at
   const cover = getCover(order?.service || { slug: serviceName }, order?.service?.category?.slug || '', { as: 'service' })
   const [imageFailed, setImageFailed] = useState(false)

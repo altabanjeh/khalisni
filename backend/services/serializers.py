@@ -493,6 +493,8 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
     organization_id = serializers.PrimaryKeyRelatedField(source="organization", queryset=ServiceCategory.objects.none(), write_only=True, required=False, allow_null=True)
     organization_name = serializers.CharField(source="organization.name", read_only=True)
     duration_display = serializers.SerializerMethodField()
+    duration_display_ar = serializers.SerializerMethodField()
+    duration_display_en = serializers.SerializerMethodField()
     required_document_ids = serializers.PrimaryKeyRelatedField(
         source="required_document_definitions",
         queryset=RequiredDocumentDefinition.objects.filter(is_active=True, is_deleted=False),
@@ -589,12 +591,21 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
             "show_on_public_site",
             "display_order",
             "duration_display",
+            "duration_display_ar",
+            "duration_display_en",
             "required_document_ids",
             "required_documents",
         )
-        read_only_fields = ("duration_display", "image_url")
+        read_only_fields = ("duration_display", "duration_display_ar", "duration_display_en", "image_url")
 
     def get_duration_display(self, obj):
+        return obj.delivery_time_payload().get("label_en")
+
+    # Both languages, so the admin screens render the duration in theirs (audit D03).
+    def get_duration_display_ar(self, obj):
+        return obj.delivery_time_payload().get("label_ar")
+
+    def get_duration_display_en(self, obj):
         return obj.delivery_time_payload().get("label_en")
 
     def get_image_url(self, obj):

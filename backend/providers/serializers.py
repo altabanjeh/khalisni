@@ -2,11 +2,23 @@ from rest_framework import serializers
 
 from organizations.selectors import is_platform_super_admin
 
+from core.i18n import pick, request_language
 from core.serializer_mixins import SoftDeleteFieldsReadOnlyMixin
 
 from accounts.models import CustomUser
 from providers.models import ProviderProfile
 from services.models import ServiceCategory
+
+
+APPROVAL_STATUS_LABELS = {
+    True: {"ar": "معتمد", "en": "Approved"},
+    False: {"ar": "قيد المراجعة", "en": "Pending review"},
+}
+
+
+def approval_status_label(provider, request):
+    """Approval label in the caller's language (audit D03)."""
+    return pick(APPROVAL_STATUS_LABELS[bool(provider.is_approved)], request_language(request))
 
 
 class ProviderProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -71,7 +83,7 @@ class ProviderAdminListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mod
         )
 
     def get_approval_status_label(self, obj):
-        return "Approved" if obj.is_approved else "Pending review"
+        return approval_status_label(obj, self.context.get("request"))
 
     def get_capability_summary(self, obj):
         categories = list(obj.service_categories.values_list("name_ar", flat=True))
@@ -125,7 +137,7 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
         read_only_fields = ("rating", "total_completed_orders", "created_at", "approval_status_label")
 
     def get_approval_status_label(self, obj):
-        return "Approved" if obj.is_approved else "Pending review"
+        return approval_status_label(obj, self.context.get("request"))
 
     def validate(self, attrs):
         if not self.instance and not attrs.get("password"):

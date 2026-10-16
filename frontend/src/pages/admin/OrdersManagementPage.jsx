@@ -154,7 +154,7 @@ function OrdersManagementPage() {
                   type="button"
                 >
                   {item.label}
-                  <span className={statusFilter === item.key ? 'text-white/80' : 'text-slate-400'}>{counts[item.key] ?? 0}</span>
+                  <span className={statusFilter === item.key ? 'text-white' : 'text-slate-600'}>{counts[item.key] ?? 0}</span>
                 </button>
               ))}
             </div>

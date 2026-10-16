@@ -14,6 +14,7 @@ from organizations.models import Branch
 from organizations.selectors import customer_organization_for_user, resolve_organization_by_ref
 from orders.models import Order, OrderIssue, OrderNote, OrderStatusLog, Rating
 from orders.allowed_actions import get_order_allowed_actions
+from orders.system_events import describe_status_log
 from orders.readiness import order_requirement_rows, order_requirements
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
@@ -65,10 +66,28 @@ class ProviderBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
 
 class OrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     changed_by_name = serializers.CharField(source="changed_by.full_name", read_only=True)
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "changed_by", "changed_by_name", "note", "created_at")
+        fields = (
+            "id",
+            "old_status",
+            "new_status",
+            "changed_by",
+            "changed_by_name",
+            "note",
+            "system_event",
+            "system_event_params",
+            "created_at",
+        )
+
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0]
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1]
 
 
 # Transitions whose reason is written for the customer. Every other status-log
@@ -82,13 +101,25 @@ class CustomerOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializer
     """Timeline for the order owner and public tracking: no staff identity, no internal reasons."""
 
     note = serializers.SerializerMethodField()
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "note", "created_at")
+        fields = ("id", "old_status", "new_status", "note", "system_event", "system_event_params", "created_at")
+
+    def _note_visible(self, obj):
+        return obj.new_status in CUSTOMER_FACING_NOTE_STATUSES
 
     def get_note(self, obj):
-        return obj.note if obj.new_status in CUSTOMER_FACING_NOTE_STATUSES else ""
+        return obj.note if self._note_visible(obj) else ""
+
+    # The code follows the note: hidden notes stay hidden in every language.
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0] if self._note_visible(obj) else ""
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1] if self._note_visible(obj) else {}
 
 
 def _is_customer_request(request):
@@ -267,9 +298,18 @@ class OrderDetailSerializer(OrderListSerializer):
 
 
 class ProviderOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "note", "created_at")
+        fields = ("id", "old_status", "new_status", "note", "system_event", "system_event_params", "created_at")
+
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0]
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1]
 
 
 class ProviderOrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):

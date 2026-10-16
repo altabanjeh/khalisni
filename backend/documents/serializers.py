@@ -6,16 +6,19 @@ from rest_framework.reverse import reverse
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from documents.file_validation import sniff_matches_extension
 from documents.models import Document
+from documents.presentation import document_type_label
 
 
 class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
+    document_type_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Document
         fields = (
             "id",
             "document_type",
+            "document_type_label",
             "original_filename",
             "file_size",
             "mime_type",
@@ -33,15 +36,20 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
             return None
         return reverse("document-download", kwargs={"pk": obj.pk}, request=request)
 
+    def get_document_type_label(self, obj):
+        return document_type_label(obj)
+
 
 class ProviderDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
+    document_type_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Document
         fields = (
             "id",
             "document_type",
+            "document_type_label",
             "original_filename",
             "file_size",
             "status",
@@ -55,6 +63,9 @@ class ProviderDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
         if not request:
             return None
         return reverse("document-download", kwargs={"pk": obj.pk}, request=request)
+
+    def get_document_type_label(self, obj):
+        return document_type_label(obj)
 
 
 class DocumentUploadSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -101,6 +112,7 @@ class DocumentVerificationSerializer(serializers.Serializer):
 
 class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
+    document_type_label = serializers.SerializerMethodField()
     order = serializers.SerializerMethodField()
     uploaded_by_name = serializers.CharField(source="uploaded_by.full_name", read_only=True)
     verified_by_name = serializers.CharField(source="verified_by.full_name", read_only=True)
@@ -110,6 +122,7 @@ class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
         fields = (
             "id",
             "document_type",
+            "document_type_label",
             "original_filename",
             "file_size",
             "mime_type",
@@ -132,6 +145,9 @@ class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
         if not request:
             return None
         return reverse("document-download", kwargs={"pk": obj.pk}, request=request)
+
+    def get_document_type_label(self, obj):
+        return document_type_label(obj)
 
     def get_order(self, obj):
         order = getattr(obj, "order", None)
