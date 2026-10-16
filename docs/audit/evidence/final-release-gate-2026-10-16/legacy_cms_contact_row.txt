@@ -1,0 +1,3 @@
+Active-site CMS contact fields in the migrated legacy copy (environment T):
+(1, '+962790000000', '+962790000000', 'info@khalisni.local', 'Amman, Jordan', 'Amman, Jordan', 0, 0)
+(2, '+962 6 560 9000', '+962 79 000 0000', 'support@khalisni.local', 'عمان - الشميساني، شارع الملكة نور، مبنى خلصني للخدمات', 'Amman - Shmeisani, Queen Noor Street, Khalisni Services Building', 0, 0)
