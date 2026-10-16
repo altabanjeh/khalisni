@@ -135,6 +135,10 @@ function ServiceDetailsPage() {
   const pricing = service.pricing || {}
   const visiblePricingItems = getVisiblePricingItems(pricing, language, isArabic)
   const publicPriceNote = isArabic ? pricing.public_note_ar : pricing.public_note_en
+  // D02: one place per sentence. For a price that is not known yet the hero
+  // chip already shows the approved note as the price label, so the summary
+  // strip below does not repeat it.
+  const summaryPriceNote = price.note && price.note !== price.label ? price.note : ''
   const requestPath = `/create-order?service=${service.id}`
   const terms = getCatalogText(service, { ar: 'terms_ar', en: 'terms_en' }, language, '')
   const informationFields = normalizeInformationSchema(service.required_information_schema)
@@ -263,9 +267,9 @@ function ServiceDetailsPage() {
         </div>
       </section>
 
-      {duration.note || price.note ? (
+      {duration.note || summaryPriceNote ? (
         <div className="rounded-[var(--radius-lg)] bg-[var(--khalsni-public-bg-secondary)] p-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
-          {[duration.note, price.note].filter(Boolean).join(' · ')}
+          {[duration.note, summaryPriceNote].filter(Boolean).join(' · ')}
         </div>
       ) : null}
 
@@ -453,7 +457,7 @@ function ServiceDetailsPage() {
           </div>
           <div className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 xl:grid-cols-3">
             {relatedServices.map((item) => (
-              <ServiceCard key={item.id} className="w-[19rem] shrink-0 sm:w-auto" service={{ ...item, category: item.category || service.category }} />
+              <ServiceCard key={item.id} className="w-[19rem] shrink-0 sm:w-auto" priceShownAbove={price.label} service={{ ...item, category: item.category || service.category }} />
             ))}
           </div>
         </section>

@@ -1,6 +1,7 @@
 """
 Khalisni Platform – Comprehensive User Manual Generator  v2.0
-Produces: D:\ghassan\Khalisni_User_Manual.docx
+Produces: Khalisni_User_Manual.docx in the repository root
+(override with KHALSNI_MANUAL_OUT; images from KHALSNI_MANUAL_IMAGES).
 Covers every page and every action for all five roles.
 """
 
@@ -12,8 +13,9 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-IMG_DIR = r"D:\ghassan\user image"
-OUT_PATH = r"D:\ghassan\Khalisni_User_Manual.docx"
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+IMG_DIR = os.environ.get("KHALSNI_MANUAL_IMAGES", os.path.join(REPO_ROOT, "user image"))
+OUT_PATH = os.environ.get("KHALSNI_MANUAL_OUT", os.path.join(REPO_ROOT, "Khalisni_User_Manual.docx"))
 
 BRAND_BLUE   = RGBColor(0x1A, 0x56, 0xDB)
 DARK_NAVY    = RGBColor(0x1E, 0x29, 0x3B)

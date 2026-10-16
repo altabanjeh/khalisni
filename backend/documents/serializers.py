@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from documents.file_validation import sniff_matches_extension
 from documents.models import Document
-from documents.presentation import document_type_label
+from documents.presentation import document_type_label, localized_verification_note
 
 
 class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -39,9 +39,12 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
         # The verification (approval / delivery) note follows the same
         # boundary: its customer visibility is an open owner decision, so the
         # owning customer keeps what they had, and nobody else receives it.
-        if not _may_read_review_notes(self.context.get("request"), instance):
+        request = self.context.get("request")
+        if not _may_read_review_notes(request, instance):
             data.pop("rejection_reason", None)
             data.pop("verification_note", None)
+        elif "verification_note" in data:
+            data["verification_note"] = localized_verification_note(data["verification_note"], request)
         return data
 
     def get_download_url(self, obj):
@@ -163,6 +166,11 @@ class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
             "order",
             "download_url",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["verification_note"] = localized_verification_note(data.get("verification_note"), self.context.get("request"))
+        return data
 
     def get_download_url(self, obj):
         request = self.context.get("request")

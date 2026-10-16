@@ -1,0 +1,6 @@
+
+old layout connected as: ('khalisni', True)
+order: 201 KH-2026-000005
+OLD LAYOUT GAP: superuser disabled the trigger and rewrote consent (rows changed: 1 ) -- rolled back
+after rollback: consent intact: True orders: 5 consents: 1
+owners:|khalisni|58

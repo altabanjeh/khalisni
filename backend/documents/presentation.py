@@ -37,3 +37,24 @@ def document_type_label(document):
     definition = RequiredDocumentDefinition.objects.filter(code=code, is_deleted=False).only("name_ar", "name_en").first()
     label = definition and _pair(definition.name_ar, definition.name_en)
     return label or dict(GENERIC_LABEL)
+
+
+# System-written verification notes (audit D03). The English sentence stays in
+# the database for text-only API clients; an Arabic request gets the Arabic
+# sentence. Notes typed by staff or providers are never translated.
+SYSTEM_VERIFICATION_NOTES = {
+    "Approved automatically by service rule.": {
+        "ar": "اعتُمد تلقائياً وفق قاعدة الخدمة.",
+        "en": "Approved automatically by service rule.",
+    },
+}
+
+
+def localized_verification_note(note, request):
+    """The note in the request's language when it is an exact system sentence, else unchanged."""
+    from core.i18n import request_language
+
+    sentence = SYSTEM_VERIFICATION_NOTES.get((note or "").strip())
+    if not sentence:
+        return note
+    return sentence[request_language(request)]

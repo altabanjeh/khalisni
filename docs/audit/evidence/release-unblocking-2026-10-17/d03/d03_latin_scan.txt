@@ -1,0 +1,153 @@
+== orders_orderassignmenthistory.note: 5 rows
+   3x 'Order under review'
+   2x 'assign'
+== public_site_sitetheme.name: 2 rows
+   1x 'Default Khalisni Theme'
+   1x 'Khalisni Public Demo Theme'
+== public_site_missingservicerequest.source: 1 rows
+   1x 'homepage_chat'
+== public_site_missingservicerequest.service_name: 1 rows
+   1x 'Demo unlisted service'
+== public_site_missingservicerequest.request_message: 1 rows
+   1x 'Demo public page request verification'
+== help_guides_helpguide.title: 3 rows
+   1x 'How to Navigate the System'
+   1x 'Login and Account Access'
+   1x 'How to Add Screenshots to the Manual'
+== help_guides_helpguide.purpose: 3 rows
+   1x 'Use this guide to understand the common interaction patterns that appear across the Khalisni system before sta'
+   1x 'This guide explains how users enter the system, recover from common access problems, and return to work quickl'
+   1x 'Use this guide to keep the help library aligned with the current interface and replace placeholders with real '
+== help_guides_helpguide.before_you_start: 3 rows
+   1x 'Log in with your assigned account.\nMake sure the correct portal is open for your role.\nUse the top help button'
+   1x 'Have your email and password ready.\nUse the correct login page for the system.\nMake sure you can access the em'
+   1x 'Confirm the target guide already exists in Help Guide Management.\nCapture the final approved UI state only.\nPr'
+== help_guides_helpguide.step_by_step_guide: 3 rows
+   1x '1. Open your dashboard and read the summary cards to see the current workload.\n2. Use the sidebar to move betw'
+   1x '1. Open the login page and enter your email and password.\n2. Press Sign in and wait for the system to route yo'
+   1x '1. Open the exact page or modal that the guide step explains.\n2. Capture the screen at a clear desktop width, '
+== help_guides_helpguide.expected_result: 3 rows
+   1x 'You can move between major screens confidently.\nYou can read table rows, status labels, and action buttons cor'
+   1x 'The user reaches the correct dashboard after login.\nPassword reset returns the user to a working sign-in flow.'
+   1x 'Screenshots are stored with consistent names.\nManual pages show the right image with the right caption.\nOutdat'
+== help_guides_helpguide.common_errors: 3 rows
+   1x 'Opening the wrong portal for the current role.\nIgnoring the current status before pressing an action button.\nC'
+   1x 'Typing an old password after it was already reset.\nUsing an email address that does not match the registered a'
+   1x 'Saving screenshots in the wrong folder.\nUsing filenames that do not describe the role, module, and step.\nLeavi'
+== help_guides_helpguide.related_screen: 33 rows
+   3x 'provider_orders'
+   3x 'customer_order_details'
+   2x 'customer_orders'
+   2x 'employee_review_queue'
+   2x 'admin_dashboard'
+   2x 'employee_order_review'
+== help_guides_helpguide.related_permission: 9 rows
+   4x 'orders.review_order'
+   2x 'help_guides.manage_help_guides'
+   1x 'orders.request_missing_documents'
+   1x 'documents.verify_document'
+   1x 'accounts.manage_user_roles'
+== help_guides_helpguide.main_workflow: 3 rows
+   1x 'Navigation and orientation'
+   1x 'Authentication and profile access'
+   1x 'Manual maintenance'
+== help_guides_helpguide.next_step: 3 rows
+   1x 'Open the guide for the exact screen or workflow you need next.'
+   1x 'After login, open the role-specific navigation guide or the current screen guide.'
+   1x 'Open the user-facing manual panel and verify the screenshot on the live guide.'
+== help_guides_helpguide.when_to_use: 3 rows
+   1x 'Open this guide when a user is new to the system or needs a quick orientation before following a workflow guid'
+   1x 'Use this guide for first-time login, wrong password cases, reset password flows, and profile access questions.'
+   1x 'Use this guide whenever the UI changes, a placeholder still exists, or a new guide needs image support.'
+== help_guides_helpguide.category: 36 rows
+   33x 'general'
+   1x 'account'
+   1x 'manual'
+   1x 'navigation'
+== help_guides_helpguide.troubleshooting: 3 rows
+   1x 'If a button is missing, check your role and permissions first.\nIf a table looks empty, clear filters and try a'
+   1x 'If sign in fails repeatedly, verify the email address first.\nIf the reset email does not arrive, check spam or'
+   1x 'If a screenshot does not display, confirm the uploaded file or static path is correct.\nIf the image is outdate'
+== help_guides_helpguidescreenshot.caption: 42 rows
+   1x 'الدليل العام للإدارة screenshot'
+   1x 'الدليل العام للدعم screenshot'
+   1x 'الدليل العام للعميل screenshot'
+   1x 'الدليل العام للمزود screenshot'
+   1x 'الدليل العام للموظف screenshot'
+   1x 'How to Navigate the System screenshot'
+== help_guides_helpguidescreenshot.placeholder_label: 42 rows
+   1x 'Screenshot required: الدليل العام للإدارة'
+   1x 'Screenshot required: الدليل العام للدعم'
+   1x 'Screenshot required: الدليل العام للعميل'
+   1x 'Screenshot required: الدليل العام للمزود'
+   1x 'Screenshot required: الدليل العام للموظف'
+   1x 'Screenshot required: How to Navigate the System'
+== help_guides_helpguidescreenshot.alt_text: 9 rows
+   1x 'How to Navigate the System'
+   1x 'Login and Account Access'
+   1x 'How to Add Screenshots to the Manual'
+   1x 'Dashboard layout overview'
+   1x 'Sidebar and top navigation'
+   1x 'Table actions and status labels'
+== help_guides_helpguidescreenshot.step_reference: 41 rows
+   36x 'overview'
+   1x 'dashboard_layout'
+   1x 'navigation_controls'
+   1x 'table_actions'
+   1x 'forgot_password'
+   1x 'admin_help_screenshots'
+== notifications_notification.priority: 17 rows
+   17x 'normal'
+== notifications_notification.title: 17 rows
+   6x 'Order received'
+   4x 'New assigned order'
+   4x 'طلب خدمة غير موجودة: Demo unlisted service'
+   1x 'More documents required'
+   1x 'Final result uploaded'
+   1x 'Order completed'
+== notifications_notification.message: 11 rows
+   1x 'Your order KH-2026-000001 was created successfully.'
+   1x 'Your order KH-2026-000002 was created successfully.'
+   1x 'Your order KH-2026-000003 was created successfully.'
+   1x 'Your order KH-2026-000004 was created successfully.'
+   1x 'Order KH-2026-000002 was assigned to you.'
+   1x 'Order KH-2026-000003 was assigned to you.'
+== orders_ordernote.visibility: 1 rows
+   1x 'CUSTOMER'
+== organizations_organization.name: 1 rows
+   1x 'Platform Owner'
+== organizations_organization.legal_name: 1 rows
+   1x 'Platform Owner'
+== services_service.scope: 38 rows
+   38x 'global'
+== services_service.delivery_time_mode: 38 rows
+   31x 'duration'
+   7x 'duration_range'
+== services_servicerelation.message_to_customer: 2 rows
+   1x 'After renewing the business license, you may also need an updated no-criminal-record certificate.'
+   1x 'Many clients also clear related traffic obligations during the same renewal cycle.'
+== accounts_customuser.full_name: 7 rows
+   3x 'Provider'
+   1x 'Demo Customer'
+   1x 'Demo Provider'
+   1x 'Employee Demo'
+   1x 'Audit User'
+== orders_order.priority: 6 rows
+   6x 'NORMAL'
+== orders_order.organization_name_snapshot: 6 rows
+   6x 'Platform Owner'
+== orders_order.expected_delivery_mode: 6 rows
+   6x 'duration'
+== orders_orderstatuslog.note: 9 rows
+   3x 'Order under review'
+   2x 'review'
+   2x 'assign'
+   1x 'Provider completed work and uploaded final result'
+   1x 'Order completed'
+== public_site_publicpagecontent.version_name: 2 rows
+   1x 'Default Homepage Content'
+   1x 'Khalisni Public Demo Homepage'
+== public_site_publicpagecontent.office_address: 1 rows
+   1x 'Amman, Jordan'
+== public_site_publicpagecontent.footer_text: 1 rows
+   1x 'Khalisni منصة أردنية لإدارة طلبات الخدمات الحكومية والإدارية.'

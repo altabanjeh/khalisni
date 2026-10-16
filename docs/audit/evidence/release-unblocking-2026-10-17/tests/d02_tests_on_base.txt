@@ -1,0 +1,5 @@
+   × a quotation service shows the approved price sentence exactly once, related cards included 166ms
+   ✓ a fixed-price service shows its total in the hero and its note once 37ms
+   × a related card with a known total still shows its price 22ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 1 passed (3)

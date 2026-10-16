@@ -1,0 +1,31 @@
+== roles (name|super|createdb|createrole|replication|bypassrls)
+khalisni|t|t|t|t|t
+khalsni_app|f|f|f|f|f
+khalsni_owner|f|f|f|f|f
+== database / schema owner
+khalisni|khalsni_owner
+public|khalsni_owner
+== object owners in public (owner|kind|count)
+khalsni_owner|S|56
+khalsni_owner|i|589
+khalsni_owner|r|58
+function|orders_orderconsent_append_only|khalsni_owner
+== live backend connections by role
+khalisni|1
+== app-role privileges on orders_orderconsent
+DELETE
+INSERT
+SELECT
+UPDATE
+== distinct app-role table privileges across schema
+DELETE|58
+INSERT|58
+SELECT|58
+UPDATE|58
+== app-role sequence privileges (sample)
+56|0|56
+== schema / database privileges for app
+f|t|f|f|t
+== default privileges
+khalsni_owner|r|{khalsni_app=arwd/khalsni_owner}
+khalsni_owner|S|{khalsni_app=rU/khalsni_owner}

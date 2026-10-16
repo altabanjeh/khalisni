@@ -59,6 +59,13 @@ const copy = {
   },
 }
 
+// A tel: URI carries only the digits and a leading +; the visible text keeps
+// the spacing the content editor typed ("+962 6 560 9000" -> "tel:+96265609000").
+function telHref(phone) {
+  const value = String(phone || '').trim()
+  return (value.startsWith('+') ? '+' : '') + value.replace(/\D/g, '')
+}
+
 function PublicLayoutContent() {
   const { direction, isArabic } = useLanguage()
   const dictionary = copy[isArabic ? 'ar' : 'en']
@@ -228,7 +235,7 @@ function PublicLayoutContent() {
               <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.contactTitle}</h2>
               <div className="mt-4 grid gap-3 text-sm text-[var(--khalsni-public-text-secondary)]">
                 {content.contact_phone ? (
-                  <a className={`${FOOTER_LINK} gap-2`} href={`tel:${content.contact_phone}`}>
+                  <a className={`${FOOTER_LINK} gap-2`} href={`tel:${telHref(content.contact_phone)}`}>
                     <Phone className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
                     <span>{content.contact_phone}</span>
                   </a>

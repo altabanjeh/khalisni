@@ -1,0 +1,11 @@
+== backend database identity
+
+('khalsni_app', 'khalsni_app', False)
+== seed through the app role
+Created/synced groups: admin, client, employee, provider. Users synced: 1.
+CommandError: Demo users and orders are refused when DJANGO_DEBUG is False. Catalog-only seeding works without these flags; pass --allow-non-debug only on a disposable demo site.
+Public site demo data seeded: theme=1, content=1, advertisement=1.
+Demo data and roles seeded successfully.
+CommandError: The client-audit QA seed is available only with DJANGO_DEBUG=True.
+Created/synced groups: admin, client, employee, provider. Users synced: 5.
+Client-audit QA records ready: missing=KH-2026-000005, uploaded=KH-2026-000006, provider_b=KH-2026-000007, final_result=KH-2026-000008

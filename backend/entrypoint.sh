@@ -26,8 +26,24 @@ done
 echo ""
 echo "Database ready."
 
-echo "Running migrations..."
-python manage.py migrate --noinput
+# Migrations are not run here. The one-shot `db-init` service applies them as
+# the database OWNER role (backend/ops/db_init.sh); this process connects as
+# the APP role, which owns nothing and cannot alter the schema. Wait until
+# every migration is applied (Coolify may start services before db-init ends).
+echo "Waiting for migrations (applied by db-init)..."
+migration_attempt=0
+until python manage.py migrate --check >/dev/null 2>&1
+do
+    migration_attempt=$((migration_attempt + 1))
+    if [ "$migration_attempt" -ge "${KHALSNI_MIGRATION_WAIT_ATTEMPTS:-150}" ]; then
+        echo "Unapplied migrations remain. Run the db-init service (docker compose -f docker-compose.yml run --rm db-init)." >&2
+        python manage.py showmigrations --plan | grep -F '[ ]' >&2 || true
+        exit 1
+    fi
+    echo "Migrations not applied yet (attempt ${migration_attempt}). Retrying in 2s..."
+    sleep 2
+done
+echo "Migrations applied."
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 echo "Syncing roles..."

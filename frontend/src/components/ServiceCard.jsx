@@ -26,13 +26,18 @@ import {
  * cover with a large glyph, so a wall of cards still reads as image-first.
  * The "View service" / "عرض الخدمة" affordance is identical across variants.
  */
-function ServiceCard({ service, className = '', variant = 'standard' }) {
+// `priceShownAbove`: the price text the surrounding page already shows (a
+// service page passes its own). A card whose price is the same unknown-price
+// sentence leaves it out instead of repeating it (audit D02); a known total is
+// always shown.
+function ServiceCard({ service, className = '', variant = 'standard', priceShownAbove = '' }) {
   const { language, isArabic } = useLanguage()
   const categoryName = getCategoryName(service?.category, language, isArabic ? 'خدمة' : 'Service')
   const serviceName = getServiceName(service, language)
   const serviceDescription = getServiceDescription(service, language)
   const duration = getServiceDuration(service, language)
   const price = getServicePublicPrice(service, language)
+  const showPrice = price.isKnown || !priceShownAbove || price.label !== priceShownAbove
   const docCount = service?.required_documents_count ?? service?.required_documents?.length ?? null
   const href = `/services/${service?.slug ?? service?.id ?? ''}`
   const viewLabel = isArabic ? 'عرض الخدمة' : 'View service'
@@ -74,7 +79,7 @@ function ServiceCard({ service, className = '', variant = 'standard' }) {
         <Clock3 aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-accent-text)]" />
         <span className="truncate">{duration.label}</span>
       </span>
-      {!compact ? (
+      {!compact && showPrice ? (
         <span className="inline-flex items-center gap-1.5">
           <Wallet aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--khalsni-public-accent-text)]" />
           <span className="truncate">{price.label}</span>

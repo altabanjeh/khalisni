@@ -1,0 +1,27 @@
+== stored CMS email vs public API
+
+public email: '' | phone: 
+== check_public_content --strict
+CommandError: 7 public-content item(s) need owner input.
+Published content row: 1 (Default Homepage Content), updated 2026-10-16 22:58
+  contact_phone: (blank)
+  whatsapp_number: (blank)
+  email: (blank)
+  office_address: (blank)
+  office_address_en: (blank)
+  phone, WhatsApp and address cannot be verified automatically; the owner confirms them.
+  privacy_policy_ar: (blank); privacy_policy_en: (blank)
+Sender (DEFAULT_FROM_EMAIL): no-reply@example.test
+Needs owner/legal input:
+  - D05 contact_phone is blank (shown as not published).
+  - D05 whatsapp_number is blank (shown as not published).
+  - D05 email is blank (shown as not published).
+  - D05 office_address is blank (shown as not published).
+  - D05 office_address_en is blank (shown as not published).
+  - D06 approved privacy policy text is missing (the page shows the generic built-in principles).
+  - Sender no-reply@example.test is on a reserved domain; set DJANGO_DEFAULT_FROM_EMAIL on the approved domain.
+exit=1
+== check --deploy (sender)
+System check identified some issues:
+?: (khalsni.W001) DEFAULT_FROM_EMAIL (no-reply@example.test) is on a reserved domain that cannot send or receive real mail.
+System check identified 5 issues (0 silenced).

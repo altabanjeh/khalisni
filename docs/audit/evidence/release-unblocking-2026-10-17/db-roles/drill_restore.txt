@@ -1,0 +1,223 @@
+database.dump: OK
+media.tar.gz: OK
+manifest.txt: OK
+Stopping the application so nothing writes during the restore...
+ Container khalsni-ub2-backend-1 Stopping 
+ Container khalsni-ub2-backend-1 Stopped 
+Restoring database...
+Restoring media...
+ Container khalsni-ub2-backend-run-093c7ca409c2 Creating 
+ Container khalsni-ub2-backend-run-093c7ca409c2 Created 
+Re-applying database roles, migrations and grants (db-init)...
+ Container khalsni-ub2-db-1 Running 
+ Container khalsni-ub2-db-1 Waiting 
+ Container khalsni-ub2-db-1 Healthy 
+ Container khalsni-ub2-db-init-run-d5bddf5a90a1 Creating 
+ Container khalsni-ub2-db-init-run-d5bddf5a90a1 Created 
+db-init: bootstrapping roles...
+db_bootstrap: role khalsni_owner updated.
+db_bootstrap: role khalsni_app updated.
+db_bootstrap: 59 object(s) moved to khalsni_owner.
+db_bootstrap: DML grants for khalsni_app applied.
+db-init: applying migrations as khalsni_owner...
+Operations to perform:
+  Apply all migrations: accounts, admin, audit, auth, authtoken, contenttypes, documents, help_guides, notifications, orders, organizations, payment, providers, public_site, services, sessions, token_blacklist
+Running migrations:
+  No migrations to apply.
+db-init: applying app-role grants...
+db_bootstrap: DML grants for khalsni_app applied.
+db-init: done.
+Starting the application...
+ Image khalsni-ub2-frontend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.37kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 869B 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#3 DONE 0.1s
+
+#4 [internal] load metadata for docker.io/library/node:22-alpine
+#4 DONE 0.1s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 200B done
+#5 DONE 0.1s
+
+#6 [internal] load build context
+#6 ...
+
+#7 [builder 1/6] FROM docker.io/library/node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+#7 resolve docker.io/library/node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 0.1s done
+#7 DONE 0.1s
+
+#8 [stage-1 1/4] FROM docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#8 resolve docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 0.1s done
+#8 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 95.90MB 5.0s
+#6 transferring context: 198.42MB 10.0s
+#6 transferring context: 301.96MB 15.1s
+#6 transferring context: 321.91MB 16.2s done
+#6 DONE 16.3s
+
+#9 [builder 2/6] WORKDIR /app
+#9 CACHED
+
+#10 [builder 3/6] COPY package*.json ./
+#10 CACHED
+
+#11 [builder 4/6] RUN npm ci --prefer-offline
+#11 CACHED
+
+#12 [builder 5/6] COPY . .
+#12 DONE 1.3s
+
+#13 [builder 6/6] RUN npm run build
+#13 0.630 
+#13 0.630 > khalisni-frontend@1.0.0 build
+#13 0.630 > vite build
+#13 0.630 
+#13 1.101 Both esbuild and oxc options were set. oxc options will be used and esbuild options will be ignored. The following esbuild options were set: `{ jsx: 'automatic' }`
+#13 1.116 vite v8.0.10 building client environment for production...
+#13 1.134 [2Ktransforming...Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+#13 1.971   npx update-browserslist-db@latest
+#13 1.971   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+#13 3.092 ✓ 2406 modules transformed.
+#13 3.392 rendering chunks...
+#13 3.547 computing gzip size...
+#13 3.559 dist/index.html                                           1.96 kB │ gzip:   0.81 kB
+#13 3.559 dist/assets/index-DAcWzBrC.css                           70.08 kB │ gzip:  12.84 kB
+#13 3.559 dist/assets/documentPresentation-DBEtuROK.js              0.23 kB │ gzip:   0.22 kB
+#13 3.559 dist/assets/StatusBadge-Bph6PiGg.js                       0.42 kB │ gzip:   0.30 kB
+#13 3.559 dist/assets/rolldown-runtime-S-ySWqyJ.js                  0.69 kB │ gzip:   0.42 kB
+#13 3.559 dist/assets/StatCard-viWpfodI.js                          0.79 kB │ gzip:   0.42 kB
+#13 3.559 dist/assets/PreviewPublicPage-Dq5aQxBf.js                 1.05 kB │ gzip:   0.65 kB
+#13 3.559 dist/assets/CreateOrderPage-CFUvyIL1.js                   1.25 kB │ gzip:   0.81 kB
+#13 3.559 dist/assets/catalogDefaults-9_rS_t_c.js                   1.33 kB │ gzip:   0.70 kB
+#13 3.559 dist/assets/catalogImagery-C5qgbp82.js                    1.78 kB │ gzip:   0.63 kB
+#13 3.559 dist/assets/ConfirmModal-D-hxEg6H.js                      1.79 kB │ gzip:   0.90 kB
+#13 3.559 dist/assets/Pagination-BoKebOi6.js                        1.80 kB │ gzip:   0.92 kB
+#13 3.559 dist/assets/FormModal-DWPYxgKA.js                         1.82 kB │ gzip:   0.86 kB
+#13 3.559 dist/assets/NotificationsPage-B4C02crW.js                 1.94 kB │ gzip:   1.06 kB
+#13 3.559 dist/assets/timelinePresentation-D2HrwY_h.js              2.14 kB │ gzip:   0.85 kB
+#13 3.559 dist/assets/AdminSoftDeleteModal-Dsa1MW5P.js              2.20 kB │ gzip:   1.04 kB
+#13 3.559 dist/assets/EmployeeReportsPage-CPKhpYeY.js               2.32 kB │ gzip:   1.15 kB
+#13 3.559 dist/assets/AuditLogPage-D_qhiztA.js                      2.35 kB │ gzip:   1.25 kB
+#13 3.559 dist/assets/PrivacyPolicyPage-CIdft1fC.js                 2.47 kB │ gzip:   1.39 kB
+#13 3.559 dist/assets/FaqPage-BgGKMPrK.js                           2.64 kB │ gzip:   1.41 kB
+#13 3.559 dist/assets/AboutPage-CN8w__eg.js                         2.66 kB │ gzip:   1.37 kB
+#13 3.559 dist/assets/MissingRequestRecovery-DOi7UAeE.js            2.96 kB │ gzip:   1.52 kB
+#13 3.559 dist/assets/PublicSiteFormFields-D-gjoQRp.js              3.35 kB │ gzip:   1.25 kB
+#13 3.559 dist/assets/AdminOverviewPage-i39LzQmy.js                 3.43 kB │ gzip:   1.42 kB
+#13 3.559 dist/assets/ReportsPage-Bg11_MHE.js                       3.45 kB │ gzip:   1.35 kB
+#13 3.559 dist/assets/PublicSiteManagementPage-BOFpQg5I.js          3.55 kB │ gzip:   1.59 kB
+#13 3.559 dist/assets/DataTable-CSeLYO6x.js                         3.76 kB │ gzip:   1.61 kB
+#13 3.559 dist/assets/MyOrdersPage-M4Bdm-B9.js                      4.01 kB │ gzip:   1.98 kB
+#13 3.559 dist/assets/ContactPage-DRE11BkN.js                       4.45 kB │ gzip:   1.77 kB
+#13 3.559 dist/assets/ProfilePage-DVR1ksWx.js                       4.49 kB │ gzip:   1.95 kB
+#13 3.559 dist/assets/RequestCard-CLHm2GhD.js                       4.74 kB │ gzip:   2.25 kB
+#13 3.559 dist/assets/FileUploader-CDiiFmFx.js                      4.98 kB │ gzip:   2.21 kB
+#13 3.559 dist/assets/EmployeeDashboardHome-bguv_fMx.js             5.12 kB │ gzip:   1.99 kB
+#13 3.559 dist/assets/ServiceCategoryPage-B74sNkhc.js               5.37 kB │ gzip:   1.94 kB
+#13 3.559 dist/assets/AssignedOrdersPage-Bp8fn-tx.js                5.51 kB │ gzip:   2.33 kB
+#13 3.559 dist/assets/serviceForms-BG5gWbfA.js                      5.79 kB │ gzip:   2.36 kB
+#13 3.559 dist/assets/workflowPresentation-D16zVLLJ.js              5.82 kB │ gzip:   2.25 kB
+#13 3.559 dist/assets/OrdersManagementPage-DAP-4CQl.js              5.84 kB │ gzip:   2.49 kB
+#13 3.559 dist/assets/ProviderDashboardHome-ClVx-Cc3.js             5.90 kB │ gzip:   2.39 kB
+#13 3.559 dist/assets/OrderTimeline-B2q3C_ue.js                     6.30 kB │ gzip:   2.47 kB
+#13 3.559 dist/assets/ThemeSettingsPage-Dojzopgu.js                 6.65 kB │ gzip:   2.32 kB
+#13 3.559 dist/assets/TrackOrderPage-B0Btr2rU.js                    6.94 kB │ gzip:   2.53 kB
+#13 3.559 dist/assets/MissingServiceRequestsPage-T1JcTSUr.js        8.23 kB │ gzip:   3.06 kB
+#13 3.559 dist/assets/PaymentsManagementPage-DfBeUiG9.js            8.30 kB │ gzip:   3.18 kB
+#13 3.559 dist/assets/MissingDocumentsResponsePage-XaOQI8hr.js      8.35 kB │ gzip:   3.25 kB
+#13 3.559 dist/assets/ProviderOrderDetailsPage-rldmbMnP.js          9.27 kB │ gzip:   3.26 kB
+#13 3.559 dist/assets/ServiceProviderAssignmentsPage-D0MX1aZ3.js    9.55 kB │ gzip:   3.43 kB
+#13 3.559 dist/assets/EmployeeVerifyDocumentsPage-Cw8XvIJa.js       9.80 kB │ gzip:   3.84 kB
+#13 3.559 dist/assets/HomepageContentEditorPage-4PwhLKw8.js        10.05 kB │ gzip:   2.69 kB
+#13 3.559 dist/assets/CustomerDashboardHome-DoQlvyZK.js            10.18 kB │ gzip:   3.48 kB
+#13 3.559 dist/assets/EmployeeReviewQueuePage-C4x4CslY.js          10.22 kB │ gzip:   3.09 kB
+#13 3.559 dist/assets/AdminCmsPage-CeYK8kcu.js                     11.46 kB │ gzip:   4.21 kB
+#13 3.559 dist/assets/AdvertisementManagerPage-CqMAPRBQ.js         12.12 kB │ gzip:   4.14 kB
+#13 3.559 dist/assets/CustomerOrderDetailsPage-Vl60du-m.js         14.70 kB │ gzip:   5.12 kB
+#13 3.559 dist/assets/ServiceCategoryManagementPage-C33FuQkA.js    15.41 kB │ gzip:   5.07 kB
+#13 3.559 dist/assets/ServiceRelationsManagementPage-ZaVRuUnF.js   16.69 kB │ gzip:   4.97 kB
+#13 3.559 dist/assets/ProvidersManagementPage-7ElG-JCo.js          17.07 kB │ gzip:   5.53 kB
+#13 3.559 dist/assets/AdminOrderDetailsPage-CiA1jF-N.js            18.05 kB │ gzip:   5.92 kB
+#13 3.559 dist/assets/AdminUsersRolesPage-CGS83OcU.js              19.84 kB │ gzip:   6.42 kB
+#13 3.559 dist/assets/chunk-forms-DlIxjogH.js                      24.31 kB │ gzip:   9.09 kB
+#13 3.559 dist/assets/chunk-icons-u_l0xiDq.js                      25.09 kB │ gzip:   8.11 kB
+#13 3.559 dist/assets/HelpGuideManagementPage-Bmmu6CrN.js          25.73 kB │ gzip:   6.37 kB
+#13 3.559 dist/assets/CustomerCreateOrderPage-CkI9v3sO.js          26.07 kB │ gzip:   8.37 kB
+#13 3.559 dist/assets/EmployeeOrderReviewPage-xCIOnqvU.js          29.55 kB │ gzip:   7.76 kB
+#13 3.559 dist/assets/chunk-router-BZHD6VVg.js                     43.73 kB │ gzip:  15.62 kB
+#13 3.559 dist/assets/chunk-axios-DkpBSZNR.js                      49.95 kB │ gzip:  18.76 kB
+#13 3.559 dist/assets/ServicesManagementPage-lY7v59UO.js           55.73 kB │ gzip:  13.88 kB
+#13 3.559 dist/assets/AdminRuleManagementPage-CyD4WfTE.js          70.70 kB │ gzip:  17.45 kB
+#13 3.559 dist/assets/chunk-react-9KRrXCAI.js                     178.69 kB │ gzip:  56.48 kB
+#13 3.559 dist/assets/index-BOM8-Es2.js                           286.82 kB │ gzip:  70.08 kB
+#13 3.559 dist/assets/chunk-charts-DVmG1OP6.js                    373.96 kB │ gzip: 109.22 kB
+#13 3.559 
+#13 3.560 ✓ built in 2.44s
+#13 DONE 3.7s
+
+#8 [stage-1 1/4] FROM docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#8 CACHED
+
+#14 [stage-1 2/4] COPY --from=builder /app/dist /usr/share/nginx/html
+#14 DONE 0.1s
+
+#15 [stage-1 3/4] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#15 DONE 0.1s
+
+#16 [stage-1 4/4] COPY nginx-security-headers.conf /etc/nginx/snippets/security-headers.conf
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.8s done
+#17 exporting manifest sha256:ae4d532866d5e582eb73c19455425c9ec1e8b6866adb8f96a067e44888b96656 0.0s done
+#17 exporting config sha256:deb74ab1dd3fdcf42c7126962a695ef267d4d1cc58a364c3bbbeaee2594f0b62 0.0s done
+#17 exporting attestation manifest sha256:511e95fcb306d35f6fbbcf1a0a48647cf07123fe612b001c1177f42707c8bba4 0.0s done
+#17 exporting manifest list sha256:ba8e3cf0cdd8c55acd6537d6859619051b82cb4c78e79e83906b87992b8fa287
+#17 exporting manifest list sha256:ba8e3cf0cdd8c55acd6537d6859619051b82cb4c78e79e83906b87992b8fa287 0.0s done
+#17 naming to docker.io/library/khalsni-ub2-frontend:latest done
+#17 unpacking to docker.io/library/khalsni-ub2-frontend:latest
+#17 unpacking to docker.io/library/khalsni-ub2-frontend:latest 0.3s done
+#17 DONE 1.3s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image khalsni-ub2-frontend Built 
+ Container khalsni-ub2-db-1 Running 
+ Container khalsni-ub2-redis-1 Running 
+ Container khalsni-ub2-frontend-1 Creating 
+ Container khalsni-ub2-frontend-1 Created 
+ Container khalsni-ub2-db-1 Waiting 
+ Container khalsni-ub2-db-1 Healthy 
+ Container khalsni-ub2-db-init-1 Starting 
+ Container khalsni-ub2-db-init-1 Started 
+ Container khalsni-ub2-db-init-1 Waiting 
+ Container khalsni-ub2-db-init-1 Exited 
+ Container khalsni-ub2-backend-1 Starting 
+ Container khalsni-ub2-backend-1 Started 
+ Container khalsni-ub2-frontend-1 Starting 
+ Container khalsni-ub2-frontend-1 Started 
+Restored. Expected contents:
+backup_utc=20261016T215616Z
+release_commit=unknown
+media_files_archived=5
+media_files_live=5
+object_storage_bucket=none
+postgres=16.15
+orders=5
+documents=5
+users=5
+payments=0
+audit_logs=32
+migrations=115
+Now run: docker compose -p khalsni-ub2 --env-file <scratch>/ub/stack.env -f D:/ghassan/docker-compose.yml exec backend python manage.py check_system_consistency

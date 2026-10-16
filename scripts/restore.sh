@@ -23,7 +23,13 @@ ${COMPOSE} exec -T db sh -c 'pg_restore --clean --if-exists --no-owner -U "$POST
 echo "Restoring media..."
 ${COMPOSE} run --rm -T --no-deps --entrypoint sh backend -c 'rm -rf /app/media/* && tar -C /app -xzf -' < "${SOURCE}/media.tar.gz"
 
-echo "Starting the application (applies any newer migrations)..."
+# The dump is restored by the cluster admin with --no-owner, so the restored
+# objects belong to the admin. db-init moves them back to the owner role,
+# applies any newer migrations as the owner and re-grants the app role.
+echo "Re-applying database roles, migrations and grants (db-init)..."
+${COMPOSE} run --rm db-init
+
+echo "Starting the application..."
 ${COMPOSE} up -d backend frontend
 
 echo "Restored. Expected contents:"

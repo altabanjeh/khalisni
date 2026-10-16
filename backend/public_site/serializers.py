@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from accounts.fields import CanonicalPhoneField
 
+from core.reserved_domains import is_reserved_email
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from public_site.models import Advertisement, ContactInquiry, PublicPageContent, SiteTheme
 from public_site.models import MissingServiceRequest
@@ -90,6 +91,16 @@ class PublicPageContentPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serialize
 
     def get_hero_image_url(self, obj):
         return build_media_url(self.context.get("request"), obj.hero_image)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # D05: an address on a reserved domain (e.g. support@khalisni.local)
+        # cannot receive mail, so it is not published. The stored value is
+        # left as it is; the footer then shows the remaining contact details or
+        # its "not published" text.
+        if is_reserved_email(data.get("email")):
+            data["email"] = ""
+        return data
 
 
 class AdvertisementPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -193,6 +204,13 @@ class PublicPageContentAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializer
 
     def get_hero_image_url(self, obj):
         return build_media_url(self.context.get("request"), obj.hero_image)
+
+    def validate_email(self, value):
+        if is_reserved_email(value):
+            raise serializers.ValidationError(
+                "This address is on a reserved domain that cannot receive mail. Publish a real support address or leave it blank."
+            )
+        return value
 
 
 class AdvertisementAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):

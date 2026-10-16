@@ -1,0 +1,18 @@
+PASS B07 consent unchecked by default :: consent checkbox initial state
+PASS 1 customer submits valid request (UI wizard) :: {"number":"KH-2026-000009","id":9}
+PASS B07 double-click submit creates one order :: {"postRequests":1,"ordersCreated":1}
+PASS B07 refresh after submit creates no extra order :: reload on success page
+PASS 2 employee sees request in queue :: KH-2026-000009
+PASS 2b employee starts review (UI) :: UNDER_REVIEW
+PASS 3 employee requests missing document (UI) :: {"status":"WAITING_CUSTOMER","missing":["client-audit-qa-202610-authorization"]}
+PASS 4 customer receives in-app notification (bell) :: bell shows missing-doc notice for KH-2026-000009
+PASS 4b bell opens the correct missing-docs page :: http://127.0.0.1:4380/customer/orders/9/missing-docs
+PASS 5-6 customer uploads + resubmits (UI) :: {"status":"UNDER_REVIEW","url":"http://127.0.0.1:4380/customer/orders/9"}
+PASS 7-8 employee reviews/accepts document (UI) :: {"requirements_complete":true,"documents":[{"document_type":"client-audit-qa-202610-authorization","name_ar":"تفويض تجريبي","name_en":"QA authorization","is_required":true,"state":"approved","document_id":11}],"blocking_reasons":[]}
+PASS 9 eligible provider assigned (UI); readiness text shown before :: {"status":"ASSIGNED","readyTextShown":true,"providerOptions":["اختر مزوّد الخدمة","QA Provider A — Amman ","QA Provider B — Amman "]}
+PASS 10 provider receives the request (list) :: KH-2026-000009
+PASS 11 provider opens it; internal note hidden :: provider detail
+PASS 12 provider updates progress (UI) :: IN_PROGRESS
+PASS 13 customer sees progress :: قيد التنفيذ
+PASS 14 internal note hidden from customer :: {"providerNameVisibleToCustomer":false}
+PASS 15 provider supplies final result (UI) :: READY_FOR_DELIVERY
