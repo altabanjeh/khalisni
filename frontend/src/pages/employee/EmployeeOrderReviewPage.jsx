@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import MissingRequestRecovery from '../../components/MissingRequestRecovery'
 import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
@@ -317,6 +318,8 @@ function EmployeeOrderReviewPage() {
               </div>
             </div>
           </SectionCard>
+
+          <MissingRequestRecovery allowedActions={allowedActions} onRecovered={reload} orderId={id} />
 
           {allowedActions.can_request_documents ? (
             <SectionCard icon={CircleAlert} title={tr('طلب مستندات ناقصة', 'Request missing documents')} description={tr('حدّد المستندات المطلوبة وأرسل ملاحظة واضحة للعميل.', 'Select the required documents and send a clear note to the customer.')}>

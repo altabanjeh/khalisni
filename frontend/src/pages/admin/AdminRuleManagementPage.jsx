@@ -22,6 +22,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getLocalizedField } from '../../utils/i18n'
+import { describeRule, getRoleLabel, getWorkflowActionLabel, getWorkflowChannelLabel, getWorkflowCheckLabel } from '../../utils/workflowPresentation'
 
 const SERVICE_TABS = [
   { id: 'services', icon: SlidersHorizontal },
@@ -989,12 +990,15 @@ function AdminRuleManagementPage() {
     },
   ]
 
+  // Rule metadata comes from the server as codes; present it in the screen
+  // language. The rules themselves are read-only here.
+  const listSeparator = isArabic ? '، ' : ', '
   const workflowColumns = [
-    { key: 'summary', label: tx('القاعدة', 'Rule') },
-    { key: 'action', label: tx('الإجراء', 'Action') },
-    { key: 'channel', label: tx('مسار الإجراء', 'Action route'), render: (row) => row.channel === 'status' ? tx('تحديث الحالة', 'Status update') : row.channel === 'provider_status' ? tx('تحديث المزوّد', 'Provider update') : tx('إجراء مخصص', 'Dedicated action') },
-    { key: 'validation_checks', label: tx('الشروط', 'Checks'), render: (row) => row.validation_checks?.join(', ') || tx('لا توجد شروط إضافية', 'No additional checks') },
-    { key: 'allowed_role_labels', label: tx('من يمكنه التنفيذ', 'Who can do it'), render: (row) => row.allowed_role_labels.join(', ') },
+    { key: 'summary', label: tx('القاعدة', 'Rule'), render: (row) => describeRule(row, language) },
+    { key: 'action', label: tx('الإجراء', 'Action'), render: (row) => getWorkflowActionLabel(row.action, language) },
+    { key: 'channel', label: tx('مسار الإجراء', 'Action route'), render: (row) => getWorkflowChannelLabel(row.channel, language) },
+    { key: 'validation_checks', label: tx('الشروط', 'Checks'), render: (row) => (row.validation_checks || []).map((check) => getWorkflowCheckLabel(check, language)).join(listSeparator) || tx('لا توجد شروط إضافية', 'No additional checks') },
+    { key: 'allowed_role_labels', label: tx('من يمكنه التنفيذ', 'Who can do it'), render: (row) => (row.allowed_roles || []).map((role) => getRoleLabel(role, language)).join(listSeparator) },
     { key: 'reason_required', label: tx('يتطلب سبباً', 'Reason required'), render: (row) => (row.reason_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'notification_trigger', label: tx('يرسل إشعاراً', 'Sends notification'), render: (row) => (row.notification_trigger ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'change_request_supported', label: tx('تعديل مباشر', 'Direct edit'), render: () => tx('غير مسموح', 'Not allowed') },

@@ -44,6 +44,7 @@ from orders.serializers import (
     RatingCreateSerializer,
     RatingAdminSerializer,
     RejectOrderSerializer,
+    RecoverMissingDocumentRequestSerializer,
     RequestDocumentsSerializer,
     TrackOrderSerializer,
 )
@@ -54,6 +55,7 @@ from orders.services import (
     cancel_order,
     complete_order,
     create_customer_rating,
+    recover_invalid_missing_document_request,
     reject_order,
     request_missing_documents,
     update_order_status,
@@ -478,6 +480,27 @@ class AdminRequestDocumentsAPIView(APIView):
         except DjangoValidationError as exc:
             _raise_drf_validation_error(exc)
         return response.Response({"detail": "Request sent"})
+
+
+class AdminRecoverMissingDocumentRequestAPIView(APIView):
+    """Staff recovery for a waiting order whose missing-document request is unusable."""
+
+    permission_classes = [permissions.IsAuthenticated, CanRequestMissingDocuments]
+
+    def post(self, request, pk):
+        order = generics.get_object_or_404(get_reviewable_orders_for_user(request.user), pk=pk)
+        serializer = RecoverMissingDocumentRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            recover_invalid_missing_document_request(
+                order=order,
+                actor=request.user,
+                reason=serializer.validated_data["reason"],
+                request=request,
+            )
+        except DjangoValidationError as exc:
+            _raise_drf_validation_error(exc)
+        return response.Response({"status": order.status})
 
 
 class AdminOrderNotesAPIView(APIView):

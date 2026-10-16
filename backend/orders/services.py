@@ -4,6 +4,7 @@ from django.db.models import F
 
 from accounts.models import CustomUser, CustomerProfile
 from audit.utils import create_audit_log
+from documents.file_validation import requirement_upload_error
 from documents.services import create_order_document
 from notifications.services import notify_client, send_notification_event
 from organizations.models import OrganizationMembership
@@ -297,6 +298,14 @@ def upload_customer_document(*, order, actor, validated_data, request=None):
         ).exists()
     ):
         raise ValidationError({"detail": "This document type cannot be replaced by the client after upload."})
+    # The requirement's own file rules (extension, size, real content) are
+    # checked before anything is stored, so a refused file can neither create a
+    # document nor resume a waiting order. The browser `accept` filter is not a
+    # control.
+    if requirement is not None:
+        upload_error = requirement_upload_error(validated_data["file"], requirement)
+        if upload_error:
+            raise ValidationError({"file": [upload_error]})
 
     status_before_upload = order.status
     with transaction.atomic():
@@ -949,6 +958,82 @@ def resume_review(*, order, actor, note="", request=None):
         request=request,
         audit_action="resume_review",
     )
+
+
+MISSING_REQUEST_RECOVERY_ROLES = frozenset(
+    {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT}
+)
+
+
+def missing_document_request_is_invalid(order):
+    """True when a waiting order has no open request naming uploadable documents.
+
+    Such an order (typically created before requests were recorded, or with an
+    empty request) cannot be answered by the customer and cannot resume on its
+    own; only an explicit staff recovery can move it.
+    """
+    return order.status == Order.Status.WAITING_CUSTOMER and unresolved_missing_request_types(order) is None
+
+
+@locked_order_action()
+def recover_invalid_missing_document_request(*, order, actor, reason, request=None):
+    """Return a waiting order with no valid missing-document request to review.
+
+    This uses the existing WAITING_CUSTOMER -> UNDER_REVIEW rule and its role
+    and assignment checks. It never guesses which document was meant: staff
+    review the order again and, if something is still needed, send a new
+    request that names configured requirements.
+    """
+    clean_reason = _require_text(
+        reason,
+        field_name="reason",
+        message="A reason is required to recover this request.",
+    )
+    if getattr(actor, "role", "") not in MISSING_REQUEST_RECOVERY_ROLES:
+        raise ValidationError({"detail": "Only staff can recover a missing-document request."})
+    if order.status != Order.Status.WAITING_CUSTOMER:
+        raise ValidationError({"detail": "Only orders waiting for the customer can be recovered."})
+    if not missing_document_request_is_invalid(order):
+        raise ValidationError(
+            {"detail": "This order has a valid missing-document request; the customer can answer it."}
+        )
+    assert_order_transition_allowed(actor=actor, order=order, new_status=Order.Status.UNDER_REVIEW)
+
+    from django.utils import timezone as tz
+
+    previous_missing_types = list(order.missing_document_types or [])
+    open_requests = list(
+        MissingDocumentRequest.objects.filter(order=order, is_resolved=False).values("pk", "document_types")
+    )
+    with transaction.atomic():
+        order.missing_document_types = []
+        order.assigned_employee = actor
+        order.save(update_fields=["missing_document_types", "assigned_employee", "updated_at"])
+        MissingDocumentRequest.objects.filter(order=order, is_resolved=False).update(
+            is_resolved=True, responded_at=tz.now()
+        )
+        _transition_order(
+            order=order,
+            actor=actor,
+            new_status=Order.Status.UNDER_REVIEW,
+            note=f"Missing-document request recovered by staff: {clean_reason}",
+            request=request,
+            audit_action="recover_missing_document_request",
+        )
+        create_audit_log(
+            request=request,
+            user=actor,
+            action="recover_missing_document_request_detail",
+            entity_type="Order",
+            entity_id=order.pk,
+            old_value={
+                "status": Order.Status.WAITING_CUSTOMER,
+                "missing_document_types": previous_missing_types,
+                "open_requests": open_requests,
+            },
+            new_value={"status": Order.Status.UNDER_REVIEW, "reason": clean_reason},
+        )
+    return order
 
 
 @locked_order_action()

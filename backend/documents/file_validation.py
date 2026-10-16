@@ -7,6 +7,8 @@ extension. No third-party dependency is required for the six formats Khalisni
 accepts (pdf, jpg/jpeg, png, doc, docx).
 """
 
+import os
+
 from django.core.exceptions import ValidationError
 
 # extension -> tuple of acceptable magic-byte prefixes
@@ -48,6 +50,33 @@ def sniff_matches_extension(file_obj, extension):
     if isinstance(head, str):  # pragma: no cover - text-mode files are not expected
         head = head.encode("latin-1", "ignore")
     return any(head.startswith(sig) for sig in expected)
+
+
+REQUIREMENT_EXTENSION_ERROR = "Unsupported file extension for this document."
+REQUIREMENT_SIZE_ERROR = "This document exceeds the allowed file size."
+CONTENT_MISMATCH_ERROR = "File content does not match its extension."
+
+
+def requirement_upload_error(upload, requirement):
+    """Return why ``upload`` breaks a document requirement's own rules, or None.
+
+    ``requirement`` is any object exposing ``allowed_extensions`` and
+    ``max_file_size`` (a ``ServiceRequiredDocument`` or an order requirement
+    snapshot row). An empty extension list or a zero size means the
+    requirement adds no restriction beyond the global upload policy.
+    """
+    extension = os.path.splitext(getattr(upload, "name", "") or "")[1].lower()
+    allowed_extensions = [
+        str(item).lower() for item in (getattr(requirement, "allowed_extensions", None) or []) if str(item).strip()
+    ]
+    if allowed_extensions and extension not in allowed_extensions:
+        return REQUIREMENT_EXTENSION_ERROR
+    max_file_size = getattr(requirement, "max_file_size", None) or 0
+    if max_file_size and upload.size > max_file_size:
+        return REQUIREMENT_SIZE_ERROR
+    if not sniff_matches_extension(upload, extension):
+        return CONTENT_MISMATCH_ERROR
+    return None
 
 
 def validate_upload_signature(file_obj, extension):

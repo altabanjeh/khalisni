@@ -505,6 +505,8 @@ export const api = {
   uploadAdminFinalDocument: documentsApi.uploadAdminFinalDocument,
   completeOrder: ordersApi.completeOrder,
   rejectOrder: ordersApi.rejectOrder,
+  cancelAdminOrder: ordersApi.cancelAdminOrder,
+  recoverMissingDocumentRequest: ordersApi.recoverMissingDocumentRequest,
 
   getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), filterSoftDeleted(mockServices, params)),
   getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), filterSoftDeleted(mockCategories, params)),

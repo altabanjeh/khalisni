@@ -100,6 +100,14 @@ export const ordersApi = {
   rejectOrder(id, payload) {
     return http.post(`/admin/orders/${id}/reject/`, payload)
   },
+
+  cancelAdminOrder(id, payload) {
+    return http.post(`/admin/orders/${id}/cancel/`, payload)
+  },
+
+  recoverMissingDocumentRequest(id, payload) {
+    return http.post(`/admin/orders/${id}/recover-missing-documents/`, payload)
+  },
 }
 
 export default ordersApi

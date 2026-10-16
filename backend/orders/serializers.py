@@ -1,4 +1,3 @@
-import os
 import re
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -8,7 +7,7 @@ from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 
 from accounts.models import CustomUser
 from core.choices import DocumentType
-from documents.file_validation import sniff_matches_extension
+from documents.file_validation import requirement_upload_error
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
 from documents.services import can_user_download_document, is_customer_visible_document
 from organizations.models import Branch
@@ -444,23 +443,11 @@ class PublicOrderCreateSerializer(serializers.Serializer):
                 document_errors.setdefault(document_type, "This document was uploaded more than once.")
                 continue
 
-            extension = os.path.splitext(upload.name or "")[1].lower()
-            allowed_extensions = [str(item).lower() for item in (requirement.allowed_extensions or []) if str(item).strip()]
-            if allowed_extensions and extension not in allowed_extensions:
-                errors[f"documents[{index}]"] = "Unsupported file extension for this document."
-                document_errors.setdefault(document_type, "Unsupported file extension for this document.")
-                continue
-
-            max_file_size = requirement.max_file_size or 0
-            if max_file_size and upload.size > max_file_size:
-                errors[f"documents[{index}]"] = "This document exceeds the allowed file size."
-                document_errors.setdefault(document_type, "This document exceeds the allowed file size.")
-                continue
-
-            # Defect D5: reject files whose real bytes contradict the extension.
-            if not sniff_matches_extension(upload, extension):
-                errors[f"documents[{index}]"] = "File content does not match its extension."
-                document_errors.setdefault(document_type, "File content does not match its extension.")
+            # Extension, size and real-content (defect D5) rules of this requirement.
+            upload_error = requirement_upload_error(upload, requirement)
+            if upload_error:
+                errors[f"documents[{index}]"] = upload_error
+                document_errors.setdefault(document_type, upload_error)
                 continue
 
             seen_types.add(document_type)
@@ -630,3 +617,7 @@ class CompleteOrderSerializer(serializers.Serializer):
 
 class CancelOrderSerializer(serializers.Serializer):
     reason = serializers.CharField()
+
+
+class RecoverMissingDocumentRequestSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=1000)

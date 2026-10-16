@@ -42,29 +42,42 @@ def _workflow_transitions(*, user, order, readiness):
     for rule in WORKFLOW_TRANSITIONS:
         if rule.from_status != order.status:
             continue
+        # `reasons` keeps the existing English text; `blocked` carries the same
+        # facts as stable codes so a screen can present them in its language.
         reasons = []
+        blocked = []
+
+        def block(code, message, **params):
+            reasons.append(message)
+            blocked.append({"code": code, "params": params})
+
         try:
             assert_order_transition_allowed(actor=user, order=order, new_status=rule.to_status)
         except ValidationError as error:
-            reasons.append(str(error.messages[0]))
+            code = "role_not_allowed" if _role(user) not in rule.allowed_roles else "actor_not_assigned"
+            block(code, str(error.messages[0]), allowed_roles=sorted(rule.allowed_roles))
         if not reasons and rule.action == "assign_provider" and not readiness["requirements_complete"]:
-            reasons.append("Required documents are incomplete.")
+            block("documents_incomplete", "Required documents are incomplete.")
         if not reasons and rule.action == "request_missing_documents" and not readiness["documents"]:
-            reasons.append("This service has no uploadable document requirements.")
+            block("no_uploadable_requirements", "This service has no uploadable document requirements.")
         if not reasons and rule.action == "resume_review":
             unresolved = unresolved_missing_request_types(order)
             if unresolved is None:
-                reasons.append("No valid missing-document request exists.")
+                block("missing_request_invalid", "No valid missing-document request exists.")
             elif unresolved:
-                reasons.append(f"Requested documents still need upload: {', '.join(unresolved)}.")
+                block(
+                    "requested_documents_pending",
+                    f"Requested documents still need upload: {', '.join(unresolved)}.",
+                    document_types=list(unresolved),
+                )
         if not reasons and rule.action in {"mark_ready_for_delivery", "complete_order"} and not readiness["requirements_complete"]:
-            reasons.append("Required documents are incomplete.")
+            block("documents_incomplete", "Required documents are incomplete.")
         if not reasons and rule.action == "complete_order" and _role(user) != UserRole.ADMIN:
             latest_final = (
                 order.documents.filter(is_deleted=False, is_final_document=True).order_by("-created_at", "-pk").first()
             )
             if latest_final is None or not latest_final.is_verified:
-                reasons.append("A verified final result is required before completion.")
+                block("final_result_unverified", "A verified final result is required before completion.")
         options.append({
             "to_status": rule.to_status,
             "action": rule.action,
@@ -74,6 +87,7 @@ def _workflow_transitions(*, user, order, readiness):
             ),
             "available": not reasons,
             "blocked_reasons": reasons,
+            "blocked": blocked,
             "reason_required": rule.reason_required,
         })
     return options
@@ -101,6 +115,11 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         if option["available"] and option["channel"] in {"status", "provider_status"}
     ]
     available_actions = {option["action"] for option in workflow_transitions if option["available"]}
+    # A waiting order whose open request names no uploadable document cannot be
+    # answered by the customer; only staff recovery can move it.
+    missing_request_valid = None
+    if can_view and order.status == OrderStatus.WAITING_CUSTOMER:
+        missing_request_valid = unresolved_missing_request_types(order) is not None
 
     can_add_internal_note = can_view and (
         ((role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user)) and (_has_perm(user, "orders.review_order") or is_partner_operational_user(user)))
@@ -116,6 +135,13 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         "can_cancel": can_view and _can_cancel(user=user, order=order),
         "can_upload_customer_document": can_view and role == UserRole.CUSTOMER and order.status in CUSTOMER_UPLOAD_STATUSES,
         "can_view_missing_documents_form": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.WAITING_CUSTOMER,
+        "missing_document_request_valid": missing_request_valid,
+        "can_recover_missing_document_request": bool(
+            missing_request_valid is False
+            and role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT}
+            and _has_perm(user, "orders.request_missing_documents")
+            and _can_transition(user=user, order=order, target_status=OrderStatus.UNDER_REVIEW)
+        ),
         "can_submit_rating": can_view and role == UserRole.CUSTOMER and order.status == OrderStatus.COMPLETED and not hasattr(order, "rating"),
         "can_request_documents": "request_missing_documents" in available_actions
         and (_has_perm(user, "orders.request_missing_documents") or is_partner_operational_user(user)),
