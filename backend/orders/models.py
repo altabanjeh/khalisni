@@ -952,6 +952,23 @@ class MissingDocumentRequest(models.Model):
         return f"MissingDocRequest #{self.pk} for {self.order_id} ({len(self.document_types)} types)"
 
 
+class OrderConsentQuerySet(models.QuerySet):
+    """Refuses the bulk paths that skip ``OrderConsent.save()``/``delete()``."""
+
+    def update(self, **kwargs):
+        raise ValidationError("Consent evidence is append-only and cannot be changed.")
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError("Consent evidence is append-only and cannot be changed.")
+
+    def delete(self):
+        raise ValidationError("Consent evidence is append-only and cannot be deleted.")
+
+    delete.alters_data = True
+    delete.queryset_only = True
+    update.alters_data = True
+
+
 class OrderConsent(models.Model):
     """Append-only evidence that the customer accepted the order consent statement.
 
@@ -970,9 +987,14 @@ class OrderConsent(models.Model):
     source = models.CharField(max_length=16)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    objects = OrderConsentQuerySet.as_manager()
+
     class Meta:
         ordering = ["created_at", "consent_id"]
         indexes = [models.Index(fields=["order", "created_at"])]
+        # Related managers and Django's internal lookups use the base manager;
+        # pointing it at the guarded manager closes the ``_base_manager`` path.
+        base_manager_name = "objects"
 
     def save(self, *args, **kwargs):
         if self.pk is not None and not self._state.adding:

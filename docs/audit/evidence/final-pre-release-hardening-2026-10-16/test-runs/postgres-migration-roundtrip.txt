@@ -1,0 +1,11 @@
+  Applying token_blacklist.0012_alter_outstandingtoken_user... OK
+  Applying token_blacklist.0013_alter_blacklistedtoken_options_and_more... OK
+ orders_orderconsent_append_only
+
+  Rendering model states... DONE
+  Unapplying orders.0019_order_consent_append_only... OK
+     0
+
+  Applying orders.0019_order_consent_append_only... OK
+ orders_orderconsent_append_only
+

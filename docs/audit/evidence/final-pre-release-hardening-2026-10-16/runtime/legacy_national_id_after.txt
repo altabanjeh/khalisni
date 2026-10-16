@@ -1,0 +1,5 @@
+national-ID fields by (type, required): {('textarea', True): 1, ('text', True): 23}
+other number fields left numeric: {'رأس مال الشركة': 1, 'عدد الشركاء': 2, 'رقم تسجيل الشركة': 3, 'رقم الاسم التجاري': 1, 'عدد الورثة': 1, 'كم عدد الشركاء؟': 1, 'عدد القطع أو الوحدات المطلوب إفرازها': 1, 'كم عدد القطع أو الوحدات المطلوب إفرازها؟': 1, 'كم عدد القطع المطلوب توحيدها؟': 1, 'كم عدد الطوابق؟': 1}
+orders: (6, 52)
+services fees: (38, 161, 76, 102)
+consent triggers: [('orders_orderconsent_no_update',), ('orders_orderconsent_no_delete',)]

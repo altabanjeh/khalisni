@@ -1,3 +1,5 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from organizations.selectors import is_platform_super_admin
@@ -140,11 +142,6 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
     def get_approval_status_label(self, obj):
         return approval_status_label(obj, self.context.get("request"))
 
-    def validate(self, attrs):
-        if not self.instance and not attrs.get("password"):
-            raise serializers.ValidationError({"password": "Password is required when creating a provider account."})
-        return attrs
-
     def create(self, validated_data):
         user_data = validated_data.pop("user")
         account_active = user_data.pop("is_active", True)
@@ -163,8 +160,24 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
         return profile
 
     def validate(self, attrs):
+        # The single validate() of this serializer: a second definition used to
+        # shadow the password check, so a create without one reached create()
+        # and failed with KeyError (HTTP 500).
         attrs = super().validate(attrs)
         actor = getattr(self.context.get("request"), "user", None)
+        if self.instance is None:
+            password = attrs.get("password")
+            if not password:
+                raise serializers.ValidationError({"password": "Password is required when creating a provider account."})
+            user_data = attrs.get("user", {})
+            candidate = CustomUser(
+                email=user_data.get("email", ""), full_name=user_data.get("full_name", ""), phone=user_data.get("phone", "")
+            )
+            try:
+                # Same policy as registration and admin-created users.
+                validate_password(password, user=candidate)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"password": list(exc.messages)})
         if self.instance is None and not is_platform_super_admin(actor):
             # A provider added by an organization waits for platform approval.
             attrs["is_approved"] = False
@@ -183,6 +196,14 @@ class ProviderAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
                 raise serializers.ValidationError(
                     {name: "Only a platform super admin can change this field." for name in blocked}
                 )
+        email = attrs.get("user", {}).get("email")
+        if email:
+            email = CustomUser.objects.normalize_email(email.strip())
+            attrs["user"]["email"] = email
+            owner_pk = self.instance.user_id if self.instance is not None else None
+            # Soft-deleted accounts still own their address (as in registration).
+            if CustomUser._base_manager.filter(email=email).exclude(pk=owner_pk).exists():
+                raise serializers.ValidationError({"email": "This email is already used by another account."})
         phone = attrs.get("user", {}).get("phone")
         if phone:
             # Canonical numbers: 079... and +96279... are the same phone.

@@ -1,0 +1,5 @@
+orders with consent rows: [('KH-2026-000009', 1, 'order-consent-web-v1', 'ar', 'web', 1, 77)]
+seeded orders without a row (legacy_unknown): 8
+refused by the database: 'update orders_orderconsent set accepted=0' -> IntegrityError: Consent evidence is append-only.
+refused by the database: 'delete from orders_orderconsent' -> IntegrityError: Consent evidence is append-only.
+rows after attempts: (1, 1)

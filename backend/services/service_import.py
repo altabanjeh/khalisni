@@ -14,7 +14,13 @@ from django.db import transaction
 from django.utils.text import slugify
 
 from services.catalog_defaults import suggest_category_icon
-from services.catalogue_rules import APPROVED_PRICE_NOTE, apply_schema_rules, approved_delivery_note, approved_price_note
+from services.catalogue_rules import (
+    APPROVED_PRICE_NOTE,
+    apply_identifier_rules,
+    apply_schema_rules,
+    approved_delivery_note,
+    approved_price_note,
+)
 from services.models import RequiredDocumentDefinition, Service, ServiceCategory, ServiceRequiredDocument
 
 
@@ -704,7 +710,7 @@ def _service_defaults(service_data, category):
         "short_description_en": "",
         "description_ar": service_data.get("description_ar") or service_data.get("short_description_ar") or service_data["name_ar"],
         "description_en": "",
-        "required_information_schema": apply_schema_rules(service_data.get("fields", [])),
+        "required_information_schema": apply_identifier_rules(apply_schema_rules(service_data.get("fields", []))),
         "price_type": service_data.get("price_type") or Service.PriceType.QUOTATION,
         "base_price": Decimal(service_data.get("base_price", "0.00")),
         "government_fee": Decimal(service_data.get("government_fee", "0.00")),

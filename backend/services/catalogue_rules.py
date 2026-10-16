@@ -11,6 +11,11 @@ a fresh import cannot bring the old wording or field shapes back.
   otherwise they are hidden and staff resolve them during review. Parcel and
   basin identifiers are text, so a leading zero is kept.
 * B10-4: a field whose meaning is "additional notes" is optional.
+
+Final pre-release hardening (``services.0015``): national-ID fields are text,
+not numbers. They are identifiers (some labels also accept a registration or
+passport number), so a numeric input could alter or reject a valid value. No
+format rule is added: the official format is an owner/domain decision.
 """
 
 import copy
@@ -96,4 +101,23 @@ def apply_schema_rules(schema):
             for order, field in enumerate(fields, start=1):
                 if isinstance(field, dict) and "display_order" in field:
                     field["display_order"] = order
+    return fields
+
+
+NATIONAL_ID_KEYS = ("national_id", "seller_national_id", "buyer_national_id")
+NATIONAL_ID_LABEL = "الرقم الوطني"
+
+
+def _is_national_id(field):
+    return field.get("key") in NATIONAL_ID_KEYS or NATIONAL_ID_LABEL in (field.get("label_ar") or field.get("label") or "")
+
+
+def apply_identifier_rules(schema):
+    """Return a new schema where national-ID ``number`` fields are ``text``. Nothing else changes."""
+    if not isinstance(schema, list):
+        return schema
+    fields = copy.deepcopy(schema)
+    for field in fields:
+        if isinstance(field, dict) and field.get("type") == "number" and _is_national_id(field):
+            field["type"] = "text"
     return fields

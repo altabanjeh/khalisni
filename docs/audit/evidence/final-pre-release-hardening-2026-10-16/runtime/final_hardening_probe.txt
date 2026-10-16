@@ -1,0 +1,11 @@
+PASS PROVIDER create without password -> structured 400 :: {"status":400,"keys":["password"]}
+PASS PROVIDER blank password -> 400 :: {"status":400}
+PASS PROVIDER malformed JSON -> 400 :: {"status":400}
+PASS PROVIDER valid create -> 201 :: {"status":201}
+PASS PROVIDER duplicate email -> 400 :: {"status":400,"keys":["email"]}
+PASS PROVIDER update without a new password -> 200 :: {"status":200}
+PASS VERIFICATION NOTE public tracking lists the final result without the note :: {"order":"KH-2026-000009","finals":1,"keys":["id","document_type","document_type_label","ar","en","original_filename","file_size","mime_type","status","is_final_document","is_verified","created_at","download_url"]}
+PASS VERIFICATION NOTE owning customer payload unchanged (key still present) :: {"order":"KH-2026-000009"}
+PASS LANGUAGE Accept-Language: ar (mobile) -> Arabic reset email :: {"status":200,"subject":"إعادة تعيين كلمة المرور في خلّصني"}
+PASS LANGUAGE no header (old mobile behaviour) -> English reset email :: {"status":200,"subject":"Khalsni password reset"}
+SUMMARY 10/10 PASS

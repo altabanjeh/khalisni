@@ -1,0 +1,133 @@
+[
+ {
+  "step": "pre: a document waits in the verify queue",
+  "result": "PASS",
+  "detail": [
+   6,
+   "KH-2026-000006"
+  ]
+ },
+ {
+  "step": "F04 reject box says the reason is shown to the customer",
+  "result": "PASS",
+  "detail": "سيظهر هذا السبب للعميل"
+ },
+ {
+  "step": "F04 owner API returns the exact reason",
+  "result": "PASS",
+  "detail": {
+   "status": 200,
+   "reason": "QA-ODI: الصورة غير واضحة، يرجى رفع نسخة أوضح."
+  }
+ },
+ {
+  "step": "F04 another customer gets 404",
+  "result": "PASS",
+  "detail": 404
+ },
+ {
+  "step": "F04 customer UI shows the reason",
+  "result": "PASS",
+  "detail": "customer order page"
+ },
+ {
+  "step": "F04 public tracking carries no reason",
+  "result": "PASS",
+  "detail": [
+   "id",
+   "order_number",
+   "status",
+   "timeline",
+   "old_status",
+   "new_status",
+   "note",
+   "system_event",
+   "system_event_params",
+   "created_at",
+   "missing_documents",
+   "missing_document_details",
+   "final_documents"
+  ]
+ },
+ {
+  "step": "B06 customer JSON has no provider keys",
+  "result": "PASS",
+  "detail": []
+ },
+ {
+  "step": "B06 customer JSON has no provider name",
+  "result": "PASS",
+  "detail": [
+   "QA Provider A",
+   "QA Provider B",
+   "Demo Provider"
+  ]
+ },
+ {
+  "step": "B06 staff API still shows the provider",
+  "result": "PASS",
+  "detail": [
+   "QA Provider A",
+   "QA Provider B",
+   "Demo Provider"
+  ]
+ },
+ {
+  "step": "PHONE customer phone stored canonical",
+  "result": "PASS",
+  "detail": "+9627…"
+ },
+ {
+  "step": "PHONE tracking UI accepts the local spaced format",
+  "result": "PASS",
+  "detail": [
+   "GET 200 /api/orders/track/?order_number=KH-2026-000006&phone=079+880+0103"
+  ]
+ },
+ {
+  "step": "CONSENT submit without consent refused",
+  "result": "PASS",
+  "detail": 400
+ },
+ {
+  "step": "CONSENT API create needs the service documents; covered by the UI journey instead",
+  "result": "PASS",
+  "detail": {
+   "status": 400,
+   "docsNeeded": 1
+  }
+ },
+ {
+  "step": "CONSENT seeded (pre-existing) order stays legacy_unknown",
+  "result": "PASS",
+  "detail": {
+   "status": "legacy_unknown"
+  }
+ },
+ {
+  "step": "B05 customer payment create blocked",
+  "result": "PASS",
+  "detail": 405
+ },
+ {
+  "step": "B05 admin ledger still readable",
+  "result": "PASS",
+  "detail": 200
+ },
+ {
+  "step": "B10-7 four labelled counts match the server",
+  "result": "PASS",
+  "detail": {
+   "total": 8,
+   "active": 8,
+   "published": 8,
+   "customer_visible": 8,
+   "customer_scope": "platform"
+  }
+ },
+ {
+  "step": "STRUCTURE staff layout has one main landmark",
+  "result": "PASS",
+  "detail": 1
+ }
+]

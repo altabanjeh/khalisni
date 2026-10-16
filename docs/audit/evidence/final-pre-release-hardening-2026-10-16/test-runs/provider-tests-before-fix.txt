@@ -1,0 +1,69 @@
+Creating test database for alias 'default'...
+.2026-10-16 16:58:03,340 ERROR django.request Internal Server Error: /api/admin/providers/
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\ghassan\backend\providers\views.py", line 140, in perform_create
+    provider = serializer.save()
+               ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\backend\providers\serializers.py", line 151, in create
+    password = validated_data.pop("password")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'password'
+FF....F
+======================================================================
+FAIL: test_create_without_password_is_a_structured_400 (providers.tests_final_hardening.ProviderCreateValidationTests.test_create_without_password_is_a_structured_400)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\backend\providers\tests_final_hardening.py", line 46, in test_create_without_password_is_a_structured_400
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.content)
+AssertionError: 500 != 400 : b'\n<!doctype html>\n<html lang="en">\n<head>\n  <title>Server Error (500)</title>\n</head>\n<body>\n  <h1>Server Error (500)</h1><p></p>\n</body>\n</html>\n'
+
+======================================================================
+FAIL: test_duplicate_email_is_a_400_not_an_integrity_error (providers.tests_final_hardening.ProviderCreateValidationTests.test_duplicate_email_is_a_400_not_an_integrity_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\backend\providers\tests_final_hardening.py", line 89, in test_duplicate_email_is_a_400_not_an_integrity_error
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.content)
+AssertionError: 201 != 400 : b'{"id":2,"full_name":"New Provider","email":"NEW-provider@example.com","phone":"+962791110009","provider_type":"Agent","company_name":"","commercial_registration_number":"","tax_number":"","address":"","service_categories":[],"service_category_ids":[],"city":"Amman","is_available":true,"is_approved":false,"account_active":true,"rating":"0.00","total_completed_orders":0,"is_deleted":false,"deleted_at":null,"delete_reason":"","created_at":"2026-10-16T16:58:04.367176+03:00","approval_status_label":"\xd9\x82\xd9\x8a\xd8\xaf \xd8\xa7\xd9\x84\xd9\x85\xd8\xb1\xd8\xa7\xd8\xac\xd8\xb9\xd8\xa9"}'
+
+======================================================================
+FAIL: test_weak_password_is_refused_by_the_password_validators (providers.tests_final_hardening.ProviderCreateValidationTests.test_weak_password_is_refused_by_the_password_validators)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\backend\providers\tests_final_hardening.py", line 59, in test_weak_password_is_refused_by_the_password_validators
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.content)
+AssertionError: 201 != 400 : b'{"id":1,"full_name":"New Provider","email":"new-provider@example.com","phone":"+962791110003","provider_type":"Agent","company_name":"","commercial_registration_number":"","tax_number":"","address":"","service_categories":[],"service_category_ids":[],"city":"Amman","is_available":true,"is_approved":false,"account_active":true,"rating":"0.00","total_completed_orders":0,"is_deleted":false,"deleted_at":null,"delete_reason":"","created_at":"2026-10-16T16:58:08.381226+03:00","approval_status_label":"\xd9\x82\xd9\x8a\xd8\xaf \xd8\xa7\xd9\x84\xd9\x85\xd8\xb1\xd8\xa7\xd8\xac\xd8\xb9\xd8\xa9"}'
+
+----------------------------------------------------------------------
+Ran 8 tests in 6.290s
+
+FAILED (failures=3)
+Destroying test database for alias 'default'...
+Found 8 test(s).
+System check identified no issues (0 silenced).

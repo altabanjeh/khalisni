@@ -1,0 +1,27 @@
+[
+ {
+  "method": "GET",
+  "url": "/api/auth/me/",
+  "acceptLanguage": null,
+  "auth": "Bearer expired-access"
+ },
+ {
+  "method": "POST",
+  "url": "/api/auth/token/refresh/",
+  "acceptLanguage": null,
+  "auth": null
+ },
+ {
+  "method": "GET",
+  "url": "/api/auth/me/",
+  "acceptLanguage": null,
+  "auth": "Bearer fresh-access"
+ },
+ {
+  "method": "POST",
+  "url": "/api/auth/forgot-password/",
+  "acceptLanguage": null,
+  "auth": "Bearer fresh-access"
+ }
+]
+FAIL

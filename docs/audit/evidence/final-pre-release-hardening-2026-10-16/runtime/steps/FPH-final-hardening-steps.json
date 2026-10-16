@@ -1,0 +1,96 @@
+[
+ {
+  "step": "PROVIDER create without password -> structured 400",
+  "result": "PASS",
+  "detail": {
+   "status": 400,
+   "keys": [
+    "password"
+   ]
+  }
+ },
+ {
+  "step": "PROVIDER blank password -> 400",
+  "result": "PASS",
+  "detail": {
+   "status": 400
+  }
+ },
+ {
+  "step": "PROVIDER malformed JSON -> 400",
+  "result": "PASS",
+  "detail": {
+   "status": 400
+  }
+ },
+ {
+  "step": "PROVIDER valid create -> 201",
+  "result": "PASS",
+  "detail": {
+   "status": 201
+  }
+ },
+ {
+  "step": "PROVIDER duplicate email -> 400",
+  "result": "PASS",
+  "detail": {
+   "status": 400,
+   "keys": [
+    "email"
+   ]
+  }
+ },
+ {
+  "step": "PROVIDER update without a new password -> 200",
+  "result": "PASS",
+  "detail": {
+   "status": 200
+  }
+ },
+ {
+  "step": "VERIFICATION NOTE public tracking lists the final result without the note",
+  "result": "PASS",
+  "detail": {
+   "order": "KH-2026-000009",
+   "finals": 1,
+   "keys": [
+    "id",
+    "document_type",
+    "document_type_label",
+    "ar",
+    "en",
+    "original_filename",
+    "file_size",
+    "mime_type",
+    "status",
+    "is_final_document",
+    "is_verified",
+    "created_at",
+    "download_url"
+   ]
+  }
+ },
+ {
+  "step": "VERIFICATION NOTE owning customer payload unchanged (key still present)",
+  "result": "PASS",
+  "detail": {
+   "order": "KH-2026-000009"
+  }
+ },
+ {
+  "step": "LANGUAGE Accept-Language: ar (mobile) -> Arabic reset email",
+  "result": "PASS",
+  "detail": {
+   "status": 200,
+   "subject": "إعادة تعيين كلمة المرور في خلّصني"
+  }
+ },
+ {
+  "step": "LANGUAGE no header (old mobile behaviour) -> English reset email",
+  "result": "PASS",
+  "detail": {
+   "status": 200,
+   "subject": "Khalsni password reset"
+  }
+ }
+]

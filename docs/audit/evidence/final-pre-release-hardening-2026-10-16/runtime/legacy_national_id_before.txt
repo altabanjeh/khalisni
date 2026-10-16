@@ -1,0 +1,4 @@
+national-ID fields by type: {'textarea': 1, 'number': 23}
+orders: (6, 52)
+services fees: (38, 161, 76, 102)
+applied: [('services.0014_apply_owner_catalogue_decisions',), ('orders.0018_order_consent',)]

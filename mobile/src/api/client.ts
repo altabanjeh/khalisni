@@ -6,9 +6,16 @@ import { queryClient } from '../services/queryClient';
 import { useAuthStore } from '../state/authStore';
 import type { ApiError, PaginatedResponse } from '../types/common';
 
+// The app's screens are Arabic only (there is no language setting), so every
+// request names Arabic. Without it the API falls back to its own defaults
+// (password-reset email in English) and iOS adds the device locale instead.
+export const APP_LANGUAGE = 'ar';
+const languageHeaders = { 'Accept-Language': APP_LANGUAGE };
+
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
   timeout: 20_000,
+  headers: languageHeaders,
 });
 
 type RetriableConfig = AxiosRequestConfig & { _retry?: boolean };
@@ -42,7 +49,7 @@ async function refreshAccessToken() {
       const response = await axios.post<{ access: string; refresh?: string }>(
         `${env.apiBaseUrl}/auth/token/refresh/`,
         { refresh },
-        { timeout: 15_000 },
+        { timeout: 15_000, headers: languageHeaders },
       );
 
       const access = response.data.access;

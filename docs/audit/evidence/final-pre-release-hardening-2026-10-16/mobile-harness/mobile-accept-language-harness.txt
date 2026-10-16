@@ -1,0 +1,27 @@
+[
+ {
+  "method": "GET",
+  "url": "/api/auth/me/",
+  "acceptLanguage": "ar",
+  "auth": "Bearer expired-access"
+ },
+ {
+  "method": "POST",
+  "url": "/api/auth/token/refresh/",
+  "acceptLanguage": "ar",
+  "auth": null
+ },
+ {
+  "method": "GET",
+  "url": "/api/auth/me/",
+  "acceptLanguage": "ar",
+  "auth": "Bearer fresh-access"
+ },
+ {
+  "method": "POST",
+  "url": "/api/auth/forgot-password/",
+  "acceptLanguage": "ar",
+  "auth": "Bearer fresh-access"
+ }
+]
+PASS every request (initial, refresh, retry, forgot-password) sent Accept-Language: ar

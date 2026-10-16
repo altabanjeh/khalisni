@@ -1,0 +1,7 @@
+    155     Error: login admin: 401
+     55     Error: login employee: 401
+     45     Error: login customer: 401
+     25     Error: login provider: 401
+      1   281 failed
+      1   205 passed (19.3m)
+      1   14 skipped

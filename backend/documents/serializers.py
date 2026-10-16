@@ -36,8 +36,12 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
         # Owner decision F04: the staff rejection reason is shown to the
         # customer who owns the order (and to staff). Anyone else -- another
         # customer, anonymous public tracking -- gets no reason at all.
-        if not _may_read_rejection_reason(self.context.get("request"), instance):
+        # The verification (approval / delivery) note follows the same
+        # boundary: its customer visibility is an open owner decision, so the
+        # owning customer keeps what they had, and nobody else receives it.
+        if not _may_read_review_notes(self.context.get("request"), instance):
             data.pop("rejection_reason", None)
+            data.pop("verification_note", None)
         return data
 
     def get_download_url(self, obj):
@@ -50,7 +54,7 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
         return document_type_label(obj)
 
 
-def _may_read_rejection_reason(request, document):
+def _may_read_review_notes(request, document):
     user = getattr(request, "user", None)
     if not getattr(user, "is_authenticated", False):
         return False
