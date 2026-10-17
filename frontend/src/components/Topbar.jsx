@@ -49,8 +49,8 @@ function Topbar({ title, onMenuClick }) {
   }, [])
 
   return (
-    <header className="sticky top-2 z-20 flex items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border bg-card/95 p-3 shadow-soft backdrop-blur-xl sm:p-4">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="sticky top-2 z-20 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border bg-card/95 p-3 shadow-soft backdrop-blur-xl sm:p-4">
+      <div className="flex min-w-[12rem] flex-1 items-center gap-3">
         <button
           aria-label={t('topbar.openSidebar', 'فتح القائمة الجانبية')}
           className="btn-ghost min-h-10 min-w-10 p-2 xl:hidden"
@@ -61,22 +61,21 @@ function Topbar({ title, onMenuClick }) {
         </button>
         <KhalsniAppIcon size="sm" to="/" className="hidden sm:inline-flex xl:hidden" />
         <div className="min-w-0">
-          <h2 className="break-words text-lg font-extrabold text-ink sm:text-xl">{title}</h2>
+          <h2 className="text-lg font-extrabold text-ink sm:text-xl">{title}</h2>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2 sm:flex-wrap sm:justify-end">
+      <div className="flex max-w-full items-center gap-2 sm:flex-wrap sm:justify-end 2xl:w-full 2xl:flex-nowrap">
         <div className="relative">
           <button
             aria-label={t('topbar.notifications', 'الإشعارات')}
             aria-expanded={notificationsOpen}
             aria-haspopup="dialog"
-            className="btn-secondary min-h-10 min-w-10 px-2 py-2 text-xs sm:px-4"
+            className="btn-secondary min-h-10 min-w-10 px-2 py-2 text-xs"
             onClick={() => setNotificationsOpen((current) => !current)}
             type="button"
           >
             <Bell className="h-4 w-4" />
-            <span className="hidden 2xl:inline">{t('topbar.notifications', 'الإشعارات')}</span>
           </button>
           {notificationsOpen ? (
             <div className="fixed inset-x-4 top-24 z-30 2xl:absolute 2xl:left-0 2xl:right-auto 2xl:top-[calc(100%+0.75rem)]">
@@ -95,7 +94,7 @@ function Topbar({ title, onMenuClick }) {
           <ChevronDown className={`h-4 w-4 transition-transform ${mobileActionsOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        <div className={`${mobileActionsOpen ? 'flex' : 'hidden'} absolute inset-x-3 top-[calc(100%+0.5rem)] z-30 flex-col gap-3 rounded-[var(--radius-lg)] border border-border bg-card p-3 shadow-xl 2xl:static 2xl:flex 2xl:flex-row 2xl:flex-wrap 2xl:items-center 2xl:justify-end 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:shadow-none`}>
+        <div className={`${mobileActionsOpen ? 'flex' : 'hidden'} absolute inset-x-3 top-[calc(100%+0.5rem)] z-30 flex-col gap-3 rounded-[var(--radius-lg)] border border-border bg-card p-3 shadow-xl 2xl:static 2xl:flex 2xl:flex-row 2xl:flex-nowrap 2xl:items-center 2xl:justify-end 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:shadow-none`}>
 
         <button className="btn-secondary w-full px-4 py-2 text-xs 2xl:w-auto" onClick={() => setHelpOpen(true)} type="button">
           <BookOpenText className="h-4 w-4" />
@@ -104,7 +103,7 @@ function Topbar({ title, onMenuClick }) {
 
         <LanguageSwitcher className="w-full justify-center 2xl:w-auto" />
 
-        <div className="flex w-full items-center gap-3 rounded-[var(--radius)] border border-brand-100 bg-brand-50 px-4 py-2.5 text-sm 2xl:min-w-[220px] 2xl:w-auto">
+        <div className="flex w-full items-center gap-3 rounded-[var(--radius)] border border-brand-100 bg-brand-50 px-4 py-2.5 text-sm 2xl:w-auto">
           <span className="icon-chip h-10 w-10 rounded-2xl bg-white">
             <UserRound className="h-4 w-4" />
           </span>
