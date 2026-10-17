@@ -20,6 +20,12 @@ class Command(BaseCommand):
             default=None,
             help="Repository root for docs/service-import and data/service-import artifacts.",
         )
+        parser.add_argument(
+            "--allow-incomplete-forms",
+            action="store_true",
+            help="Import even when a service form cannot be completed (e.g. a required dropdown "
+            "whose choices the source does not list). Such services are refused at order time.",
+        )
 
     def handle(self, *args, **options):
         source = Path(options["source"])
@@ -27,6 +33,14 @@ class Command(BaseCommand):
             raise CommandError(f"Source directory does not exist: {source}")
 
         result = discover_and_normalize(source)
+        problems = result.normalized.get("validation_problems", [])
+        for problem in problems:
+            self.stderr.write(f"{problem['service']} / {problem['field']}: {problem['message']}")
+        if problems and not options["dry_run"] and not options["allow_incomplete_forms"]:
+            raise CommandError(
+                f"{len(problems)} form problem(s) found; nothing imported. Supply the missing values in the "
+                "source documents, or rerun with --allow-incomplete-forms."
+            )
         applied = False
         if not options["dry_run"]:
             apply_import(result)

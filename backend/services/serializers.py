@@ -18,6 +18,7 @@ from services.models import (
 )
 from services.catalog_defaults import fallback_slug, suggest_category_icon
 from services.order_validation import get_completed_service_ids_for_customer
+from services.schema_rules import SEMANTIC_MESSAGES, order_blockers, schema_problems
 from services.service_relations import RELATION_TYPE_HELP_TEXT
 from services.selectors import resolve_service_organization_from_request, visible_services_queryset
 
@@ -513,49 +514,17 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
     def validate_required_information_schema(self, value):
         """
         The request form is rendered from this schema. Reject shapes that would
-        silently drop or merge fields on the customer form.
+        silently drop or merge fields on the customer form, and forms no
+        customer could submit (services/schema_rules.py).
         """
         if value in (None, ""):
             return []
-        if not isinstance(value, list):
-            raise serializers.ValidationError("The form schema must be a list of fields.")
-        seen = set()
-        for index, field in enumerate(value, start=1):
-            if not isinstance(field, dict):
-                raise serializers.ValidationError(f"Field {index} must be an object.")
-            key = next((field.get(name) for name in ("name", "key", "field", "id") if field.get(name)), None)
-            if not isinstance(key, (str, int)) or not str(key).strip():
-                raise serializers.ValidationError(f"Field {index} needs a key.")
-            key = str(key).strip().lower()
-            if key in seen:
-                raise serializers.ValidationError(f"Field key '{key}' is used more than once.")
-            seen.add(key)
-            field_type = field.get("type", field.get("field_type", field.get("input_type")))
-            if field_type is not None and not isinstance(field_type, str):
-                raise serializers.ValidationError(f"Field {index} has an invalid type.")
-            options = field.get("options", field.get("choices", field.get("values")))
-            if options is not None and not isinstance(options, list):
-                raise serializers.ValidationError(f"Field {index} options must be a list.")
-            if not any(str(field.get(name) or "").strip() for name in ("label_ar", "label_en", "label")):
-                raise serializers.ValidationError(f"Field {index} needs a label.")
-        # Conditional fields (owner decision B10-1/2/3): ``visible_when`` names
-        # another field of this form and the answer that shows this field. A
-        # hidden field is never required.
-        for index, field in enumerate(value, start=1):
-            condition = field.get("visible_when")
-            if condition is None:
-                continue
-            key = str(next(field.get(name) for name in ("name", "key", "field", "id") if field.get(name))).strip().lower()
-            if (
-                not isinstance(condition, dict)
-                or not isinstance(condition.get("field"), str)
-                or not isinstance(condition.get("equals"), str)
-                or set(condition) - {"field", "equals"}
-            ):
-                raise serializers.ValidationError(f"Field {index} visible_when must be {{\"field\": <key>, \"equals\": <value>}}.")
-            target = condition["field"].strip().lower()
-            if target == key or target not in seen:
-                raise serializers.ValidationError(f"Field {index} visible_when refers to an unknown field.")
+        problems = schema_problems(value)
+        if problems:
+            number, key, message = problems[0]
+            if message in SEMANTIC_MESSAGES and key:
+                message = f"Field '{key}': {message}"
+            raise serializers.ValidationError(message)
         return value
 
     class Meta:
@@ -908,9 +877,13 @@ class ServiceDetailSerializer(ServiceListSerializer):
     related_services = serializers.SerializerMethodField()
     prerequisite_services = serializers.SerializerMethodField()
     recommended_services = serializers.SerializerMethodField()
+    orderable = serializers.SerializerMethodField()
+    order_blockers = serializers.SerializerMethodField()
 
     class Meta(ServiceListSerializer.Meta):
         fields = ServiceListSerializer.Meta.fields + (
+            "orderable",
+            "order_blockers",
             "short_description_ar",
             "short_description_en",
             "description_en",
@@ -931,6 +904,19 @@ class ServiceDetailSerializer(ServiceListSerializer):
             "recommended_services",
             "related_services",
         )
+
+    def get_orderable(self, obj):
+        # A published form no customer can complete (e.g. a required select
+        # with no options) is not offered as an online request.
+        return not order_blockers(obj.required_information_schema)
+
+    def get_order_blockers(self, obj):
+        schema = obj.required_information_schema if isinstance(obj.required_information_schema, list) else []
+        blockers = []
+        for number, key, _message in order_blockers(schema):
+            field = schema[number - 1] if number else {}
+            blockers.append({"key": key, "label_ar": field.get("label_ar", ""), "label_en": field.get("label_en", "")})
+        return blockers
 
     def get_steps(self, obj):
         return [

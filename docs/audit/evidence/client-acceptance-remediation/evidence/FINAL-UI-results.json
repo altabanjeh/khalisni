@@ -1,0 +1,50 @@
+{
+ "slogan ar 1440": {
+  "h1": "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
+  "overflowX": 0
+ },
+ "contact ar 1440": {
+  "type": "tel",
+  "inputmode": "tel",
+  "autocomplete": "tel",
+  "describedBy": true
+ },
+ "slogan ar 390": {
+  "h1": "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
+  "overflowX": 0
+ },
+ "contact ar 390": {
+  "type": "tel",
+  "inputmode": "tel",
+  "autocomplete": "tel",
+  "describedBy": true
+ },
+ "slogan en 390": {
+  "h1": "Focus on what matters… and we will handle the rest.",
+  "overflowX": 0
+ },
+ "contact en 390": {
+  "type": "tel",
+  "inputmode": "tel",
+  "autocomplete": "tel",
+  "describedBy": true
+ },
+ "upload": {
+  "previewLink": 1,
+  "previewHref": "blob:",
+  "replaceButton": 1,
+  "removeButton": 1
+ },
+ "queue": {
+  "rawNormal": false,
+  "normalLabel": true
+ },
+ "help guides ar": {
+  "englishChrome": []
+ },
+ "help guides en": {
+  "arabicChrome": [
+   "دليل"
+  ]
+ }
+}

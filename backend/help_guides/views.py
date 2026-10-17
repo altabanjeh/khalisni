@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from audit.utils import create_audit_log
 from config.permissions import CanManageHelpGuides
 from core.delete_guard import AdminDeleteGuardMixin
+from core.errors import localize_message
+from core.i18n import request_language
 from help_guides.models import HelpGuide, HelpGuideAction, HelpGuideField, HelpGuideScreenshot, HelpGuideService, HelpGuideWorkflow
 from help_guides.selectors import (
     build_contextual_help_payload,
@@ -146,7 +148,7 @@ class HelpGuideServiceAPIView(APIView):
             include_permission_restricted=_include_preview_permissions(request, self),
         )
         if not guide:
-            return response.Response({"detail": "Service help was not found."}, status=status.HTTP_404_NOT_FOUND)
+            return response.Response({"detail": localize_message("Service help was not found.", request_language(request))}, status=status.HTTP_404_NOT_FOUND)
         return response.Response(serialize_service_guide(guide))
 
 

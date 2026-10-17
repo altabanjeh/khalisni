@@ -75,7 +75,7 @@ const mockReviewOrders = mockOrders.filter((order) => reviewStatuses.includes(or
 const mockProviderOrders = mockOrders.filter((order) => providerStatuses.includes(order.status))
 const mockNotificationCenter = mockNotifications.map((notification, index) => ({
   ...notification,
-  message: notification.order_number ? `Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø·Ù„Ø¨ ${notification.order_number}` : 'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ø§Ù…',
+  message: notification.order_number ? `مرتبطة بالطلب ${notification.order_number}` : 'إشعار عام',
   is_read: index !== 0,
 }))
 let mockPublicMissingServiceRequests = [...mockMissingServiceRequests]
@@ -83,7 +83,7 @@ const mockRoleOptions = ['admin', 'customer', 'employee', 'support', 'provider']
 let mockUsers = [
   {
     id: 1,
-    full_name: 'Ù…Ø´Ø±Ù Ø§Ù„Ù†Ø¸Ø§Ù…',
+    full_name: 'مشرف النظام',
     email: 'admin@khalisni.local',
     phone: '0790000001',
     role: 'admin',
@@ -95,7 +95,7 @@ let mockUsers = [
   },
   {
     id: 2,
-    full_name: 'Ø£Ø­Ù…Ø¯ Ø®Ø§Ù„Ø¯',
+    full_name: 'أحمد خالد',
     email: 'customer@khalisni.local',
     phone: '0790000002',
     role: 'customer',
@@ -107,7 +107,7 @@ let mockUsers = [
   },
   {
     id: 3,
-    full_name: 'Ù„ÙŠÙ„Ù‰ Ø£Ø­Ù…Ø¯',
+    full_name: 'ليلى أحمد',
     email: 'employee@khalisni.local',
     phone: '0790000004',
     role: 'employee',
@@ -119,7 +119,7 @@ let mockUsers = [
   },
   {
     id: 4,
-    full_name: 'Ù…Ø­Ù…ÙˆØ¯ Ø¹Ù„ÙŠ',
+    full_name: 'محمود علي',
     email: 'provider@khalisni.local',
     phone: '0790000003',
     role: 'provider',
@@ -135,8 +135,8 @@ const mockSystemSettings = [
     id: 1,
     key: 'site.homepage',
     value: {
-      hero_title: 'Ø®Ù„ØµÙ†ÙŠ Ù„Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø­ÙƒÙˆÙ…ÙŠØ©',
-      hero_subtitle: 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ù…Ù† Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯.',
+      hero_title: 'خلصني للخدمات الحكومية',
+      hero_subtitle: 'إدارة الطلبات والوثائق من مكان واحد.',
     },
     description: 'Public homepage content blocks',
     updated_at: '2026-05-01T09:00:00Z',
@@ -187,8 +187,8 @@ const mockEmployeeReports = {
   ],
 }
 let mockNotificationTemplates = [
-  { template_id: 1, key: 'missing_documents_followup', channel: 'system', title_ar: 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø·Ù„Ø¨', message_ar: 'ÙŠØ±Ø¬Ù‰ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ« Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ.' },
-  { template_id: 2, key: 'review_started', channel: 'system', title_ar: 'Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', message_ar: 'ØªÙ… Ø¨Ø¯Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø·Ù„Ø¨Ùƒ.' },
+  { template_id: 1, key: 'missing_documents_followup', channel: 'system', title_ar: 'متابعة الطلب', message_ar: 'يرجى مراجعة آخر تحديث على طلبك.' },
+  { template_id: 2, key: 'review_started', channel: 'system', title_ar: 'بدء المراجعة', message_ar: 'تم بدء مراجعة طلبك.' },
 ]
 const mockDeleteGuard = {
   key: 'security.delete_guard',
@@ -354,12 +354,12 @@ let mockPublicAdvertisements = [
   {
     id: 1,
     advertisement_id: 1,
-    title_ar: 'Ø¥Ø¹Ù„Ø§Ù† ØªØ¬Ø±ÙŠØ¨ÙŠ',
+    title_ar: 'إعلان تجريبي',
     title_en: 'Sample Advertisement',
-    description_ar: 'Ø¥Ø¹Ù„Ø§Ù† ØªØ¬Ø±ÙŠØ¨ÙŠ ÙŠØ¸Ù‡Ø± ÙÙŠ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ø¶Ù…Ù† ÙˆØ¶Ø¹ Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø±.',
+    description_ar: 'إعلان تجريبي يظهر في الصفحة الرئيسية ضمن وضع الاختبار.',
     description_en: 'Sample advertisement shown on the homepage in test mode.',
     advertisement_type: 'general',
-    button_text_ar: 'Ø§Ø³ØªØ¹Ø±Ø¶ Ø§Ù„Ø®Ø¯Ù…Ø§Øª',
+    button_text_ar: 'استعرض الخدمات',
     button_text_en: 'Browse Services',
     button_url: '/services',
     background_color: '#eaf6ff',
@@ -758,7 +758,7 @@ export const api = {
         notification_id: 999,
         order: Number(orderId),
         template: Number(payload?.template_id || 0),
-        title: mockNotificationTemplates.find((template) => template.template_id === Number(payload?.template_id))?.title_ar || 'Ø¥Ø´Ø¹Ø§Ø±',
+        title: mockNotificationTemplates.find((template) => template.template_id === Number(payload?.template_id))?.title_ar || 'إشعار',
       },
     ),
   getWorkflowRules: async () => withTestValue(() => servicesApi.getWorkflowRules(), []),

@@ -25,6 +25,7 @@ function EmployeeTabs() {
       <Tab.Screen name="ReviewOrders" component={ReviewOrdersScreen} options={{ title: 'المراجعة', tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} /> }} />
       <Tab.Screen name="EmployeeTasks" component={EmployeeTasksScreen} options={{ title: 'المهام', tabBarIcon: ({ color, size }) => <Ionicons name="checkmark-done-outline" color={color} size={size} /> }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'الإشعارات', tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" color={color} size={size} /> }} />
+      <Tab.Screen name="Account" component={SettingsScreen} options={{ title: 'حسابي', tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} /> }} />
     </Tab.Navigator>
   );
 }

@@ -28,6 +28,7 @@ import {
   validateSingleFileList,
 } from '../../utils/serviceForms'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 function MetricCard({ label, value }) {
   return (
@@ -170,7 +171,7 @@ function CustomerOrderDetailsPage() {
               {serviceName} · {order.city || tr('مدينة غير محددة', 'City not set')}
             </p>
             <p className="mt-2 text-xs font-bold text-slate-500">
-              {tr('رقم الطلب', 'Request number')}: <bdi dir="ltr">{order.order_number}</bdi>
+              {tr('رقم الطلب', 'Request number')}: <OrderNumber value={order.order_number} />
             </p>
           </div>
           <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-ink">
@@ -180,6 +181,7 @@ function CustomerOrderDetailsPage() {
         </div>
       </section>
 
+      {customerActionRequired ? (
       <section className={`rounded-[var(--radius-xl)] border p-5 shadow-soft ${customerActionRequired ? 'border-amber-200 bg-amber-50' : 'border-brand-100 bg-brand-50'}`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex gap-3">
@@ -188,32 +190,25 @@ function CustomerOrderDetailsPage() {
             </span>
             <div>
               <p className={`font-extrabold ${customerActionRequired ? 'text-amber-900' : 'text-ink'}`}>{responsibilityTitle}</p>
-              <p className={`mt-1 text-sm font-semibold leading-7 ${customerActionRequired ? 'text-amber-800' : 'text-slate-600'}`}>{responsibilityText}</p>
+              {/* One action card: the hero above states who has the ball; this card says what to do (DEF-C01). */}
+              <p className={`mt-1 text-sm font-semibold leading-7 ${customerActionRequired ? 'text-amber-800' : 'text-slate-600'}`}>
+                {customerActionRequired
+                  ? tr('ارفع النواقص المطلوبة حتى يعود الطلب إلى مسار التنفيذ دون تأخير.', 'Upload the missing items so the request can continue without delay.')
+                  : responsibilityText}
+              </p>
             </div>
           </div>
           {allowedActions.can_view_missing_documents_form ? (
-            <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
-              <UploadCloud className="h-4 w-4" />
-              {tr('رفع الوثائق المطلوبة', 'Upload the requested documents')}
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
+                <UploadCloud className="h-4 w-4" />
+                {tr('رفع الوثائق المطلوبة', 'Upload the requested documents')}
+              </Link>
+              <InlineHelp actionKey="open_missing_documents" className="self-center" />
+            </div>
           ) : null}
         </div>
       </section>
-
-      {allowedActions.can_view_missing_documents_form ? (
-        <div className="glass-panel border-amber-200 bg-amber-50 p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="font-bold text-amber-900">{tr('هذا الطلب يحتاج إلى مستندات إضافية منك', 'This request needs additional documents from you')}</p>
-              <p className="mt-1 text-sm text-amber-800">{tr('ارفع النواقص المطلوبة حتى يعود الطلب إلى مسار التنفيذ دون تأخير.', 'Upload the missing items so the request can continue without delay.')}</p>
-            </div>
-            <Link className="btn-primary" to={`/customer/orders/${order.id}/missing-docs`}>
-              <UploadCloud className="h-4 w-4" />
-              {tr('فتح شاشة النواقص', 'Open missing documents')}
-            </Link>
-            <InlineHelp actionKey="open_missing_documents" className="self-center" />
-          </div>
-        </div>
       ) : null}
 
       <section className="glass-panel p-6">

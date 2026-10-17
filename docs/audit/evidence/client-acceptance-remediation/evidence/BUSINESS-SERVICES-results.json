@@ -1,0 +1,112 @@
+{
+ "business_company_registration": {
+  "apiOrderable": false,
+  "apiBlockers": [
+   "نوع الشركة"
+  ],
+  "noticeShown": true,
+  "nextDisabled": true,
+  "publicNotice": true,
+  "publicCta": 2
+ },
+ "business_company_information_amendment": {
+  "apiOrderable": false,
+  "apiBlockers": [
+   "نوع الشركة"
+  ],
+  "noticeShown": true,
+  "nextDisabled": true,
+  "publicNotice": true,
+  "publicCta": 2
+ },
+ "business_company_add_activities": {
+  "apiOrderable": false,
+  "apiBlockers": [
+   "نوع الشركة"
+  ],
+  "noticeShown": true,
+  "nextDisabled": true,
+  "publicNotice": true,
+  "publicCta": 2
+ },
+ "business_commercial_registration_certificate": {
+  "apiOrderable": true,
+  "apiBlockers": [],
+  "noticeShown": false,
+  "nextDisabled": false,
+  "passedDetailsStep": true,
+  "detailsErrors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "مطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب"
+  ],
+  "orderNumber": "KH-2026-000007"
+ },
+ "business_trade_name_certificate": {
+  "apiOrderable": true,
+  "apiBlockers": [],
+  "noticeShown": false,
+  "nextDisabled": false,
+  "passedDetailsStep": true,
+  "detailsErrors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "مطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب"
+  ],
+  "orderNumber": "KH-2026-000008"
+ },
+ "business_trade_name_registration": {
+  "apiOrderable": true,
+  "apiBlockers": [],
+  "noticeShown": false,
+  "nextDisabled": false,
+  "passedDetailsStep": true,
+  "detailsErrors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "مطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب"
+  ],
+  "orderNumber": "KH-2026-000009"
+ },
+ "business_trademark_services": {
+  "apiOrderable": true,
+  "apiBlockers": [],
+  "noticeShown": false,
+  "nextDisabled": false,
+  "passedDetailsStep": true,
+  "detailsErrors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "مطلوب",
+   "مطلوبة عند تسجيل علامة جديدة أو عندما تتطلب المعاملة صورة العلامة.",
+   "ارفع المستند المطلوب",
+   "ارفع المستند المطلوب"
+  ],
+  "orderNumber": "KH-2026-000010"
+ },
+ "business_license_services": {
+  "apiOrderable": false,
+  "apiBlockers": [
+   "المحافظة / البلدية"
+  ],
+  "noticeShown": true,
+  "nextDisabled": true,
+  "publicNotice": true,
+  "publicCta": 2
+ },
+ "business_company_closure_liquidation": {
+  "apiOrderable": false,
+  "apiBlockers": [
+   "نوع الشركة"
+  ],
+  "noticeShown": true,
+  "nextDisabled": true,
+  "publicNotice": true,
+  "publicCta": 2
+ }
+}

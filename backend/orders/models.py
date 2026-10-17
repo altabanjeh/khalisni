@@ -431,6 +431,10 @@ class Order(models.Model):
             delivery_mode = getattr(self.service, "delivery_time_mode", "duration")
             if delivery_mode == "date_range":
                 self.expected_delivery_date = self.service.delivery_end_date
+            elif delivery_mode == "after_review":
+                # No approved duration: no promised date (DEF-D02).
+                self.expected_duration_value_snapshot = None
+                self.expected_duration_unit_snapshot = ""
             elif delivery_mode == "duration_range":
                 base_date = timezone.localdate()
                 min_duration = self.service.estimated_duration_min or self.service.estimated_duration or 1

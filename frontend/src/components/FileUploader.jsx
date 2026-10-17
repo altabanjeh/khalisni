@@ -1,5 +1,5 @@
-import { FileText, Paperclip, TriangleAlert, UploadCloud, X } from 'lucide-react'
-import { useId, useRef, useState } from 'react'
+import { Eye, FileText, Paperclip, RefreshCw, TriangleAlert, UploadCloud, X } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 
 const MAX_SIZE = 10 * 1024 * 1024
@@ -61,8 +61,18 @@ function FileUploader({
   const [dragOver, setDragOver] = useState(false)
   const [validationError, setValidationError] = useState('')
   const inputRef = useRef(null)
+  // Replace reuses the one file input (one upload control per document):
+  // the index says which selected file the next pick replaces.
+  const replaceIndexRef = useRef(-1)
   const inputId = useId()
   const acceptValue = accept || DEFAULT_ACCEPT
+  // Local preview links for the selected files (client note CN-ACT-08:
+  // each file can be previewed, replaced or removed before sending).
+  const previewUrls = useMemo(
+    () => files.map((file) => (typeof URL !== 'undefined' && URL.createObjectURL ? URL.createObjectURL(file) : '')),
+    [files],
+  )
+  useEffect(() => () => previewUrls.forEach((url) => url && URL.revokeObjectURL?.(url)), [previewUrls])
 
   function syncRegisteredValue(nextFiles) {
     const fileList = buildSyntheticFileList(nextFiles)
@@ -85,6 +95,26 @@ function FileUploader({
     })
   }
 
+  function fileProblem(candidates) {
+    const oversized = candidates.find((file) => file.size > MAX_SIZE)
+    if (oversized) {
+      return t(
+        'upload.error.size',
+        isArabic ? 'الملف "{name}" يتجاوز الحد الأقصى المسموح (10 MB).' : 'File "{name}" exceeds the maximum allowed size (10 MB).',
+        { name: oversized.name },
+      )
+    }
+    const invalid = candidates.find((file) => !isAcceptedFile(file, acceptValue))
+    if (invalid) {
+      return t(
+        'upload.error.type',
+        isArabic ? 'نوع الملف "{name}" غير مدعوم لهذا الحقل.' : 'File type "{name}" is not supported for this field.',
+        { name: invalid.name },
+      )
+    }
+    return ''
+  }
+
   function handleFiles(fileList) {
     setValidationError('')
     const nextInputFiles = Array.from(fileList || [])
@@ -96,23 +126,9 @@ function FileUploader({
       return
     }
 
-    const oversized = nextInputFiles.find((file) => file.size > MAX_SIZE)
-    if (oversized) {
-      setValidationError(t(
-        'upload.error.size',
-        isArabic ? 'الملف "{name}" يتجاوز الحد الأقصى المسموح (10 MB).' : 'File "{name}" exceeds the maximum allowed size (10 MB).',
-        { name: oversized.name },
-      ))
-      return
-    }
-
-    const invalid = nextInputFiles.find((file) => !isAcceptedFile(file, acceptValue))
-    if (invalid) {
-      setValidationError(t(
-        'upload.error.type',
-        isArabic ? 'نوع الملف "{name}" غير مدعوم لهذا الحقل.' : 'File type "{name}" is not supported for this field.',
-        { name: invalid.name },
-      ))
+    const problem = fileProblem(nextInputFiles)
+    if (problem) {
+      setValidationError(problem)
       return
     }
 
@@ -120,6 +136,23 @@ function FileUploader({
     setFiles(normalizedFiles)
     syncRegisteredValue(normalizedFiles)
     if (externalOnChange) externalOnChange(multiple ? normalizedFiles : normalizedFiles[0] || null)
+  }
+
+  function replaceFile(fileList) {
+    const index = replaceIndexRef.current
+    replaceIndexRef.current = -1
+    const [replacement] = Array.from(fileList || [])
+    if (!replacement || index < 0) return
+    const problem = fileProblem([replacement])
+    if (problem) {
+      setValidationError(problem)
+      return
+    }
+    setValidationError('')
+    const nextFiles = files.map((file, fileIndex) => (fileIndex === index ? replacement : file))
+    setFiles(nextFiles)
+    syncRegisteredValue(nextFiles)
+    if (externalOnChange) externalOnChange(multiple ? nextFiles : nextFiles[0] || null)
   }
 
   function removeFile(index) {
@@ -170,7 +203,7 @@ function FileUploader({
               </p>
             </div>
           </div>
-          <label className="btn-secondary cursor-pointer px-4 py-2 text-xs" htmlFor={inputId}>
+          <label className="btn-secondary cursor-pointer px-4 py-2 text-xs" htmlFor={inputId} onClick={() => { replaceIndexRef.current = -1 }}>
             {t('upload.chooseFile', isArabic ? 'اختر ملف' : 'Choose file')}
           </label>
         </div>
@@ -182,6 +215,10 @@ function FileUploader({
           className="hidden"
           multiple={multiple}
           onChange={(event) => {
+            if (replaceIndexRef.current >= 0) {
+              replaceFile(event.target.files)
+              return
+            }
             registrationOnChange?.(event)
             handleFiles(event.target.files)
           }}
@@ -208,6 +245,33 @@ function FileUploader({
               <FileText className="h-4 w-4 shrink-0 text-brand-500" />
               <span className="flex-1 truncate font-medium text-ink">{file.name}</span>
               <span className="shrink-0 text-xs text-slate-400">{formatSize(file.size)}</span>
+              {previewUrls[index] ? (
+                <a
+                  aria-label={t('upload.previewFile', isArabic ? 'معاينة الملف {name}' : 'Preview file {name}', { name: file.name })}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
+                  href={previewUrls[index]}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Eye aria-hidden="true" className="h-4 w-4" />
+                  {t('upload.preview', isArabic ? 'معاينة' : 'Preview')}
+                </a>
+              ) : null}
+              <button
+                aria-label={t('upload.replaceFile', isArabic ? 'استبدال الملف {name}' : 'Replace file {name}', { name: file.name })}
+                className="inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
+                onClick={() => {
+                  replaceIndexRef.current = index
+                  if (inputRef.current) {
+                    inputRef.current.value = ''
+                    inputRef.current.click()
+                  }
+                }}
+                type="button"
+              >
+                <RefreshCw aria-hidden="true" className="h-4 w-4" />
+                {t('upload.replace', isArabic ? 'استبدال' : 'Replace')}
+              </button>
               <button
                 aria-label={t('upload.removeFile', isArabic ? 'حذف الملف {name}' : 'Remove file {name}', { name: file.name })}
                 className="shrink-0 rounded-xl p-1 hover:bg-red-50"

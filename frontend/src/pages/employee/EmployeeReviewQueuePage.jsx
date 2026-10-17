@@ -7,8 +7,9 @@ import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { formatDate } from '../../utils/format'
+import { formatDate, getPriorityLabel, priorityLabels } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 const EMPTY_FILTERS = {
   search: '', status: '', service: '', date_from: '', date_to: '',
@@ -53,10 +54,7 @@ function EmployeeReviewQueuePage() {
   ]
   const priorityOptions = [
     ['', isArabic ? 'كل الأولويات' : 'All priorities'],
-    ['LOW', isArabic ? 'منخفضة' : 'Low'],
-    ['NORMAL', isArabic ? 'عادية' : 'Normal'],
-    ['HIGH', isArabic ? 'عالية' : 'High'],
-    ['URGENT', isArabic ? 'عاجلة' : 'Urgent'],
+    ...Object.keys(priorityLabels).map((code) => [code, getPriorityLabel(code, language)]),
   ]
   const notSet = isArabic ? 'غير محددة' : 'Not set'
   const none = isArabic ? 'لا يوجد' : 'None'
@@ -72,11 +70,11 @@ function EmployeeReviewQueuePage() {
   }, [orders])
 
   const columns = [
-    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink">#{row.order_number}</span> },
+    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink"><OrderNumber hash value={row.order_number} /></span> },
     { key: 'customer', label: isArabic ? 'العميل' : 'Customer', render: (row) => row.customer?.full_name || (isArabic ? 'غير متاح' : 'Unavailable') },
     { key: 'service', label: isArabic ? 'الخدمة' : 'Service', render: (row) => (row.service ? getServiceName(row.service, language) : notSet) },
     { key: 'status', label: isArabic ? 'الحالة' : 'Status', render: (row) => <StatusBadge status={row.status} /> },
-    { key: 'priority', label: isArabic ? 'الأولوية' : 'Priority', render: (row) => row.priority || (isArabic ? 'عادية' : 'Normal') },
+    { key: 'priority', label: isArabic ? 'الأولوية' : 'Priority', render: (row) => getPriorityLabel(row.priority, language) },
     { key: 'missing_document_types', label: isArabic ? 'النواقص' : 'Missing', render: (row) => (row.missing_document_types?.length ? row.missing_document_types.join(isArabic ? '، ' : ', ') : none) },
     { key: 'created_at', label: isArabic ? 'تاريخ الإنشاء' : 'Created', render: (row) => formatDate(row.created_at, language) },
     {
@@ -116,7 +114,7 @@ function EmployeeReviewQueuePage() {
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">#{row.order_number}</p>
+              <p className="font-bold text-ink"><OrderNumber hash value={row.order_number} /></p>
               <StatusBadge status={row.status} />
             </div>
             <div className="space-y-1 text-sm text-slate-600">

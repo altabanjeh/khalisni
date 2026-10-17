@@ -1,4 +1,4 @@
-﻿DEFAULT_SITE_THEME = {
+DEFAULT_SITE_THEME = {
     "name": "Default Khalsni Theme",
     "primary_color": "#0b67b2",
     "secondary_color": "#147fd1",
@@ -12,8 +12,8 @@
 
 DEFAULT_PUBLIC_PAGE_CONTENT = {
     "version_name": "Default Homepage Content",
-    "hero_title_ar": "خلّص معاملاتك الحكومية والإدارية بدون تعب",
-    "hero_title_en": "Finish your government and admin requests without the hassle",
+    "hero_title_ar": "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
+    "hero_title_en": "Focus on what matters… and we will handle the rest.",
     "hero_subtitle_ar": "اختر الخدمة، ارفع الوثائق، تابع التنفيذ، واستلم النتيجة من مكان واحد.",
     "hero_subtitle_en": "Choose the service, upload documents, track execution, and receive the result from one place.",
     "primary_button_text": "ابدأ الآن",

@@ -1,8 +1,9 @@
 import { Bell, BookOpenText, ChevronDown, LogOut, Menu, Monitor, UserRound } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { getRoleLabel } from '../utils/format'
 import HelpGuidePanel from './HelpGuidePanel'
 import LanguageSwitcher from './LanguageSwitcher'
@@ -16,6 +17,25 @@ function Topbar({ title, onMenuClick }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
+  const notificationsWrapperRef = useRef(null)
+  const notificationsPanelRef = useRef(null)
+  const notificationsPanelId = useId()
+  const notificationsTitleId = useId()
+  const closeNotifications = useCallback(() => setNotificationsOpen(false), [])
+  const closeHelp = useCallback(() => setHelpOpen(false), [])
+
+  // Non-modal popover dialog: focus moves in on open, Escape closes, focus
+  // returns to the bell; a click outside also closes it.
+  useDialogFocus(notificationsOpen, notificationsPanelRef, { onClose: closeNotifications })
+
+  useEffect(() => {
+    if (!notificationsOpen) return undefined
+    function handlePointerDown(event) {
+      if (!notificationsWrapperRef.current?.contains(event.target)) setNotificationsOpen(false)
+    }
+    document.addEventListener('mousedown', handlePointerDown)
+    return () => document.removeEventListener('mousedown', handlePointerDown)
+  }, [notificationsOpen])
 
   async function handleLogout() {
     await logout()
@@ -66,8 +86,9 @@ function Topbar({ title, onMenuClick }) {
       </div>
 
       <div className="flex max-w-full items-center gap-2 sm:flex-wrap sm:justify-end 2xl:w-full 2xl:flex-nowrap">
-        <div className="relative">
+        <div className="relative" ref={notificationsWrapperRef}>
           <button
+            aria-controls={notificationsOpen ? notificationsPanelId : undefined}
             aria-label={t('topbar.notifications', 'الإشعارات')}
             aria-expanded={notificationsOpen}
             aria-haspopup="dialog"
@@ -78,8 +99,15 @@ function Topbar({ title, onMenuClick }) {
             <Bell className="h-4 w-4" />
           </button>
           {notificationsOpen ? (
-            <div className="fixed inset-x-4 top-24 z-30 2xl:absolute 2xl:left-0 2xl:right-auto 2xl:top-[calc(100%+0.75rem)]">
-              <NotificationPanel onNavigate={handleNotificationNavigate} user={user} />
+            <div
+              aria-labelledby={notificationsTitleId}
+              className="fixed inset-x-4 top-24 z-30 focus:outline-none 2xl:absolute 2xl:left-0 2xl:right-auto 2xl:top-[calc(100%+0.75rem)]"
+              id={notificationsPanelId}
+              ref={notificationsPanelRef}
+              role="dialog"
+              tabIndex={-1}
+            >
+              <NotificationPanel onNavigate={handleNotificationNavigate} titleId={notificationsTitleId} user={user} />
             </div>
           ) : null}
         </div>
@@ -96,7 +124,7 @@ function Topbar({ title, onMenuClick }) {
 
         <div className={`${mobileActionsOpen ? 'flex' : 'hidden'} absolute inset-x-3 top-[calc(100%+0.5rem)] z-30 flex-col gap-3 rounded-[var(--radius-lg)] border border-border bg-card p-3 shadow-xl 2xl:static 2xl:flex 2xl:flex-row 2xl:flex-nowrap 2xl:items-center 2xl:justify-end 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:shadow-none`}>
 
-        <button className="btn-secondary w-full px-4 py-2 text-xs 2xl:w-auto" onClick={() => setHelpOpen(true)} type="button">
+        <button aria-haspopup="dialog" className="btn-secondary w-full px-4 py-2 text-xs 2xl:w-auto" onClick={() => setHelpOpen(true)} type="button">
           <BookOpenText className="h-4 w-4" />
           {t('topbar.manual', 'الدليل')}
         </button>
@@ -129,7 +157,7 @@ function Topbar({ title, onMenuClick }) {
         </div>
       </div>
 
-      <HelpGuidePanel onClose={() => setHelpOpen(false)} open={helpOpen} />
+      <HelpGuidePanel onClose={closeHelp} open={helpOpen} />
     </header>
   )
 }

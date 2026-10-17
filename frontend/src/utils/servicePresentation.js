@@ -81,6 +81,12 @@ export function getServiceDuration(service, language) {
     ? deliveryTime.label_en || deliveryTime.label
     : deliveryTime.label_ar || deliveryTime.label
 
+  if (label && deliveryTime.mode === 'after_review') {
+    // No approved duration: only the approved "confirmed after review"
+    // sentence, never a number (DEF-D02).
+    return { label, mode: 'after_review', isKnown: false, note: '' }
+  }
+
   if (label) {
     return {
       label,

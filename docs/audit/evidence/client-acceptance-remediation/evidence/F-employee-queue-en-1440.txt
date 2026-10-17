@@ -1,0 +1,125 @@
+URL: http://127.0.0.1:4351/employee/orders
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+WORK PORTAL
+
+Employee portal
+
+OVERVIEW
+
+Home
+
+OPERATIONS
+
+Review queue
+New service requests
+Verify documents
+
+REPORTING & AUDIT
+
+Employee reports
+
+SETTINGS
+
+Manual
+Employee portal
+
+Work queue
+
+Review queue
+
+A unified review queue to triage requests by status, priority, missing items and execution state before opening each one.
+
+Total requests
+
+8
+
+Under review
+
+1
+
+Has missing items
+
+2
+
+Urgent
+
+0
+
+Visible items: 8
+
+Queue filters
+
+Refine by status, priority and ownership.
+
+Reset
+Search
+Status
+All statuses
+New
+Under review
+Waiting for customer
+Ready for delivery
+Waiting for external body
+Service
+All services
+Tax Clearance
+Passport Renewal
+Business License Renewal
+Passport Appointment Booking
+Client audit QA journey
+Traffic Fines Payment
+Property Registration Deed
+No Criminal Record Certificate
+Priority
+All priorities
+Low
+Normal
+High
+Urgent
+From date
+To date
+Execution state
+All execution states
+Assigned
+In progress
+Waiting for external body
+Result awaiting review
+Ownership
+All
+Assigned to me
+Unassigned
+Missing items
+All
+Has missing
+None missing
+REQUEST	CUSTOMER	SERVICE	STATUS	PRIORITY	MISSING	CREATED	ACTION
+#KH-2026-000010	QA	Client audit QA journey	
+New
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000009	QA	Client audit QA journey	
+Completed
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000008	QA	Client audit QA journey	
+Ready for delivery
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000007	QA Customer B	Client audit QA journey	
+Assigned
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000006	QA	Client audit QA journey	
+Under review
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000005	QA	Client audit QA journey	
+Waiting for customer
+	Normal	client-audit-qa-202610-authorization	Oct 17, 2026	Review request
+#KH-2026-000004	Demo Customer	No Criminal Record Certificate	
+New
+	Normal	None	Oct 17, 2026	Review request
+#KH-2026-000001	Demo Customer	No Criminal Record Certificate	
+Waiting for customer
+	Normal	authorization-letter	Oct 17, 2026	Review request

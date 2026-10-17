@@ -9,6 +9,7 @@ import { ErrorState } from '../../../components/ErrorState';
 import { LoadingState } from '../../../components/LoadingState';
 import { ordersApi } from '../../../api/orders.api';
 import { getDisplayError } from '../../../api/client';
+import { describeMissingDocuments } from '../../../utils/documentPresentation';
 import { theme } from '../../../theme';
 
 export function MissingDocumentRequestsScreen({ navigation }: { navigation: any }) {
@@ -28,7 +29,12 @@ export function MissingDocumentRequestsScreen({ navigation }: { navigation: any 
         renderItem={({ item }) => (
           <AppCard>
             <Text style={{ textAlign: 'right', fontSize: 18, fontWeight: '700' }}>{item.order_number}</Text>
-            <Text style={{ textAlign: 'right' }}>{item.missing_document_types?.join('، ') || 'يرجى مراجعة تفاصيل الطلب.'}</Text>
+            <Text style={{ textAlign: 'right' }}>{item.required_documents?.length
+                ? describeMissingDocuments(item.missing_document_types, item.required_documents).join('، ') || 'يرجى مراجعة تفاصيل الطلب.'
+                : item.missing_document_types?.length
+                  // The list endpoint carries no requirement names; the detail screen shows them.
+                  ? `عدد المستندات المطلوبة: ${item.missing_document_types.length}`
+                  : 'يرجى مراجعة تفاصيل الطلب.'}</Text>
             <AppButton label="الرد الآن" onPress={() => navigation.navigate('RespondToMissingDocument', { orderId: item.id })} />
           </AppCard>
         )}

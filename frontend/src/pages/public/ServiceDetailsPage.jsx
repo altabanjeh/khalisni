@@ -140,6 +140,13 @@ function ServiceDetailsPage() {
   // strip below does not repeat it.
   const summaryPriceNote = price.note && price.note !== price.label ? price.note : ''
   const requestPath = `/create-order?service=${service.id}`
+  // A service whose form cannot be completed yet is not offered online (the
+  // server refuses it too); point to the special request instead.
+  const orderable = service?.orderable !== false
+  const requestTarget = orderable ? requestPath : '/#special-request'
+  const startLabel = (short) => (orderable
+    ? (isArabic ? (short ? 'ابدأ الطلب' : 'ابدأ الطلب الآن') : 'Start request')
+    : (isArabic ? 'إرسال طلب خاص' : 'Send a special request'))
   const terms = getCatalogText(service, { ar: 'terms_ar', en: 'terms_en' }, language, '')
   const informationFields = normalizeInformationSchema(service.required_information_schema)
   const requiredDocuments = (service.required_documents || [])
@@ -252,9 +259,9 @@ function ServiceDetailsPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               className="kh-focusable inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-sm font-extrabold text-[var(--khalsni-public-primary)] shadow-lg transition hover:bg-white/90"
-              to={requestPath}
+              to={requestTarget}
             >
-              {isArabic ? 'ابدأ الطلب' : 'Start request'}
+              {startLabel(true)}
               {isArabic ? <ArrowLeft aria-hidden="true" className="h-4 w-4" /> : <ArrowRight aria-hidden="true" className="h-4 w-4" />}
             </Link>
             <Link
@@ -425,8 +432,15 @@ function ServiceDetailsPage() {
               </div>
             ) : null}
             {publicPriceNote && publicPriceNote !== price.note ? <p className="mt-4 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{publicPriceNote}</p> : null}
-            <PublicLinkButton className="mt-5 w-full" to={requestPath}>
-              {isArabic ? 'ابدأ الطلب الآن' : 'Start request'}
+            {!orderable ? (
+              <p className="mt-4 rounded-[var(--radius-md)] bg-amber-50 p-3 text-sm font-semibold leading-6 text-amber-900" role="status">
+                {isArabic
+                  ? 'الطلب الإلكتروني لهذه الخدمة غير متاح حالياً لأن نموذجها بانتظار استكمال بعض الخيارات. أرسل طلباً خاصاً وسيتواصل معك الفريق.'
+                  : 'Online requests for this service are not available yet: some choices in its form are still being completed. Send a special request and the team will contact you.'}
+              </p>
+            ) : null}
+            <PublicLinkButton className="mt-5 w-full" to={requestTarget}>
+              {startLabel(false)}
             </PublicLinkButton>
             <PublicLinkButton className="mt-3 w-full" to="/track-order" variant="secondary">
               {isArabic ? 'تتبع طلب قائم' : 'Track existing request'}
@@ -464,8 +478,8 @@ function ServiceDetailsPage() {
       ) : null}
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--khalsni-public-border)] bg-white/95 p-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
-        <PublicLinkButton className="w-full" to={requestPath}>
-          {isArabic ? 'ابدأ الطلب' : 'Start request'}
+        <PublicLinkButton className="w-full" to={requestTarget}>
+          {startLabel(true)}
         </PublicLinkButton>
       </div>
     </PublicPageShell>

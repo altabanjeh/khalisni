@@ -287,17 +287,17 @@ function AdminRuleManagementPage() {
     weeks: tx('أسابيع', 'Weeks'),
   }
   const fileExtensionLabels = {
-    '.pdf': tx('Ù…Ù„Ù PDF', 'PDF document'),
-    '.jpg': tx('ØµÙˆØ±Ø© JPG', 'JPG image'),
-    '.jpeg': tx('ØµÙˆØ±Ø© JPEG', 'JPEG image'),
-    '.png': tx('ØµÙˆØ±Ø© PNG', 'PNG image'),
-    '.doc': tx('Ù…Ù„Ù Word DOC', 'Word DOC'),
-    '.docx': tx('Ù…Ù„Ù Word DOCX', 'Word DOCX'),
+    '.pdf': tx('ملف PDF', 'PDF document'),
+    '.jpg': tx('صورة JPG', 'JPG image'),
+    '.jpeg': tx('صورة JPEG', 'JPEG image'),
+    '.png': tx('صورة PNG', 'PNG image'),
+    '.doc': tx('ملف Word DOC', 'Word DOC'),
+    '.docx': tx('ملف Word DOCX', 'Word DOCX'),
   }
   const formatExtensionList = (value) =>
     (Array.isArray(value) ? value : [])
       .map((item) => fileExtensionLabels[item] || item)
-      .join(', ') || tx('ØºÙŠØ± Ù…Ø­Ø¯Ø¯', 'Not set')
+      .join(', ') || tx('غير محدد', 'Not set')
   const tabLabels = {
     services: tx('الخدمات والأسعار', 'Services and pricing'),
     documents: tx('المستندات المطلوبة', 'Required documents'),

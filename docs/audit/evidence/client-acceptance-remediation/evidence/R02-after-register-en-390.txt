@@ -1,0 +1,42 @@
+URL: http://127.0.0.1:4351/login?registered=1&email=en-acceptance-1792243860702%40example.org
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+Sign in
+
+Access the Khalsni portals
+
+Use your credentials to continue, or create a customer account before requesting a service.
+
+Your account was created successfully. Sign in now to continue your service request.
+Email
+Password
+Remember me on this device
+Forgot your password?
+Sign in
+Don't have an account?
+
+Create a customer account to submit and track requests from one place.
+
+Create a customer account
+
+Khalsni is a Jordanian platform for managing government and administrative service requests.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

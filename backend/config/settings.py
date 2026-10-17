@@ -132,6 +132,8 @@ if HAS_DJANGO_FILTERS:
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Built-in Django/DRF messages follow the request language (core/middleware.py).
+    "core.middleware.RequestLanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -279,6 +281,8 @@ if HAS_DRF:
         "DEFAULT_AUTHENTICATION_CLASSES": tuple(authentication_classes),
         "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
         "DEFAULT_FILTER_BACKENDS": tuple(filter_backends),
+        # Known system error messages in the request language (core/errors.py).
+        "EXCEPTION_HANDLER": "core.errors.localized_exception_handler",
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 20,
         # Same limits as the DRF classes; a cache outage is logged and does not

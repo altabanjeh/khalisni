@@ -14,6 +14,7 @@ import { api } from '../../api/services'
 import { KhalsniLockup } from '../../components/brand/KhalsniLogo'
 import { useLanguage } from '../../context/LanguageContext'
 import { getPasswordRules, PASSWORD_MIN_LENGTH } from '../../utils/passwordPolicy'
+import { getPhoneFormatHint, PHONE_INPUT_PROPS } from '../../utils/phoneInput'
 
 function getSafeNextPath(value) {
   // A single leading slash only: `//host` and `/\host` leave this site.
@@ -99,16 +100,12 @@ function RegisterPage() {
               aria-describedby="reg-phone-hint"
               aria-invalid={errors.phone ? 'true' : undefined}
               aria-required="true"
-              autoComplete="tel"
-              dir="ltr"
+              {...PHONE_INPUT_PROPS}
               id="reg-phone"
-              inputMode="tel"
-              placeholder="0791234567"
-              type="tel"
               {...register('phone', { required: isArabic ? 'رقم الهاتف مطلوب' : 'Phone number is required' })}
             />
             <p className="mt-1 text-xs font-semibold text-slate-600" id="reg-phone-hint">
-              {isArabic ? 'مثال: 0791234567 أو ‎+962791234567. للأرقام من خارج الأردن أضف رمز الدولة مسبوقاً بـ +.' : 'Example: 0791234567 or +962791234567. For a number outside Jordan, add the country code after +.'}
+              {getPhoneFormatHint(isArabic)}
             </p>
             {fieldError('phone')}
           </div>

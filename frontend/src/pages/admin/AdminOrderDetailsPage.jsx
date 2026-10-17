@@ -18,6 +18,7 @@ import { formatDate, getStatusLabel } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 import { getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
 import { describeTransitionBlock } from '../../utils/workflowPresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 function Panel({ icon: Icon, title, description, children, tone }) {
   return (
@@ -181,7 +182,7 @@ function AdminOrderDetailsPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-600">{isArabic ? 'إدارة الطلب' : 'Request management'}</p>
             <h1 className="mt-1 text-2xl font-black text-ink sm:text-3xl">
-              <ShieldCheck className="me-2 inline h-6 w-6 text-brand-600" />#{order.order_number}
+              <ShieldCheck className="me-2 inline h-6 w-6 text-brand-600" /><OrderNumber hash value={order.order_number} />
             </h1>
             <p className="mt-1.5 text-sm font-semibold text-slate-600">{primaryHint}</p>
           </div>

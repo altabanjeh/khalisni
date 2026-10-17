@@ -27,7 +27,12 @@ export function DocumentUploadWidget({
   const pickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,
-      type: ['application/pdf', 'image/*'],
+      type: [
+        'application/pdf',
+        'image/*',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ],
     });
     if (result.canceled) return;
     const asset = result.assets[0];
@@ -63,13 +68,11 @@ export function DocumentUploadWidget({
   return (
     <AppCard>
       <Text style={styles.title}>{title}</Text>
-      <AppInput
-        label="نوع المستند"
-        value={documentType}
-        onChangeText={setDocumentType}
-        editable={!defaultDocumentType}
-        hint="اكتب القيمة كما يعتمدها النظام مثل passport أو national_id."
-      />
+      {/* Customers never type a document code: their screens list the
+          requested documents instead (RespondToMissingDocumentScreen). */}
+      {!defaultDocumentType ? (
+        <AppInput label="نوع المستند" value={documentType} onChangeText={setDocumentType} />
+      ) : null}
       <AppButton label={file ? `تم اختيار: ${file.name}` : 'اختيار ملف'} variant="secondary" onPress={() => void pickDocument()} />
       <AppButton label="رفع المستند" onPress={() => void handleSubmit()} loading={loading} />
     </AppCard>

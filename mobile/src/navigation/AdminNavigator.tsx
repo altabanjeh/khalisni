@@ -30,6 +30,7 @@ function AdminTabs() {
       <Tab.Screen name="ManageUsers" component={ManageUsersScreen} options={{ title: 'المستخدمون', tabBarIcon: ({ color, size }) => <Ionicons name="people-outline" color={color} size={size} /> }} />
       <Tab.Screen name="ReportsDashboard" component={ReportsDashboardScreen} options={{ title: 'التقارير', tabBarIcon: ({ color, size }) => <Ionicons name="stats-chart-outline" color={color} size={size} /> }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'الإشعارات', tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" color={color} size={size} /> }} />
+      <Tab.Screen name="Account" component={SettingsScreen} options={{ title: 'حسابي', tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} /> }} />
     </Tab.Navigator>
   );
 }

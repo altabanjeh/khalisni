@@ -1549,6 +1549,7 @@ function ServicesManagementPage() {
                 <select className="field" {...serviceForm.register('delivery_time_mode')}>
                   <option value="duration">{tr('مدة متوقعة', 'Expected duration')}</option>
                   <option value="duration_range">{tr('نطاق زمني متوقع', 'Expected range')}</option>
+                  <option value="after_review">{tr('تُحدَّد بعد مراجعة الطلب (بدون مدة)', 'Confirmed after review (no duration)')}</option>
                 </select>
               </Field>
               <Field label={tr('نوع السعر', 'Price type')}>

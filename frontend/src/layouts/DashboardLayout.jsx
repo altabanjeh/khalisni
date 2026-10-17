@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import SkipLink from '../components/SkipLink'
 import Topbar from '../components/Topbar'
 
 function DashboardLayout({ title, links }) {
@@ -8,6 +9,7 @@ function DashboardLayout({ title, links }) {
 
   return (
     <div className="min-h-screen bg-[var(--kh-bg)] text-[var(--kh-text)]">
+      <SkipLink />
       <div className="container-shell py-3 sm:py-4 lg:py-6">
         <div className="grid items-start gap-4 lg:gap-6 xl:grid-cols-[290px_minmax(0,1fr)]">
         <Sidebar
@@ -19,7 +21,7 @@ function DashboardLayout({ title, links }) {
         <div className="min-w-0 space-y-4 lg:space-y-6">
           <Topbar onMenuClick={() => setMobileSidebarOpen(true)} title={title} />
           {/* The page content landmark; same classes as before, so the layout does not move. */}
-          <main className="min-w-0 space-y-4 lg:space-y-6" id="main-content">
+          <main className="min-w-0 space-y-4 focus:outline-none lg:space-y-6" id="main-content" tabIndex={-1}>
             <Outlet />
           </main>
         </div>

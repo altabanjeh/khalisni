@@ -10,11 +10,12 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 function QueuePreview({ rows = [], title, emptyText }) {
   const { language, isArabic } = useLanguage()
   const columns = [
-    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink">#{row.order_number}</span> },
+    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink"><OrderNumber hash value={row.order_number} /></span> },
     { key: 'service', label: isArabic ? 'الخدمة' : 'Service', render: (row) => (row.service ? getServiceName(row.service, language) : '—') },
     { key: 'customer', label: isArabic ? 'العميل' : 'Customer', render: (row) => row.customer?.full_name || '—' },
     { key: 'status', label: isArabic ? 'الحالة' : 'Status', render: (row) => <StatusBadge status={row.status} /> },

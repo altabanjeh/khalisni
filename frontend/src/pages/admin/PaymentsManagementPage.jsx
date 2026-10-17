@@ -11,6 +11,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDateTime, getPaymentStatusKey } from '../../utils/format'
+import OrderNumber from '../../components/OrderNumber'
 
 const PAGE_SIZE = 20
 
@@ -165,7 +166,7 @@ function PaymentsManagementPage() {
               <p className="font-bold text-ink">{row.payment_number}</p>
               <StatusBadge status={getPaymentStatusKey(row.status)} />
             </div>
-            <p className="text-sm text-slate-600">{row.order_number} — {row.customer_name}</p>
+            <p className="text-sm text-slate-600"><OrderNumber value={row.order_number} /> — {row.customer_name}</p>
             <p className="text-sm font-medium text-ink">{row.amount} {row.currency || 'JOD'}</p>
           </div>
         )}
@@ -198,7 +199,7 @@ function PaymentsManagementPage() {
         {selectedPayment ? (
           <form className="space-y-5" id="payment-status-form" onSubmit={statusForm.handleSubmit(handleStatusUpdate)}>
             <div className="rounded-3xl border border-border bg-slate-50 p-4 text-sm space-y-2">
-              <p>{tr('رقم الطلب:', 'Order number:')} <span className="font-semibold">{selectedPayment.order_number}</span></p>
+              <p>{tr('رقم الطلب:', 'Order number:')} <OrderNumber className="font-semibold" value={selectedPayment.order_number} /></p>
               <p>{tr('العميل:', 'Customer:')} <span className="font-semibold">{selectedPayment.customer_name}</span></p>
               <p>{tr('المبلغ:', 'Amount:')} <span className="font-semibold">{selectedPayment.amount} {selectedPayment.currency}</span></p>
               <p>{tr('طريقة الدفع:', 'Payment method:')} <span className="font-semibold">{selectedPayment.method_label}</span></p>

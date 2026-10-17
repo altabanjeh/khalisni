@@ -81,6 +81,11 @@ class P1RemediationBase(APITestCase):
 
 
 class B02RequirementFileRulesTests(P1RemediationBase):
+    def setUp(self):
+        super().setUp()
+        # These tests read the English server messages; ask for them (Arabic is the default since D03).
+        self.client.credentials(HTTP_ACCEPT_LANGUAGE="en")
+
     def assert_rejected_without_side_effects(self, order, response):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
         order.refresh_from_db()

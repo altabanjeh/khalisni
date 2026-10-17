@@ -13,6 +13,7 @@ import {
   PublicTextarea,
 } from '../../components/public/PublicPage'
 import { useLanguage } from '../../context/LanguageContext'
+import { getPhoneFormatHint, PHONE_INPUT_PROPS } from '../../utils/phoneInput'
 
 function ContactPage() {
   const { isArabic } = useLanguage()
@@ -67,7 +68,17 @@ function ContactPage() {
             </div>
             <div>
               <label htmlFor="contact-phone" className="mb-2 block text-sm font-bold text-ink">{isArabic ? 'الهاتف' : 'Phone'}{requirement(true)}</label>
-              <PublicInput aria-required="true" id="contact-phone" {...register('phone', { required: isArabic ? 'الهاتف مطلوب' : 'Phone is required' })} />
+              <PublicInput
+                aria-describedby="contact-phone-hint"
+                aria-invalid={errors.phone ? 'true' : undefined}
+                aria-required="true"
+                {...PHONE_INPUT_PROPS}
+                id="contact-phone"
+                {...register('phone', { required: isArabic ? 'الهاتف مطلوب' : 'Phone is required' })}
+              />
+              <p className="mt-1 text-xs font-semibold text-slate-600" id="contact-phone-hint">
+                {getPhoneFormatHint(isArabic)}
+              </p>
               {fieldError('phone')}
             </div>
             <div className="md:col-span-2">

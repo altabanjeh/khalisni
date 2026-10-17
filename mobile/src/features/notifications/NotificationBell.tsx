@@ -8,12 +8,13 @@ import { theme } from '../../theme';
 
 export function NotificationBell({ navigation }: { navigation: any }) {
   const role = useAuthStore((state) => state.role);
+  // Server count (/notifications/unread-count/): a page of the list would undercount.
   const { data } = useQuery({
-    queryKey: ['notifications', 'count', role],
-    queryFn: () => role === 'admin' ? notificationsApi.getAdminNotifications() : notificationsApi.getNotifications(),
+    queryKey: ['notifications-unread', role],
+    queryFn: () => notificationsApi.getUnreadCount(),
   });
 
-  const unreadCount = data?.filter((item) => !item.is_read).length ?? 0;
+  const unreadCount = data ?? 0;
 
   return (
     <Pressable style={styles.button} onPress={() => navigation.navigate('Notifications')}>

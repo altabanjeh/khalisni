@@ -30,4 +30,15 @@ export const statusLabels: Record<string, string> = {
   PENDING: 'معلق',
   FAILED: 'فشل',
   PAID: 'مدفوع',
+  // Document statuses (backend documents.Document.DocumentStatus) and the
+  // requirement state "not_uploaded"; same Arabic as the web (utils/format.js).
+  uploaded: 'مرفوع',
+  pending_scan: 'بانتظار الفحص الأمني',
+  safe: 'آمن',
+  unsafe: 'غير آمن',
+  pending_review: 'بانتظار التحقق',
+  approved: 'معتمد',
+  rejected: 'مرفوض',
+  archived: 'مؤرشف',
+  not_uploaded: 'لم يُرفع بعد',
 };

@@ -11,6 +11,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useNotifications } from '../../context/NotificationContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'CANCELLED', 'REJECTED', 'VERIFIED'])
 
@@ -205,7 +206,7 @@ function CustomerDashboardHome() {
                 <li key={order.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-ink">{getServiceName(order.service, language)}</p>
-                    <p className="mt-0.5 text-xs font-semibold text-slate-500">#{order.order_number}</p>
+                    <p className="mt-0.5 text-xs font-semibold text-slate-500"><OrderNumber hash value={order.order_number} /></p>
                   </div>
                   <Link className="btn-ghost shrink-0 px-3 py-1.5 text-xs" to={`/customer/orders/${order.id}`}>
                     {isArabic ? 'فتح' : 'Open'}

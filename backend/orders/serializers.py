@@ -22,6 +22,7 @@ from orders.readiness import order_requirement_rows, order_requirements
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
 from services.models import Service
+from services.schema_rules import answers_notes_section, order_blockers, parse_answers, validate_answers
 from services.selectors import visible_services_queryset
 from workflow.rules import get_transition_rule
 
@@ -484,6 +485,7 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError({"branch_id": "Branch must belong to the selected organization."})
 
         service = attrs["service"]
+        attrs["answers_section"] = self._validated_answers_section(service)
         requirements = list(service.document_requirements.filter(is_active=True, is_deleted=False).order_by("display_order", "name_ar"))
         requirements_by_type = {requirement.document_type: requirement for requirement in requirements}
         required_types = {requirement.document_type for requirement in requirements if requirement.is_required}
@@ -550,6 +552,25 @@ class PublicOrderCreateSerializer(serializers.Serializer):
         attrs["initial_documents"] = initial_documents
         return attrs
 
+    def _validated_answers_section(self, service):
+        """Server-side check of the service form answers (audit B10-3).
+
+        The schema carries the rules (required, options, visible_when); the
+        same reader is used by the admin editor and the catalogue validator.
+        Hidden conditional answers are dropped, never stored.
+        """
+        schema = service.required_information_schema
+        if order_blockers(schema):
+            raise serializers.ValidationError({"service": "This service needs configuration before it can be ordered online."})
+        try:
+            answers = parse_answers(self.initial_data.get("service_answers"))
+        except ValueError as exc:
+            raise serializers.ValidationError({"service_answers": str(exc)})
+        cleaned, errors = validate_answers(schema, answers or {})
+        if errors:
+            raise serializers.ValidationError({"service_answers": errors})
+        return answers_notes_section(schema, cleaned)
+
     def create(self, validated_data):
         request = self.context.get("request")
         user = getattr(request, "user", None)
@@ -557,6 +578,9 @@ class PublicOrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Only authenticated customer accounts can create orders.")
 
         payload = dict(validated_data)
+        # The customer's own notes, then the answers block built from validated answers.
+        section = payload.pop("answers_section", "")
+        payload["notes"] = "\n".join(part for part in (str(payload.get("notes") or "").strip(), section) if part)
         payload.pop("consent", None)
         payload["consent_evidence"] = consent_evidence(
             version=payload.pop("consent_version", ""),

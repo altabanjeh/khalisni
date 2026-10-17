@@ -1,4 +1,4 @@
-﻿export const fallbackPublicTheme = {
+export const fallbackPublicTheme = {
   id: 1,
   theme_id: 1,
   name: 'Default Khalsni Theme',
@@ -17,8 +17,8 @@ export const fallbackPublicContent = {
   id: 1,
   content_id: 1,
   version_name: 'Default Homepage Content',
-  hero_title_ar: 'خلّص معاملاتك الحكومية والإدارية بدون تعب',
-  hero_title_en: 'Finish your government and admin requests without the hassle',
+  hero_title_ar: 'ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.',
+  hero_title_en: 'Focus on what matters… and we will handle the rest.',
   hero_subtitle_ar: 'اختر الخدمة، ارفع الوثائق، تابع التنفيذ، واستلم النتيجة من مكان واحد.',
   hero_subtitle_en: 'Choose the service, upload documents, track execution, and receive the result from one place.',
   primary_button_text: 'ابدأ الآن',

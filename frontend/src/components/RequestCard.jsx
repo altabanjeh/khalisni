@@ -8,6 +8,7 @@ import { getCover } from '../utils/cover'
 import { getServiceName } from '../utils/servicePresentation'
 import StatusBadge from './StatusBadge'
 import { describeTimelineNote } from '../utils/timelinePresentation'
+import OrderNumber from '../components/OrderNumber'
 
 const ACTION_REQUIRED = new Set(['WAITING_CUSTOMER'])
 const DONE = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'])
@@ -85,7 +86,7 @@ function RequestCard({ order, className = '', to }) {
         <div className="kh-cover-content flex h-full flex-col justify-between p-3.5 text-start">
           <div className="flex items-center justify-between gap-2">
             <StatusBadge status={order?.status} />
-            <span className="rounded-full bg-black/35 px-2 py-0.5 text-[0.7rem] font-extrabold text-white backdrop-blur">#{order?.order_number}</span>
+            <span className="rounded-full bg-black/35 px-2 py-0.5 text-[0.7rem] font-extrabold text-white backdrop-blur"><OrderNumber hash value={order?.order_number} /></span>
           </div>
           <h3 className="line-clamp-1 text-sm font-black text-white drop-shadow">{serviceName}</h3>
         </div>

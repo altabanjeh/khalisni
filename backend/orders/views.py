@@ -26,6 +26,8 @@ from config.permissions import (
     IsCustomerRole,
 )
 from core.delete_guard import AdminDeleteGuardMixin
+from core.errors import localize_message
+from core.i18n import request_language
 from workflow.rules import WORKFLOW_TRANSITIONS
 from documents.serializers import DocumentUploadSerializer
 from orders.models import Order, OrderIssue, OrderNote, Rating
@@ -142,7 +144,10 @@ class CreateOrderAPIView(generics.CreateAPIView):
             return None
         if existing.submission_fingerprint != fingerprint:
             return response.Response(
-                {"detail": "This submission key was used for different request data.", "code": "submission_key_conflict"},
+                {
+                    "detail": localize_message("This submission key was used for different request data.", request_language(self.request)),
+                    "code": "submission_key_conflict",
+                },
                 status=status.HTTP_409_CONFLICT,
             )
         return response.Response(self._order_response(existing), status=status.HTTP_200_OK)

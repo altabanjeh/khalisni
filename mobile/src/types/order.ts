@@ -1,6 +1,6 @@
 import type { OrderDocument } from './document';
 import type { BaseEntity } from './common';
-import type { Service } from './service';
+import type { Service, ServiceRequirement } from './service';
 import type { User } from './user';
 
 export interface ProviderProfileBrief {
@@ -28,6 +28,10 @@ export interface OrderStatusLog {
   changed_by?: number;
   changed_by_name?: string;
   note?: string;
+  // Code of a system-written note (backend orders/system_events.py); the
+  // screen renders it in Arabic. Empty for notes a person typed.
+  system_event?: string;
+  system_event_params?: Record<string, string>;
   created_at?: string;
 }
 
@@ -44,7 +48,12 @@ export interface OrderAllowedActions {
   can_verify_document?: boolean;
   can_send_manual_notification?: boolean;
   can_reject?: boolean;
-  [key: string]: boolean | undefined;
+  can_upload_customer_document?: boolean;
+  can_view_missing_documents_form?: boolean;
+  // false: the order waits for the customer but its request names nothing the
+  // customer can upload (only staff recovery can move it). null when not waiting.
+  missing_document_request_valid?: boolean | null;
+  [key: string]: unknown;
 }
 
 export interface Order extends BaseEntity {
@@ -62,7 +71,8 @@ export interface Order extends BaseEntity {
   internal_notes?: string;
   provider_instructions?: string[] | null;
   missing_document_types?: string[];
-  required_documents?: Array<{ document_type: string; name_ar?: string | null; name_en?: string | null }>;
+  // The order's requirement snapshot (backend orders/readiness.py SNAPSHOT_FIELDS).
+  required_documents?: ServiceRequirement[];
   rejection_reason?: string;
   is_archived?: boolean;
   completed_at?: string | null;
@@ -85,6 +95,7 @@ export interface CreateOrderPayload {
   national_id?: string;
   city: string;
   notes?: string;
+  service_answers?: string;
   consent: boolean;
   document_types?: string[];
   documents?: unknown[];

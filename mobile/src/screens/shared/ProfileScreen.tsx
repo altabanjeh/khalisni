@@ -11,6 +11,7 @@ import { useAuthStore } from '../../state/authStore';
 import { useAuth } from '../../auth/AuthProvider';
 import { applyAccessToken, getDisplayError } from '../../api/client';
 import { saveSession } from '../../auth/authStorage';
+import { roleLabels } from '../../constants/roles';
 
 export function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
@@ -26,7 +27,7 @@ export function ProfileScreen() {
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
       if (role !== 'client') {
-        throw new Error('تحديث الملف الشخصي متاح للعميل فقط حالياً لأن بقية الأدوار لا تملك endpoint مخصصاً بعد.');
+        throw new Error('تعديل الملف الشخصي من التطبيق متاح لحسابات العملاء فقط. تواصل مع الإدارة لتحديث بياناتك.');
       }
       if (phoneChanged && !currentPassword) {
         setPasswordError('أدخل كلمة المرور الحالية لتغيير رقم الهاتف.');
@@ -78,7 +79,7 @@ export function ProfileScreen() {
             error={passwordError}
           />
         ) : null}
-        <AppInput label="الدور" value={role ?? ''} editable={false} />
+        <AppInput label="نوع الحساب" value={role ? roleLabels[role] : ''} editable={false} />
         <AppButton label="حفظ التغييرات" onPress={() => updateProfileMutation.mutate()} loading={updateProfileMutation.isPending} />
       </AppCard>
     </AppScreen>

@@ -1,0 +1,17 @@
+{
+ "profilePatch": 200,
+ "before": "9901234567",
+ "blankSubmit": [
+  201,
+  "{\"id\":10,\"order_number\":\"KH-2026-000010\",\"status\":\"NEW\",\"warnings\":[]}"
+ ],
+ "after": "9901234567",
+ "duplicateSubmitByB": [
+  400,
+  "{\"national_id\":[\"الرقم الوطني مستخدم في حساب آخر.\"]}"
+ ],
+ "phoneOfOtherUserByB": [
+  400,
+  "{\"phone\":[\"رقم الهاتف مستخدم في حساب آخر.\"]}"
+ ]
+}

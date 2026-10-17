@@ -1,0 +1,463 @@
+WARNING 1 no-criminal-record | document national-id | Document has no readable English name.
+WARNING 1 no-criminal-record | document authorization-letter | Document has no readable English name.
+WARNING 2 passport-renewal | document national-id | Document has no readable English name.
+WARNING 2 passport-renewal | document authorization-letter | Document has no readable English name.
+WARNING 3 tax-clearance | document national-id | Document has no readable English name.
+WARNING 3 tax-clearance | document authorization-letter | Document has no readable English name.
+WARNING 7 no-criminal-record-certificate | document national-id | Document has no readable English name.
+WARNING 7 no-criminal-record-certificate | document national-id | No allowed file types (the global list applies).
+WARNING 7 no-criminal-record-certificate | document authorization-letter | Document has no readable English name.
+WARNING 7 no-criminal-record-certificate | document authorization-letter | No allowed file types (the global list applies).
+WARNING 8 passport-appointment-booking | document national-id | Document has no readable English name.
+WARNING 8 passport-appointment-booking | document national-id | No allowed file types (the global list applies).
+WARNING 8 passport-appointment-booking | document authorization-letter | Document has no readable English name.
+WARNING 8 passport-appointment-booking | document authorization-letter | No allowed file types (the global list applies).
+WARNING 9 traffic-fines-payment | document national-id | Document has no readable English name.
+WARNING 9 traffic-fines-payment | document national-id | No allowed file types (the global list applies).
+WARNING 9 traffic-fines-payment | document authorization-letter | Document has no readable English name.
+WARNING 9 traffic-fines-payment | document authorization-letter | No allowed file types (the global list applies).
+WARNING 10 property-registration-deed | document national-id | Document has no readable English name.
+WARNING 10 property-registration-deed | document national-id | No allowed file types (the global list applies).
+WARNING 10 property-registration-deed | document authorization-letter | Document has no readable English name.
+WARNING 10 property-registration-deed | document authorization-letter | No allowed file types (the global list applies).
+WARNING 11 business-license-renewal | document national-id | Document has no readable English name.
+WARNING 11 business-license-renewal | document national-id | No allowed file types (the global list applies).
+WARNING 11 business-license-renewal | document authorization-letter | Document has no readable English name.
+WARNING 11 business-license-renewal | document authorization-letter | No allowed file types (the global list applies).
+ERROR   12 business_company_registration | field company_type | A select field needs at least one option.
+WARNING 12 business_company_registration | field company_type | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field proposed_company_name_1 | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field proposed_company_name_2 | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field proposed_company_name_3 | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field company_objectives | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field company_address | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field capital_amount | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field partners_count | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field partner_name | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field partner_id | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field partner_nationality | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field partner_share | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field authorized_signatories | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | field signing_authority | No English label (English screens show a generic name).
+WARNING 12 business_company_registration | document document_b84500235f | Document has no readable English name.
+WARNING 12 business_company_registration | document document_a7c41b216c | Document has no readable English name.
+WARNING 12 business_company_registration | document document_d6f5694849 | Document has no readable English name.
+WARNING 12 business_company_registration | document document_6a5fef1088 | Document has no readable English name.
+WARNING 12 business_company_registration | document document_bf9b841bf1 | Document has no readable English name.
+ERROR   12 business_company_registration | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   13 business_company_information_amendment | field company_type | A select field needs at least one option.
+WARNING 13 business_company_information_amendment | field company_registration_number | No English label (English screens show a generic name).
+WARNING 13 business_company_information_amendment | field company_name | No English label (English screens show a generic name).
+WARNING 13 business_company_information_amendment | field company_type | No English label (English screens show a generic name).
+WARNING 13 business_company_information_amendment | field amendment_type | No English label (English screens show a generic name).
+WARNING 13 business_company_information_amendment | field amendment_details | No English label (English screens show a generic name).
+WARNING 13 business_company_information_amendment | document document_cb35245bcf | Document has no readable English name.
+WARNING 13 business_company_information_amendment | document document_39a02bfad7 | Document has no readable English name.
+WARNING 13 business_company_information_amendment | document document_e6d6a52927 | Document has no readable English name.
+WARNING 13 business_company_information_amendment | document document_bb343bc1a7 | Document has no readable English name.
+WARNING 13 business_company_information_amendment | document document_04defb9ccb | Document has no readable English name.
+ERROR   13 business_company_information_amendment | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   14 business_company_add_activities | field company_type | A select field needs at least one option.
+WARNING 14 business_company_add_activities | field company_registration_number | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | field company_name | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | field company_type | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | field current_business_activities | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | field new_business_activities | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | field additional_details | No English label (English screens show a generic name).
+WARNING 14 business_company_add_activities | document document_cdd8ce3328 | Document has no readable English name.
+WARNING 14 business_company_add_activities | document document_ec8d545fbf | Document has no readable English name.
+WARNING 14 business_company_add_activities | document document_cc8affb2cc | Document has no readable English name.
+ERROR   14 business_company_add_activities | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   15 business_commercial_registration_certificate | field entity_type | A select field needs at least one option.
+WARNING 15 business_commercial_registration_certificate | field certificate_copy_type | Optional select field has no options.
+WARNING 15 business_commercial_registration_certificate | field entity_type | No English label (English screens show a generic name).
+WARNING 15 business_commercial_registration_certificate | field registration_number | No English label (English screens show a generic name).
+WARNING 15 business_commercial_registration_certificate | field registered_entity_name | No English label (English screens show a generic name).
+WARNING 15 business_commercial_registration_certificate | field certificate_copy_type | No English label (English screens show a generic name).
+WARNING 15 business_commercial_registration_certificate | document document_85697877bb | Document has no readable English name.
+WARNING 15 business_commercial_registration_certificate | document document_5ca1add6b9 | Document has no readable English name.
+WARNING 15 business_commercial_registration_certificate | document document_af883d59b3 | Document has no readable English name.
+ERROR   15 business_commercial_registration_certificate | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+WARNING 16 business_trade_name_certificate | field certificate_copy_type | Optional select field has no options.
+WARNING 16 business_trade_name_certificate | field trade_name_number | No English label (English screens show a generic name).
+WARNING 16 business_trade_name_certificate | field trade_name | No English label (English screens show a generic name).
+WARNING 16 business_trade_name_certificate | field trade_name_owner | No English label (English screens show a generic name).
+WARNING 16 business_trade_name_certificate | field certificate_copy_type | No English label (English screens show a generic name).
+WARNING 16 business_trade_name_certificate | document document_85697877bb | Document has no readable English name.
+WARNING 16 business_trade_name_certificate | document document_11714fabf5 | Document has no readable English name.
+WARNING 16 business_trade_name_certificate | document document_af883d59b3 | Document has no readable English name.
+ERROR   16 business_trade_name_certificate | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   17 business_trade_name_registration | field applicant_type | A select field needs at least one option.
+ERROR   17 business_trade_name_registration | field business_activity | A select field needs at least one option.
+WARNING 17 business_trade_name_registration | field applicant_type | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | field applicant_registration_number | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | field proposed_trade_name_1 | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | field proposed_trade_name_2 | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | field proposed_trade_name_3 | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | field business_activity | No English label (English screens show a generic name).
+WARNING 17 business_trade_name_registration | document document_197c7d7fc0 | Document has no readable English name.
+WARNING 17 business_trade_name_registration | document document_322e004de0 | Document has no readable English name.
+WARNING 17 business_trade_name_registration | document document_d038474c7a | Document has no readable English name.
+WARNING 17 business_trade_name_registration | document document_1b1707d621 | Document has no readable English name.
+ERROR   17 business_trade_name_registration | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   18 business_trademark_services | field trademark_service_type | A select field needs at least one option.
+ERROR   18 business_trademark_services | field trademark_owner_type | A select field needs at least one option.
+WARNING 18 business_trademark_services | field trademark_class | Optional select field has no options.
+WARNING 18 business_trademark_services | field trademark_service_type | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field trademark_name | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field trademark_owner_type | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field trademark_owner_name | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field trademark_class | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field goods_services_description | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | field trademark_description | No English label (English screens show a generic name).
+WARNING 18 business_trademark_services | document document_5eb4193ba1 | Document has no readable English name.
+WARNING 18 business_trademark_services | document document_fd135ce03f | Document has no readable English name.
+WARNING 18 business_trademark_services | document document_d7d63d7027 | Document has no readable English name.
+WARNING 18 business_trademark_services | document document_7672fa9fbe | Document has no readable English name.
+WARNING 18 business_trademark_services | document document_fb697280d9 | Document has no readable English name.
+WARNING 18 business_trademark_services | document document_56caf9c71a | Document has no readable English name.
+ERROR   18 business_trademark_services | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   19 business_license_services | field business_license_action | A select field needs at least one option.
+ERROR   19 business_license_services | field business_activity_type | A select field needs at least one option.
+ERROR   19 business_license_services | field municipality | A select field needs at least one option.
+ERROR   19 business_license_services | field occupancy_status | A select field needs at least one option.
+WARNING 19 business_license_services | field business_license_action | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field business_name | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field business_registration_number | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field business_activity_type | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field municipality | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field business_location | No English label (English screens show a generic name).
+WARNING 19 business_license_services | field occupancy_status | No English label (English screens show a generic name).
+WARNING 19 business_license_services | document document_b7393c5318 | Document has no readable English name.
+WARNING 19 business_license_services | document document_1c40b3e58a | Document has no readable English name.
+WARNING 19 business_license_services | document document_602b0a206b | Document has no readable English name.
+WARNING 19 business_license_services | document document_69e9a26d6e | Document has no readable English name.
+WARNING 19 business_license_services | document document_3df268a71b | Document has no readable English name.
+WARNING 19 business_license_services | document document_ef81fa254a | Document has no readable English name.
+WARNING 19 business_license_services | document document_f56c2e0812 | Document has no readable English name.
+WARNING 19 business_license_services | document document_5375b03f66 | Document has no readable English name.
+ERROR   19 business_license_services | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+ERROR   20 business_company_closure_liquidation | field closure_or_liquidation_type | A select field needs at least one option.
+ERROR   20 business_company_closure_liquidation | field company_type | A select field needs at least one option.
+WARNING 20 business_company_closure_liquidation | field closure_or_liquidation_type | No English label (English screens show a generic name).
+WARNING 20 business_company_closure_liquidation | field company_registration_number | No English label (English screens show a generic name).
+WARNING 20 business_company_closure_liquidation | field company_name | No English label (English screens show a generic name).
+WARNING 20 business_company_closure_liquidation | field company_type | No English label (English screens show a generic name).
+WARNING 20 business_company_closure_liquidation | field has_operated | No English label (English screens show a generic name).
+ERROR   20 business_company_closure_liquidation | field has_operated | A required yes/no checkbox can only be answered 'yes'.
+WARNING 20 business_company_closure_liquidation | field has_assets | No English label (English screens show a generic name).
+ERROR   20 business_company_closure_liquidation | field has_assets | A required yes/no checkbox can only be answered 'yes'.
+WARNING 20 business_company_closure_liquidation | field has_liabilities | No English label (English screens show a generic name).
+ERROR   20 business_company_closure_liquidation | field has_liabilities | A required yes/no checkbox can only be answered 'yes'.
+WARNING 20 business_company_closure_liquidation | field has_employees | No English label (English screens show a generic name).
+ERROR   20 business_company_closure_liquidation | field has_employees | A required yes/no checkbox can only be answered 'yes'.
+WARNING 20 business_company_closure_liquidation | field has_trade_name | No English label (English screens show a generic name).
+ERROR   20 business_company_closure_liquidation | field has_trade_name | A required yes/no checkbox can only be answered 'yes'.
+WARNING 20 business_company_closure_liquidation | field authorized_followup_person | No English label (English screens show a generic name).
+WARNING 20 business_company_closure_liquidation | document document_f0fbb87902 | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_3bee74c311 | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_ddc0c08e82 | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_7713142b41 | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_8e430fe32b | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_6192cecaba | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_37e2d6c45c | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_652dd91fc4 | Document has no readable English name.
+WARNING 20 business_company_closure_liquidation | document document_c82005f833 | Document has no readable English name.
+ERROR   20 business_company_closure_liquidation | delivery | Shows a fixed duration (1 days) while the note says it depends: 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'.
+WARNING 21 request-property-registration-certificate | field full_name | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field national_id | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field phone_number | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field field_2fa52c6cfa | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field parcel_number | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field basin_number | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field region | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field governorate | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field additional_notes | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field field_3b752a334c | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 21 request-property-registration-certificate | document document_74a2f98299 | Document has no readable English name.
+ERROR   21 request-property-registration-certificate | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة.'.
+WARNING 22 request-cadastral-map | field full_name | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field national_id | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field phone_number | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field field_2fa52c6cfa | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field parcel_number | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field basin_number | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field region | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field governorate | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field additional_notes | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field field_ccc9901249 | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 22 request-cadastral-map | document document_74a2f98299 | Document has no readable English name.
+ERROR   22 request-cadastral-map | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة.'.
+WARNING 23 request-property-ownership-transfer | field seller_name | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field seller_national_id | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field buyer_name | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field buyer_national_id | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field phone_numbers | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field parcel_number | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field basin_number | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field region | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field governorate | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field additional_notes | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field field_498ac74dd1 | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field field_23afc22be9 | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | field field_2013716fdf | No English label (English screens show a generic name).
+WARNING 23 request-property-ownership-transfer | document document_b0f143ad16 | Document has no readable English name.
+ERROR   23 request-property-ownership-transfer | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'.
+WARNING 24 request-inheritance-registration | field applicant_name | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field national_id | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field phone_number | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_b8a0419109 | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field parcel_number | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field basin_number | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field region | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field governorate | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_a4c0cc56df | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field additional_notes | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_ac120aaeaa | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_6dd0ca5286 | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_45a27f6310 | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_da11e8ca0f | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | field field_44b3e07432 | No English label (English screens show a generic name).
+WARNING 24 request-inheritance-registration | document document_443aae22bf | Document has no readable English name.
+WARNING 24 request-inheritance-registration | document document_c3a3aa1c50 | Document has no readable English name.
+ERROR   24 request-inheritance-registration | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'.
+WARNING 25 request-property-gift-transfer | field field_3cd1e5af3a | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_c67372ee55 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_11eb543426 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_fdba9f39a6 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field phone_numbers | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field parcel_number | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field basin_number | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field region | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field governorate | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field additional_notes | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_e2f57bbb81 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_f105f02706 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | field field_41624b6665 | No English label (English screens show a generic name).
+WARNING 25 request-property-gift-transfer | document document_564406e175 | Document has no readable English name.
+WARNING 25 request-property-gift-transfer | document document_11667481fd | Document has no readable English name.
+WARNING 25 request-property-gift-transfer | document document_b0f143ad16 | Document has no readable English name.
+ERROR   25 request-property-gift-transfer | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'.
+WARNING 26 request-termination-of-co-ownership | field applicant_name | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field national_id | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field phone_number | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field parcel_number | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field basin_number | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field region | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field governorate | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_224269de21 | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field additional_notes | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_4bca17a629 | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_5c6164c551 | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_3c7283fc39 | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | field field_e9352003cb | No English label (English screens show a generic name).
+WARNING 26 request-termination-of-co-ownership | document document_b0f143ad16 | Document has no readable English name.
+ERROR   26 request-termination-of-co-ownership | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'.
+WARNING 27 request-property-subdivision | field applicant_name | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field national_id | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field phone_number | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field parcel_number | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field basin_number | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field region | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field governorate | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_2085c3cabf | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field additional_notes | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_649c50d973 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_e7d765ce63 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_5ebd0dedc5 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_b18f129f12 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | field field_9fe181a6e8 | No English label (English screens show a generic name).
+WARNING 27 request-property-subdivision | document document_b0f143ad16 | Document has no readable English name.
+ERROR   27 request-property-subdivision | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات الجهات المختصة وطبيعة العقار.'.
+WARNING 28 request-property-consolidation | field applicant_name | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field national_id | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field phone_number | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_56b1987951 | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_7d9efcd6d5 | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field region | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field governorate | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field additional_notes | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_b8d4677c65 | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_da334d766f | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_b07ae7100c | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 28 request-property-consolidation | document document_7c6a69c2f4 | Document has no readable English name.
+WARNING 28 request-property-consolidation | document document_b0f143ad16 | Document has no readable English name.
+ERROR   28 request-property-consolidation | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'.
+WARNING 29 request-boundary-demarcation | field applicant_name | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field national_id | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field phone_number | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field parcel_number | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field basin_number | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field region | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field governorate | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_bbea5e4459 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field additional_notes | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_57847bd284 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_44f22ef962 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_8946eb1107 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | field field_2525256bd4 | No English label (English screens show a generic name).
+WARNING 29 request-boundary-demarcation | document document_b03d952538 | Document has no readable English name.
+ERROR   29 request-boundary-demarcation | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'.
+WARNING 30 request-land-survey | field full_name | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field applicant_name | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field national_id | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_760c65a1fa | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field phone_number | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field parcel_number | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field basin_number | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field region | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field governorate | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_d7fc96e29e | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field survey_reason | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field additional_notes | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_225e3741b4 | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_8946eb1107 | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_711abf9b11 | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | field field_2525256bd4 | No English label (English screens show a generic name).
+WARNING 30 request-land-survey | document document_a4c4fed3af | Document has no readable English name.
+WARNING 30 request-land-survey | document document_0cc19c2317 | Document has no readable English name.
+WARNING 30 request-land-survey | document document_e95445e836 | Document has no readable English name.
+WARNING 30 request-land-survey | document document_b03d952538 | Document has no readable English name.
+ERROR   30 request-land-survey | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'.
+WARNING 31 request-property-readjustment | field applicant_name | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field full_name | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field national_id | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field phone_number | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field parcel_number | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field basin_number | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field region | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field governorate | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field readjustment_reason | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_536eddb5ee | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field additional_notes | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_b0926cf796 | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_da897ff7ee | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_05c9a7346b | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_729ed5c96d | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_d25b82bf60 | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | field field_c7eea7fb68 | No English label (English screens show a generic name).
+WARNING 31 request-property-readjustment | document document_b03d952538 | Document has no readable English name.
+ERROR   31 request-property-readjustment | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات الجهات المختصة وطبيعة المعاملة.'.
+WARNING 32 request-zoning-certificate | field full_name | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field national_id | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field phone_number | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field parcel_number | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field basin_number | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field region | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field governorate | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field additional_notes | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field field_2a8f1a87c6 | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | field field_c5251821b3 | No English label (English screens show a generic name).
+WARNING 32 request-zoning-certificate | document document_b03d952538 | Document has no readable English name.
+WARNING 32 request-zoning-certificate | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات البلدية أو الجهة المختصة.'.
+WARNING 33 request-land-use-classification-change | field applicant_name | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field full_name | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field national_id | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field phone_number | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field parcel_number | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field basin_number | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field region | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field governorate | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field current_land_use_classification | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field requested_land_use_classification | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field request_reason | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field additional_notes | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_937cc4d5d6 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_e825ca6266 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_02572f19a1 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_088e60f563 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | field field_c7eea7fb68 | No English label (English screens show a generic name).
+WARNING 33 request-land-use-classification-change | document document_3775124a52 | Document has no readable English name.
+WARNING 33 request-land-use-classification-change | document document_b03d952538 | Document has no readable English name.
+ERROR   33 request-land-use-classification-change | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات الجهات المختصة وطبيعة المعاملة.'.
+WARNING 34 request-zoning-plan | field applicant_name | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field national_id | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field phone_number | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field governorate | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field region | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field basin_number | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field parcel_number | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field request_purpose | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field additional_notes | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field field_5dded7dd47 | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field field_c3bd9f38ed | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field field_9702f3b4ac | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | field field_54143bc9fe | No English label (English screens show a generic name).
+WARNING 34 request-zoning-plan | document document_b0f143ad16 | Document has no readable English name.
+ERROR   34 request-zoning-plan | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب مدة إصدار المخطط من الجهة المختصة.'.
+WARNING 35 request-change-statement | field full_name | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field national_id | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field phone_number | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field governorate | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field region | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field basin_number | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field parcel_number | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field request_reason | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field field_22e7ac2cd2 | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field field_bc07ea41c3 | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field field_23afc22be9 | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | field field_c7eea7fb68 | No English label (English screens show a generic name).
+WARNING 35 request-change-statement | document document_b0f143ad16 | Document has no readable English name.
+ERROR   35 request-change-statement | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات الجهة المختصة.'.
+WARNING 36 request-property-mortgage-registration | field applicant_name | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field national_id | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field phone_number | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field parcel_number | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field basin_number | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field region | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field governorate | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_08d94d2888 | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_3ece488644 | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field additional_notes | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_d6467d46cf | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_6ff5e81d0f | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | field field_9209f03252 | No English label (English screens show a generic name).
+WARNING 36 request-property-mortgage-registration | document document_5c2f8f95d1 | Document has no readable English name.
+WARNING 36 request-property-mortgage-registration | document document_b03d952538 | Document has no readable English name.
+ERROR   36 request-property-mortgage-registration | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'.
+WARNING 37 request-mortgage-release | field applicant_name | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field national_id | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field phone_number | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field parcel_number | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field basin_number | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field region | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field governorate | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field field_8a38c4158a | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field additional_notes | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field field_e70300dbb6 | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field field_646f133865 | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field field_acf5f0c3dd | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | field field_307ab61eb9 | No English label (English screens show a generic name).
+WARNING 37 request-mortgage-release | document document_d2024a06a1 | Document has no readable English name.
+WARNING 37 request-mortgage-release | document document_b03d952538 | Document has no readable English name.
+ERROR   37 request-mortgage-release | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات دائرة الأراضي والمساحة والجهة المرتهنة.'.
+WARNING 38 request-building-permit | field full_name | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field national_id | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field phone_number | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field parcel_number | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field basin_number | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field region | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field governorate | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field field_530e3b26a8 | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field additional_notes | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field field_e021559e7a | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field field_51b3ed7839 | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field field_4874b04e76 | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | field field_65bdb1ffad | No English label (English screens show a generic name).
+WARNING 38 request-building-permit | document document_3775124a52 | Document has no readable English name.
+WARNING 38 request-building-permit | document document_3443627d36 | Document has no readable English name.
+WARNING 38 request-building-permit | document document_b0f143ad16 | Document has no readable English name.
+ERROR   38 request-building-permit | delivery | Shows a fixed duration (1 days) while the note says it depends: 'حسب إجراءات البلدية أو أمانة عمان والجهات المختصة.'.
+Services: 38 (32 customer-visible). Errors: 45. Warnings: 417.

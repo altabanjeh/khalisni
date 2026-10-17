@@ -8,7 +8,7 @@ import { hasPermission } from '../utils/authz'
 import { formatDateTime } from '../utils/format'
 import EmptyState from './EmptyState'
 
-function NotificationPanel({ user, onNavigate }) {
+function NotificationPanel({ user, onNavigate, titleId }) {
   const { t, isArabic } = useLanguage()
   const { notifications, markRead, markAllRead, loading, error } = useNotifications()
   const unreadCount = notifications.filter((item) => !item.is_read).length
@@ -37,11 +37,30 @@ function NotificationPanel({ user, onNavigate }) {
     onNavigate?.(notification)
   })
 
-  if (loading && !notifications.length) return <div className="p-4 text-sm" role="status">{t('common.loading', 'جارٍ التحميل...')}</div>
-  if (error && !notifications.length) return <div className="p-4 text-sm text-danger" role="alert">{t('notifications.loadError', 'تعذر تحميل الإشعارات.')}</div>
+  const centerTitle = t('notifications.center', 'مركز الإشعارات')
+  // The surrounding dialog is labelled by this id, so every state renders it.
+  const hiddenTitle = titleId ? <h2 className="sr-only" id={titleId}>{centerTitle}</h2> : null
+
+  if (loading && !notifications.length) {
+    return (
+      <div className="rounded-3xl border border-border bg-white p-4 text-sm shadow-panel sm:max-w-sm">
+        {hiddenTitle}
+        <p role="status">{t('common.loading', 'جارٍ التحميل...')}</p>
+      </div>
+    )
+  }
+  if (error && !notifications.length) {
+    return (
+      <div className="rounded-3xl border border-border bg-white p-4 text-sm text-danger shadow-panel sm:max-w-sm">
+        {hiddenTitle}
+        <p role="alert">{t('notifications.loadError', 'تعذر تحميل الإشعارات.')}</p>
+      </div>
+    )
+  }
   if (!notifications.length) {
     return (
       <div className="w-full sm:max-w-sm">
+        {hiddenTitle}
         <EmptyState
           title={t('notifications.emptyTitle', 'لا توجد إشعارات حالياً')}
           description={t('notifications.emptyDescription', 'ستظهر هنا التنبيهات المرتبطة بالطلبات والوثائق.')}
@@ -55,7 +74,7 @@ function NotificationPanel({ user, onNavigate }) {
     <div className="w-full rounded-3xl border border-border bg-white p-4 shadow-panel sm:max-w-sm">
       <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <p className="text-sm font-bold text-ink">{t('notifications.center', 'مركز الإشعارات')}</p>
+          <h2 className="text-sm font-bold text-ink" id={titleId}>{centerTitle}</h2>
           <p className="text-xs text-slate-500">{t('notifications.unreadCount', 'غير المقروءة: {count}', { count: unreadCount })}</p>
         </div>
         <div className="flex items-center gap-2">

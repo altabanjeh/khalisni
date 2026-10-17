@@ -1,36 +1,54 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
+import { APP_LANGUAGE } from '../api/client';
+import { documentsApi } from '../api/documents.api';
+import { env } from '../config/env';
 import type { UploadableDocument } from '../types/document';
+import { DOWNLOAD_ERROR_MESSAGES, DownloadError, downloadDocumentWithToken } from './download';
+import { validateUploadableFile } from './serviceForms';
 
-const supportedMimeTypes = [
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/jpg',
-];
-
-export const maxUploadSizeBytes = 10 * 1024 * 1024;
-
+/**
+ * Generic upload check (backend global rules: .pdf .jpg .jpeg .png .doc .docx,
+ * 10 MB). Screens that know the requirement pass it to validateUploadableFile
+ * instead, which applies that requirement's own extensions and size.
+ */
 export function validateUploadDocument(file: UploadableDocument) {
-  if (file.size && file.size > maxUploadSizeBytes) {
-    return 'الملف أكبر من 10 ميغابايت.';
-  }
-
-  if (file.mimeType && !supportedMimeTypes.includes(file.mimeType)) {
-    return 'نوع الملف غير مدعوم. استخدم PDF أو صورة.';
-  }
-
-  return null;
+  return validateUploadableFile(file, null);
 }
 
-export async function downloadAndShareDocument(url: string, filename: string, accessToken?: string | null) {
-  const target = `${FileSystem.cacheDirectory}${filename}`;
-  const result = await FileSystem.downloadAsync(url, target, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-  });
-  if (await Sharing.isAvailableAsync()) {
-    await Sharing.shareAsync(result.uri);
+const DOWNLOAD_DIRECTORY = `${FileSystem.cacheDirectory}downloads/`;
+
+/**
+ * Downloads a document with a short-lived token and opens the share sheet.
+ * Throws an Error with an Arabic message instead of sharing an error body.
+ */
+export async function downloadAndShareDocument(document: { id: number; original_filename?: string | null }) {
+  await FileSystem.makeDirectoryAsync(DOWNLOAD_DIRECTORY, { intermediates: true }).catch(() => undefined);
+  let uri: string;
+  try {
+    uri = await downloadDocumentWithToken({
+      apiBaseUrl: env.apiBaseUrl,
+      documentId: document.id,
+      filename: document.original_filename,
+      targetDirectory: DOWNLOAD_DIRECTORY,
+      getToken: (documentId) => documentsApi.getDownloadToken(documentId),
+      download: async (url, target) => {
+        const result = await FileSystem.downloadAsync(url, target, {
+          headers: { 'Accept-Language': APP_LANGUAGE },
+        });
+        return { status: result.status, headers: result.headers, uri: result.uri };
+      },
+      discard: (fileUri) => FileSystem.deleteAsync(fileUri, { idempotent: true }),
+    });
+  } catch (error) {
+    if (error instanceof DownloadError) throw error;
+    // Token request failures are already normalized (Arabic) by the API client.
+    const message = (error as { message?: unknown } | null)?.message;
+    throw new Error(typeof message === 'string' && message ? message : DOWNLOAD_ERROR_MESSAGES.generic);
   }
-  return result.uri;
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(uri);
+  }
+  return uri;
 }

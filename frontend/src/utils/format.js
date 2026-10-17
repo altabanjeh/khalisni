@@ -108,3 +108,17 @@ export function formatDateTime(value, language) {
     minute: '2-digit',
   }).format(new Date(value))
 }
+
+// Order priority labels (backend core.choices.OrderPriority).
+export const priorityLabels = {
+  LOW: { ar: 'منخفضة', en: 'Low' },
+  NORMAL: { ar: 'عادية', en: 'Normal' },
+  HIGH: { ar: 'عالية', en: 'High' },
+  URGENT: { ar: 'عاجلة', en: 'Urgent' },
+}
+
+export function getPriorityLabel(priority, language) {
+  const code = String(priority || 'NORMAL').toUpperCase()
+  const label = priorityLabels[code]
+  return label ? label[normalizeLanguage(language)] : priority
+}

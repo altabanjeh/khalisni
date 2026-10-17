@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
@@ -15,13 +16,18 @@ from django.utils.text import slugify
 
 from services.catalog_defaults import suggest_category_icon
 from services.catalogue_rules import (
+    EITHER_OR_QUESTION_OPTIONS,
+    OPEN_QUESTION_PREFIX,
+    YES_NO_OPTIONS,
     APPROVED_PRICE_NOTE,
     apply_identifier_rules,
     apply_schema_rules,
     approved_delivery_note,
     approved_price_note,
+    drop_merged_aliases,
 )
 from services.models import RequiredDocumentDefinition, Service, ServiceCategory, ServiceRequiredDocument
+from services.schema_rules import schema_problems
 
 
 WORD_NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
@@ -148,15 +154,30 @@ def _map_field_type(source_type, label):
     return "text"
 
 
-def _extract_options(note):
+# A trailing qualifier on a choice list ("عادية / مصدقة عند توفر الخيار":
+# "normal / certified, when that option exists") qualifies the list; it is not a choice.
+OPTION_LIST_QUALIFIERS = (r"\s*عند توفر الخيار\s*$",)
+
+
+def _extract_options(note, *, select=False):
+    """Choices written in the source note column.
+
+    The client documents list choices separated by Arabic/Latin commas, and for
+    dropdowns also by " / " ("شركة / مؤسسة فردية"). Notes that describe a rule
+    ("حسب ...", "إذا ...") are not choice lists.
+    """
     note = _clean(note)
+    if select:
+        for qualifier in OPTION_LIST_QUALIFIERS:
+            note = re.sub(qualifier, "", note)
     if not note:
         return []
-    if "،" not in note and "," not in note:
+    separators = r"[،,/]" if select else r"[،,]"
+    if not re.search(separators, note):
         return []
     if any(word in note for word in ["حسب", "إذا", "عند"]):
         return []
-    return [{"value": _stable_slug(part, prefix="option"), "label_ar": _clean(part)} for part in re.split(r"[،,]", note) if _clean(part)]
+    return [{"value": _stable_slug(part, prefix="option"), "label_ar": _clean(part)} for part in re.split(separators, note) if _clean(part)]
 
 
 def _field_from_label(label, *, source_type="", required=True, note="", order=0, source_section=""):
@@ -167,6 +188,23 @@ def _field_from_label(label, *, source_type="", required=True, note="", order=0,
     if "repeater" in source_type.lower():
         warnings.append("Current platform has no first-class repeater field; imported as editable textarea/field metadata.")
         mapped_type = "textarea"
+    if label in EITHER_OR_QUESTION_OPTIONS:
+        mapped_type = "select"
+    elif label.startswith(OPEN_QUESTION_PREFIX) and mapped_type == "checkbox":
+        mapped_type = "text"
+    options = _extract_options(note, select=mapped_type == "select")
+    if label in EITHER_OR_QUESTION_OPTIONS:
+        options = [{"value": _stable_slug(choice, prefix="option"), "label_ar": choice} for choice in EITHER_OR_QUESTION_OPTIONS[label]]
+    if mapped_type == "checkbox" and required:
+        # "Yes/No, required" asks for an answer; a single checkbox could only say yes.
+        mapped_type = "select"
+        options = copy.deepcopy(YES_NO_OPTIONS)
+    source_tokens = {token.strip().lower() for token in _clean(source_type).split("/")}
+    if mapped_type == "select" and not options and "text" in source_tokens:
+        # "Text / Dropdown": the source allows a typed answer and lists no choices.
+        mapped_type = "text"
+    if mapped_type == "select" and not options:
+        warnings.append("Source lists no choices for this dropdown; the client must supply them.")
     return {
         "key": key,
         "label_ar": label,
@@ -174,7 +212,7 @@ def _field_from_label(label, *, source_type="", required=True, note="", order=0,
         "required": required,
         "display_order": order,
         "help_text_ar": _clean(note),
-        "options": _extract_options(note),
+        "options": options,
         "source_section": source_section,
         "source_type": _clean(source_type),
         "import_warnings": warnings,
@@ -549,9 +587,20 @@ def discover_and_normalize(source_dir):
         ],
         "warnings": warnings,
         "conflicts": conflicts,
+        "validation_problems": catalogue_form_problems(canonical_services),
     }
     inventory_rows = build_inventory(docs, raw_services, canonical_services)
     return ImportResult(normalized=normalized, inventory_rows=inventory_rows, conflicts=conflicts, warnings=warnings)
+
+
+def catalogue_form_problems(services):
+    """The admin editor's form rules (services/schema_rules.py) applied to the import."""
+    problems = []
+    for service in services:
+        schema = apply_identifier_rules(apply_schema_rules(service.get("fields", [])))
+        for _number, key, message in schema_problems(schema):
+            problems.append({"service": service["slug"], "field": key, "message": message})
+    return problems
 
 
 def _completeness_score(service):
@@ -580,6 +629,7 @@ def reconcile_services(raw_services):
         canonical["merged_sources"] = sorted(set(current.get("merged_sources", [current["source_file"]]) + [service["source_file"]]))
         canonical["fields"] = _merge_by_key(current.get("fields", []), service.get("fields", []), "key")
         canonical["documents"] = _merge_by_key(current.get("documents", []), service.get("documents", []), "code")
+        canonical["fields"], canonical["documents"] = drop_merged_aliases(key, canonical["fields"], canonical["documents"])
         by_slug[key] = canonical
         for prop in ("display_order", "source_service_number", "short_description_ar", "description_ar"):
             if _clean(current.get(prop)) and _clean(service.get(prop)) and _clean(current.get(prop)) != _clean(service.get(prop)):
@@ -720,9 +770,11 @@ def _service_defaults(service_data, category):
         "show_company_fee_public": False,
         "public_price_note_ar": price_note_ar,
         "public_price_note_en": price_note_en,
+        # The source documents give no durations: show only the approved
+        # "confirmed after review" sentence, never a placeholder (DEF-D02).
         "estimated_duration": 1,
         "estimated_duration_unit": Service.DurationUnit.DAYS,
-        "delivery_time_mode": Service.DeliveryTimeMode.DURATION,
+        "delivery_time_mode": Service.DeliveryTimeMode.AFTER_REVIEW,
         "delivery_note_ar": delivery_note_ar,
         "delivery_note_en": delivery_note_en,
         "terms_ar": service_data.get("terms_ar", ""),

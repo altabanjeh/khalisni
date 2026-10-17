@@ -1,5 +1,6 @@
 import type { UploadableDocument } from '../types/document';
 import type { Service, ServiceRequirement } from '../types/service';
+import { GENERIC_REQUIRED_DOCUMENT_LABEL, getRequirementLabel } from './documentPresentation';
 
 const globalUploadRules = {
   allowed_extensions: ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'],
@@ -31,7 +32,8 @@ function normalizeOptions(options: unknown): Array<{ value: string; label: strin
     .map((option) => {
       if (option && typeof option === 'object') {
         const record = option as Record<string, unknown>;
-        const value = record.value ?? record.id ?? record.key ?? record.slug;
+        // First non-empty of value/id/key/slug, as the server reads it.
+        const value = [record.value, record.id, record.key, record.slug].find((item) => item != null && item !== '');
         const label = record.label_ar ?? record.label ?? record.name_ar ?? record.name ?? record.title ?? value;
         if (value == null || value === '') return null;
         return { value: String(value), label: String(label) };
@@ -78,17 +80,11 @@ export function formatBytes(bytes: number) {
   return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
+// Arabic name only: never the internal document code or an English name.
 export function getRequiredDocumentLabel(item?: string | ServiceRequirement | null) {
-  if (typeof item === 'string') return item;
+  if (typeof item === 'string') return /[؀-ۿ]/.test(item) ? item : GENERIC_REQUIRED_DOCUMENT_LABEL;
   if (!item) return '';
-  return (
-    item.name_ar ||
-    item.document_definition?.name_ar ||
-    item.name_en ||
-    item.document_definition?.name_en ||
-    item.document_type ||
-    ''
-  );
+  return getRequirementLabel(item);
 }
 
 export function getRequiredDocumentType(item?: string | ServiceRequirement | null, index = 0) {
@@ -117,7 +113,7 @@ export function getServiceSchemaFields(service?: Service | null): ServiceSchemaF
       const record = field as Record<string, unknown>;
       const rawKey = record.name ?? record.key ?? record.field ?? record.id ?? `field_${index + 1}`;
       const inputName = `service_info_${sanitizeFieldToken(rawKey, `field_${index + 1}`)}`;
-      const label = record.label_ar || record.label || record.name_ar || record.title || record.placeholder || `Field ${index + 1}`;
+      const label = record.label_ar || record.label || record.name_ar || record.title || record.placeholder_ar || record.placeholder || `معلومة مطلوبة ${index + 1}`;
 
       return {
         key: String(rawKey),
@@ -125,7 +121,7 @@ export function getServiceSchemaFields(service?: Service | null): ServiceSchemaF
         label: String(label),
         type: normalizeSchemaType(record.type || record.field_type || record.input_type),
         required: Boolean(record.required),
-        placeholder: String(record.placeholder || ''),
+        placeholder: String(record.placeholder_ar || record.placeholder || ''),
         helpText: String(record.help_text_ar || record.help_text || record.description || ''),
         options: normalizeOptions(record.options || record.choices || record.values),
         visibleWhen: normalizeVisibleWhen(record.visible_when),
@@ -146,51 +142,89 @@ function normalizeVisibleWhen(condition: unknown): ServiceSchemaField['visibleWh
  * expected answer (parcel and basin numbers appear after "yes" to "do you know
  * them?"). A hidden field is neither required nor sent. Same rule as the web app.
  */
+const TRUE_VALUES = new Set(['true', '1', 'yes', 'on']);
+
+function isTruthyAnswer(value: unknown) {
+  if (typeof value === 'boolean') return value;
+  return TRUE_VALUES.has(String(value ?? '').trim().toLowerCase());
+}
+
 export function isSchemaFieldVisible(
   field: ServiceSchemaField,
   schemaFields: ServiceSchemaField[],
   values: Record<string, string | boolean>,
+  depth = 0,
 ): boolean {
   if (!field.visibleWhen) return true;
-  const controller = schemaFields.find((candidate) => candidate.key === field.visibleWhen?.field);
-  if (!controller || !isSchemaFieldVisible(controller, schemaFields, values)) return false;
-  return String(values[controller.inputName] ?? '') === field.visibleWhen.equals;
+  if (depth > schemaFields.length) return true;
+  // Same matching as the server (backend services/schema_rules.py _is_visible):
+  // the controlling key is compared trimmed and case-insensitively, and a
+  // checkbox controller compares as true/false.
+  const target = field.visibleWhen.field.trim().toLowerCase();
+  const controller = schemaFields.find((candidate) => candidate.key.trim().toLowerCase() === target);
+  if (!controller || !isSchemaFieldVisible(controller, schemaFields, values, depth + 1)) return false;
+  const answer = values[controller.inputName];
+  if (controller.type === 'checkbox') {
+    return isTruthyAnswer(answer) === TRUE_VALUES.has(field.visibleWhen.equals.trim().toLowerCase());
+  }
+  return String(answer ?? '') === field.visibleWhen.equals;
 }
 
-export function buildDynamicNotes(
-  baseNotes: string,
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Arabic format error for a filled answer, mirroring the server checks; null when valid. */
+export function validateSchemaAnswerFormat(field: ServiceSchemaField, value: unknown) {
+  if (field.type === 'checkbox' || value == null || typeof value === 'boolean') return null;
+  const text = String(value).trim();
+  if (!text) return null;
+  if (field.type === 'number' && !Number.isFinite(Number(text.replace(',', '.')))) {
+    return 'أدخل رقماً صحيحاً.';
+  }
+  if (field.type === 'email' && !EMAIL.test(text)) {
+    return 'أدخل بريداً إلكترونياً صحيحاً.';
+  }
+  if (field.type === 'date') {
+    const valid = ISO_DATE.test(text) && !Number.isNaN(Date.parse(`${text}T00:00:00Z`))
+      && new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
+    if (!valid) return 'أدخل التاريخ بالصيغة سنة-شهر-يوم، مثل 2026-01-31.';
+  }
+  if (field.type === 'select' && field.options.length && !field.options.some((option) => option.value === text)) {
+    return 'اختر أحد الخيارات المتاحة.';
+  }
+  return null;
+}
+
+export type ServiceAnswerValue = string | boolean;
+
+/**
+ * The `service_answers` object sent with POST /api/orders/: one entry per
+ * VISIBLE schema field, keyed by the schema field key (`name ?? key ?? field
+ * ?? id ?? field_N`, not the sanitized input name). Hidden `visible_when`
+ * fields are left out entirely. Checkboxes are booleans; select fields send
+ * the option value; other types send trimmed text, and an empty optional
+ * answer is omitted. The server validates these answers and builds the
+ * "additional information" section of the order notes itself, so `notes`
+ * carries only the customer's own text.
+ */
+export function buildServiceAnswers(
   schemaFields: ServiceSchemaField[],
   values: Record<string, string | boolean>,
 ) {
-  const extraLines = schemaFields
+  const answers: Record<string, ServiceAnswerValue> = {};
+  schemaFields
     .filter((field) => isSchemaFieldVisible(field, schemaFields, values))
-    .map((field) => {
+    .forEach((field) => {
       const rawValue = values[field.inputName];
       if (field.type === 'checkbox') {
-        return rawValue ? `${field.label}: نعم` : '';
+        answers[field.key] = rawValue === true || rawValue === 'true';
+        return;
       }
-      if (field.type === 'select') {
-        const option = field.options.find((candidate) => candidate.value === String(rawValue ?? ''));
-        if (option) return `${field.label}: ${option.label}`;
-      }
-
-      if (rawValue == null) return '';
-      const normalizedValue = String(rawValue).trim();
-      return normalizedValue ? `${field.label}: ${normalizedValue}` : '';
-    })
-    .filter(Boolean);
-
-  const sections: string[] = [];
-  const trimmedNotes = String(baseNotes || '').trim();
-  if (trimmedNotes) {
-    sections.push(trimmedNotes);
-  }
-  if (extraLines.length) {
-    sections.push('البيانات الإضافية المطلوبة:');
-    sections.push(...extraLines);
-  }
-
-  return sections.join('\n');
+      if (rawValue == null || typeof rawValue === 'boolean') return;
+      const text = String(rawValue).trim();
+      if (text) answers[field.key] = text;
+    });
+  return answers;
 }
 
 export function getUploadRules(requirement?: ServiceRequirement | null) {

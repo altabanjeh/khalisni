@@ -4,7 +4,7 @@ import { env } from '../config/env';
 import { clearSessionStorage, readSession, saveSession } from '../auth/authStorage';
 import { queryClient } from '../services/queryClient';
 import { useAuthStore } from '../state/authStore';
-import type { ApiError, PaginatedResponse } from '../types/common';
+import type { ApiError, ApiListParams, PaginatedResponse } from '../types/common';
 
 // The app's screens are Arabic only (there is no language setting), so every
 // request names Arabic. Without it the API falls back to its own defaults
@@ -124,12 +124,71 @@ function firstErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
+// Arabic text for failures that carry no usable server message. Axios's own
+// English text ("Network Error", "timeout of 20000ms exceeded", "Request failed
+// with status code 500") is never shown to the user.
+export const NETWORK_ERROR_MESSAGE = 'تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت ثم حاول مرة أخرى.';
+export const TIMEOUT_ERROR_MESSAGE = 'انتهت مهلة الاتصال بالخادم. تحقق من اتصالك ثم حاول مرة أخرى.';
+export const SERVER_ERROR_MESSAGE = 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد قليل.';
+export const UNEXPECTED_ERROR_MESSAGE = 'حدث خطأ غير متوقع.';
+
+function fallbackMessageForStatus(status: number) {
+  if (status === 401) return 'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.';
+  if (status === 403) return 'لا تملك صلاحية تنفيذ هذا الإجراء.';
+  if (status === 404) return 'العنصر المطلوب غير موجود.';
+  if (status === 413) return 'حجم الملف أكبر من المسموح.';
+  if (status === 429) return 'تم تجاوز عدد المحاولات المسموح. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.';
+  return `تعذر إكمال الطلب (رمز الخطأ ${status}).`;
+}
+
+// `{ key: "message" }` objects nested under one error key, such as
+// `document_errors` and `service_answers`.
+function toMessageMap(value: unknown): Record<string, string> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const result: Record<string, string> = {};
+  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    const message = firstErrorMessage(item);
+    if (message) result[key] = message;
+  }
+  return Object.keys(result).length ? result : undefined;
+}
+
+function isNormalizedApiError(error: unknown): error is ApiError {
+  return Boolean(
+    error
+    && typeof error === 'object'
+    && !(error instanceof Error)
+    && typeof (error as ApiError).message === 'string',
+  );
+}
+
 export function normalizeApiError(error: unknown): ApiError {
   if (axios.isAxiosError(error)) {
-    const rawData: unknown = error.response?.data;
+    const status = error.response?.status;
+
+    if (!error.response) {
+      const isTimeout = error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT' || /timeout/i.test(error.message || '');
+      return {
+        message: isTimeout ? TIMEOUT_ERROR_MESSAGE : NETWORK_ERROR_MESSAGE,
+        code: isTimeout ? 'timeout' : 'network_error',
+      };
+    }
+
+    const rawData: unknown = error.response.data;
     const responseData = (rawData && typeof rawData === 'object' && !Array.isArray(rawData) ? rawData : undefined) as
       | { detail?: string; message?: string; code?: unknown; [key: string]: unknown }
       | undefined;
+
+    // A 5xx body is an internal error page or a generic English sentence; it
+    // never means anything to the customer.
+    if (status && status >= 500) {
+      return {
+        message: SERVER_ERROR_MESSAGE,
+        status,
+        code: typeof responseData?.code === 'string' ? responseData.code : undefined,
+      };
+    }
+
     const detail = typeof responseData?.detail === 'string'
       ? responseData.detail
       : typeof responseData?.message === 'string'
@@ -153,16 +212,22 @@ export function normalizeApiError(error: unknown): ApiError {
       message:
         detail
         ?? firstErrorMessage(responseData ?? (Array.isArray(rawData) ? rawData : undefined))
-        ?? error.message
-        ?? 'حدث خطأ غير متوقع.',
-      status: error.response?.status,
+        ?? (status ? fallbackMessageForStatus(status) : UNEXPECTED_ERROR_MESSAGE),
+      status,
       code: typeof responseData?.code === 'string' ? responseData.code : undefined,
       fieldErrors: Object.keys(fieldErrors).length ? fieldErrors : undefined,
+      documentErrors: toMessageMap(responseData?.document_errors),
+      serviceAnswerErrors: toMessageMap(responseData?.service_answers),
     };
   }
 
+  // Errors rejected by the response interceptor are already normalized.
+  if (isNormalizedApiError(error)) {
+    return error;
+  }
+
   return {
-    message: error instanceof Error ? error.message : 'حدث خطأ غير متوقع.',
+    message: error instanceof Error && error.message ? error.message : UNEXPECTED_ERROR_MESSAGE,
   };
 }
 
@@ -174,6 +239,62 @@ export function buildQuery(params: Record<string, string | number | boolean | un
   return Object.fromEntries(
     Object.entries(params).filter(([, value]) => value !== undefined && value !== ''),
   );
+}
+
+export interface PageResult<T> {
+  results: T[];
+  next: string | null;
+  count: number;
+}
+
+export function toPageResult<T>(data: T[] | PaginatedResponse<T> | null | undefined): PageResult<T> {
+  if (Array.isArray(data)) return { results: data, next: null, count: data.length };
+  const results = Array.isArray(data?.results) ? data.results : [];
+  return {
+    results,
+    next: typeof data?.next === 'string' && data.next ? data.next : null,
+    count: typeof data?.count === 'number' ? data.count : results.length,
+  };
+}
+
+// The page number named by a DRF `next` link. Re-requesting the relative path
+// with that page keeps the configured base URL even when the server builds
+// `next` with an internal host name or plain http behind a proxy.
+export function pageFromNextLink(next: string | null | undefined) {
+  if (!next) return null;
+  const match = /[?&]page=(\d+)/.exec(next);
+  return match ? Number(match[1]) : null;
+}
+
+const MAX_PAGES = 200;
+
+/**
+ * Reads every page of a DRF PageNumberPagination list ({count, next, previous,
+ * results}) by following `next`. A plain array response is returned as is.
+ */
+export async function fetchAllPages<T>(url: string, params: ApiListParams = {}) {
+  const firstResponse = await apiClient.get<T[] | PaginatedResponse<T>>(url, { params: buildQuery(params) });
+  const first = toPageResult(firstResponse.data);
+  const items = [...first.results];
+  let next = first.next;
+  let pages = 1;
+  while (next && pages < MAX_PAGES) {
+    const page = pageFromNextLink(next);
+    const response = page
+      ? await apiClient.get<T[] | PaginatedResponse<T>>(url, { params: buildQuery({ ...params, page }) })
+      : await apiClient.get<T[] | PaginatedResponse<T>>(next);
+    const current = toPageResult(response.data);
+    items.push(...current.results);
+    next = current.next;
+    pages += 1;
+  }
+  return items;
+}
+
+// One page of a paginated list, for screens that load more on demand.
+export async function fetchPage<T>(url: string, params: ApiListParams = {}) {
+  const response = await apiClient.get<T[] | PaginatedResponse<T>>(url, { params: buildQuery(params) });
+  return toPageResult(response.data);
 }
 
 export function unwrapListData<T>(data: T[] | PaginatedResponse<T> | null | undefined) {
@@ -193,7 +314,7 @@ export function secureAdminDelete<T = unknown>(
 ) {
   const normalizedPassword = String(deletePassword || '').trim();
   if (!normalizedPassword) {
-    throw new Error('Current admin password is required.');
+    throw new Error('كلمة مرور المشرف الحالية مطلوبة.');
   }
 
   return apiClient.delete<T>(url, {

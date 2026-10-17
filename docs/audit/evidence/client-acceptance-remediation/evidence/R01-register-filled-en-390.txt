@@ -1,0 +1,49 @@
+URL: http://127.0.0.1:4351/register
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+Create a customer account
+
+Create your account before requesting a service
+
+After creating an account, you can submit requests, upload documents, and track progress from the customer portal.
+
+Full name(Required)
+Phone number(Required)
+
+Example: 0791234567 or +962791234567. For a number outside Jordan, add the country code after +.
+
+Email(Required)
+National ID(Optional)
+Password(Required)
+
+Your password must be:
+
+At least 8 characters
+Not only numbers
+Not a common or easy-to-guess password
+Not similar to your name, email or phone number
+Create account
+
+Already have an account? Sign in
+
+Khalsni is a Jordanian platform for managing government and administrative service requests.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

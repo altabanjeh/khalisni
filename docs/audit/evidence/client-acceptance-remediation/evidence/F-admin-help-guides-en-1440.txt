@@ -1,0 +1,284 @@
+URL: http://127.0.0.1:4351/admin/help-guides
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+WORK PORTAL
+
+Admin dashboard
+
+OVERVIEW
+
+Admin dashboard
+
+OPERATIONS
+
+Requests
+New service requests
+Payments
+Operating rules
+Notifications
+
+SERVICE MANAGEMENT
+
+Service categories
+Services
+Service relations
+
+USERS & PROVIDERS
+
+Users & roles
+Providers
+Provider services
+
+CONTENT & PUBLIC SITE
+
+Public site
+Homepage content
+Advertisements
+Appearance
+Preview site
+Guide management
+
+REPORTING & AUDIT
+
+Reports
+Audit log
+
+SETTINGS
+
+System settings
+Manual
+Admin dashboard
+
+In-App Help
+
+Help Guide Management
+
+Manage contextual help content for screens, fields, buttons, services, and workflow steps. All user-facing help still stays filtered by backend role and permission checks.
+
++ New screen guide
+Screen Guides
+Screenshots
+Field Guides
+Action Guides
+Service Guides
+Workflow Guides
+All roles
+All users
+Admin
+Customer
+Employee
+Support
+Provider
+Platform super admin
+Platform support
+Partner owner
+Partner admin
+Branch manager
+Partner employee
+Provider admin
+Provider employee
+Finance
+Auditor
+All screens
+How to Navigate the System
+Login and Account Access
+How to Add Screenshots to the Manual
+Customer Dashboard
+Create New Order
+My Orders
+Customer Order Details
+Missing Documents Response
+Profile
+Employee Dashboard
+Review Queue
+Order Review
+Document Verification
+Employee Reports
+Missing Service Requests
+Service Categories
+Service Relations
+Admin Dashboard
+Orders Management
+Admin Order Details
+Rule Management
+System Settings
+Service Category Management
+Services Management
+Service Relations Management
+Public Site Management
+Homepage Content Editor
+Advertisement Manager
+Theme Settings
+Missing Service Requests
+Users and Roles
+Providers
+Provider Services
+Reports
+Notifications
+Payments
+Audit Log
+Help Guide Management
+Provider Dashboard
+Assigned Orders
+Provider Order Details
+All services
+Tax Clearance
+Passport Renewal
+Business License Renewal
+Passport Appointment Booking
+Client audit QA journey
+Traffic Fines Payment
+Property Registration Deed
+No Criminal Record Certificate
+Active
+Deleted
+All
+TITLE	CATEGORY	SCREEN	ROLE	WORKFLOW	ORDER	STATUS	ACTIONS
+الدليل العام للإدارة	General	General	Admin	General	0	Active	
+Edit
+Deactivate
+
+الدليل العام للدعم	General	General	Support	General	0	Active	
+Edit
+Deactivate
+
+الدليل العام للعميل	General	General	Customer	General	0	Active	
+Edit
+Deactivate
+
+الدليل العام للمزود	General	General	Provider	General	0	Active	
+Edit
+Deactivate
+
+الدليل العام للموظف	General	General	Employee	General	0	Active	
+Edit
+Deactivate
+
+إدارة الإعلانات	General	Advertisement Manager	Admin	General	90	Active	
+Edit
+Deactivate
+
+لوحة الإدارة	General	Admin Dashboard	Admin	General	10	Active	
+Edit
+Deactivate
+
+إدارة دليل المستخدم داخل النظام	General	Help Guide Management	Admin	General	120	Active	
+Edit
+Deactivate
+
+إدارة قوالب الإشعارات	General	Notifications	Admin	General	110	Active	
+Edit
+Deactivate
+
+إدارة المزودين	General	Providers	Admin	General	60	Active	
+Edit
+Deactivate
+
+إدارة الموقع العام	General	Public Site Management	Admin	General	80	Active	
+Edit
+Deactivate
+
+التقارير الإدارية	General	Reports	Admin	General	70	Active	
+Edit
+Deactivate
+
+إدارة تصنيفات الخدمات	General	Service Category Management	Admin	General	40	Active	
+Edit
+Deactivate
+
+إدارة علاقات الخدمات	General	Service Relations Management	Admin	General	50	Active	
+Edit
+Deactivate
+
+إدارة الخدمات	General	Services Management	Admin	General	30	Active	
+Edit
+Deactivate
+
+إعدادات المظهر العام	General	Theme Settings	Admin	General	100	Active	
+Edit
+Deactivate
+
+إدارة المستخدمين والأدوار	General	Users and Roles	Admin	General	20	Active	
+Edit
+Deactivate
+
+إنشاء طلب جديد	General	Create New Order	Customer	General	20	Active	
+Edit
+Deactivate
+
+لوحة العميل	General	Customer Dashboard	Customer	General	10	Active	
+Edit
+Deactivate
+
+الرد على طلب المستندات الناقصة	General	Missing Documents Response	Customer	General	50	Active	
+Edit
+Deactivate
+
+تفاصيل الطلب للعميل	General	Customer Order Details	Customer	General	40	Active	
+Edit
+Deactivate
+
+متابعة الطلبات	General	My Orders	Customer	General	30	Active	
+Edit
+Deactivate
+
+لوحة الموظف	General	Employee Dashboard	Employee	General	10	Active	
+Edit
+Deactivate
+
+طلبات الخدمات الجديدة لفريق الدعم	General	Missing Service Requests	Support	General	10	Active	
+Edit
+Deactivate
+
+مراجعة الطلب	General	Order Review	Employee	General	30	Active	
+Edit
+Deactivate
+
+متابعة الطلبات المنتظرة من العميل	General	Order Review	Employee	Waiting customer	31	Active	
+Edit
+Deactivate
+
+قائمة مراجعة الطلبات	General	Review Queue	Employee	General	20	Active	
+Edit
+Deactivate
+
+تصنيفات الخدمات للدعم	General	Service Categories	Support	General	20	Active	
+Edit
+Deactivate
+
+علاقات الخدمات للدعم	General	Service Relations	Support	General	30	Active	
+Edit
+Deactivate
+
+التحقق من الوثائق	General	Document Verification	Employee	General	40	Active	
+Edit
+Deactivate
+
+Login and Account Access	Account access	Login and Account Access	All users	General	2	Active	
+Edit
+Deactivate
+
+How to Add Screenshots to the Manual	Manual maintenance	How to Add Screenshots to the Manual	Admin	General	3	Active	
+Edit
+Deactivate
+
+How to Navigate the System	Navigation	How to Navigate the System	All users	General	1	Active	
+Edit
+Deactivate
+
+لوحة المزود	General	Provider Dashboard	Provider	General	10	Active	
+Edit
+Deactivate
+
+تفاصيل الطلب للمزود	General	Provider Order Details	Provider	General	30	Active	
+Edit
+Deactivate
+
+الطلبات المعيّنة للمزود	General	Assigned Orders	Provider	General	20	Active	
+Edit
+Deactivate

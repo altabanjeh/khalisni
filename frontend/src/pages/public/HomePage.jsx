@@ -41,8 +41,6 @@ import {
 const copy = {
   ar: {
     heroEyebrow: 'منصة خدمات حكومية وإدارية',
-    headline: 'ركّز على اللي بهمّك...',
-    headlineAccent: 'وإحنا بنخلّص الباقي.',
     heroText: 'ابحث عن الخدمة، اعرف المتطلبات، وابدأ طلبك من مسار واضح.',
     searchPlaceholder: 'ابحث عن خدمة أو تصنيف...',
     searchLabel: 'البحث في خدمات خلصني',
@@ -94,8 +92,6 @@ const copy = {
   },
   en: {
     heroEyebrow: 'Government and administrative services platform',
-    headline: 'Focus on what matters...',
-    headlineAccent: 'and we will handle the rest.',
     heroText: 'Search for a service, review the requirements, and start through a clear request flow.',
     searchPlaceholder: 'Search for a service or category...',
     searchLabel: 'Search Khalsni services',

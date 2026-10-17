@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import LoadError from '../components/LoadError'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useAuth } from '../context/AuthContext'
+import { getDefaultDashboardPath } from '../utils/authz'
 import { normalizeRole } from '../utils/format'
 
 function ProtectedRoute({ roles }) {
@@ -22,7 +23,9 @@ function ProtectedRoute({ roles }) {
   const userRole = normalizeRole(user.role)
   const allowedRoles = roles?.map(normalizeRole)
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) return <Navigate to="/" replace />
+  // A signed-in user on another role's route goes back to their own portal
+  // home, not to the public site.
+  if (allowedRoles && !allowedRoles.includes(userRole)) return <Navigate to={getDefaultDashboardPath(user)} replace />
   return <Outlet />
 }
 

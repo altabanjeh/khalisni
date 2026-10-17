@@ -19,17 +19,46 @@ React Native / Expo mobile extension for the existing Khalsni service-order mana
 - Expo CLI through `npx expo`
 - Running Khalsni backend with API access
 
-## Environment
+## API base URL
 
-Create a `.env` file inside `mobile/`:
+The app reads its backend address from **one** place: the build-time variable
+`EXPO_PUBLIC_API_BASE_URL` (Expo inlines `EXPO_PUBLIC_*` variables into the
+bundle). No backend host is written in the repository, `eas.json` or `app.json`.
+
+- The app appends `/api` when the value does not already end with it.
+- Do not place secrets in `EXPO_PUBLIC_*` variables: they are readable in the app bundle.
+
+### Development (Expo Go / `npx expo start`)
+
+Create `mobile/.env` (not committed):
 
 ```bash
-EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.20:8000
 ```
 
-Notes:
-- The app automatically appends `/api` if your value does not already include it.
-- Do not place production secrets in the Expo app.
+Use your computer's LAN IP when testing from a phone; `127.0.0.1` only works in
+a simulator on the same machine. When the variable is missing, a development
+bundle falls back to `http://127.0.0.1:8000`.
+
+### Preview and production builds (EAS)
+
+Set the variable as an EAS environment variable for the matching environment
+(`eas.json` maps the `preview` profile to the `preview` environment and the
+`production` profile to the `production` environment):
+
+```bash
+npx eas-cli env:create --environment production --name EXPO_PUBLIC_API_BASE_URL --value https://api.your-real-domain --visibility plaintext
+npx eas-cli env:create --environment preview    --name EXPO_PUBLIC_API_BASE_URL --value https://staging-api.your-real-domain --visibility plaintext
+```
+
+Guards (both refuse a missing value, a non-`https://` value, and placeholder or
+local hosts such as `example.com`, `*.test`, `localhost`, `127.0.0.1`, `10.0.2.2`):
+
+1. **Build time** - `app.config.js` throws and the EAS build fails for every
+   profile except `development` when the value is not a real HTTPS URL.
+2. **Run time** - `src/config/env.ts` checks the value again in a production
+   bundle (`__DEV__ === false`). If it is not valid, the app shows a blocking
+   Arabic "التطبيق غير مهيأ للتشغيل" screen and sends no requests.
 
 ## Install
 
@@ -155,13 +184,8 @@ Profiles:
 - `preview`: internal Android APK and non-store iOS build settings
 - `production`: Android AAB and iOS store-ready configuration
 
-Before using production builds, replace the placeholder production API URL in `eas.json`:
-
-```json
-"EXPO_PUBLIC_API_BASE_URL": "https://api.example.com"
-```
-
-with your real production backend URL.
+Before building `preview` or `production`, set `EXPO_PUBLIC_API_BASE_URL` for that
+EAS environment (see "API base URL" above). A build without it fails on purpose.
 
 ## Main Project Structure
 
@@ -211,8 +235,7 @@ See:
 
 ## Known Limitations
 
-- Forgot/reset password is a UI placeholder until backend endpoints exist.
-- Notification mark-as-read is blocked by a missing backend endpoint.
+- Forgot/reset password: the reset link opens the web page.
 - Push notifications are documented but not activated because backend registration/delivery is missing.
 - Non-customer profile editing is read-mostly until dedicated backend profile endpoints exist.
 - Some admin content/theme editors currently submit JSON payloads directly because field-specific mobile contracts are not fully defined.
@@ -220,7 +243,6 @@ See:
 ## Next Backend Support Recommended
 
 - Add forgot password / reset password endpoints
-- Add notification mark-as-read and unread-count endpoints
 - Add push token registration and push delivery workflow
 - Add self-profile update endpoints for employee, provider, and admin
 - Add narrower mobile summary endpoints if payload size becomes a performance issue

@@ -5,4 +5,5 @@ export type ScreenName =
   | 'Error'
   | 'Profile'
   | 'Settings'
+  | 'Account'
   | 'Notifications';

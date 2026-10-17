@@ -1,0 +1,67 @@
+URL: http://127.0.0.1:4351/customer/orders/new?service=6
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+Customer portal
+
+CUSTOMER PORTAL
+
+New service request
+Save draft
+
+Choose the service, enter your details and upload the required documents, then review and submit.
+
+1
+CURRENT
+Service
+2
+2
+Applicant
+3
+3
+Documents
+4
+4
+Review
+
+STEP 1
+
+Service
+
+Choose the service you want to request.
+
+This service was chosen from its detail page.
+
+Tax Clearance
+
+Tax
+
+Back
+Next
+
+SERVICE SUMMARY
+
+Tax Clearance
+
+Service for Tax Clearance.
+
+Price:
+JOD 36.00
+Expected duration:
+Expected completion: 3 days
+
+COMPLETION CHECKLIST
+
+Service
+2
+Applicant
+3
+Documents
+
+REQUIRED DOCUMENTS
+
+National ID
+Authorization Letter

@@ -1,11 +1,12 @@
 import { BookOpenText, CircleHelp, Search, TriangleAlert, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { api } from '../api/services'
 import { getDisplayError } from '../api/client'
 import { useHelpGuideContext } from '../context/HelpGuideContext'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { getManualScreenshots } from '../help/manualAssets'
 import { getRoleLabel } from '../utils/format'
 import { getHelpScreenLabel, matchHelpScreen } from '../help/screenRegistry'
@@ -316,16 +317,11 @@ function HelpGuidePanel({ onClose, open }) {
     libraryData.guides[0] ||
     null
 
-  useEffect(() => {
-    if (!open) return undefined
-
-    function handleEscape(event) {
-      if (event.key === 'Escape') onClose()
-    }
-
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [onClose, open])
+  const dialogRef = useRef(null)
+  const titleId = useId()
+  // Modal dialog: focus moves into the panel, Tab stays inside it, Escape
+  // closes it and focus returns to the button that opened it.
+  useDialogFocus(open && Boolean(user), dialogRef, { onClose, trapFocus: true, initialFocus: 'container' })
 
   useEffect(() => {
     if (!open || panelView !== 'current') return undefined
@@ -476,10 +472,18 @@ function HelpGuidePanel({ onClose, open }) {
 
   return (
     <div className="fixed inset-0 z-50">
-      <button aria-label={t('common.close', 'إغلاق')} className="absolute inset-0 bg-slate-900/45" onClick={onClose} type="button" />
+      {/* Backdrop: mouse/touch dismiss only; the dialog has its own close button. */}
+      <button aria-label={t('common.close', 'إغلاق')} className="absolute inset-0 bg-slate-900/45" onClick={onClose} tabIndex={-1} type="button" />
 
-      <aside className="absolute inset-y-0 left-0 flex w-full max-w-full justify-end">
-        <div className="flex h-full w-full max-w-[1080px] flex-col border-e border-border bg-[#f7f5ef] shadow-2xl">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex w-full max-w-full justify-end">
+        <div
+          aria-labelledby={titleId}
+          aria-modal="true"
+          className="pointer-events-auto flex h-full w-full max-w-[1080px] flex-col border-e border-border bg-[#f7f5ef] shadow-2xl focus:outline-none"
+          ref={dialogRef}
+          role="dialog"
+          tabIndex={-1}
+        >
           <header className="border-b border-border bg-white px-5 py-4 sm:px-6">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
@@ -487,7 +491,7 @@ function HelpGuidePanel({ onClose, open }) {
                   <CircleHelp className="h-5 w-5" />
                   <span className="text-sm font-semibold">{t('manual.inAppManual', 'الدليل داخل النظام')}</span>
                 </div>
-                <h2 className="text-2xl font-extrabold text-ink">{panelView === 'current' ? activeScreenLabel : t('manual.library', 'مكتبة الدليل')}</h2>
+                <h2 className="text-2xl font-extrabold text-ink" id={titleId}>{panelView === 'current' ? activeScreenLabel : t('manual.library', 'مكتبة الدليل')}</h2>
                 <p className="text-sm leading-7 text-slate-600">
                   {panelView === 'current'
                     ? t('manual.currentDescription', 'اقرأ دليل الصفحة الحالية، وراجع الأزرار والحقول المرتبطة بها، أو ابحث داخل نظام المساعدة.')
@@ -675,7 +679,7 @@ function HelpGuidePanel({ onClose, open }) {
             )}
           </div>
         </div>
-      </aside>
+      </div>
     </div>
   )
 }

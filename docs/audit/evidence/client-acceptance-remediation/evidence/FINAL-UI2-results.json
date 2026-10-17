@@ -1,0 +1,21 @@
+{
+ "fileInputsOnMissingDocs": 1,
+ "replace": {
+  "replacedName": true,
+  "oldNameGone": true,
+  "fileInputsAfter": 1,
+  "previewLink": 1
+ },
+ "waitingOrder": {
+  "heroSentenceCount": 1,
+  "uploadButtons": 1,
+  "oldSecondBanner": false
+ },
+ "readyOrder": {
+  "workingSentenceCount": 1
+ },
+ "mobileOrderNumber": {
+  "tokenUnbroken": true,
+  "overflowX": 0
+ }
+}

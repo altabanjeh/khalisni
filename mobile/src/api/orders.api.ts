@@ -1,4 +1,4 @@
-import { apiClient, buildQuery, unwrapListData } from './client';
+import { apiClient, buildQuery, fetchAllPages, unwrapListData } from './client';
 import type { ApiListParams } from '../types/common';
 import type { Order } from '../types/order';
 
@@ -18,8 +18,10 @@ export const ordersApi = {
   trackOrder(payload: { order_number: string; phone: string }) {
     return apiClient.get<Order>('/orders/track/', { params: buildQuery(payload) }).then((res) => res.data);
   },
+  // Every page: the list is paginated server-side (PAGE_SIZE 20) and the
+  // dashboard counts and the missing-documents list need all of it.
   getCustomerOrders(params: ApiListParams = {}) {
-    return apiClient.get<Order[]>('/customer/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
+    return fetchAllPages<Order>('/customer/orders/', params);
   },
   getCustomerOrder(orderId: number | string) {
     return apiClient.get<Order>(`/customer/orders/${orderId}/`).then((res) => res.data);

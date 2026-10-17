@@ -4,15 +4,13 @@ import { AppButton } from '../../components/AppButton';
 import { AppCard } from '../../components/AppCard';
 import { EmptyState } from '../../components/EmptyState';
 import { StatusBadge } from '../../components/StatusBadge';
-import { useAuthStore } from '../../state/authStore';
+import { getDocumentTypeLabel } from '../../utils/documentPresentation';
 import { downloadAndShareDocument } from '../../utils/file';
 import { formatDate } from '../../utils/format';
 import type { OrderDocument } from '../../types/document';
 import { theme } from '../../theme';
 
 export function DocumentList({ documents, title = 'المستندات' }: { documents?: OrderDocument[]; title?: string }) {
-  const accessToken = useAuthStore((state) => state.tokens?.access);
-
   if (!documents?.length) {
     return <EmptyState title="لا توجد مستندات" description="سيظهر كل ملف مرتبط بالطلب هنا." />;
   }
@@ -28,10 +26,10 @@ export function DocumentList({ documents, title = 'المستندات' }: { docu
         renderItem={({ item }) => (
           <AppCard>
             <View style={styles.header}>
-              <StatusBadge status={item.status} />
+              {item.status ? <StatusBadge status={item.status} /> : null}
               <View style={styles.headerText}>
                 <Text style={styles.name}>{item.original_filename}</Text>
-                <Text style={styles.meta}>{item.document_type} • {formatDate(item.created_at)}</Text>
+                <Text style={styles.meta}>{getDocumentTypeLabel(item)} • {formatDate(item.created_at)}</Text>
               </View>
             </View>
             {item.verification_note ? <Text style={styles.note}>ملاحظة التحقق: {item.verification_note}</Text> : null}
@@ -41,8 +39,8 @@ export function DocumentList({ documents, title = 'المستندات' }: { docu
                 label="فتح / مشاركة"
                 variant="secondary"
                 onPress={() => {
-                  void downloadAndShareDocument(item.download_url!, item.original_filename, accessToken).catch((error) =>
-                    Alert.alert('تعذر تنزيل الملف', error instanceof Error ? error.message : 'حدث خطأ أثناء التنزيل.'),
+                  void downloadAndShareDocument(item).catch((error) =>
+                    Alert.alert('تعذر تنزيل الملف', error instanceof Error && error.message ? error.message : 'حدث خطأ أثناء التنزيل.'),
                   );
                 }}
               />

@@ -332,10 +332,18 @@
   }
 
   .kh-eyebrow {
-    @apply inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-[0.72rem] font-extrabold uppercase;
+    @apply inline-flex w-fit max-w-full items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-[0.72rem] font-extrabold uppercase;
     letter-spacing: 0.1em;
     background: var(--khalsni-public-primary-soft);
     color: var(--khalsni-public-accent-text);
+  }
+
+  /* A long eyebrow (the English hero one) wraps on phones instead of being
+     clipped at the container edge; short eyebrows still fit on one line. */
+  @media (max-width: 639px) {
+    .kh-eyebrow {
+      white-space: normal;
+    }
   }
 
   /* Arabic script must stay joined — never letter-space it. */

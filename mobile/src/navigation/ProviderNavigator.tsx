@@ -22,6 +22,7 @@ function ProviderTabs() {
       <Tab.Screen name="ProviderDashboard" component={ProviderDashboardScreen} options={{ title: 'الرئيسية', tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} /> }} />
       <Tab.Screen name="AssignedOrders" component={AssignedOrdersScreen} options={{ title: 'الأعمال', tabBarIcon: ({ color, size }) => <Ionicons name="briefcase-outline" color={color} size={size} /> }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'الإشعارات', tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" color={color} size={size} /> }} />
+      <Tab.Screen name="Account" component={SettingsScreen} options={{ title: 'حسابي', tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} /> }} />
     </Tab.Navigator>
   );
 }

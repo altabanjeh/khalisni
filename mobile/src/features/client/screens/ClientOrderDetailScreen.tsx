@@ -9,11 +9,15 @@ import { AppScreen } from '../../../components/AppScreen';
 import { ErrorState } from '../../../components/ErrorState';
 import { KeyValueRow } from '../../../components/KeyValueRow';
 import { LoadingState } from '../../../components/LoadingState';
+import { OrderTimeline } from '../../../components/OrderTimeline';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { DocumentList } from '../../documents/DocumentList';
 import { ordersApi } from '../../../api/orders.api';
 import { formatCurrency } from '../../../utils/format';
 import { getDisplayError } from '../../../api/client';
+import { describeMissingDocuments } from '../../../utils/documentPresentation';
+import { getClosureReason } from '../../../utils/timelinePresentation';
+import { theme } from '../../../theme';
 
 export function ClientOrderDetailScreen({ route, navigation }: { route: any; navigation: any }) {
   const orderId = route.params?.orderId;
@@ -56,12 +60,25 @@ export function ClientOrderDetailScreen({ route, navigation }: { route: any; nav
             <KeyValueRow label="الخدمة" value={query.data.service?.name_ar} />
             <KeyValueRow label="المدينة" value={query.data.city} />
             <KeyValueRow label="السعر النهائي" value={formatCurrency(query.data.final_price)} />
-            {query.data.missing_document_types?.length ? (
-              <Text style={{ textAlign: 'right' }}>النواقص: {query.data.missing_document_types.join('، ')}</Text>
+            {query.data.status === 'WAITING_CUSTOMER' && query.data.missing_document_types?.length ? (
+              <Text style={{ textAlign: 'right' }}>
+                المستندات المطلوبة: {describeMissingDocuments(query.data.missing_document_types, query.data.required_documents).join('، ')}
+              </Text>
             ) : null}
           </AppCard>
+          {['REJECTED', 'CANCELLED'].includes(query.data.status) ? (
+            <AppCard style={{ borderColor: theme.colors.danger }}>
+              <Text style={{ textAlign: 'right', fontWeight: '700', color: theme.colors.danger }}>
+                {query.data.status === 'REJECTED' ? 'سبب رفض الطلب' : 'سبب إلغاء الطلب'}
+              </Text>
+              <Text style={{ textAlign: 'right', color: theme.colors.text }}>
+                {getClosureReason(query.data) || 'لم يُذكر سبب. يمكنك التواصل مع الدعم لمزيد من التفاصيل.'}
+              </Text>
+            </AppCard>
+          ) : null}
+          <OrderTimeline logs={query.data.status_logs} />
           <DocumentList documents={query.data.documents} />
-          {query.data.status === 'WAITING_CUSTOMER' ? (
+          {query.data.allowed_actions?.can_view_missing_documents_form ?? query.data.status === 'WAITING_CUSTOMER' ? (
             <AppButton label="الرد على طلب النواقص" onPress={() => navigation.navigate('RespondToMissingDocument', { orderId })} />
           ) : null}
           {(query.data.documents ?? []).some((document) => document.is_final_document) ? (

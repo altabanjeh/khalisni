@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { formatDateTime } from '../../utils/format'
 import { getLocalizedField } from '../../utils/i18n'
+import OrderNumber from '../../components/OrderNumber'
 
 function labelClass() {
   return 'mb-2 block text-sm font-bold text-ink'
@@ -91,7 +92,7 @@ function TrackOrderPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'ملخص الطلب' : 'Request summary'}</p>
-                  <h2 className="mt-2 text-3xl font-extrabold text-ink">{result.order_number}</h2>
+                  <h2 className="mt-2 text-3xl font-extrabold text-ink"><OrderNumber value={result.order_number} /></h2>
                 </div>
                 <StatusBadge status={result.status} />
               </div>

@@ -1,0 +1,269 @@
+{
+  "generated": "2026-10-17T13:00:40.410Z",
+  "adapter": "axios Node http adapter (not React Native XHR)",
+  "passed": 17,
+  "total": 17,
+  "results": [
+    {
+      "id": "DEF-pagination-1",
+      "name": "getCustomerOrders follows `next` until null (45 items over 3 pages, base URL kept)",
+      "pass": true,
+      "evidence": {
+        "count": 45,
+        "requests": [
+          "/api/customer/orders/",
+          "/api/customer/orders/?page=2",
+          "/api/customer/orders/?page=3"
+        ],
+        "lastId": 45
+      }
+    },
+    {
+      "id": "DEF-pagination-2",
+      "name": "notifications page API exposes next/count for load-more; page 2 reachable",
+      "pass": true,
+      "evidence": {
+        "page1": {
+          "n": 20,
+          "count": 25,
+          "next": "http://127.0.0.1:8097/api/notifications/?page=2"
+        },
+        "page2": {
+          "n": 5,
+          "next": null
+        }
+      }
+    },
+    {
+      "id": "DEF-pagination-3",
+      "name": "dashboard unread count uses /notifications/unread-count/ (server count, not page 1)",
+      "pass": true,
+      "evidence": {
+        "unread": 37
+      }
+    },
+    {
+      "id": "DEF-service-answers-1",
+      "name": "keys are raw schema keys (name ?? key ?? field ?? id ?? field_N), hidden fields omitted, checkbox booleans, select sends option value, empty optional omitted",
+      "pass": true,
+      "evidence": {
+        "answersWhenNo": {
+          "12": false,
+          "knows_parcel": "no",
+          "agree_terms": true,
+          "field_6": "نص حر",
+          "urgent_reason": "سفر"
+        },
+        "keys": [
+          "knows_parcel",
+          "parcel_number",
+          "Basin",
+          "agree_terms",
+          "12",
+          "field_6",
+          "visit_date",
+          "urgent_reason"
+        ]
+      }
+    },
+    {
+      "id": "DEF-service-answers-2",
+      "name": "controller = yes shows parcel/basin; unticked checkbox controller hides its dependent field",
+      "pass": true,
+      "evidence": {
+        "answersWhenYes": {
+          "12": false,
+          "knows_parcel": "yes",
+          "parcel_number": "123",
+          "Basin": "9",
+          "agree_terms": false,
+          "field_6": "نص حر"
+        }
+      }
+    },
+    {
+      "id": "DEF-service-answers-3",
+      "name": "generated \"البيانات الإضافية المطلوبة:\" notes builder removed from mobile",
+      "pass": true,
+      "evidence": {
+        "buildDynamicNotesExported": false
+      }
+    },
+    {
+      "id": "DEF-service-answers-4",
+      "name": "POST /api/orders/ is multipart with service_answers = JSON object string; notes carries only customer text",
+      "pass": true,
+      "evidence": {
+        "contentType": "multipart/form-data",
+        "service_answers": "{\"12\":false,\"knows_parcel\":\"no\",\"agree_terms\":true,\"field_6\":\"نص حر\",\"urgent_reason\":\"سفر\"}",
+        "notes": "ملاحظتي فقط"
+      }
+    },
+    {
+      "id": "DEF-service-answers-5",
+      "name": "service_answers {key: msg} and document_errors {type: msg} exposed per key (interceptor-normalized error keeps them)",
+      "pass": true,
+      "evidence": {
+        "serviceAnswerErrors": {
+          "parcel_number": "This field is required.",
+          "visit_date": "Enter a date as YYYY-MM-DD."
+        },
+        "documentErrors": {
+          "national_id": "Unsupported file type."
+        },
+        "fieldErrorKeys": [
+          "phone"
+        ]
+      }
+    },
+    {
+      "id": "DEF-M10",
+      "name": "network, timeout and 5xx errors show Arabic text (no axios English); a server 4xx detail is still shown",
+      "pass": true,
+      "evidence": {
+        "html500": "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد قليل.",
+        "json500": "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد قليل.",
+        "timeout": "انتهت مهلة الاتصال بالخادم. تحقق من اتصالك ثم حاول مرة أخرى.",
+        "refused": "تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت ثم حاول مرة أخرى.",
+        "detail400": "تم رفض الطلب لسبب محدد من الخادم."
+      }
+    },
+    {
+      "id": "DEF-M09-1",
+      "name": "2xx application/pdf is saved; token obtained via axios (401 -> refresh -> retry); download uses ?token= without bearer; filename sanitized inside target dir",
+      "pass": true,
+      "evidence": {
+        "uri": "5-report_1_.pdf",
+        "tokenRequests": [
+          "Bearer expired-access",
+          "Bearer fresh-access"
+        ],
+        "downloadQuery": "?token=tok-5-2",
+        "downloadAuth": null
+      }
+    },
+    {
+      "id": "DEF-M09-2",
+      "name": "non-2xx (404, 403) and 200-with-JSON-body are refused with Arabic messages and the written file is deleted",
+      "pass": true,
+      "evidence": {
+        "r404": {
+          "ok": false,
+          "message": "الملف غير متاح حالياً.",
+          "status": 404
+        },
+        "r403": {
+          "ok": false,
+          "message": "لا تملك صلاحية تنزيل هذا الملف أو انتهت صلاحية رابط التنزيل.",
+          "status": 403
+        },
+        "r200json": {
+          "ok": false,
+          "message": "وصلت استجابة غير صالحة بدلاً من الملف. حاول مرة أخرى.",
+          "status": 200
+        },
+        "leftoverFiles": []
+      }
+    },
+    {
+      "id": "DEF-M09-3",
+      "name": "sanitizeFilename strips traversal, separators, control and reserved characters",
+      "pass": true,
+      "evidence": {
+        "a": "a_b_.pdf",
+        "b": "document",
+        "c": "passwd"
+      }
+    },
+    {
+      "id": "DEF-M04-1",
+      "name": "production bundle refuses placeholder / localhost / http / missing URL (blocking configError, empty base URL); accepts real https; dev keeps local default",
+      "pass": true,
+      "evidence": {
+        "prod_placeholder": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL is a placeholder or local address (\"https://api.example.com\").",
+          "isProduction": true
+        },
+        "prod_localhost": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL must use https:// (got \"http://127.0.0.1:8000\").",
+          "isProduction": true
+        },
+        "prod_http": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL must use https:// (got \"http://api.khalsni.jo\").",
+          "isProduction": true
+        },
+        "prod_missing": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL is not set.",
+          "isProduction": true
+        },
+        "prod_valid": {
+          "apiBaseUrl": "https://api.khalsni.jo/api",
+          "configError": null,
+          "isProduction": true
+        },
+        "dev_missing": {
+          "apiBaseUrl": "http://127.0.0.1:8000/api",
+          "configError": null,
+          "isProduction": false
+        }
+      }
+    },
+    {
+      "id": "DEF-M04-2",
+      "name": "app.config.js fails EAS preview/production builds without a real https URL; passes valid URL and local dev",
+      "pass": true,
+      "evidence": {
+        "production_example": "throws: [khalsni] Refusing to build profile \"production\": EXPO_PUBLIC_API_BASE_URL is a placeholde",
+        "production_missing": "throws: [khalsni] Refusing to build profile \"production\": EXPO_PUBLIC_API_BASE_URL is not set. Set",
+        "preview_loopback": "throws: [khalsni] Refusing to build profile \"preview\": EXPO_PUBLIC_API_BASE_URL must use https:// ",
+        "production_valid": "ok",
+        "local_expo_start": "ok"
+      }
+    },
+    {
+      "id": "DEF-M04-3",
+      "name": "eas.json no longer names api.example.com or 127.0.0.1",
+      "pass": true,
+      "evidence": {
+        "easJsonHasPlaceholder": false
+      }
+    },
+    {
+      "id": "DEF-M02",
+      "name": "timeline: system_event rendered in Arabic, sorted oldest first; REJECTED reason taken from the timeline note (fallback rejection_reason); status labels Arabic",
+      "pass": true,
+      "evidence": {
+        "underReview": "الطلب قيد المراجعة.",
+        "closureReason": "الوثيقة منتهية الصلاحية، يرجى تقديم طلب جديد.",
+        "recovered": "أعاد الفريق الطلب إلى المراجعة لأن طلب المستندات السابق لم يكن قابلاً للرفع. السبب: خطأ"
+      }
+    },
+    {
+      "id": "DEF-M03",
+      "name": "document statuses Arabic; requested documents labelled by Arabic name (never the code); per-requirement extensions/size enforced; .docx allowed by global fallback",
+      "pass": true,
+      "evidence": {
+        "docStatuses": [
+          "مرفوع",
+          "بانتظار التحقق",
+          "معتمد",
+          "مرفوض",
+          "بانتظار الفحص الأمني",
+          "مؤرشف"
+        ],
+        "missing": [
+          "تفويض رسمي",
+          "مستند مطلوب",
+          "مستند مطلوب"
+        ],
+        "big": "حجم الملف يتجاوز الحد المسموح (2.0 MB).",
+        "wrongExt": "صيغة الملف غير مدعومة. المسموح: .pdf",
+        "docxDefault": null
+      }
+    }
+  ]
+}

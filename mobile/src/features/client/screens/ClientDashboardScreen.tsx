@@ -33,7 +33,8 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
   const publicThemeQuery = useQuery({ queryKey: ['public-theme'], queryFn: () => publicSiteApi.getTheme() });
   const servicesQuery = useQuery({ queryKey: ['services'], queryFn: () => servicesApi.getServices() });
   const ordersQuery = useQuery({ queryKey: ['client-orders'], queryFn: () => ordersApi.getCustomerOrders() });
-  const notificationsQuery = useQuery({ queryKey: ['client-notifications'], queryFn: () => notificationsApi.getNotifications() });
+  // Server-side unread count: the notification list is paginated.
+  const notificationsQuery = useQuery({ queryKey: ['notifications-unread', 'client'], queryFn: () => notificationsApi.getUnreadCount() });
 
   const isLoading = homepageQuery.isLoading || servicesQuery.isLoading || ordersQuery.isLoading;
   const hasError = homepageQuery.isError || servicesQuery.isError || ordersQuery.isError;
@@ -66,7 +67,7 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
   const orders = ordersQuery.data ?? [];
   const activeOrders = orders.filter((item) => !['COMPLETED', 'REJECTED', 'CANCELLED', 'ARCHIVED'].includes(item.status));
   const waitingDocuments = orders.filter((item) => item.status === 'WAITING_CUSTOMER').length;
-  const unreadNotifications = notificationsQuery.data?.filter((item) => !item.is_read).length ?? 0;
+  const unreadNotifications = notificationsQuery.data ?? 0;
   const palette = getPalette(publicThemeQuery.data);
 
   const handlePublicAction = async (url?: string | null) => {

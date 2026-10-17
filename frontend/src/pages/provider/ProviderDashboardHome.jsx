@@ -9,6 +9,7 @@ import { getDisplayError } from '../../api/client'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 const ATTENTION = new Set(['ASSIGNED', 'READY_FOR_DELIVERY', 'WAITING_PROVIDER'])
 const ACTIVE = new Set(['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITING_PROVIDER', 'READY_FOR_DELIVERY'])
@@ -47,7 +48,7 @@ function ProviderDashboardHome() {
         <div className="min-w-0">
           <p className="truncate text-sm font-black text-ink">{order.service ? getServiceName(order.service, language) : (isArabic ? 'خدمة' : 'Service')}</p>
           <p className="mt-0.5 text-xs font-semibold text-slate-500">
-            #{order.order_number} · {isArabic ? 'التسليم' : 'Due'} {formatDate(order.expected_delivery_date, language)}
+            <OrderNumber hash value={order.order_number} /> · {isArabic ? 'التسليم' : 'Due'} {formatDate(order.expected_delivery_date, language)}
           </p>
         </div>
         <div className="flex items-center gap-3">

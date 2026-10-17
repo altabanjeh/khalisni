@@ -45,6 +45,7 @@ function ClientTabs() {
       <Tab.Screen name="ServiceList" component={ServiceListScreen} options={{ title: 'الخدمات', tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" color={color} size={size} /> }} />
       <Tab.Screen name="MyOrders" component={MyOrdersScreen} options={{ title: 'طلباتي', tabBarIcon: ({ color, size }) => <Ionicons name="document-text-outline" color={color} size={size} /> }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'الإشعارات', tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" color={color} size={size} /> }} />
+      <Tab.Screen name="Account" component={SettingsScreen} options={{ title: 'حسابي', tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} /> }} />
     </Tab.Navigator>
   );
 }

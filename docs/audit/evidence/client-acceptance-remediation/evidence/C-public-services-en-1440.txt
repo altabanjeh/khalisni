@@ -1,0 +1,379 @@
+URL: http://127.0.0.1:4351/services
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+Services
+About
+For business
+FAQ
+Contact
+Arabic
+English
+Sign in
+Create account
+
+Category directory
+
+Browse Khalsni Services by Category
+
+Choose a category or search by service name to open details and continue through the existing request flow.
+
+7
+
+Categories
+
+32
+
+Results
+
+All services
+Civil Status and Passports
+1
+Land and Survey
+18
+Business Services
+9
+Quick Public Services
+1
+Tax
+1
+Municipal Services
+1
+Ministry of Labour
+1
+
+Main categories
+
+Choose the right category
+View all
+Category
+1 services
+Civil Status and Passports
+
+Passport, appointment, and official personal-document services.
+
+Open category
+Category
+18 services
+Land and Survey
+
+Property deed, survey, and ownership-document services.
+
+Open category
+Category
+9 services
+Business Services
+
+Business Services
+
+Open category
+Category
+1 services
+Quick Public Services
+
+Fast public requests that can be started and tracked online.
+
+Open category
+Category
+1 services
+Tax
+
+Clearance, certificates, and tax follow-up services.
+
+Open category
+Category
+1 services
+Municipal Services
+
+Municipal permits, renewals, and city-service requests.
+
+Open category
+Category
+1 services
+Ministry of Labour
+
+Labour, permit, and compliance-related requests.
+
+Open category
+
+Services
+
+Available services
+32 services
+Civil Status and Passports
+Passport Appointment Booking
+
+Book a passport appointment before visiting Civil Status and Passports. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 1 to 3 days
+JOD 16.00
+View service
+Business Services
+Request Company Registration
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Registration Certificate
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Business Services
+Request Company Information Amendment
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Cadastral Map
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Quick Public Services
+Traffic Fines Payment
+
+Check and follow up traffic fine payment in one request. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 3 to 5 days
+JOD 12.00
+View service
+Business Services
+Request to Add Business Activities to an Existing Company
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Ownership Transfer
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Tax
+Tax Clearance
+
+Issue or follow up a tax clearance for individuals or businesses. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 4 to 6 days
+JOD 36.00
+View service
+Business Services
+Request Commercial Registration Certificate
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Inheritance Registration
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Municipal Services
+Business License Renewal
+
+Follow up business license renewal and municipal requirements. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 5 to 7 days
+JOD 48.00
+View service
+Business Services
+Request Trade Name Certificate
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Gift Transfer
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Property Registration Deed
+
+Request a property registration deed or updated ownership copy. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 6 to 8 days
+JOD 56.00
+View service
+Land and Survey
+Request Termination of Co-ownership
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Business Services
+Request Trade Name Registration
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Ministry of Labour
+No Criminal Record Certificate
+
+Request a no-criminal-record certificate and track it until ready. The service includes initial document review, status notifications, and final delivery through the platform.
+
+Expected completion: 7 to 9 days
+JOD 30.00
+View service
+Land and Survey
+Request Property Subdivision
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Business Services
+Request Trademark Services
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Consolidation
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Business Services
+Request Business License Services
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Business Services
+Request Company Closure or Liquidation
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Boundary Demarcation
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Land Survey
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Readjustment
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Land Use Classification Change
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Zoning Plan
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Change Statement
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Property Mortgage Registration
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Mortgage Release
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+Land and Survey
+Request Building Permit
+
+Service details are being prepared.
+
+The completion time is confirmed after your request is reviewed.
+Final fees are confirmed after document review.
+View service
+
+Khalisni is a Jordanian platform for managing and tracking public and administrative service requests digitally.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Contact
++962 6 560 9000
+
+Amman - Shmeisani, Queen Noor Street, Khalisni Services Building
+
+All rights reserved © 2026 Khalsni

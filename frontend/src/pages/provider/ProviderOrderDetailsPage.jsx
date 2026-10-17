@@ -16,6 +16,7 @@ import { getOrderAllowedActions } from '../../utils/authz'
 import { formatDate, getStatusLabel } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 import { buildAcceptValue, buildUploadHint, validateSingleFileList } from '../../utils/serviceForms'
+import OrderNumber from '../../components/OrderNumber'
 
 function Panel({ icon: Icon, title, description, children }) {
   return (
@@ -100,7 +101,7 @@ function ProviderOrderDetailsPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-600">{isArabic ? 'تنفيذ الطلب' : 'Request processing'}</p>
             <h1 className="mt-1 text-2xl font-black text-ink sm:text-3xl">
-              <Building2 className="me-2 inline h-6 w-6 text-brand-600" />#{order.order_number}
+              <Building2 className="me-2 inline h-6 w-6 text-brand-600" /><OrderNumber hash value={order.order_number} />
             </h1>
           </div>
           <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3 text-start">

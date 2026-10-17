@@ -21,6 +21,7 @@ import {
   getRequiredDocumentLabel,
   validateSingleFileList,
 } from '../../utils/serviceForms'
+import OrderNumber from '../../components/OrderNumber'
 
 const SUBMIT_BTN_AR = 'رفع المستندات وإعادة الإرسال'
 
@@ -80,7 +81,9 @@ function MissingDocumentsResponsePage() {
             ? 'لا توجد حالياً مستندات قابلة للرفع لهذا الطلب. يرجى انتظار مراجعة الطلب من فريق خلصني أو التواصل مع الدعم.'
             : 'There are currently no documents you can upload for this request. Please wait for the Khalsni team to review it, or contact support.'}
           icon={CircleAlert}
-          title={isArabic ? `لا يمكن الرد على الطلب ${order.order_number} حالياً` : `Request ${order.order_number} cannot be answered right now`}
+          title={isArabic
+            ? <>لا يمكن الرد على الطلب <OrderNumber value={order.order_number} /> حالياً</>
+            : <>Request <OrderNumber value={order.order_number} /> cannot be answered right now</>}
         />
         {customerNotes.length ? (
           <section className="rounded-[var(--radius-lg)] border border-border bg-card p-4 text-sm font-semibold leading-7 text-slate-700">
@@ -165,7 +168,8 @@ function MissingDocumentsResponsePage() {
             </span>
             <div>
               <h1 className="text-lg font-black text-amber-950 sm:text-xl">
-                {isArabic ? `مستندات ناقصة — الطلب ${order.order_number}` : `Missing documents — request ${order.order_number}`}
+                {isArabic ? 'مستندات ناقصة — الطلب' : 'Missing documents — request'}{' '}
+                <OrderNumber value={order.order_number} />
               </h1>
               <p className="text-xs font-semibold text-amber-900">
                 {isArabic ? 'ارفع كل مستند مطلوب لإعادة الطلب إلى مسار التنفيذ.' : 'Upload every requested document to send the request back for processing.'}

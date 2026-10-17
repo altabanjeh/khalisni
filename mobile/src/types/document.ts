@@ -9,6 +9,8 @@ export interface DocumentOrderReference {
 
 export interface OrderDocument extends BaseEntity {
   document_type: string;
+  // Display name built by the backend from the requirement (documents/presentation.py).
+  document_type_label?: { ar?: string; en?: string } | string | null;
   original_filename: string;
   file_size?: number;
   mime_type?: string;

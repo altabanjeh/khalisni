@@ -144,6 +144,27 @@ export function visibleSchemaFields(schemaFields, values) {
   return schemaFields.filter((field) => isSchemaFieldVisible(field, schemaFields, values))
 }
 
+/**
+ * The answers sent as `service_answers`: visible fields only, keyed by the
+ * schema key. The server validates them against the same schema (required,
+ * options, visible_when) and writes the answers block into the order notes,
+ * so `notes` carries only the customer's own text (audit B10-3).
+ */
+export function buildServiceAnswers(schemaFields, values) {
+  const answers = {}
+  visibleSchemaFields(schemaFields, values).forEach((field) => {
+    const rawValue = values?.[field.inputName]
+    if (field.type === 'checkbox') {
+      answers[field.key] = Boolean(rawValue)
+      return
+    }
+    if (rawValue == null) return
+    const text = String(rawValue).trim()
+    if (text) answers[field.key] = text
+  })
+  return answers
+}
+
 export function buildDynamicNotes(baseNotes, schemaFields, values) {
   const extraLines = visibleSchemaFields(schemaFields, values)
     .map((field) => {
@@ -279,9 +300,11 @@ export function applyServerFieldErrors({
   fieldNameForDocumentIndex,
   knownFields,
   fallbackField = 'root.server',
+  schemaFields = [],
 }) {
   const fieldErrors = error?.apiError?.fieldErrors || {}
   const documentErrors = error?.apiError?.rawData?.document_errors
+  const answerErrors = error?.apiError?.rawData?.service_answers
   const known = knownFields ? new Set(knownFields) : null
   const fields = []
   const general = []
@@ -312,8 +335,18 @@ export function applyServerFieldErrors({
     })
   }
 
+  // Server-side form validation: {"service_answers": {"<schema key>": message}}.
+  const answersByKey = answerErrors && typeof answerErrors === 'object' && !Array.isArray(answerErrors) ? answerErrors : null
+  if (answersByKey) {
+    Object.entries(answersByKey).forEach(([key, messages]) => {
+      const field = schemaFields.find((candidate) => candidate.key === key)
+      assign(field?.inputName || '', firstMessage(messages))
+    })
+  }
+
   Object.entries(fieldErrors).forEach(([key, messages]) => {
     if (key === 'document_errors') return
+    if (key === 'service_answers' && answersByKey) return
     const message = firstMessage(messages)
     if (!message) return
 

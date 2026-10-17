@@ -21,6 +21,7 @@ import { formatDate, formatDateTime } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 import { findRequiredDocument,
   getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
+import OrderNumber from '../../components/OrderNumber'
 
 const REVIEW_STARTED_NOTE_AR = 'بدأ الموظف مراجعة الطلب.'
 
@@ -211,7 +212,7 @@ function EmployeeOrderReviewPage() {
         description={tr('راجع بيانات العميل والخدمة والوثائق، ثم استخدم فقط الإجراءات المسموح بها في هذه المرحلة.', 'Review the customer, service and documents, then use only the actions permitted at this stage.')}
         eyebrow={tr('تفاصيل المراجعة', 'Review detail')}
         icon={FileSearch}
-        title={order.order_number}
+        title={<OrderNumber value={order.order_number} />}
       />
 
       <section className="rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft sm:p-6">

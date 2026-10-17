@@ -216,13 +216,31 @@ def create_customer_order(*, customer, data, request=None):
         organization=data.get("organization"),
     )
 
+    changes = {}
     for field_name in ("full_name", "phone", "national_id"):
         new_value = data.get(field_name, "")
         if new_value is None:
             new_value = ""
+        # A blank national ID on an order means "unchanged": an order never
+        # clears identity data saved on the profile (DEF-C06).
+        if field_name == "national_id" and not str(new_value).strip():
+            continue
         if getattr(customer, field_name) != new_value:
-            setattr(customer, field_name, new_value)
-            updated_fields.append(field_name)
+            changes[field_name] = new_value
+
+    # The same values on another account would fail the unique constraints
+    # with database wording; answer with the field and a plain message (DEF-C07).
+    conflicts = {}
+    others = CustomUser._base_manager.exclude(pk=customer.pk)
+    if changes.get("phone") and others.filter(phone=changes["phone"]).exists():
+        conflicts["phone"] = "This phone number is already used by another account."
+    if changes.get("national_id") and others.filter(national_id=changes["national_id"]).exists():
+        conflicts["national_id"] = "This national ID is already used by another account."
+    if conflicts:
+        raise ValidationError(conflicts)
+    for field_name, new_value in changes.items():
+        setattr(customer, field_name, new_value)
+        updated_fields.append(field_name)
 
     with transaction.atomic():
         if updated_fields:

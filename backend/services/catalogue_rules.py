@@ -121,3 +121,49 @@ def apply_identifier_rules(schema):
         if isinstance(field, dict) and field.get("type") == "number" and _is_national_id(field):
             field["type"] = "text"
     return fields
+
+
+# Question shapes in the client service sheets (section 8 of the client
+# acceptance remediation). The sheets list dynamic questions as plain text; a
+# question that asks for a description ("ما الغاية ...؟") cannot be answered
+# with a yes/no checkbox, and a question that names its two answers
+# ("هل العقار أرض أم بناء؟") is a choice between exactly those answers.
+OPEN_QUESTION_PREFIX = "ما "
+EITHER_OR_QUESTION_OPTIONS = {
+    "هل الطلب للمالك أم لمفوض عنه؟": ["للمالك", "لمفوض عنه"],
+    "هل العقار أرض أم بناء؟": ["أرض", "بناء"],
+    "هل الإفراز لقطعة أرض أم لشقق/وحدات؟": ["قطعة أرض", "شقق/وحدات"],
+    "هل الطلب للمالك أم بموجب وكالة؟": ["للمالك", "بموجب وكالة"],
+    "هل الرهن لصالح بنك أم جهة أخرى؟": ["بنك", "جهة أخرى"],
+    "هل الرخصة لبناء جديد أم إعادة بناء؟": ["بناء جديد", "إعادة بناء"],
+}
+
+# Two client sheets describe request-land-survey (same slug, version and date)
+# with synonymous wording; merging them by key kept both wordings. Each alias
+# below is the same data item as its canonical entry (the fuller sheet's wording).
+MERGED_SOURCE_ALIASES = {
+    "request-land-survey": {
+        "fields": {
+            "full_name": "applicant_name",  # الاسم = اسم مقدم الطلب
+            "field_760c65a1fa": "phone_number",  # الهاتف = رقم الهاتف
+            "field_d7fc96e29e": "survey_reason",  # سبب الكشف = سبب طلب الكشف
+        },
+        "documents": {
+            "document_a4c4fed3af": "national_id_copy",  # الهوية = صورة الهوية
+            "document_0cc19c2317": "cadastral_map",  # مخطط أراضٍ إن وجد = مخطط أراضٍ (إن وجد)
+            "document_e95445e836": "legal_power_of_attorney",  # وكالة قانونية إن وجدت = وكالة قانونية (إن وجدت)
+        },
+    },
+}
+
+
+def drop_merged_aliases(slug, fields, documents):
+    """Remove alias entries whose canonical entry is present (see MERGED_SOURCE_ALIASES)."""
+    aliases = MERGED_SOURCE_ALIASES.get(slug)
+    if not aliases:
+        return fields, documents
+    field_keys = {field.get("key") for field in fields}
+    document_codes = {document.get("code") for document in documents}
+    fields = [field for field in fields if aliases["fields"].get(field.get("key")) not in field_keys]
+    documents = [document for document in documents if aliases["documents"].get(document.get("code")) not in document_codes]
+    return fields, documents

@@ -1,30 +1,37 @@
 import clsx from 'clsx'
 import { X } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useEffect, useMemo, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useDialogFocus } from '../hooks/useDialogFocus'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { normalizeRole } from '../utils/format'
 import { KhalsniAppIcon, KhalsniLogo } from './brand/KhalsniLogo'
 
 function Sidebar({ title, links, isOpen, onClose }) {
   const { user } = useAuth()
   const { t } = useLanguage()
+  const { pathname } = useLocation()
+  // Tailwind's default `xl` breakpoint: from here on the sidebar is a static
+  // column, below it an off-canvas drawer.
+  const isDesktop = useMediaQuery('(min-width: 1280px)')
+  const drawerHidden = !isOpen && !isDesktop
+
+  const asideRef = useRef(null)
+  const drawerOpen = isOpen && !isDesktop
 
   useEffect(() => {
     if (!isOpen) return undefined
-
-    function handleEscape(event) {
-      if (event.key === 'Escape') onClose?.()
-    }
-
     document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', handleEscape)
     return () => {
       document.body.style.overflow = ''
-      window.removeEventListener('keydown', handleEscape)
     }
-  }, [isOpen, onClose])
+  }, [isOpen])
+
+  // While the drawer is open: focus moves into it, Tab stays inside, Escape
+  // closes it and focus returns to the menu button.
+  useDialogFocus(drawerOpen, asideRef, { onClose, trapFocus: true })
 
   const currentRole = normalizeRole(user?.role)
   const visibleLinks = links.filter((link) => {
@@ -48,7 +55,21 @@ function Sidebar({ title, links, isOpen, onClose }) {
     return order.map((key) => ({ key, items: byGroup.get(key) }))
   }, [visibleLinks])
 
-  const linkClass = ({ isActive }) =>
+  // Exactly one current item: the most specific link whose path matches the
+  // location (so /admin does not stay active on /admin/orders, and
+  // /customer/orders does not compete with /customer/orders/new).
+  const activeTo = useMemo(() => {
+    const path = pathname.replace(/\/+$/, '') || '/'
+    let best = null
+    for (const link of visibleLinks) {
+      const to = link.to.replace(/\/+$/, '') || '/'
+      const matches = path === to || path.startsWith(`${to === '/' ? '' : to}/`)
+      if (matches && (!best || to.length > best.length)) best = to
+    }
+    return best
+  }, [pathname, visibleLinks])
+
+  const linkClass = (isActive) =>
     clsx(
       'group/navlink relative flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-semibold transition',
       'before:absolute before:inset-inline-start-0 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:transition',
@@ -66,13 +87,22 @@ function Sidebar({ title, links, isOpen, onClose }) {
         )}
         onClick={onClose}
       />
+      {/*
+        Closed drawer (below xl): inert + aria-hidden so its links are neither
+        focusable nor announced while off-screen. `invisible` does the same in
+        CSS (and covers the first paint before the media query is read);
+        xl:visible keeps the static column usable.
+      */}
       <aside
+        aria-hidden={drawerHidden ? 'true' : undefined}
         aria-label={title}
+        inert={drawerHidden}
+        ref={asideRef}
         className={clsx(
-          'fixed inset-y-3 left-3 right-3 z-50 flex flex-col overflow-y-auto rounded-[1.5rem] border border-border bg-card p-4 shadow-panel transition',
+          'fixed inset-y-3 left-3 right-3 z-50 flex flex-col overflow-y-auto rounded-[1.5rem] border border-border bg-card p-4 shadow-panel transition-[transform,visibility]',
           'sm:left-auto sm:w-[320px] sm:max-w-[calc(100vw-1.5rem)]',
           'xl:sticky xl:inset-y-auto xl:left-auto xl:right-auto xl:top-4 xl:z-auto xl:h-[calc(100vh-2rem)] xl:w-auto xl:max-w-none xl:translate-x-0',
-          isOpen ? 'translate-x-0' : 'translate-x-[120%] xl:translate-x-0',
+          isOpen ? 'visible translate-x-0' : 'invisible translate-x-[120%] xl:visible xl:translate-x-0',
         )}
       >
         <div className="mb-4 flex items-center justify-between gap-2 border-b border-border pb-4">
@@ -108,15 +138,22 @@ function Sidebar({ title, links, isOpen, onClose }) {
               <div className="space-y-0.5">
                 {group.items.map((link) => {
                   const Icon = link.icon
+                  const isActive = (link.to.replace(/\/+$/, '') || '/') === activeTo
                   return (
-                    <NavLink key={link.to} className={linkClass} onClick={onClose} to={link.to}>
+                    <Link
+                      key={link.to}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={linkClass(isActive)}
+                      onClick={onClose}
+                      to={link.to}
+                    >
                       {Icon ? (
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--kh-surface-muted)] text-[var(--kh-text-secondary)] transition group-hover/navlink:text-[var(--kh-navy)]">
                           <Icon className="h-4 w-4" />
                         </span>
                       ) : null}
                       <span className="min-w-0 truncate">{link.label}</span>
-                    </NavLink>
+                    </Link>
                   )
                 })}
               </div>

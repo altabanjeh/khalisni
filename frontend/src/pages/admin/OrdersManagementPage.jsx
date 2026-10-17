@@ -9,6 +9,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
+import OrderNumber from '../../components/OrderNumber'
 
 const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false, statusCounts: null }
 
@@ -61,7 +62,7 @@ function OrdersManagementPage() {
   const counts = pageData?.statusCounts || {}
 
   const columns = [
-    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink">#{row.order_number}</span> },
+    { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink"><OrderNumber hash value={row.order_number} /></span> },
     { key: 'customer', label: isArabic ? 'العميل' : 'Customer', render: (row) => row.customer?.full_name || unavailable },
     { key: 'service', label: isArabic ? 'الخدمة' : 'Service', render: (row) => (row.service ? getServiceName(row.service, language) : notSet) },
     { key: 'status', label: isArabic ? 'الحالة' : 'Status', render: (row) => <StatusBadge status={row.status} /> },
@@ -119,7 +120,7 @@ function OrdersManagementPage() {
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">#{row.order_number}</p>
+              <p className="font-bold text-ink"><OrderNumber hash value={row.order_number} /></p>
               <StatusBadge status={row.status} />
             </div>
             <div className="space-y-1 text-sm text-slate-600">

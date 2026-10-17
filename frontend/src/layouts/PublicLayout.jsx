@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext'
 import { PublicSiteProvider, usePublicSite } from '../context/PublicSiteContext'
 import { getDefaultDashboardPath } from '../utils/authz'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import SkipLink from '../components/SkipLink'
 import { KhalsniLogo } from '../components/brand/KhalsniLogo'
 import { getLocalizedField } from '../utils/i18n'
 
@@ -32,6 +33,7 @@ const copy = {
     contactTitle: 'تواصل معنا',
     noContact: 'معلومات التواصل غير منشورة حالياً.',
     copyright: 'جميع الحقوق محفوظة © 2026 خلصني',
+    homeLink: 'الصفحة الرئيسية لخلصني',
     openMenu: 'فتح قائمة التنقل',
     closeMenu: 'إغلاق قائمة التنقل',
   },
@@ -54,6 +56,7 @@ const copy = {
     contactTitle: 'Contact',
     noContact: 'Contact details are not published yet.',
     copyright: 'All rights reserved © 2026 Khalsni',
+    homeLink: 'Khalsni home',
     openMenu: 'Open navigation menu',
     closeMenu: 'Close navigation menu',
   },
@@ -99,10 +102,11 @@ function PublicLayoutContent() {
 
   return (
     <div className="min-h-screen bg-[var(--khalsni-public-bg)] text-[var(--khalsni-public-text)]" dir={direction}>
+      <SkipLink />
       <header className="sticky top-0 z-50 border-b border-[var(--khalsni-public-border)] bg-white/95 backdrop-blur-xl">
         <div className="kh-public-container">
           <div className="flex min-h-[3.55rem] items-center justify-between gap-2">
-            <Link className="kh-focusable inline-flex min-h-11 shrink-0 items-center rounded-[var(--radius-sm)]" to="/" aria-label="Khalsni home">
+            <Link className="kh-focusable inline-flex min-h-11 shrink-0 items-center rounded-[var(--radius-sm)]" to="/" aria-label={dictionary.homeLink}>
               <KhalsniLogo overrideSrc={theme.logo_url} size="md" />
             </Link>
 
@@ -198,7 +202,7 @@ function PublicLayoutContent() {
         ) : null}
       </header>
 
-      <main className="bg-[var(--khalsni-public-bg)]">
+      <main className="bg-[var(--khalsni-public-bg)] focus:outline-none" id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
 

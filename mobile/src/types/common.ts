@@ -29,4 +29,8 @@ export interface ApiError {
   status?: number;
   code?: string;
   fieldErrors?: Record<string, string[]>;
+  // `document_errors` from order creation: { document_type: message }.
+  documentErrors?: Record<string, string>;
+  // `service_answers` from order creation: { schema field key: message }.
+  serviceAnswerErrors?: Record<string, string>;
 }

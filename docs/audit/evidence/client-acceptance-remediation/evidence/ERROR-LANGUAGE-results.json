@@ -1,0 +1,30 @@
+{
+ "ar": {
+  "apiCalls": [
+   "GET 200 /api/customer/orders/",
+   "GET 200 /api/help/current/?screen_key=customer_missing_documents",
+   "GET 200 /api/customer/orders/5/",
+   "POST 400 /api/customer/orders/5/documents/"
+  ],
+  "englishServerMsg": false,
+  "excerpt": [
+   "تخطَّ إلى المحتوى الرئيسي",
+   "الملف الشخصي",
+   "الملفات المسموحة: PDF | الحد الأقصى: 10 MB",
+   "الملفات المسموحة: PDF | الحد الأقصى: 10 MB"
+  ]
+ },
+ "en": {
+  "apiCalls": [
+   "GET 200 /api/customer/orders/",
+   "GET 200 /api/help/current/?screen_key=customer_missing_documents",
+   "GET 200 /api/customer/orders/5/",
+   "POST 400 /api/customer/orders/5/documents/"
+  ],
+  "englishServerMsg": true,
+  "excerpt": [
+   "File content does not match its extension.",
+   "File content does not match its extension."
+  ]
+ }
+}

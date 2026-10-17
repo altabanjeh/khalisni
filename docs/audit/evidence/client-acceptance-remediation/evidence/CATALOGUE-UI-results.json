@@ -1,0 +1,134 @@
+{
+ "public business_commercial_registration_certificate ar 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "تُحدَّد مدة الإنجاز بعد مراجعة الطلب.",
+   "تُحدَّد مدة الإنجاز بعد مراجعة الطلب."
+  ],
+  "overflowX": 0
+ },
+ "public request-land-survey ar 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.",
+   "حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة."
+  ],
+  "overflowX": 0
+ },
+ "public request-cadastral-map ar 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "حسب إجراءات دائرة الأراضي والمساحة.",
+   "حسب إجراءات دائرة الأراضي والمساحة."
+  ],
+  "overflowX": 0
+ },
+ "services list ar 1440": {
+  "placeholderOneDayCount": 0
+ },
+ "public business_commercial_registration_certificate ar 390": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "تُحدَّد مدة الإنجاز بعد مراجعة الطلب.",
+   "تُحدَّد مدة الإنجاز بعد مراجعة الطلب."
+  ],
+  "overflowX": 0
+ },
+ "public request-land-survey ar 390": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.",
+   "حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة."
+  ],
+  "overflowX": 0
+ },
+ "public request-cadastral-map ar 390": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "حسب إجراءات دائرة الأراضي والمساحة.",
+   "حسب إجراءات دائرة الأراضي والمساحة."
+  ],
+  "overflowX": 0
+ },
+ "services list ar 390": {
+  "placeholderOneDayCount": 0
+ },
+ "public business_commercial_registration_certificate en 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "The completion time is confirmed after your request is reviewed.",
+   "Final fees are confirmed after document review."
+  ],
+  "overflowX": 0
+ },
+ "public request-land-survey en 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "The completion time is confirmed after your request is reviewed.",
+   "Final fees are confirmed after document review."
+  ],
+  "overflowX": 0
+ },
+ "public request-cadastral-map en 1440": {
+  "placeholderOneDay": false,
+  "durationText": [
+   "The completion time is confirmed after your request is reviewed.",
+   "Final fees are confirmed after document review."
+  ],
+  "overflowX": 0
+ },
+ "services list en 1440": {
+  "placeholderOneDayCount": 0
+ },
+ "landSurvey": {
+  "phoneLabels": [
+   "رقم الهاتف",
+   "رقم الهاتف"
+  ],
+  "nameLabels": [
+   "الاسم",
+   "اسم مقدم الطلب"
+  ],
+  "purposeIsText": 1
+ },
+ "cadastralGate": {
+  "parcelLabelWhenYes": 1,
+  "parcelLabelWhenNo": 0,
+  "ownerOrDelegateIsChoice": 1
+ },
+ "serverGate": {
+  "yesWithoutParcel": 400,
+  "messages": {
+   "full_name": "هذا الحقل مطلوب.",
+   "national_id": "هذا الحقل مطلوب.",
+   "phone_number": "هذا الحقل مطلوب.",
+   "parcel_number": "هذا الحقل مطلوب.",
+   "basin_number": "هذا الحقل مطلوب.",
+   "region": "هذا الحقل مطلوب.",
+   "governorate": "هذا الحقل مطلوب."
+  },
+  "notOption": {
+   "full_name": "هذا الحقل مطلوب.",
+   "national_id": "هذا الحقل مطلوب.",
+   "phone_number": "هذا الحقل مطلوب.",
+   "field_2fa52c6cfa": "اختر أحد الخيارات المتاحة.",
+   "region": "هذا الحقل مطلوب.",
+   "governorate": "هذا الحقل مطلوب."
+  }
+ },
+ "adminRules": {
+  "mojibake": [],
+  "fileTypeLabels": [
+   "ملف Word",
+   "ملف Word",
+   "صورة JPG"
+  ]
+ },
+ "adminServices": {
+  "counts": [
+   "إجمالي الخدمات\n38",
+   "نشطة\n37",
+   "منشورة للعامة\n32"
+  ]
+ }
+}

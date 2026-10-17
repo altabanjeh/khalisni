@@ -612,6 +612,8 @@ class OrderAPITests(APITestCase):
         self.assertEqual(order.status, Order.Status.WAITING_CUSTOMER)
 
     def test_provider_assignment_requires_required_documents_to_be_approved(self):
+        # The assertions below read the English server message; ask for it (Arabic is the default since D03).
+        self.client.credentials(HTTP_ACCEPT_LANGUAGE="en")
         ServiceRequiredDocument.objects.create(
             service=self.service,
             document_type="national_id",
@@ -855,6 +857,8 @@ class OrderAPITests(APITestCase):
         self.assertIn("status", response.data)
 
     def test_complete_endpoint_requires_final_document_and_verification_without_override(self):
+        # The assertions below read the English server message; ask for it (Arabic is the default since D03).
+        self.client.credentials(HTTP_ACCEPT_LANGUAGE="en")
         missing_final_order = Order.objects.create(
             customer=self.customer,
             service=self.service,

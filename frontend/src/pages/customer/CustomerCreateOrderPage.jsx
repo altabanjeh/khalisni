@@ -23,7 +23,7 @@ import {
 import {
   applyServerFieldErrors,
   buildAcceptValue,
-  buildDynamicNotes,
+  buildServiceAnswers,
   buildUploadHint,
   getDocumentFieldName,
   getRequiredDocumentLabel,
@@ -134,7 +134,10 @@ function CustomerCreateOrderPage() {
   const selectedServiceDetails = serviceDetailsError ? null : loadedServiceDetails
   // Without the service details the required documents are unknown, so the
   // wizard must not continue (it would fall back to the generic uploader).
-  const serviceStepBlocked = Boolean(catalogError || (selectedService && (serviceDetailsError || serviceDetailsLoading)))
+  // A service whose form cannot be completed (e.g. a required list with no
+  // choices yet) is not offered as an online request; the server refuses it too.
+  const serviceNotOrderable = Boolean(selectedServiceDetails && selectedServiceDetails.orderable === false)
+  const serviceStepBlocked = Boolean(catalogError || serviceNotOrderable || (selectedService && (serviceDetailsError || serviceDetailsLoading)))
   const categoryLabel = (category) => (isArabic
     ? category?.full_path_name || getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'ar')
     : getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'en', category?.full_path_name || ''))
@@ -281,7 +284,8 @@ function CustomerCreateOrderPage() {
     formData.append('phone', values.phone)
     formData.append('national_id', values.national_id || '')
     formData.append('city', values.city)
-    formData.append('notes', buildDynamicNotes(values.notes, schemaFields, values))
+    formData.append('notes', String(values.notes || '').trim())
+    formData.append('service_answers', JSON.stringify(buildServiceAnswers(schemaFields, values)))
     formData.append('consent', values.consent ? 'true' : 'false')
     // Names the statement shown above so the server records exactly what was accepted.
     formData.append('consent_version', ORDER_CONSENT_VERSION)
@@ -341,6 +345,7 @@ function CustomerCreateOrderPage() {
         knownFields: [...(startedFromService ? [] : ['category_slug', 'service']), ...stepOneFields, ...stepTwoFields],
         fallbackField: 'root.server',
         fieldNameForDocumentIndex: (index, document) => getDocumentFieldName(document, index),
+        schemaFields,
       })
       // Jump to the earliest step that received an error. Errors without a
       // visible field stay on screen in the general error area of any step.
@@ -464,6 +469,21 @@ function CustomerCreateOrderPage() {
                     </Field>
                   </div>
                 )}
+                {serviceNotOrderable ? (
+                  <div className="mt-4 rounded-[var(--radius-lg)] border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900" role="status">
+                    <p className="font-extrabold">
+                      {isArabic ? 'الطلب الإلكتروني لهذه الخدمة غير متاح حالياً.' : 'This service cannot be requested online yet.'}
+                    </p>
+                    <p className="mt-1">
+                      {isArabic
+                        ? 'نموذج الخدمة بانتظار استكمال بعض الخيارات من فريق خلصني. أرسل طلباً خاصاً وسيتواصل معك الفريق.'
+                        : 'Some choices in this service form are still being completed by the Khalsni team. Send a special request and the team will contact you.'}
+                    </p>
+                    <Link className="btn-secondary mt-3 inline-flex px-4 py-2 text-xs" to="/#special-request">
+                      {isArabic ? 'إرسال طلب خاص' : 'Send a special request'}
+                    </Link>
+                  </div>
+                ) : null}
                 {!catalogError && selectedService && serviceDetailsError ? (
                   <div className="mt-4">
                     <LoadError

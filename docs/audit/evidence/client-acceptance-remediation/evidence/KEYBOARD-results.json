@@ -1,0 +1,318 @@
+[
+ {
+  "where": "home ar 1440",
+  "firstFocus": {
+   "tag": "a",
+   "name": "تخطَّ إلى المحتوى الرئيسي",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 1218,
+   "y": 12
+  },
+  "skipLinkFirst": false,
+  "noRing": [],
+  "seq": [
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "a:الصفحة الرئيسية لخلصني",
+   "a:الخدمات",
+   "a:عن خلصني",
+   "a:للأعمال",
+   "a:الأسئلة الشائعة",
+   "a:تواصل معنا",
+   "button:العربية",
+   "button:English",
+   "a:تسجيل الدخول",
+   "a:إنشاء حساب",
+   "input:البحث في خدمات خلصني"
+  ]
+ },
+ {
+  "where": "login ar 1440",
+  "seq": [
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "a:الصفحة الرئيسية لخلصني",
+   "a:الخدمات",
+   "a:عن خلصني",
+   "a:للأعمال",
+   "a:الأسئلة الشائعة",
+   "a:تواصل معنا",
+   "button:العربية",
+   "button:English",
+   "a:تسجيل الدخول"
+  ],
+  "noRing": []
+ },
+ {
+  "where": "keyboard login ar 1440",
+  "ok": true,
+  "url": "/customer"
+ },
+ {
+  "where": "notifications panel ar 1440",
+  "dialogsOpen": 1,
+  "focusAfterOpen": {
+   "tag": "button",
+   "name": "تعليم الكل كمقروء",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 678,
+   "y": 150
+  },
+  "visibleDialogsAfterEscape": 0,
+  "focusAfterEscape": {
+   "tag": "button",
+   "name": "الإشعارات",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 177,
+   "y": 42
+  }
+ },
+ {
+  "where": "help panel ar 1440",
+  "focusMovedIntoDialog": true,
+  "focusStillInsideAfter15Tabs": true,
+  "walk": [
+   "button:إغلاق",
+   "button:الصفحة الحالية",
+   "button:مكتبة الدليل",
+   "input:",
+   "button:إغلاق",
+   "button:الصفحة الحالية"
+  ],
+  "visibleDialogsAfterEscape": 0
+ },
+ {
+  "where": "wizard ar 1440",
+  "seq": [
+   "button:حفظ كمسودة",
+   "select:اختر التصنيف\nالأحوال المدنية والجوازات\nا",
+   "select:اختر الخدمة\nبراءة ذمة ضريبية\nتجديد جواز ",
+   "button:التالي",
+   "body:undefined",
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "a:خلصني",
+   "a:خلصني",
+   "a:لوحتي",
+   "a:طلب جديد",
+   "a:طلباتي",
+   "a:تصفح الخدمات",
+   "a:الملف الشخصي",
+   "a:الدليل",
+   "button:الإشعارات",
+   "button:المزيد من الخيارات",
+   "button:حفظ كمسودة",
+   "select:اختر التصنيف\nالأحوال المدنية والجوازات\nا",
+   "select:اختر الخدمة\nبراءة ذمة ضريبية\nتجديد جواز ",
+   "button:التالي"
+  ],
+  "noRing": [],
+  "offscreen": 0
+ },
+ {
+  "where": "home en 1440",
+  "firstFocus": {
+   "tag": "a",
+   "name": "Skip to main content",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 12,
+   "y": 12
+  },
+  "skipLinkFirst": true,
+  "noRing": [],
+  "seq": [
+   "a:Skip to main content",
+   "a:Khalsni home",
+   "a:Services",
+   "a:About",
+   "a:For business",
+   "a:FAQ",
+   "a:Contact",
+   "button:Arabic",
+   "button:English",
+   "a:Sign in",
+   "a:Create account",
+   "input:Search Khalsni services"
+  ]
+ },
+ {
+  "where": "login en 1440",
+  "seq": [
+   "a:Skip to main content",
+   "a:Khalsni home",
+   "a:Services",
+   "a:About",
+   "a:For business",
+   "a:FAQ",
+   "a:Contact",
+   "button:Arabic",
+   "button:English",
+   "a:Sign in"
+  ],
+  "noRing": []
+ },
+ {
+  "where": "keyboard login en 1440",
+  "ok": true,
+  "url": "/customer"
+ },
+ {
+  "where": "notifications panel en 1440",
+  "dialogsOpen": 1,
+  "focusAfterOpen": {
+   "tag": "button",
+   "name": "Mark all as read",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 666,
+   "y": 150
+  },
+  "visibleDialogsAfterEscape": 0,
+  "focusAfterEscape": {
+   "tag": "button",
+   "name": "Notifications",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 1223,
+   "y": 42
+  }
+ },
+ {
+  "where": "help panel en 1440",
+  "focusMovedIntoDialog": true,
+  "focusStillInsideAfter15Tabs": true,
+  "walk": [
+   "button:Close",
+   "button:Current page",
+   "button:Manual library",
+   "input:",
+   "button:Close",
+   "button:Current page"
+  ],
+  "visibleDialogsAfterEscape": 0
+ },
+ {
+  "where": "wizard en 1440",
+  "seq": [
+   "button:Save draft",
+   "select:Select a category\nCivil Status and Passp",
+   "select:Select a service\nTax Clearance\nPassport ",
+   "button:Next",
+   "body:undefined",
+   "a:Skip to main content",
+   "a:Khalsni",
+   "a:Khalsni",
+   "a:My dashboard",
+   "a:New request",
+   "a:My requests",
+   "a:Browse services",
+   "a:Profile",
+   "a:Manual",
+   "button:Notifications",
+   "button:More options",
+   "button:Save draft",
+   "select:Select a category\nCivil Status and Passp",
+   "select:Select a service\nTax Clearance\nPassport ",
+   "button:Next"
+  ],
+  "noRing": [],
+  "offscreen": 0
+ },
+ {
+  "where": "home ar 390",
+  "firstFocus": {
+   "tag": "a",
+   "name": "تخطَّ إلى المحتوى الرئيسي",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 168,
+   "y": 12
+  },
+  "skipLinkFirst": false,
+  "noRing": [],
+  "seq": [
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "a:الصفحة الرئيسية لخلصني",
+   "button:فتح قائمة التنقل",
+   "input:البحث في خدمات خلصني",
+   "button:براءة ذمة ضريبية\nخدمة براءة ذمة ضريبية.\n",
+   "button:تجديد جواز السفر\nخدمة تجديد جواز السفر.\n",
+   "button:تجديد رخصة مهن\nخدمة تجديد رخصة مهن.\nخدمة",
+   "button:حجز موعد جواز سفر\nخدمة حجز موعد جواز سفر",
+   "button:خدمة اختبار رحلة الطلب\nخدمة اختبار داخلي",
+   "button:دفع المخالفات المرورية\nخدمة دفع المخالفا",
+   "a:ابدأ الآن",
+   "a:تتبع طلبك"
+  ]
+ },
+ {
+  "where": "login ar 390",
+  "seq": [
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "a:الصفحة الرئيسية لخلصني",
+   "button:فتح قائمة التنقل",
+   "a:خلصني",
+   "input:email",
+   "input:password",
+   "input:remember",
+   "a:نسيت كلمة المرور؟",
+   "button:دخول",
+   "a:إنشاء حساب عميل"
+  ],
+  "noRing": []
+ },
+ {
+  "where": "keyboard login ar 390",
+  "ok": true,
+  "url": "/customer"
+ },
+ {
+  "where": "notifications panel ar 390",
+  "dialogsOpen": 1,
+  "focusAfterOpen": {
+   "tag": "button",
+   "name": "تعليم الكل كمقروء",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 98,
+   "y": 138
+  },
+  "visibleDialogsAfterEscape": 0,
+  "focusAfterEscape": {
+   "tag": "button",
+   "name": "الإشعارات",
+   "visibleRing": true,
+   "inViewport": true,
+   "x": 77,
+   "y": 26
+  }
+ },
+ {
+  "where": "wizard ar 390",
+  "seq": [
+   "button:حفظ كمسودة",
+   "select:اختر التصنيف\nالأحوال المدنية والجوازات\nا",
+   "select:اختر الخدمة\nبراءة ذمة ضريبية\nتجديد جواز ",
+   "button:التالي",
+   "body:undefined",
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "button:فتح القائمة الجانبية",
+   "button:الإشعارات",
+   "button:المزيد من الخيارات",
+   "button:حفظ كمسودة",
+   "select:اختر التصنيف\nالأحوال المدنية والجوازات\nا",
+   "select:اختر الخدمة\nبراءة ذمة ضريبية\nتجديد جواز ",
+   "button:التالي",
+   "body:undefined",
+   "a:تخطَّ إلى المحتوى الرئيسي",
+   "button:فتح القائمة الجانبية",
+   "button:الإشعارات",
+   "button:المزيد من الخيارات",
+   "button:حفظ كمسودة",
+   "select:اختر التصنيف\nالأحوال المدنية والجوازات\nا"
+  ],
+  "noRing": [],
+  "offscreen": 0
+ }
+]

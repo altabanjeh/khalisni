@@ -1,0 +1,52 @@
+URL: http://127.0.0.1:4351/customer
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+Customer portal
+
+CUSTOMER PORTAL
+
+Welcome, Acceptance
+
+Everything about your requests in one place — start with what needs you now.
+
+New request
+Browse services
+
+0
+
+Active
+
+0
+
+Needs you
+
+0
+
+Completed
+
+Active requests
+All requests
+No active requests
+
+Start your first request from the service catalog and it will appear here with its status and next step.
+
+Browse services
+Recently updated
+View all
+
+No activity yet.
+
+Latest notifications
+
+No recent notifications.
+
+Need help?
+
+Open the user guide or follow an existing request from the tracking page.
+
+Open the guide
+Track a request

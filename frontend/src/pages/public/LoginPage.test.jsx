@@ -95,7 +95,7 @@ test('remember me stores tokens in localStorage only', async () => {
   vi.spyOn(api, 'login').mockResolvedValueOnce({
     access: 'remember-access-token',
     refresh: 'remember-refresh-token',
-    user: { id: 2, full_name: 'Ø£Ø­Ù…Ø¯ Ø®Ø§Ù„Ø¯', role: 'customer', email: 'customer@khalisni.local' },
+    user: { id: 2, full_name: 'أحمد خالد', role: 'customer', email: 'customer@khalisni.local' },
   })
 
   renderLoginPage('/login')

@@ -18,13 +18,14 @@ import { theme } from '../../../theme';
 import type { UploadableDocument } from '../../../types/document';
 import type { ServiceRequirement } from '../../../types/service';
 import {
-  buildDynamicNotes,
+  buildServiceAnswers,
   buildUploadHint,
   getDocumentFieldName,
   getRequiredDocumentLabel,
   getRequiredDocumentType,
   getServiceSchemaFields,
   validateUploadableFile,
+  validateSchemaAnswerFormat,
   isSchemaFieldVisible,
 } from '../../../utils/serviceForms';
 import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../../utils/orderConsent';
@@ -115,6 +116,11 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
           validationErrors[field.inputName] = `${field.label} مطلوب.`;
         }
       });
+      schemaFields.forEach((field) => {
+        if (validationErrors[field.inputName] || !isSchemaFieldVisible(field, schemaFields, dynamicValues)) return;
+        const formatError = validateSchemaAnswerFormat(field, dynamicValues[field.inputName]);
+        if (formatError) validationErrors[field.inputName] = formatError;
+      });
 
       requiredDocuments.forEach((document, index) => {
         const fieldName = getDocumentFieldName(document, index);
@@ -131,7 +137,11 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
         throw new Error('validation');
       }
 
-      const builtNotes = buildDynamicNotes(notes, schemaFields, dynamicValues);
+      // `notes` is only the customer's own text; the server writes the
+      // additional-information section from the validated service_answers.
+      const customerNotes = notes.trim();
+      const serviceAnswers = buildServiceAnswers(schemaFields, dynamicValues);
+      const serviceAnswersJson = JSON.stringify(serviceAnswers);
       const describeFile = (file: UploadableDocument) => [file.uri, file.name, file.size ?? null];
       const fingerprint = JSON.stringify([
         selectedServiceId,
@@ -139,7 +149,8 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
         phone.trim(),
         nationalId.trim(),
         city.trim(),
-        builtNotes,
+        customerNotes,
+        serviceAnswersJson,
         consent,
         requiredDocuments.length
           ? requiredDocuments.map((document, index) => {
@@ -158,7 +169,8 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       formData.append('phone', phone.trim());
       formData.append('national_id', nationalId.trim());
       formData.append('city', city.trim());
-      formData.append('notes', builtNotes);
+      formData.append('notes', customerNotes);
+      formData.append('service_answers', serviceAnswersJson);
       formData.append('consent', consent ? 'true' : 'false');
       // Names the consent statement shown on this screen (backend/orders/consent.py).
       formData.append('consent_version', ORDER_CONSENT_VERSION);
@@ -194,9 +206,78 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
         setServerError('تم استخدام مفتاح هذا الإرسال مع بيانات مختلفة. تحقق من قائمة طلباتك أولاً، ثم اضغط إرسال مرة أخرى إذا لم يظهر الطلب.');
         return;
       }
-      setServerError(getDisplayError(error));
+      applyServerErrors(error);
     },
   });
+
+  // Put each server validation error on the field it belongs to (audit M-09);
+  // anything without a visible field goes to the general message.
+  const applyServerErrors = (error: unknown) => {
+    const apiError = normalizeApiError(error);
+    const placed: Record<string, string> = {};
+    const general: string[] = [];
+    const fieldNames: Record<string, string> = {
+      service: 'service',
+      full_name: 'full_name',
+      phone: 'phone',
+      national_id: 'national_id',
+      city: 'city',
+      notes: 'notes',
+      consent: 'consent',
+      consent_version: 'consent',
+    };
+    const visibleFields = schemaFields.filter((field) => isSchemaFieldVisible(field, schemaFields, dynamicValues));
+    const documentFieldFor = (documentType: string) => {
+      const index = requiredDocuments.findIndex(
+        (document, position) => getRequiredDocumentType(document, position) === String(documentType).trim().toLowerCase(),
+      );
+      return index >= 0 ? getDocumentFieldName(requiredDocuments[index], index) : null;
+    };
+    // Requirements actually sent, in sending order, for index-keyed errors.
+    const sentDocuments = requiredDocuments
+      .map((document, index) => ({ document, index }))
+      .filter(({ document, index }) => selectedDocuments[getDocumentFieldName(document, index)]);
+
+    Object.entries(apiError.serviceAnswerErrors ?? {}).forEach(([key, message]) => {
+      const field = visibleFields.find((candidate) => candidate.key === key);
+      if (field) placed[field.inputName] = message;
+      else general.push(message);
+    });
+
+    Object.entries(apiError.documentErrors ?? {}).forEach(([documentType, message]) => {
+      const fieldName = documentFieldFor(documentType);
+      if (fieldName) placed[fieldName] = message;
+      else general.push(message);
+    });
+
+    Object.entries(apiError.fieldErrors ?? {}).forEach(([key, messages]) => {
+      const message = messages.find(Boolean);
+      if (!message) return;
+      const indexMatch = /^(documents|document_types)\[(\d+)\]$/.exec(key);
+      if (indexMatch) {
+        if (apiError.documentErrors) return; // already placed by document type
+        const sent = sentDocuments[Number(indexMatch[2])];
+        if (sent) {
+          placed[getDocumentFieldName(sent.document, sent.index)] = message;
+          return;
+        }
+      }
+      if (fieldNames[key]) {
+        placed[fieldNames[key]] = message;
+        return;
+      }
+      general.push(message);
+    });
+
+    setErrors(placed);
+    if (general.length) {
+      setServerError(general.join(' '));
+    } else if (Object.keys(placed).length) {
+      setServerError('يرجى تصحيح الحقول المشار إليها ثم إعادة الإرسال.');
+    } else {
+      setServerError(apiError.message || getDisplayError(error));
+    }
+  };
 
   const pickDocument = async (document?: ServiceRequirement, index = 0) => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -251,7 +332,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
   }
 
   return (
-    <AppScreen title="طلب خدمة" subtitle="أدخل بياناتك وارفع الوثائق بنفس منطق نموذج الموقع، لكن بترتيب مناسب للجوال.">
+    <AppScreen title="طلب خدمة" subtitle="أدخل بياناتك وارفع الوثائق المطلوبة لإرسال الطلب.">
       <View style={styles.stack}>
         <AppCard style={styles.stack}>
           <Text style={styles.sectionTitle}>الخدمة المختارة</Text>
@@ -280,9 +361,9 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
           <Text style={styles.sectionTitle}>بيانات الطلب</Text>
           <AppInput label="الاسم الكامل" value={fullName} onChangeText={setFullName} error={errors.full_name} />
           <AppInput label="رقم الهاتف" value={phone} onChangeText={setPhone} keyboardType="phone-pad" error={errors.phone} />
-          <AppInput label="الرقم الوطني" value={nationalId} onChangeText={setNationalId} />
+          <AppInput label="الرقم الوطني" value={nationalId} onChangeText={setNationalId} error={errors.national_id} />
           <AppInput label="المدينة" value={city} onChangeText={setCity} error={errors.city} />
-          <AppInput label="ملاحظات" value={notes} onChangeText={setNotes} multiline />
+          <AppInput label="ملاحظات" value={notes} onChangeText={setNotes} multiline error={errors.notes} />
         </AppCard>
 
         {schemaFields.length ? (
@@ -322,14 +403,11 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
                     onChangeText={(value) => setDynamicValues((current) => ({ ...current, [field.inputName]: value }))}
                     keyboardType={getKeyboardType(field.type)}
                     multiline={field.type === 'textarea'}
-                    placeholder={field.placeholder}
+                    placeholder={field.placeholder || (field.type === 'date' ? 'YYYY-MM-DD' : undefined)}
                     hint={field.helpText}
                     error={errors[field.inputName]}
                   />
                 )}
-                {field.type !== 'textarea' && field.type !== 'select' && field.type !== 'checkbox' && errors[field.inputName] ? (
-                  <Text style={styles.errorText}>{errors[field.inputName]}</Text>
-                ) : null}
                 {field.type === 'select' && errors[field.inputName] ? <Text style={styles.errorText}>{errors[field.inputName]}</Text> : null}
                 {field.type === 'checkbox' && errors[field.inputName] ? <Text style={styles.errorText}>{errors[field.inputName]}</Text> : null}
               </View>
