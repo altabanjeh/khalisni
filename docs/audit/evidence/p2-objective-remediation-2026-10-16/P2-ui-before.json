@@ -1,0 +1,614 @@
+{
+ "localization": [
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin",
+   "leaks": [
+    "NEW",
+    "WAITING_CUSTOMER",
+    "COMPLETED"
+   ],
+   "chartTicks": "COMPLETED | COMPLETED | NEW | NEW | WAITING_CUSTOMER | WAITING_CUSTOMER | 0 | 0 | 0.5 | 0.5 | 1 | 1 | 1.5 | 1.5 | 2 | 2 | 4 | 4 | 2 | 2 | 1 | 1 | 1 | 1"
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders/6",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders/8",
+   "leaks": [
+    "Order assigned to provider",
+    "Provider completed work and uploaded final result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/rules",
+   "leaks": [
+    "Expected completion"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/services",
+   "leaks": [
+    "Expected completion",
+    "client-audit-qa-202610-authorization"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/documents/verify",
+   "leaks": [
+    "client-audit-qa-202610-authorization",
+    "final-result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/orders/6",
+   "leaks": [
+    "Approved"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/orders/8",
+   "leaks": [
+    "Approved",
+    "Order assigned to provider",
+    "Provider completed work and uploaded final result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "provider",
+   "route": "/provider/orders/8",
+   "leaks": [
+    "Order assigned to provider",
+    "Provider completed work and uploaded final result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "customer",
+   "route": "/customer/orders/8",
+   "leaks": [
+    "final-result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "customer",
+   "route": "/customer/orders/5/missing-docs",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer (bell)",
+   "leaks": [
+    "Order completed",
+    "Order received",
+    "Final result uploaded",
+    "More documents required",
+    "was created successfully"
+   ]
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer/orders/3",
+   "leaks": [
+    "final-result"
+   ]
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer/orders/1",
+   "leaks": []
+  }
+ ],
+ "users": {
+  "verifiedBadges": 13,
+  "activeBadges": 1,
+  "notVerified": 0,
+  "rowsText": 13
+ },
+ "services": {
+  "servicesPageRows": 20,
+  "servicesPaginationText": [],
+  "rulesServicesRows": 20,
+  "rulesServicesPaginationText": [],
+  "rulesDocumentsRows": 20,
+  "rulesDocumentsPaginationText": []
+ },
+ "axe": [
+  {
+   "label": "1440-A-admin",
+   "route": "/admin",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders/6",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders/8",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/rules",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/services",
+   "violations": []
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/documents/verify",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<p class=\"mt-1 text-xs font-semibold text-slate-500\">#KH-2026-000008 · final-result</p>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/orders/6",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/orders/8",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "1440-A-provider",
+   "route": "/provider/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-customer",
+   "route": "/customer/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-customer",
+   "route": "/customer/orders/5/missing-docs",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders/6",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-[0.7rem] font-bold uppercase tracking-wide text-slate-500\">المرحلة الحالية</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 8.4pt (11.2px), font weight: bold). Expected contrast rati"
+      },
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders/8",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-[0.7rem] font-bold uppercase tracking-wide text-slate-500\">المرحلة الحالية</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 8.4pt (11.2px), font weight: bold). Expected contrast rati"
+      },
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/rules",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/services",
+   "violations": []
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/documents/verify",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<p class=\"mt-1 text-xs font-semibold text-slate-500\">#KH-2026-000008 · final-result</p>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/orders/6",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/orders/8",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-provider",
+   "route": "/provider/orders/8",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "nodes": [
+      {
+       "html": "<span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١١:٣٥ ص</span>",
+       "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast rati"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-A-customer",
+   "route": "/customer/orders/8",
+   "violations": []
+  },
+  {
+   "label": "390-A-customer",
+   "route": "/customer/orders/5/missing-docs",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#قواعد سير العمل",
+   "violations": [
+    {
+     "id": "scrollable-region-focusable",
+     "nodes": [
+      {
+       "html": "<div class=\"max-h-[70vh] overflow-auto\">",
+       "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#قواعد سير العمل",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#الخدمات والأسعار",
+   "violations": []
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#الخدمات والأسعار",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#المستندات المطلوبة",
+   "violations": []
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#المستندات المطلوبة",
+   "violations": []
+  },
+  {
+   "label": "390-A-public-ar",
+   "route": "/",
+   "violations": []
+  },
+  {
+   "label": "390-A-public-en",
+   "route": "/",
+   "violations": []
+  }
+ ],
+ "footer": [
+  {
+   "lang": "ar",
+   "targets": [
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "طلب خاص",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الرئيسية",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "تتبع الطلب",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الأسئلة الشائعة",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "سياسة الخصوصية",
+     "w": 366,
+     "h": 20
+    }
+   ],
+   "undersized": [
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "طلب خاص",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الرئيسية",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "تتبع الطلب",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "الأسئلة الشائعة",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "سياسة الخصوصية",
+     "w": 366,
+     "h": 20
+    }
+   ]
+  },
+  {
+   "lang": "en",
+   "targets": [
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Special request",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Home",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Track request",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "FAQ",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Privacy policy",
+     "w": 366,
+     "h": 20
+    }
+   ],
+   "undersized": [
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Special request",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Home",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Track request",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "FAQ",
+     "w": 366,
+     "h": 20
+    },
+    {
+     "text": "Privacy policy",
+     "w": 366,
+     "h": 20
+    }
+   ]
+  }
+ ],
+ "scrollRegions": [
+  {
+   "cls": "fixed inset-y-3 left-3 right-3 z-50 flex flex-col overflow-y-auto rounded-[1.5re",
+   "tabIndex": -1,
+   "role": null,
+   "label": "لوحة الإدارة"
+  },
+  {
+   "cls": "max-h-[70vh] overflow-auto",
+   "tabIndex": -1,
+   "role": null,
+   "label": ""
+  }
+ ]
+}

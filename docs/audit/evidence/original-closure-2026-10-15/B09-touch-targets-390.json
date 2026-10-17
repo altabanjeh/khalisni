@@ -1,0 +1,16 @@
+{
+ "/services/business_company_registration": [
+  "A 366x20 \"كل الخدمات\" inFooter=false",
+  "A 366x20 \"الخدمات\" inFooter=true",
+  "A 366x20 \"طلب خاص\" inFooter=true",
+  "A 366x20 \"الرئيسية\" inFooter=true",
+  "A 366x20 \"الخدمات\" inFooter=true",
+  "A 366x20 \"تتبع الطلب\" inFooter=true",
+  "A 366x20 \"الأسئلة الشائعة\" inFooter=true",
+  "A 366x20 \"سياسة الخصوصية\" inFooter=true",
+  "A 366x20 \"+962 6 560 9000\" inFooter=true",
+  "A 366x20 \"support@khalisni.local\" inFooter=true"
+ ],
+ "/customer/orders/5/missing-docs": [],
+ "/provider/orders/8": []
+}

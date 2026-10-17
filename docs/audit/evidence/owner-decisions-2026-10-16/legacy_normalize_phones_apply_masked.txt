@@ -1,0 +1,9 @@
+CommandError: Apply mode changes data. Re-run with --confirm NORMALIZE after reviewing the dry run.
+  missing_service_request  normalize  1
+  user                     normalize  13
+Report written to <scratch>/odi/private_phone_report.json (contains full phone numbers; keep it private).
+Applied: 14 phone value(s) rewritten. Collisions and invalid values were not touched.
+Summary:
+  missing_service_request  unchanged  1
+  user                     unchanged  13
+Dry run: nothing was changed.

@@ -1,0 +1,14 @@
+{
+ "customer": {
+  "statusBefore": "WAITING_CUSTOMER",
+  "flag": false,
+  "safeState": true,
+  "message": true,
+  "progress00": false,
+  "fileInputs": 0,
+  "resubmitButtons": 0,
+  "falseSuccess": false,
+  "nonGetRequests": [],
+  "statusAfter": "WAITING_CUSTOMER"
+ }
+}

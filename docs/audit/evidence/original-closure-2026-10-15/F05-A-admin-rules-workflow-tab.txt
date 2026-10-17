@@ -1,0 +1,102 @@
+URL: http://127.0.0.1:4319/admin/rules
+TITLE: خلصني | Khalsni
+DIR: rtl LANG: ar
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+بوابة العمل
+
+لوحة الإدارة
+
+نظرة عامة
+
+لوحة الإدارة
+
+العمليات
+
+إدارة الطلبات
+طلبات الخدمات الجديدة
+المدفوعات
+قواعد التشغيل
+الإشعارات
+
+إدارة الخدمات
+
+تصنيفات الخدمات
+الخدمات
+علاقات الخدمات
+
+المستخدمون والمزوّدون
+
+المستخدمون والأدوار
+المزوّدون
+خدمات المزوّدين
+
+المحتوى والموقع العام
+
+الموقع العام
+محتوى الرئيسية
+الإعلانات
+المظهر العام
+معاينة الواجهة
+إدارة الدليل
+
+التقارير والتدقيق
+
+التقارير
+سجل التدقيق
+
+الإعدادات
+
+إعدادات النظام
+الدليل
+لوحة الإدارة
+
+قواعد الإدارة
+
+إدارة القواعد
+
+إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.
+
+الخدمات والأسعار
+المستندات المطلوبة
+قواعد المزودين
+قواعد سير العمل
+قوالب الإشعارات
+المدفوعات
+المستخدمون والأدوار
+سجلات التدقيق
+إعدادات النظام
+مراجعة قواعد سير العمل
+
+تشرح هذه الشاشة سير العمل النشط بلغة بسيطة. لا يمكن تعديل الانتقالات الخطرة مباشرة من واجهة الإدارة.
+
+إذا تمت إضافة اعتماد لتغيير سير العمل لاحقاً، فيجب أن تتجه طلبات التغيير إليه بدلاً من التعديل المباشر.
+
+القاعدة	الإجراء	مسار الإجراء	الشروط	من يمكنه التنفيذ	يتطلب سبباً	يرسل إشعاراً	تعديل مباشر
+New to Archived by Admin	archive_order	تحديث الحالة	لا توجد شروط إضافية	Admin	لا	لا	غير مسموح
+New to Under review by Admin, Employee, Support	start_review	تحديث الحالة	internal_actor_required	Admin, Employee, Support	لا	لا	غير مسموح
+New to Cancelled by Admin, Customer	cancel_order	إجراء مخصص	customer_owns_order	Admin, Customer	نعم	نعم	غير مسموح
+Under review to Waiting customer by Admin, Employee, Support	request_missing_documents	إجراء مخصص	note_required	Admin, Employee, Support	نعم	نعم	غير مسموح
+Under review to Assigned by Admin, Employee, Support	assign_provider	إجراء مخصص	provider_required, required_documents_approved, provider_approved, provider_available, provider_service_match	Admin, Employee, Support	لا	نعم	غير مسموح
+Under review to Rejected by Admin, Employee, Support	reject_order	إجراء مخصص	reason_required	Admin, Employee, Support	نعم	نعم	غير مسموح
+Under review to Cancelled by Admin, Employee, Support	cancel_order	إجراء مخصص	assigned_employee_or_unassigned	Admin, Employee, Support	نعم	نعم	غير مسموح
+Waiting customer to Under review by Admin, Customer, Employee, Support	resume_review	إجراء مخصص	all_missing_documents_uploaded	Admin, Customer, Employee, Support	لا	لا	غير مسموح
+Waiting customer to Cancelled by Admin, Employee, Support	cancel_order	إجراء مخصص	assigned_employee_or_unassigned	Admin, Employee, Support	نعم	نعم	غير مسموح
+Assigned to In progress by Provider	provider_start_work	تحديث المزوّد	assigned_provider_only	Provider	لا	لا	غير مسموح
+Assigned to Cancelled by Admin	cancel_order	إجراء مخصص	لا توجد شروط إضافية	Admin	نعم	نعم	غير مسموح
+In progress to Waiting government by Provider	provider_pause_for_government	تحديث المزوّد	assigned_provider_only	Provider	لا	لا	غير مسموح
+In progress to Ready for delivery by Admin, Employee, Provider, Support	mark_ready_for_delivery	إجراء مخصص	final_document_required, required_documents_approved	Admin, Employee, Provider, Support	لا	نعم	غير مسموح
+In progress to Rejected by Admin, Employee, Support	reject_order	إجراء مخصص	reason_required	Admin, Employee, Support	نعم	نعم	غير مسموح
+In progress to Cancelled by Admin	cancel_order	إجراء مخصص	لا توجد شروط إضافية	Admin	نعم	نعم	غير مسموح
+Waiting government to In progress by Provider	provider_resume_work	تحديث المزوّد	assigned_provider_only	Provider	لا	لا	غير مسموح
+Waiting government to Ready for delivery by Admin, Employee, Provider, Support	mark_ready_for_delivery	إجراء مخصص	final_document_required, required_documents_approved	Admin, Employee, Provider, Support	لا	نعم	غير مسموح
+Waiting government to Cancelled by Admin	cancel_order	إجراء مخصص	لا توجد شروط إضافية	Admin	نعم	نعم	غير مسموح
+Ready for delivery to Under review by Admin, Employee, Support	return_to_internal_review	تحديث الحالة	reason_required	Admin, Employee, Support	نعم	لا	غير مسموح
+Ready for delivery to In progress by Admin, Employee, Support	return_to_provider	تحديث الحالة	assigned_provider_required, reason_required	Admin, Employee, Support	نعم	لا	غير مسموح
+Ready for delivery to Completed by Admin, Employee, Support	complete_order	إجراء مخصص	final_document_verified_or_admin_override	Admin, Employee, Support	لا	نعم	غير مسموح
+Ready for delivery to Cancelled by Admin	cancel_order	إجراء مخصص	لا توجد شروط إضافية	Admin	نعم	نعم	غير مسموح
+Completed to Under review by Admin	reopen_order	تحديث الحالة	reason_required	Admin	نعم	نعم	غير مسموح
+Completed to Archived by Admin	archive_order	تحديث الحالة	لا توجد شروط إضافية	Admin	لا	لا	غير مسموح
+Rejected to Archived by Admin	archive_order	تحديث الحالة	لا توجد شروط إضافية	Admin	لا	لا	غير مسموح
+Cancelled to Archived by Admin	archive_order	تحديث الحالة	لا توجد شروط إضافية	Admin	لا	لا	غير مسموح

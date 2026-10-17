@@ -1,0 +1,71 @@
+[
+ {
+  "step": "D02 service page shows the approved price wording",
+  "result": "PASS",
+  "detail": "public service page"
+ },
+ {
+  "step": "D02 service page has no admin-panel wording",
+  "result": "PASS",
+  "detail": "public service page"
+ },
+ {
+  "step": "D02 services list has no admin-panel wording",
+  "result": "PASS",
+  "detail": "/services"
+ },
+ {
+  "step": "B10-1 question is a yes/no select",
+  "result": "PASS",
+  "detail": [
+   "اختر القيمة",
+   "نعم",
+   "لا"
+  ]
+ },
+ {
+  "step": "B10-2 parcel/basin hidden before an answer",
+  "result": "PASS",
+  "detail": "hidden"
+ },
+ {
+  "step": "B10-3 help text says staff can assist",
+  "result": "PASS",
+  "detail": "help text"
+ },
+ {
+  "step": "B10-2 \"yes\" shows parcel and basin as text inputs",
+  "result": "PASS",
+  "detail": "text"
+ },
+ {
+  "step": "B10 leading zero kept in the parcel field",
+  "result": "PASS",
+  "detail": "012"
+ },
+ {
+  "step": "B10-2 \"no\" hides parcel and basin",
+  "result": "PASS",
+  "detail": "hidden after no"
+ },
+ {
+  "step": "B10-4 additional notes field present",
+  "result": "PASS",
+  "detail": 1
+ },
+ {
+  "step": "B10-4 empty notes and hidden parcel/basin raise no required error",
+  "result": "PASS",
+  "detail": [
+   "*",
+   "*",
+   "*",
+   "المدينة مطلوبة",
+   "الحقل الاسم الكامل مطلوب",
+   "الحقل الرقم الوطني مطلوب",
+   "الحقل رقم الهاتف مطلوب",
+   "الحقل المنطقة مطلوب",
+   "الحقل المحافظة مطلوب"
+  ]
+ }
+]

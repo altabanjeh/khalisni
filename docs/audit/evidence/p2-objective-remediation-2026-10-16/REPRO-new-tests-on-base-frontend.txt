@@ -1,0 +1,5925 @@
+
+ RUN  v3.2.4 D:/p2base/frontend
+
+ ❯ src/pages/admin/ServicesManagementPage.pagination.test.jsx (2 tests | 2 failed) 10ms
+   × every service is reachable with next and previous, and the current page is announced 7ms
+     → getAdminServicesPage does not exist
+   × category filter and search go to the server and restart at page one 1ms
+     → getAdminServicesPage does not exist
+ ❯ src/pages/admin/AdminUsersRolesPage.verification.test.jsx (2 tests | 2 failed) 149ms
+   × an active user is not shown as verified, and each verification fact is separate 110ms
+     → Unable to find an element by: [data-testid="user-account-state"]
+
+Ignored nodes: comments, script, style
+<tr
+  class="transition hover:bg-brand-50/40"
+>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    Active Unverified
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    a@example.test
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex flex-wrap items-center gap-2"
+    >
+      <span>
+        موظف
+      </span>
+    </div>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <span
+      class="status-pill bg-green-100 text-green-700"
+    >
+      <svg
+        aria-hidden="true"
+        class="lucide lucide-shield-check h-3.5 w-3.5"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+        <path
+          d="m9 12 2 2 4-4"
+        />
+      </svg>
+      <span>
+        تم التحقق
+      </span>
+    </span>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex gap-2"
+    >
+      <button
+        class="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعديل
+      </button>
+      <button
+        class="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعطيل
+      </button>
+    </div>
+  </td>
+</tr>
+   × a missing verification field is reported as not available, never as verified 37ms
+     → Unable to find an element by: [data-testid="user-verification"]
+
+Ignored nodes: comments, script, style
+<tr
+  class="transition hover:bg-brand-50/40"
+>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    Old Payload
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    d@example.test
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex flex-wrap items-center gap-2"
+    >
+      <span>
+        موظف
+      </span>
+    </div>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <span
+      class="status-pill bg-green-100 text-green-700"
+    >
+      <svg
+        aria-hidden="true"
+        class="lucide lucide-shield-check h-3.5 w-3.5"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+        <path
+          d="m9 12 2 2 4-4"
+        />
+      </svg>
+      <span>
+        تم التحقق
+      </span>
+    </span>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex gap-2"
+    >
+      <button
+        class="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعديل
+      </button>
+      <button
+        class="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعطيل
+      </button>
+    </div>
+  </td>
+</tr>
+stderr | src/components/a11y.p2.test.jsx > footer links carry the minimum target-size classes
+An update to PublicSiteProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PublicSiteProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PublicSiteProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ❯ src/components/a11y.p2.test.jsx (3 tests | 3 failed) 296ms
+   × data table scroll region is a named, focusable region with a visible focus style 184ms
+     → Unable to find an accessible element with the role "region" and name "قواعد سير العمل"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "":
+  <div
+    class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+    dir="rtl"
+    role="region"
+  />
+
+  --------------------------------------------------
+  table:
+
+  Name "":
+  <table
+    class="min-w-full divide-y divide-border text-sm"
+  />
+
+  --------------------------------------------------
+  rowgroup:
+
+  Name "":
+  <thead
+    class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+  />
+
+  Name "":
+  <tbody
+    class="divide-y divide-brand-50"
+  />
+
+  --------------------------------------------------
+  row:
+
+  Name "الاسم":
+  <tr />
+
+  Name "صف 1":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 2":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 3":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 4":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 5":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 6":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 7":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 8":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 9":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 10":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 11":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 12":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 13":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 14":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 15":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 16":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 17":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 18":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 19":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 20":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 21":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 22":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 23":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 24":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 25":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 26":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 27":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 28":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 29":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 30":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  --------------------------------------------------
+  columnheader:
+
+  Name "الاسم":
+  <th
+    class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+  />
+
+  --------------------------------------------------
+  cell:
+
+  Name "صف 1":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 2":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 3":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 4":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 5":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 6":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 7":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 8":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 9":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 10":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 11":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 12":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 13":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 14":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 15":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 16":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 17":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 18":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 19":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 20":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 21":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 22":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 23":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 24":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 25":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 26":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 27":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 28":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 29":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 30":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="space-y-4"
+    >
+      <div
+        class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+        dir="rtl"
+        role="region"
+      >
+        <div
+          class="max-h-[70vh] overflow-auto"
+        >
+          <table
+            class="min-w-full divide-y divide-border text-sm"
+          >
+            <thead
+              class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+            >
+              <tr>
+                <th
+                  class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+                >
+                  الاسم
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-brand-50"
+            >
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 1
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 2
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 3
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 4
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 5
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 6
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 7
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 8
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 9
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 10
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 11
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 12
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 13
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 14
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 15
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 16
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 17
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 18
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 19
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 20
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 21
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 22
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 23
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 24
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 25
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 26
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 27
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 28
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 29
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 30
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+   × data table region gets a default name 76ms
+     → Unable to find an accessible element with the role "region" and name "جدول البيانات"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "":
+  <div
+    class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+    dir="rtl"
+    role="region"
+  />
+
+  --------------------------------------------------
+  table:
+
+  Name "":
+  <table
+    class="min-w-full divide-y divide-border text-sm"
+  />
+
+  --------------------------------------------------
+  rowgroup:
+
+  Name "":
+  <thead
+    class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+  />
+
+  Name "":
+  <tbody
+    class="divide-y divide-brand-50"
+  />
+
+  --------------------------------------------------
+  row:
+
+  Name "الاسم":
+  <tr />
+
+  Name "صف 1":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 2":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 3":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 4":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 5":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 6":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 7":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 8":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 9":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 10":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 11":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 12":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 13":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 14":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 15":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 16":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 17":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 18":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 19":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 20":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 21":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 22":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 23":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 24":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 25":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 26":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 27":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 28":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 29":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 30":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  --------------------------------------------------
+  columnheader:
+
+  Name "الاسم":
+  <th
+    class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+  />
+
+  --------------------------------------------------
+  cell:
+
+  Name "صف 1":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 2":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 3":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 4":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 5":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 6":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 7":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 8":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 9":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 10":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 11":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 12":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 13":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 14":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 15":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 16":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 17":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 18":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 19":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 20":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 21":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 22":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 23":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 24":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 25":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 26":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 27":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 28":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 29":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 30":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="space-y-4"
+    >
+      <div
+        class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+        dir="rtl"
+        role="region"
+      >
+        <div
+          class="max-h-[70vh] overflow-auto"
+        >
+          <table
+            class="min-w-full divide-y divide-border text-sm"
+          >
+            <thead
+              class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+            >
+              <tr>
+                <th
+                  class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+                >
+                  الاسم
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-brand-50"
+            >
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 1
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 2
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 3
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 4
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 5
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 6
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 7
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 8
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 9
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 10
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 11
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 12
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 13
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 14
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 15
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 16
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 17
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 18
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 19
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 20
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 21
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 22
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 23
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 24
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 25
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 26
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 27
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 28
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 29
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 30
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+   × footer links carry the minimum target-size classes 35ms
+     → expect(element).toHaveClass("min-h-6")
+
+Expected the element to have class:
+  min-h-6
+Received:
+  hover:text-[var(--khalsni-public-primary)]
+ ❯ src/pages/admin/AdminRuleManagementPage.pagination.test.jsx (2 tests | 2 failed) 1080ms
+   × the rules services tab shows all 38 services across pages, durations in Arabic 1078ms
+     → Unable to find role="region" and name "الخدمات والأسعار"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="page-section space-y-6"
+    >
+      <header
+        class="rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-soft sm:p-6"
+      >
+        <div
+          class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div
+            class="flex items-start gap-4"
+          >
+            <span
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-file-stack h-5 w-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"
+                />
+              </svg>
+            </span>
+            <div
+              class="min-w-0"
+            >
+              <p
+                class="text-sm font-semibold text-brand-600"
+              >
+                قواعد الإدارة
+              </p>
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3"
+              >
+                <h1
+                  class="break-words text-2xl font-extrabold text-ink md:text-3xl"
+                >
+                  إدارة القواعد
+                </h1>
+              </div>
+              <p
+                class="mt-3 max-w-3xl text-sm leading-7 text-slate-600"
+              >
+                إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div
+        class="flex flex-wrap gap-3"
+      >
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-brand-600 text-white shadow-soft"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sliders-horizontal h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="21"
+              x2="14"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="10"
+              x2="3"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="21"
+              x2="12"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="8"
+              x2="3"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="21"
+              x2="16"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="12"
+              x2="3"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="14"
+              x2="14"
+              y1="2"
+              y2="6"
+            />
+            <line
+              x1="8"
+              x2="8"
+              y1="10"
+              y2="14"
+            />
+            <line
+              x1="16"
+              x2="16"
+              y1="18"
+              y2="22"
+            />
+          </svg>
+          <span>
+            الخدمات والأسعار
+          </span>
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-white text-slate-600"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-file-check2 lucide-file-check-2 h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="page-section space-y-6"
+    >
+      <header
+        class="rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-soft sm:p-6"
+      >
+        <div
+          class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div
+            class="flex items-start gap-4"
+          >
+            <span
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-file-stack h-5 w-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"
+                />
+              </svg>
+            </span>
+            <div
+              class="min-w-0"
+            >
+              <p
+                class="text-sm font-semibold text-brand-600"
+              >
+                قواعد الإدارة
+              </p>
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3"
+              >
+                <h1
+                  class="break-words text-2xl font-extrabold text-ink md:text-3xl"
+                >
+                  إدارة القواعد
+                </h1>
+              </div>
+              <p
+                class="mt-3 max-w-3xl text-sm leading-7 text-slate-600"
+              >
+                إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div
+        class="flex flex-wrap gap-3"
+      >
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-brand-600 text-white shadow-soft"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sliders-horizontal h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="21"
+              x2="14"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="10"
+              x2="3"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="21"
+              x2="12"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="8"
+              x2="3"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="21"
+              x2="16"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="12"
+              x2="3"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="14"
+              x2="14"
+              y1="2"
+              y2="6"
+            />
+            <line
+              x1="8"
+              x2="8"
+              y1="10"
+              y2="14"
+            />
+            <line
+              x1="16"
+              x2="16"
+              y1="18"
+              y2="22"
+            />
+          </svg>
+          <span>
+            الخدمات والأسعار
+          </span>
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-white text-slate-600"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-file-check2 lucide-file-check-2 h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="...
+   × fetchAllPages follows every page and fails loudly instead of truncating 1ms
+     → (0 , fetchAllPages) is not a function
+ ❯ src/pages/public/RegisterPage.validation.test.jsx (6 tests | 4 failed) 5496ms
+   × phone is labelled required, uses a phone keypad and shows an example 96ms
+     → expect(element).toHaveAttribute("type", "tel") // element.getAttribute("type") === "tel"
+
+Expected the element to have attribute:
+  type="tel"
+Received:
+  null
+   × the server phone error is shown under the field 1013ms
+     → expect(element).toHaveAttribute("aria-invalid", "true") // element.getAttribute("aria-invalid") === "true"
+
+Expected the element to have attribute:
+  aria-invalid="true"
+Received:
+  null
+   ✓ the customer-facing duplicate-account message is shown, not a model message  1123ms
+   × password guidance lists every server rule in Arabic 1024ms
+     → Unable to find an element by: [data-testid="password-rules"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="خلصني"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                إنشاء حساب عميل
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                أنشئ حسابك قبل طلب الخدمة
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                الاسم الكامل
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                رقم الهاتف
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                البريد الإلكتروني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                الرقم الوطني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (اختياري)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                كلمة المرور
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                ثمانية أحرف على الأقل.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                إنشاء الحساب
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                لديك حساب بالفعل؟
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  سجل الدخول
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="خلصني"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                إنشاء حساب عميل
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                أنشئ حسابك قبل طلب الخدمة
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                الاسم الكامل
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                رقم الهاتف
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                البريد الإلكتروني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                الرقم الوطني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (اختياري)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                كلمة المرور
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                ثمانية أحرف على الأقل.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                إنشاء الحساب
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                لديك حساب بالفعل؟
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  سجل الدخول
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+   × password guidance and phone example are in English in English mode 1027ms
+     → Unable to find an element by: [data-testid="password-rules"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="Khalsni"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                Create a customer account
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                Create your account before requesting a service
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                After creating an account, you can submit requests, upload documents, and track progress from the customer portal.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                Full name
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                Phone number
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                Email
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                National ID
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Optional)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                Password
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                At least eight characters.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                Create account
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                Already have an account?
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  Sign in
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="Khalsni"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                Create a customer account
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                Create your account before requesting a service
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                After creating an account, you can submit requests, upload documents, and track progress from the customer portal.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                Full name
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                Phone number
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                Email
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                National ID
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Optional)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                Password
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                At least eight characters.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                Create account
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                Already have an account?
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  Sign in
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+   ✓ a valid form is still submitted unchanged  1211ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/localization.p2.test.jsx [ src/pages/localization.p2.test.jsx ]
+Error: Failed to resolve import "../utils/timelinePresentation" from "src/pages/localization.p2.test.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: D:/p2base/frontend/src/pages/localization.p2.test.jsx:7:0
+  39 |  const __vi_import_5__ = await import("../components/OrderTimeline");
+  40 |  const __vi_import_6__ = await import("../api/services");
+  41 |  const __vi_import_7__ = await import("../utils/timelinePresentation");
+     |                                       ^
+  42 |  const __vi_import_8__ = await import("../utils/i18n");
+  43 |  
+ ❯ TransformPluginContext._formatLog ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29003:43
+ ❯ TransformPluginContext.error ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29000:14
+ ❯ normalizeUrl ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27123:18
+ ❯ ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27181:32
+ ❯ TransformPluginContext.transform ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27149:4
+ ❯ EnvironmentPluginContainer.transform ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28801:14
+ ❯ loadAndTransform ../../ghassan/frontend/node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:22670:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/a11y.p2.test.jsx > data table scroll region is a named, focusable region with a visible focus style
+TestingLibraryElementError: Unable to find an accessible element with the role "region" and name "قواعد سير العمل"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "":
+  <div
+    class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+    dir="rtl"
+    role="region"
+  />
+
+  --------------------------------------------------
+  table:
+
+  Name "":
+  <table
+    class="min-w-full divide-y divide-border text-sm"
+  />
+
+  --------------------------------------------------
+  rowgroup:
+
+  Name "":
+  <thead
+    class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+  />
+
+  Name "":
+  <tbody
+    class="divide-y divide-brand-50"
+  />
+
+  --------------------------------------------------
+  row:
+
+  Name "الاسم":
+  <tr />
+
+  Name "صف 1":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 2":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 3":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 4":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 5":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 6":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 7":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 8":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 9":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 10":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 11":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 12":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 13":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 14":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 15":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 16":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 17":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 18":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 19":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 20":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 21":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 22":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 23":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 24":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 25":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 26":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 27":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 28":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 29":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 30":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  --------------------------------------------------
+  columnheader:
+
+  Name "الاسم":
+  <th
+    class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+  />
+
+  --------------------------------------------------
+  cell:
+
+  Name "صف 1":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 2":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 3":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 4":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 5":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 6":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 7":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 8":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 9":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 10":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 11":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 12":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 13":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 14":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 15":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 16":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 17":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 18":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 19":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 20":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 21":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 22":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 23":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 24":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 25":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 26":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 27":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 28":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 29":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 30":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="space-y-4"
+    >
+      <div
+        class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+        dir="rtl"
+        role="region"
+      >
+        <div
+          class="max-h-[70vh] overflow-auto"
+        >
+          <table
+            class="min-w-full divide-y divide-border text-sm"
+          >
+            <thead
+              class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+            >
+              <tr>
+                <th
+                  class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+                >
+                  الاسم
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-brand-50"
+            >
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 1
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 2
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 3
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 4
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 5
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 6
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 7
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 8
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 9
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 10
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 11
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 12
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 13
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 14
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 15
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 16
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 17
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 18
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 19
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 20
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 21
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 22
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 23
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 24
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 25
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 26
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 27
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 28
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 29
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 30
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../../ghassan/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/a11y.p2.test.jsx:21:25
+     19|   const user = userEvent.setup()
+     20|   render(<DataTable ariaLabel="قواعد سير العمل" columns={columns} rows…
+     21|   const region = screen.getByRole('region', { name: 'قواعد سير العمل' …
+       |                         ^
+     22|   expect(region).toHaveAttribute('tabindex', '0')
+     23|   expect(region.className).toMatch(/overflow-auto/)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  src/components/a11y.p2.test.jsx > data table region gets a default name
+TestingLibraryElementError: Unable to find an accessible element with the role "region" and name "جدول البيانات"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "":
+  <div
+    class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+    dir="rtl"
+    role="region"
+  />
+
+  --------------------------------------------------
+  table:
+
+  Name "":
+  <table
+    class="min-w-full divide-y divide-border text-sm"
+  />
+
+  --------------------------------------------------
+  rowgroup:
+
+  Name "":
+  <thead
+    class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+  />
+
+  Name "":
+  <tbody
+    class="divide-y divide-brand-50"
+  />
+
+  --------------------------------------------------
+  row:
+
+  Name "الاسم":
+  <tr />
+
+  Name "صف 1":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 2":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 3":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 4":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 5":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 6":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 7":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 8":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 9":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 10":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 11":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 12":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 13":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 14":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 15":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 16":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 17":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 18":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 19":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 20":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 21":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 22":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 23":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 24":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 25":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 26":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 27":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 28":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 29":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  Name "صف 30":
+  <tr
+    class="transition hover:bg-brand-50/40"
+  />
+
+  --------------------------------------------------
+  columnheader:
+
+  Name "الاسم":
+  <th
+    class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+  />
+
+  --------------------------------------------------
+  cell:
+
+  Name "صف 1":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 2":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 3":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 4":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 5":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 6":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 7":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 8":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 9":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 10":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 11":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 12":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 13":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 14":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 15":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 16":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 17":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 18":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 19":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 20":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 21":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 22":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 23":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 24":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 25":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 26":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 27":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 28":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 29":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  Name "صف 30":
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="space-y-4"
+    >
+      <div
+        class="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft"
+        dir="rtl"
+        role="region"
+      >
+        <div
+          class="max-h-[70vh] overflow-auto"
+        >
+          <table
+            class="min-w-full divide-y divide-border text-sm"
+          >
+            <thead
+              class="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur"
+            >
+              <tr>
+                <th
+                  class="whitespace-nowrap px-4 py-3 text-start text-xs font-bold uppercase tracking-wide text-[var(--kh-text-muted)]"
+                >
+                  الاسم
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-brand-50"
+            >
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 1
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 2
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 3
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 4
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 5
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 6
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 7
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 8
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 9
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 10
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 11
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 12
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 13
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 14
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 15
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 16
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 17
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 18
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 19
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 20
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 21
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 22
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 23
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 24
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 25
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 26
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 27
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 28
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 29
+                </td>
+              </tr>
+              <tr
+                class="transition hover:bg-brand-50/40"
+              >
+                <td
+                  class="px-4 py-3.5 align-middle text-slate-700"
+                >
+                  صف 30
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../../ghassan/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/a11y.p2.test.jsx:31:17
+     29| test('data table region gets a default name', () => {
+     30|   render(<DataTable columns={columns} rows={rows} />)
+     31|   expect(screen.getByRole('region', { name: 'جدول البيانات' })).toBeIn…
+       |                 ^
+     32| })
+     33| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  src/components/a11y.p2.test.jsx > footer links carry the minimum target-size classes
+Error: expect(element).toHaveClass("min-h-6")
+
+Expected the element to have class:
+  min-h-6
+Received:
+  hover:text-[var(--khalsni-public-primary)]
+ ❯ src/components/a11y.p2.test.jsx:44:18
+     42|   expect(links.length).toBeGreaterThanOrEqual(7)
+     43|   for (const link of links) {
+     44|     expect(link).toHaveClass('min-h-6')
+       |                  ^
+     45|     expect(link).toHaveClass('inline-flex')
+     46|     expect(link).toHaveClass('kh-focusable')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  src/pages/admin/AdminRuleManagementPage.pagination.test.jsx > the rules services tab shows all 38 services across pages, durations in Arabic
+TestingLibraryElementError: Unable to find role="region" and name "الخدمات والأسعار"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="page-section space-y-6"
+    >
+      <header
+        class="rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-soft sm:p-6"
+      >
+        <div
+          class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div
+            class="flex items-start gap-4"
+          >
+            <span
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-file-stack h-5 w-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"
+                />
+              </svg>
+            </span>
+            <div
+              class="min-w-0"
+            >
+              <p
+                class="text-sm font-semibold text-brand-600"
+              >
+                قواعد الإدارة
+              </p>
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3"
+              >
+                <h1
+                  class="break-words text-2xl font-extrabold text-ink md:text-3xl"
+                >
+                  إدارة القواعد
+                </h1>
+              </div>
+              <p
+                class="mt-3 max-w-3xl text-sm leading-7 text-slate-600"
+              >
+                إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div
+        class="flex flex-wrap gap-3"
+      >
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-brand-600 text-white shadow-soft"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sliders-horizontal h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="21"
+              x2="14"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="10"
+              x2="3"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="21"
+              x2="12"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="8"
+              x2="3"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="21"
+              x2="16"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="12"
+              x2="3"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="14"
+              x2="14"
+              y1="2"
+              y2="6"
+            />
+            <line
+              x1="8"
+              x2="8"
+              y1="10"
+              y2="14"
+            />
+            <line
+              x1="16"
+              x2="16"
+              y1="18"
+              y2="22"
+            />
+          </svg>
+          <span>
+            الخدمات والأسعار
+          </span>
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-white text-slate-600"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-file-check2 lucide-file-check-2 h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="page-section space-y-6"
+    >
+      <header
+        class="rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-soft sm:p-6"
+      >
+        <div
+          class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div
+            class="flex items-start gap-4"
+          >
+            <span
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-file-stack h-5 w-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"
+                />
+                <path
+                  d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"
+                />
+              </svg>
+            </span>
+            <div
+              class="min-w-0"
+            >
+              <p
+                class="text-sm font-semibold text-brand-600"
+              >
+                قواعد الإدارة
+              </p>
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3"
+              >
+                <h1
+                  class="break-words text-2xl font-extrabold text-ink md:text-3xl"
+                >
+                  إدارة القواعد
+                </h1>
+              </div>
+              <p
+                class="mt-3 max-w-3xl text-sm leading-7 text-slate-600"
+              >
+                إدارة آمنة لقواعد العمل للمشرفين غير التقنيين. تبقى جميع التغييرات داخل إجراءات مدققة وصلاحيات إدارية مقيدة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div
+        class="flex flex-wrap gap-3"
+      >
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-brand-600 text-white shadow-soft"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sliders-horizontal h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="21"
+              x2="14"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="10"
+              x2="3"
+              y1="4"
+              y2="4"
+            />
+            <line
+              x1="21"
+              x2="12"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="8"
+              x2="3"
+              y1="12"
+              y2="12"
+            />
+            <line
+              x1="21"
+              x2="16"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="12"
+              x2="3"
+              y1="20"
+              y2="20"
+            />
+            <line
+              x1="14"
+              x2="14"
+              y1="2"
+              y2="6"
+            />
+            <line
+              x1="8"
+              x2="8"
+              y1="10"
+              y2="14"
+            />
+            <line
+              x1="16"
+              x2="16"
+              y1="18"
+              y2="22"
+            />
+          </svg>
+          <span>
+            الخدمات والأسعار
+          </span>
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition bg-white text-slate-600"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-file-check2 lucide-file-check-2 h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="...
+ ❯ waitForWrapper ../../ghassan/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/admin/AdminRuleManagementPage.pagination.test.jsx:28:30
+     26|   const user = userEvent.setup()
+     27|   render(<MemoryRouter><AdminRuleManagementPage /></MemoryRouter>)
+     28|   const table = await screen.findByRole('region', { name: 'الخدمات وال…
+       |                              ^
+     29|   expect(await within(table).findByText('خدمة 1')).toBeInTheDocument()
+     30|   expect(within(table).getAllByRole('row')).toHaveLength(21)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  src/pages/admin/AdminRuleManagementPage.pagination.test.jsx > fetchAllPages follows every page and fails loudly instead of truncating
+TypeError: (0 , fetchAllPages) is not a function
+ ❯ src/pages/admin/AdminRuleManagementPage.pagination.test.jsx:44:22
+     42|     return { count: 38, next: page < 2 ? `?page=${page + 1}` : null, p…
+     43|   })
+     44|   const rows = await fetchAllPages('/admin/services/', { category: 3 })
+       |                      ^
+     45|   expect(rows.map((row) => row.id)).toEqual(Array.from({ length: 38 },…
+     46|   expect(get.mock.calls.map((call) => call[0])).toEqual(['/admin/servi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  src/pages/admin/AdminUsersRolesPage.verification.test.jsx > an active user is not shown as verified, and each verification fact is separate
+TestingLibraryElementError: Unable to find an element by: [data-testid="user-account-state"]
+
+Ignored nodes: comments, script, style
+<tr
+  class="transition hover:bg-brand-50/40"
+>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    Active Unverified
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    a@example.test
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex flex-wrap items-center gap-2"
+    >
+      <span>
+        موظف
+      </span>
+    </div>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <span
+      class="status-pill bg-green-100 text-green-700"
+    >
+      <svg
+        aria-hidden="true"
+        class="lucide lucide-shield-check h-3.5 w-3.5"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+        <path
+          d="m9 12 2 2 4-4"
+        />
+      </svg>
+      <span>
+        تم التحقق
+      </span>
+    </span>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex gap-2"
+    >
+      <button
+        class="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعديل
+      </button>
+      <button
+        class="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعطيل
+      </button>
+    </div>
+  </td>
+</tr>
+ ❯ Object.getElementError ../../ghassan/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/pages/admin/AdminUsersRolesPage.verification.test.jsx:31:25
+     29|   // 11. active + not verified
+     30|   const active = rowOf('Active Unverified')
+     31|   expect(within(active).getByTestId('user-account-state')).toHaveTextC…
+       |                         ^
+     32|   expect(facts(active)).toEqual({
+     33|     is_verified: 'الحساب موثّق:لا',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  src/pages/admin/AdminUsersRolesPage.verification.test.jsx > a missing verification field is reported as not available, never as verified
+TestingLibraryElementError: Unable to find an element by: [data-testid="user-verification"]
+
+Ignored nodes: comments, script, style
+<tr
+  class="transition hover:bg-brand-50/40"
+>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    Old Payload
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    d@example.test
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  />
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex flex-wrap items-center gap-2"
+    >
+      <span>
+        موظف
+      </span>
+    </div>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <span
+      class="status-pill bg-green-100 text-green-700"
+    >
+      <svg
+        aria-hidden="true"
+        class="lucide lucide-shield-check h-3.5 w-3.5"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+        <path
+          d="m9 12 2 2 4-4"
+        />
+      </svg>
+      <span>
+        تم التحقق
+      </span>
+    </span>
+  </td>
+  <td
+    class="px-4 py-3.5 align-middle text-slate-700"
+  >
+    <div
+      class="flex gap-2"
+    >
+      <button
+        class="btn-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعديل
+      </button>
+      <button
+        class="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+      >
+        تعطيل
+      </button>
+    </div>
+  </td>
+</tr>
+ ❯ Object.getElementError ../../ghassan/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ facts src/pages/admin/AdminUsersRolesPage.verification.test.jsx:20:21
+     18| function facts(row) {
+     19|   return Object.fromEntries(
+     20|     [...within(row).getByTestId('user-verification').querySelectorAll(…
+       |                     ^
+     21|   )
+     22| }
+ ❯ src/pages/admin/AdminUsersRolesPage.verification.test.jsx:58:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  src/pages/admin/ServicesManagementPage.pagination.test.jsx > every service is reachable with next and previous, and the current page is announced
+Error: getAdminServicesPage does not exist
+ ❯ src/pages/admin/ServicesManagementPage.pagination.test.jsx:39:18
+     37| 
+     38| test('every service is reachable with next and previous, and the curre…
+     39|   const spy = vi.spyOn(api, 'getAdminServicesPage').mockImplementation…
+       |                  ^
+     40|   const user = userEvent.setup()
+     41|   render(<MemoryRouter><ServicesManagementPage /></MemoryRouter>)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  src/pages/admin/ServicesManagementPage.pagination.test.jsx > category filter and search go to the server and restart at page one
+Error: getAdminServicesPage does not exist
+ ❯ src/pages/admin/ServicesManagementPage.pagination.test.jsx:65:18
+     63| 
+     64| test('category filter and search go to the server and restart at page …
+     65|   const spy = vi.spyOn(api, 'getAdminServicesPage').mockImplementation…
+       |                  ^
+     66|   const user = userEvent.setup()
+     67|   render(<MemoryRouter><ServicesManagementPage /></MemoryRouter>)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  src/pages/public/RegisterPage.validation.test.jsx > phone is labelled required, uses a phone keypad and shows an example
+Error: expect(element).toHaveAttribute("type", "tel") // element.getAttribute("type") === "tel"
+
+Expected the element to have attribute:
+  type="tel"
+Received:
+  null
+ ❯ src/pages/public/RegisterPage.validation.test.jsx:29:17
+     27|   renderPage()
+     28|   const phone = await screen.findByLabelText(/رقم الهاتف/)
+     29|   expect(phone).toHaveAttribute('type', 'tel')
+       |                 ^
+     30|   expect(phone).toHaveAttribute('inputmode', 'tel')
+     31|   expect(phone).toHaveAttribute('aria-required', 'true')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  src/pages/public/RegisterPage.validation.test.jsx > the server phone error is shown under the field
+Error: expect(element).toHaveAttribute("aria-invalid", "true") // element.getAttribute("aria-invalid") === "true"
+
+Expected the element to have attribute:
+  aria-invalid="true"
+Received:
+  null
+ ❯ src/pages/public/RegisterPage.validation.test.jsx:44:47
+     42|   await user.click(screen.getByRole('button', { name: 'إنشاء الحساب' }…
+     43|   expect(await screen.findByText(message)).toBeInTheDocument()
+     44|   expect(screen.getByLabelText(/رقم الهاتف/)).toHaveAttribute('aria-in…
+       |                                               ^
+     45| })
+     46| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  src/pages/public/RegisterPage.validation.test.jsx > password guidance lists every server rule in Arabic
+TestingLibraryElementError: Unable to find an element by: [data-testid="password-rules"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="خلصني"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                إنشاء حساب عميل
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                أنشئ حسابك قبل طلب الخدمة
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                الاسم الكامل
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                رقم الهاتف
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                البريد الإلكتروني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                الرقم الوطني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (اختياري)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                كلمة المرور
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                ثمانية أحرف على الأقل.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                إنشاء الحساب
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                لديك حساب بالفعل؟
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  سجل الدخول
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="خلصني"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="خلصني"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                إنشاء حساب عميل
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                أنشئ حسابك قبل طلب الخدمة
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                الاسم الكامل
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                رقم الهاتف
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                البريد الإلكتروني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                الرقم الوطني
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (اختياري)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                كلمة المرور
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (مطلوب)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                ثمانية أحرف على الأقل.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                إنشاء الحساب
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                لديك حساب بالفعل؟
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  سجل الدخول
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper ../../ghassan/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/public/RegisterPage.validation.test.jsx:60:30
+     58| test('password guidance lists every server rule in Arabic', async () =…
+     59|   renderPage()
+     60|   const rules = await screen.findByTestId('password-rules')
+       |                              ^
+     61|   const items = [...rules.querySelectorAll('li')].map((item) => item.t…
+     62|   expect(items).toEqual(PASSWORD_RULES.map((rule) => rule.ar))
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  src/pages/public/RegisterPage.validation.test.jsx > password guidance and phone example are in English in English mode
+TestingLibraryElementError: Unable to find an element by: [data-testid="password-rules"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="Khalsni"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                Create a customer account
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                Create your account before requesting a service
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                After creating an account, you can submit requests, upload documents, and track progress from the customer portal.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                Full name
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                Phone number
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                Email
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                National ID
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Optional)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                Password
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                At least eight characters.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                Create account
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                Already have an account?
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  Sign in
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-[var(--khalsni-public-bg)] py-5 text-[var(--khalsni-public-text)] sm:py-7"
+    >
+      <div
+        class="kh-public-container space-y-6"
+      >
+        <div
+          class="mb-6 flex justify-center"
+        >
+          <a
+            aria-label="Khalsni"
+            class="inline-flex items-center gap-2.5"
+            data-discover="true"
+            href="/"
+          >
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-10 shrink-0 rounded-[22%] object-contain"
+                height="512"
+                loading="eager"
+                src="/brand/khalsni-app-icon.png"
+                width="512"
+              />
+            </span>
+            <span
+              class="inline-flex shrink-0 items-center"
+            >
+              <img
+                alt="Khalsni"
+                class="h-10 w-auto max-w-full rounded-[var(--radius-sm,0.5rem)] object-contain"
+                height="427"
+                loading="eager"
+                src="/brand/khalsni-wordmark.png"
+                width="695"
+              />
+            </span>
+          </a>
+        </div>
+        <section
+          class="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-start shadow-soft sm:p-7"
+        >
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--khalsni-public-primary)]"
+          />
+          <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div
+              class="max-w-4xl"
+            >
+              <p
+                class="inline-flex items-center gap-2 rounded-full bg-[var(--khalsni-public-primary-soft)] px-4 py-2 text-sm font-extrabold text-[var(--khalsni-public-accent-text)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user-plus h-4 w-4"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="4"
+                  />
+                  <line
+                    x1="19"
+                    x2="19"
+                    y1="8"
+                    y2="14"
+                  />
+                  <line
+                    x1="22"
+                    x2="16"
+                    y1="11"
+                    y2="11"
+                  />
+                </svg>
+                Create a customer account
+              </p>
+              <h1
+                class="mt-4 kh-text-h1 text-[var(--khalsni-public-navy)]"
+              >
+                Create your account before requesting a service
+              </h1>
+              <p
+                class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base"
+              >
+                After creating an account, you can submit requests, upload documents, and track progress from the customer portal.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="rounded-[var(--radius-xl)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-5 text-[var(--khalsni-public-text)] shadow-soft sm:p-6 mx-auto max-w-4xl"
+        >
+          <form
+            class="grid gap-4 md:grid-cols-2"
+          >
+            <div
+              class="md:col-span-2"
+            >
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-full-name"
+              >
+                Full name
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-full-name"
+                name="full_name"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-phone"
+              >
+                Phone number
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-phone"
+                name="phone"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-email"
+              >
+                Email
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-email"
+                name="email"
+                type="email"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-national-id"
+              >
+                National ID
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Optional)
+                </span>
+              </label>
+              <input
+                aria-required="false"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-national-id"
+                name="national_id"
+              />
+            </div>
+            <div>
+              <label
+                class="mb-2 block text-sm font-bold text-ink"
+                for="reg-password"
+              >
+                Password
+                <span
+                  class="ms-2 text-xs font-semibold text-slate-600"
+                >
+                  (Required)
+                </span>
+              </label>
+              <input
+                aria-describedby="reg-password-hint"
+                aria-required="true"
+                class="kh-focusable h-11 w-full rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-semibold text-[var(--khalsni-public-text)] outline-none transition placeholder:text-[var(--khalsni-public-text-muted)] focus:border-[var(--khalsni-public-primary)]"
+                id="reg-password"
+                name="password"
+                type="password"
+              />
+              <p
+                class="mt-1 text-xs font-semibold text-slate-600"
+                id="reg-password-hint"
+              >
+                At least eight characters.
+              </p>
+            </div>
+            <div
+              class="md:col-span-2 space-y-3"
+            >
+              <button
+                class="kh-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-sm font-extrabold transition-[background-color,border-color,color,box-shadow,transform] duration-fast disabled:cursor-not-allowed disabled:opacity-60 border border-transparent bg-[var(--khalsni-public-primary)] text-white hover:bg-[var(--khalsni-public-primary-hover)] w-full"
+                type="submit"
+              >
+                Create account
+              </button>
+              <p
+                class="text-center text-sm font-semibold text-slate-600"
+              >
+                Already have an account?
+                 
+                <a
+                  class="font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]"
+                  data-discover="true"
+                  href="/login"
+                >
+                  Sign in
+                </a>
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper ../../ghassan/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../ghassan/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/public/RegisterPage.validation.test.jsx:70:30
+     68|   localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en')
+     69|   renderPage()
+     70|   const rules = await screen.findByTestId('password-rules')
+       |                              ^
+     71|   expect([...rules.querySelectorAll('li')].map((item) => item.textCont…
+     72|   expect(screen.getByText(/Example: 0791234567/)).toBeInTheDocument()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
+
+
+ Test Files  6 failed (6)
+      Tests  13 failed | 2 passed (15)
+   Start at  13:09:00
+   Duration  9.32s (transform 1.94s, setup 1.43s, collect 7.97s, tests 7.03s, environment 6.81s, prepare 1.10s)
+

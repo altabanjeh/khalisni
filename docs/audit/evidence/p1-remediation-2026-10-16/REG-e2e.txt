@@ -1,0 +1,495 @@
+
+Running 68 tests using 1 worker
+
+  ok  1 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: / (2.1s)
+  ok  2 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /services (1.8s)
+  ok  3 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /track-order (1.7s)
+  ok  4 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /login (1.5s)
+  ok  5 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /register (1.4s)
+  ok  6 [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /faq (1.7s)
+  ok  7 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer (2.1s)
+  ok  8 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders (2.1s)
+  ok  9 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders/new (2.0s)
+  ok 10 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/profile (2.0s)
+  ok 11 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee (2.2s)
+  ok 12 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/orders (2.4s)
+  x  13 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify (2.3s)
+  ok 14 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/reports (2.0s)
+  ok 15 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin (2.2s)
+  x  16 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders (2.4s)
+  ok 17 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/services (2.5s)
+  ok 18 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/service-categories (2.5s)
+  ok 19 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/users (2.4s)
+  ok 20 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/providers (2.2s)
+  ok 21 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider (2.0s)
+  ok 22 [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider/orders (2.0s)
+  ok 23 [desktop-1440] › e2e\client-audit-acceptance.spec.js:12:1 › fresh client audit request completes through customer, employee, and provider (10.1s)
+  ok 24 [desktop-1440] › e2e\client-audit-acceptance.spec.js:221:1 › published CMS content appears on the public homepage and its admin preview (3.4s)
+  ok 25 [desktop-1440] › e2e\client-audit-idempotency.spec.js:11:1 › valid multipart retry creates one logical order and rejects changed payload under the same key (492ms)
+  ok 26 [desktop-1440] › e2e\client-audit-idempotency.spec.js:56:1 › customer draft survives refresh and rapid final submit creates one order (5.2s)
+  ok 27 [desktop-1440] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic (42.8s)
+  ok 28 [desktop-1440] › e2e\client-audit-role-reentry.spec.js:13:1 › each QA role can log in, refresh, log out and re-enter in an isolated session (9.2s)
+  ok 29 [desktop-1440] › e2e\client-audit-ux.spec.js:9:1 › mobile work header keeps secondary controls in its menu (1.6s)
+  ok 30 [desktop-1440] › e2e\client-audit-ux.spec.js:30:1 › search results and localized tracking action are visible on mobile (1.8s)
+  ok 31 [desktop-1440] › e2e\client-audit-ux.spec.js:71:1 › contact form confirms a stored inquiry (892ms)
+  ok 32 [desktop-1440] › e2e\hardening-access.spec.js:10:1 › logged-out, cross-account, guessed-id and stale-session access fail closed (1.9s)
+  ok 33 [desktop-1440] › e2e\hardening-closure.spec.js:33:1 › customer order details are complete in English and Arabic with no internal identifiers (3.9s)
+  ok 34 [desktop-1440] › e2e\hardening-closure.spec.js:68:1 › staff rejection needs a written reason and irreversible actions ask first (2.6s)
+  ok 35 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: / (2.0s)
+  ok 36 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /services (1.8s)
+  ok 37 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /track-order (1.7s)
+  ok 38 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /login (1.4s)
+  ok 39 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /register (1.5s)
+  ok 40 [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /faq (1.8s)
+  ok 41 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer (2.2s)
+  ok 42 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders (2.1s)
+  ok 43 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders/new (2.1s)
+  ok 44 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/profile (2.0s)
+  ok 45 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee (2.3s)
+  ok 46 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/orders (2.2s)
+  x  47 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify (2.2s)
+  ok 48 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/reports (2.1s)
+  ok 49 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin (2.1s)
+  x  50 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders (2.3s)
+  ok 51 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/services (2.6s)
+  ok 52 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/service-categories (2.5s)
+  ok 53 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/users (2.2s)
+  ok 54 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/providers (2.1s)
+  ok 55 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider (2.0s)
+  ok 56 [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider/orders (2.1s)
+  ok 57 [mobile-390] › e2e\client-audit-acceptance.spec.js:12:1 › fresh client audit request completes through customer, employee, and provider (10.3s)
+  ok 58 [mobile-390] › e2e\client-audit-acceptance.spec.js:221:1 › published CMS content appears on the public homepage and its admin preview (2.8s)
+  ok 59 [mobile-390] › e2e\client-audit-idempotency.spec.js:11:1 › valid multipart retry creates one logical order and rejects changed payload under the same key (447ms)
+  ok 60 [mobile-390] › e2e\client-audit-idempotency.spec.js:56:1 › customer draft survives refresh and rapid final submit creates one order (3.3s)
+  x  61 [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic (23.8s)
+  ok 62 [mobile-390] › e2e\client-audit-role-reentry.spec.js:13:1 › each QA role can log in, refresh, log out and re-enter in an isolated session (9.0s)
+  ok 63 [mobile-390] › e2e\client-audit-ux.spec.js:9:1 › mobile work header keeps secondary controls in its menu (1.2s)
+  ok 64 [mobile-390] › e2e\client-audit-ux.spec.js:30:1 › search results and localized tracking action are visible on mobile (1.5s)
+  ok 65 [mobile-390] › e2e\client-audit-ux.spec.js:71:1 › contact form confirms a stored inquiry (832ms)
+  ok 66 [mobile-390] › e2e\hardening-access.spec.js:10:1 › logged-out, cross-account, guessed-id and stale-session access fail closed (1.8s)
+  ok 67 [mobile-390] › e2e\hardening-closure.spec.js:33:1 › customer order details are complete in English and Arabic with no internal identifiers (3.8s)
+  ok 68 [mobile-390] › e2e\hardening-closure.spec.js:68:1 › staff rejection needs a written reason and irreversible actions ask first (2.6s)
+
+
+  1) [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify ────────
+
+    Error: color-contrast (serious): Elements must meet minimum color contrast ratio thresholds
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 58
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#eff6ff",
+    +               "contrastRatio": 4.37,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#64748b",
+    +               "fontSize": "9.0pt (12px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<button class=\"kh-focusable w-full rounded-[var(--radius-lg)] border p-3 text-start transition border-brand-400 bg-brand-50\" type=\"button\">",
+    +                 "target": Array [
+    +                   ".border-brand-400",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<p class=\"mt-1 text-xs font-semibold text-slate-500\">#KH-2026-000009 · client-audit-qa-202610-authorization</p>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           ".border-brand-400 > .mt-1.text-slate-500.text-xs",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      23 |         .analyze()
+      24 |       const blocking = results.violations.filter((v) => ['serious', 'critical'].includes(v.impact))
+    > 25 |       expect(blocking, blocking.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toEqual([])
+         |                                                                                            ^
+      26 |     })
+      27 |   }
+      28 | }
+        at D:\ghassan\frontend\e2e\axe-auth.spec.js:25:92
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-employee-employee-documents-verify-desktop-1440\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-employee-employee-documents-verify-desktop-1440\error-context.md
+
+  2) [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders ────────────────────────
+
+    Error: color-contrast (serious): Elements must meet minimum color contrast ratio thresholds
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 58
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#0f5dd8",
+    +               "contrastRatio": 4.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#cfdff7",
+    +               "fontSize": "10.5pt (14px)",
+    +               "fontWeight": "bold",
+    +               "messageKey": null,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 4.34 (foreground color: #cfdff7, background color: #0f5dd8, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<button aria-pressed=\"true\" class=\"kh-focusable inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold transition border-transparent bg-brand-600 text-white\" type=\"button\">الكل<span class=\"text-white/80\">11</span></button>",
+    +                 "target": Array [
+    +                   ".border-transparent",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 4.34 (foreground color: #cfdff7, background color: #0f5dd8, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1",
+    +         "html": "<span class=\"text-white/80\">11</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           ".text-white\\/80",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      23 |         .analyze()
+      24 |       const blocking = results.violations.filter((v) => ['serious', 'critical'].includes(v.impact))
+    > 25 |       expect(blocking, blocking.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toEqual([])
+         |                                                                                            ^
+      26 |     })
+      27 |   }
+      28 | }
+        at D:\ghassan\frontend\e2e\axe-auth.spec.js:25:92
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-admin-admin-orders-desktop-1440\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-admin-admin-orders-desktop-1440\error-context.md
+
+  3) [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify ──────────
+
+    Error: color-contrast (serious): Elements must meet minimum color contrast ratio thresholds
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 58
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#eff6ff",
+    +               "contrastRatio": 4.37,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#64748b",
+    +               "fontSize": "9.0pt (12px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<button class=\"kh-focusable w-full rounded-[var(--radius-lg)] border p-3 text-start transition border-brand-400 bg-brand-50\" type=\"button\">",
+    +                 "target": Array [
+    +                   ".border-brand-400",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 4.37 (foreground color: #64748b, background color: #eff6ff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<p class=\"mt-1 text-xs font-semibold text-slate-500\">#KH-2026-000014 · client-audit-qa-202610-authorization</p>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           ".border-brand-400 > .mt-1.text-slate-500.text-xs",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      23 |         .analyze()
+      24 |       const blocking = results.violations.filter((v) => ['serious', 'critical'].includes(v.impact))
+    > 25 |       expect(blocking, blocking.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toEqual([])
+         |                                                                                            ^
+      26 |     })
+      27 |   }
+      28 | }
+        at D:\ghassan\frontend\e2e\axe-auth.spec.js:25:92
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-employee-employee-documents-verify-mobile-390\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-employee-employee-documents-verify-mobile-390\error-context.md
+
+  4) [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders ──────────────────────────
+
+    Error: color-contrast (serious): Elements must meet minimum color contrast ratio thresholds
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 58
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#0f5dd8",
+    +               "contrastRatio": 4.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#cfdff7",
+    +               "fontSize": "10.5pt (14px)",
+    +               "fontWeight": "bold",
+    +               "messageKey": null,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 4.34 (foreground color: #cfdff7, background color: #0f5dd8, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<button aria-pressed=\"true\" class=\"kh-focusable inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold transition border-transparent bg-brand-600 text-white\" type=\"button\">الكل<span class=\"text-white/80\">14</span></button>",
+    +                 "target": Array [
+    +                   ".border-transparent",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 4.34 (foreground color: #cfdff7, background color: #0f5dd8, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1",
+    +         "html": "<span class=\"text-white/80\">14</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           ".text-white\\/80",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      23 |         .analyze()
+      24 |       const blocking = results.violations.filter((v) => ['serious', 'critical'].includes(v.impact))
+    > 25 |       expect(blocking, blocking.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toEqual([])
+         |                                                                                            ^
+      26 |     })
+      27 |   }
+      28 | }
+        at D:\ghassan\frontend\e2e\axe-auth.spec.js:25:92
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-admin-admin-orders-mobile-390\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\axe-auth-axe-admin-admin-orders-mobile-390\error-context.md
+
+  5) [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic 
+
+    Error: home did not render its page content
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('h1').first()
+    Expected: visible
+    Timeout: 12000ms
+    Error: element(s) not found
+
+    Call log:
+      - home did not render its page content locator('h1').first() with timeout 12000ms
+      - waiting for locator('h1').first()
+
+
+      61 |       }, { token: role ? tokens[role] : null })
+      62 |       await page.goto(path, { waitUntil: 'domcontentloaded' })
+    > 63 |       await expect(page.locator('h1').first(), `${name} did not render its page content`).toBeVisible()
+         |                                                                                           ^
+      64 |       const metrics = await page.evaluate(() => ({
+      65 |         scrollWidth: document.documentElement.scrollWidth,
+      66 |         viewportWidth: document.documentElement.clientWidth,
+        at D:\ghassan\frontend\e2e\client-audit-responsive.spec.js:63:91
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-5.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-6.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-8.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-7.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #9: screenshot (image/png) ──────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-9.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #10: screenshot (image/png) ─────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-10.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #11: screenshot (image/png) ─────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-12.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #12: screenshot (image/png) ─────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-11.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #13: screenshot (image/png) ─────────────────────────────────────────────────────────
+    C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-13.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: C:\Users\LENOVO\AppData\Local\Temp\claude\d--ghassan\dc81cbcb-b135-455f-8bd2-a381931b3af1\scratchpad\p1\e2e-artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\error-context.md
+
+  5 failed
+    [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify ─────────
+    [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders ─────────────────────────
+    [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify ───────────
+    [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders ───────────────────────────
+    [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic 
+  63 passed (4.2m)

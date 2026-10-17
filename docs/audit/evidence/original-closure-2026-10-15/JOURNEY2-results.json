@@ -1,0 +1,167 @@
+{
+ "id": 10,
+ "number": "KH-2026-000010",
+ "steps": [
+  {
+   "step": "pre: order READY_FOR_DELIVERY with unverified final doc",
+   "result": "PASS",
+   "detail": {
+    "status": "READY_FOR_DELIVERY",
+    "final": [
+     14,
+     "approved",
+     "FINAL_RESULT"
+    ]
+   }
+  },
+  {
+   "step": "pre: customer cannot see unapproved final result",
+   "result": "PASS",
+   "detail": [
+    13,
+    12
+   ]
+  },
+  {
+   "step": "16 (already approved via UI in previous run)",
+   "result": "PASS",
+   "detail": "see JOURNEY2 first run log"
+  },
+  {
+   "step": "16c final result approved (UI)",
+   "result": "PASS",
+   "detail": "approved"
+  },
+  {
+   "step": "17a complete button available after approval",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "step": "17 order COMPLETED via employee UI",
+   "result": "PASS",
+   "detail": {
+    "status": "COMPLETED",
+    "dialogBtns": [
+     "نعم، أكمل الطلب"
+    ]
+   }
+  },
+  {
+   "step": "18a completion notification created for customer",
+   "result": "PASS",
+   "detail": {
+    "title": "اكتمل الطلب",
+    "is_read": false,
+    "channel": "system",
+    "status": "sent"
+   }
+  },
+  {
+   "step": "18 completion notification rendered in bell",
+   "result": "PASS",
+   "detail": [
+    "اكتمل الطلب\n\nاكتمل الطلب KH-2026-000010.\n\n١٥ تشرين الأول ٢٠٢٦، ١١:٣٠ م",
+    "الطلب جاهز للتسليم\n\nالطلب KH-2026-000010 جاهز للتسليم.\n\n١٥ تشرين الأول ٢٠٢٦، ١١:٢٨ م",
+    "تم رفع النتيجة النهائية\n\nرفع مزود الخدمة النتيجة النهائية للطلب KH-2026-000010.\n\n١٥ تشرين الأول ٢٠٢٦، ١١:٢٨ م"
+   ]
+  },
+  {
+   "step": "19a customer sees COMPLETED status",
+   "result": "PASS",
+   "detail": "مكتمل"
+  },
+  {
+   "step": "19b final result now visible to customer (API)",
+   "result": "PASS",
+   "detail": {
+    "id": 14,
+    "name": "qa-valid.pdf"
+   }
+  },
+  {
+   "step": "19 customer downloads FINAL result via UI",
+   "result": "PASS",
+   "detail": {
+    "name": "qa-valid.pdf",
+    "pdf": true,
+    "matchesFinalDocBytes": true,
+    "cardFound": 1
+   }
+  },
+  {
+   "step": "20 re-login preserves COMPLETED",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "step": "21 one order; no duplicate transitions; notifications",
+   "result": "PASS",
+   "detail": {
+    "transitions": [
+     "->NEW",
+     "NEW->UNDER_REVIEW",
+     "UNDER_REVIEW->WAITING_CUSTOMER",
+     "WAITING_CUSTOMER->UNDER_REVIEW",
+     "UNDER_REVIEW->ASSIGNED",
+     "ASSIGNED->IN_PROGRESS",
+     "IN_PROGRESS->READY_FOR_DELIVERY",
+     "READY_FOR_DELIVERY->COMPLETED"
+    ],
+    "dupTransitions": [],
+    "notifications": [
+     [
+      "order_completed",
+      "اكتمل الطلب",
+      "2026-10-15T23:30:37.192551+03:00"
+     ],
+     [
+      "order_ready_for_delivery",
+      "الطلب جاهز للتسليم",
+      "2026-10-15T23:28:07.802713+03:00"
+     ],
+     [
+      "provider_completed_work",
+      "تم رفع النتيجة النهائية",
+      "2026-10-15T23:28:07.696522+03:00"
+     ],
+     [
+      "provider_started_work",
+      "بدأ تنفيذ الطلب",
+      "2026-10-15T23:27:58.645182+03:00"
+     ],
+     [
+      "provider_assigned",
+      "تم إسناد الطلب",
+      "2026-10-15T23:27:48.063772+03:00"
+     ],
+     [
+      "document_verified",
+      "تمت مراجعة المستند",
+      "2026-10-15T23:27:42.096943+03:00"
+     ],
+     [
+      "document_verified",
+      "تمت مراجعة المستند",
+      "2026-10-15T23:27:40.137573+03:00"
+     ],
+     [
+      "missing_documents_requested",
+      "مستندات إضافية مطلوبة",
+      "2026-10-15T23:27:22.461952+03:00"
+     ],
+     [
+      "order_under_review",
+      "الطلب قيد المراجعة",
+      "2026-10-15T23:27:18.876771+03:00"
+     ],
+     [
+      "order_submitted",
+      "تم استلام الطلب",
+      "2026-10-15T23:27:01.320610+03:00"
+     ]
+    ]
+   }
+  }
+ ]
+}

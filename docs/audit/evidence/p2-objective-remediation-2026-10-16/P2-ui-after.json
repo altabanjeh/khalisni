@@ -1,0 +1,406 @@
+{
+ "localization": [
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin",
+   "leaks": [],
+   "chartTicks": "تم التعيين | تم التعيين | قيد التنفيذ | قيد التنفيذ | جاهز للتسليم | جاهز للتسليم | بانتظار العميل | بانتظار العميل | 0 | 0 | 0.5 | 0.5 | 1 | 1 | 1.5 | 1.5 | 2 | 2 | 4 | 4 | 2 | 2 | 1 | 1 | 1 | 1"
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders/6",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/orders/8",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/rules",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "admin",
+   "route": "/admin/services",
+   "leaks": [
+    "client-audit-qa-202610-authorization"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/documents/verify",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/orders/6",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "employee",
+   "route": "/employee/orders/8",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "provider",
+   "route": "/provider/orders/8",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "customer",
+   "route": "/customer/orders/8",
+   "leaks": [
+    "final-result"
+   ],
+   "chartTicks": ""
+  },
+  {
+   "env": "A",
+   "role": "customer",
+   "route": "/customer/orders/5/missing-docs",
+   "leaks": [],
+   "chartTicks": ""
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer (bell)",
+   "leaks": []
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer/orders/3",
+   "leaks": [
+    "final-result"
+   ]
+  },
+  {
+   "env": "B",
+   "role": "customer",
+   "route": "/customer/orders/1",
+   "leaks": []
+  }
+ ],
+ "users": {
+  "verifiedBadges": 0,
+  "activeBadges": 14,
+  "notVerified": 0,
+  "rowsText": 13
+ },
+ "services": {
+  "servicesPageRows": 20,
+  "servicesPaginationText": [
+   "عرض 1 - 20 من 38"
+  ],
+  "servicesRowsAcrossPages": 38,
+  "servicesPaginationAfterWalk": [
+   "عرض 21 - 38 من 38"
+  ],
+  "searchJawazRows": 2,
+  "searchPagination": [],
+  "englishPager": [
+   "Showing 1–20 of 38"
+  ],
+  "mobileOverflowX": 0,
+  "mobilePager": [
+   "Showing 1–20 of 38"
+  ],
+  "rulesServicesRows": 20,
+  "rulesServicesPaginationText": [
+   "عرض 1 - 20 من 38"
+  ],
+  "rulesUsesEnglishDuration": false,
+  "rulesDocumentsRows": 20,
+  "rulesDocumentsPaginationText": [
+   "عرض 1 - 20 من 153"
+  ]
+ },
+ "axe": [
+  {
+   "label": "1440-A-admin",
+   "route": "/admin",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders/6",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/rules",
+   "violations": []
+  },
+  {
+   "label": "1440-A-admin",
+   "route": "/admin/services",
+   "violations": []
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/documents/verify",
+   "violations": []
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/orders/6",
+   "violations": []
+  },
+  {
+   "label": "1440-A-employee",
+   "route": "/employee/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-provider",
+   "route": "/provider/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-customer",
+   "route": "/customer/orders/8",
+   "violations": []
+  },
+  {
+   "label": "1440-A-customer",
+   "route": "/customer/orders/5/missing-docs",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders/6",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/orders/8",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/rules",
+   "violations": []
+  },
+  {
+   "label": "390-A-admin",
+   "route": "/admin/services",
+   "violations": []
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/documents/verify",
+   "violations": []
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/orders/6",
+   "violations": []
+  },
+  {
+   "label": "390-A-employee",
+   "route": "/employee/orders/8",
+   "violations": []
+  },
+  {
+   "label": "390-A-provider",
+   "route": "/provider/orders/8",
+   "violations": []
+  },
+  {
+   "label": "390-A-customer",
+   "route": "/customer/orders/8",
+   "violations": []
+  },
+  {
+   "label": "390-A-customer",
+   "route": "/customer/orders/5/missing-docs",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#قواعد سير العمل",
+   "violations": []
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#قواعد سير العمل",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#الخدمات والأسعار",
+   "violations": []
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#الخدمات والأسعار",
+   "violations": []
+  },
+  {
+   "label": "1440-B-admin",
+   "route": "/admin/rules#المستندات المطلوبة",
+   "violations": []
+  },
+  {
+   "label": "390-B-admin",
+   "route": "/admin/rules#المستندات المطلوبة",
+   "violations": []
+  },
+  {
+   "label": "390-A-public-ar",
+   "route": "/",
+   "violations": []
+  },
+  {
+   "label": "390-A-public-en",
+   "route": "/",
+   "violations": []
+  }
+ ],
+ "footer": [
+  {
+   "lang": "ar",
+   "targets": [
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "طلب خاص",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "الرئيسية",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "الخدمات",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "تتبع الطلب",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "الأسئلة الشائعة",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "سياسة الخصوصية",
+     "w": 366,
+     "h": 24
+    }
+   ],
+   "undersized": []
+  },
+  {
+   "lang": "en",
+   "targets": [
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "Special request",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "Home",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "Services",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "Track request",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "FAQ",
+     "w": 366,
+     "h": 24
+    },
+    {
+     "text": "Privacy policy",
+     "w": 366,
+     "h": 24
+    }
+   ],
+   "undersized": []
+  }
+ ],
+ "scrollRegions": [
+  {
+   "cls": "fixed inset-y-3 left-3 right-3 z-50 flex flex-col overflow-y-auto rounded-[1.5re",
+   "tabIndex": -1,
+   "role": null,
+   "label": "لوحة الإدارة"
+  },
+  {
+   "cls": "max-h-[70vh] overflow-auto outline-none focus-visible:ring-2 focus-visible:ring-",
+   "tabIndex": 0,
+   "role": "region",
+   "label": "جدول البيانات"
+  }
+ ]
+}

@@ -1,0 +1,97 @@
+{"round":0,"width":390,"name":"home","dcl":85,"h1":211,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":390,"name":"services","dcl":107,"h1":185,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":390,"name":"search","dcl":81,"h1":159,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":390,"name":"service","dcl":79,"h1":227,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"48ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":0,"width":390,"name":"register","dcl":80,"h1":187,"h1Count":1,"chunks":10,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"16ms /api/public-site/homepage/","state":""}
+{"round":0,"width":390,"name":"login","dcl":83,"h1":163,"h1Count":1,"chunks":10,"slowChunk":"31ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":0,"width":390,"name":"tracking","dcl":84,"h1":461,"h1Count":1,"chunks":16,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"24ms /api/public-site/homepage/","state":""}
+{"round":0,"width":390,"name":"customer","dcl":83,"h1":944,"h1Count":1,"chunks":14,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"82ms /api/customer/orders/","state":""}
+{"round":0,"width":390,"name":"missing","dcl":78,"h1":942,"h1Count":1,"chunks":14,"slowChunk":"26ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"84ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":0,"width":390,"name":"employee","dcl":81,"h1":936,"h1Count":1,"chunks":18,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":6,"slowApi":"123ms /api/admin/orders/5/","state":""}
+{"round":0,"width":390,"name":"admin","dcl":79,"h1":935,"h1Count":1,"chunks":19,"slowChunk":"25ms chunk-charts-DVmG1OP6.js","apiCalls":5,"slowApi":"67ms /api/admin/orders/5/","state":""}
+{"round":0,"width":390,"name":"provider","dcl":87,"h1":953,"h1Count":1,"chunks":12,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"66ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":0,"width":430,"name":"home","dcl":98,"h1":240,"h1Count":1,"chunks":10,"slowChunk":"33ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":430,"name":"services","dcl":166,"h1":253,"h1Count":1,"chunks":10,"slowChunk":"38ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":430,"name":"search","dcl":103,"h1":194,"h1Count":1,"chunks":10,"slowChunk":"41ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":430,"name":"service","dcl":83,"h1":231,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"51ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":0,"width":430,"name":"register","dcl":83,"h1":169,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"17ms /api/public-site/homepage/","state":""}
+{"round":0,"width":430,"name":"login","dcl":87,"h1":168,"h1Count":1,"chunks":10,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":0,"width":430,"name":"tracking","dcl":80,"h1":447,"h1Count":1,"chunks":16,"slowChunk":"24ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"15ms /api/public-site/homepage/","state":""}
+{"round":0,"width":430,"name":"customer","dcl":79,"h1":927,"h1Count":1,"chunks":14,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"74ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":0,"width":430,"name":"missing","dcl":83,"h1":930,"h1Count":1,"chunks":14,"slowChunk":"26ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"75ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":0,"width":430,"name":"employee","dcl":80,"h1":944,"h1Count":1,"chunks":18,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":6,"slowApi":"115ms /api/admin/orders/5/","state":""}
+{"round":0,"width":430,"name":"admin","dcl":97,"h1":956,"h1Count":1,"chunks":19,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"69ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":0,"width":430,"name":"provider","dcl":100,"h1":965,"h1Count":1,"chunks":12,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"68ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":0,"width":768,"name":"home","dcl":93,"h1":217,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":768,"name":"services","dcl":84,"h1":175,"h1Count":1,"chunks":10,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":768,"name":"search","dcl":80,"h1":172,"h1Count":1,"chunks":10,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":768,"name":"service","dcl":97,"h1":254,"h1Count":1,"chunks":10,"slowChunk":"33ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"46ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":0,"width":768,"name":"register","dcl":94,"h1":201,"h1Count":1,"chunks":10,"slowChunk":"39ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"26ms /api/public-site/homepage/","state":""}
+{"round":0,"width":768,"name":"login","dcl":83,"h1":164,"h1Count":1,"chunks":10,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"15ms /api/public-site/homepage/","state":""}
+{"round":0,"width":768,"name":"tracking","dcl":85,"h1":462,"h1Count":1,"chunks":16,"slowChunk":"29ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"26ms /api/public-site/homepage/","state":""}
+{"round":0,"width":768,"name":"customer","dcl":80,"h1":938,"h1Count":1,"chunks":14,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"74ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":0,"width":768,"name":"missing","dcl":76,"h1":948,"h1Count":1,"chunks":14,"slowChunk":"24ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"69ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":0,"width":768,"name":"employee","dcl":81,"h1":948,"h1Count":1,"chunks":18,"slowChunk":"31ms chunk-charts-DVmG1OP6.js","apiCalls":6,"slowApi":"130ms /api/admin/orders/5/","state":""}
+{"round":0,"width":768,"name":"admin","dcl":86,"h1":971,"h1Count":1,"chunks":19,"slowChunk":"36ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"76ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":0,"width":768,"name":"provider","dcl":82,"h1":946,"h1Count":1,"chunks":12,"slowChunk":"35ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"76ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":0,"width":1366,"name":"home","dcl":100,"h1":275,"h1Count":1,"chunks":10,"slowChunk":"33ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":1366,"name":"services","dcl":98,"h1":206,"h1Count":1,"chunks":10,"slowChunk":"38ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":1366,"name":"search","dcl":83,"h1":165,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":0,"width":1366,"name":"service","dcl":81,"h1":277,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"85ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":0,"width":1366,"name":"register","dcl":81,"h1":174,"h1Count":1,"chunks":10,"slowChunk":"25ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"19ms /api/public-site/homepage/","state":""}
+{"round":0,"width":1366,"name":"login","dcl":82,"h1":172,"h1Count":1,"chunks":10,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"15ms /api/public-site/homepage/","state":""}
+{"round":0,"width":1366,"name":"tracking","dcl":80,"h1":459,"h1Count":1,"chunks":16,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"20ms /api/public-site/homepage/","state":""}
+{"round":0,"width":1366,"name":"customer","dcl":85,"h1":922,"h1Count":1,"chunks":14,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"78ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":0,"width":1366,"name":"missing","dcl":88,"h1":945,"h1Count":1,"chunks":14,"slowChunk":"32ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"80ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":0,"width":1366,"name":"employee","dcl":72,"h1":908,"h1Count":1,"chunks":18,"slowChunk":"26ms chunk-charts-DVmG1OP6.js","apiCalls":6,"slowApi":"140ms /api/admin/orders/5/","state":""}
+{"round":0,"width":1366,"name":"admin","dcl":80,"h1":921,"h1Count":1,"chunks":19,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"71ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":0,"width":1366,"name":"provider","dcl":79,"h1":973,"h1Count":1,"chunks":12,"slowChunk":"34ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"65ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":1,"width":390,"name":"home","dcl":84,"h1":211,"h1Count":1,"chunks":10,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"53ms /api/public-site/service-categories/","state":""}
+{"round":1,"width":390,"name":"services","dcl":88,"h1":174,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"54ms /api/services/","state":""}
+{"round":1,"width":390,"name":"search","dcl":89,"h1":171,"h1Count":1,"chunks":10,"slowChunk":"32ms chunk-charts-DVmG1OP6.js","apiCalls":1,"slowApi":"38ms /api/public-site/theme/","state":""}
+{"round":1,"width":390,"name":"service","dcl":87,"h1":254,"h1Count":1,"chunks":10,"slowChunk":"29ms catalogImagery-C5qgbp82.js","apiCalls":3,"slowApi":"48ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":1,"width":390,"name":"register","dcl":73,"h1":161,"h1Count":1,"chunks":10,"slowChunk":"25ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"18ms /api/public-site/homepage/","state":""}
+{"round":1,"width":390,"name":"login","dcl":84,"h1":169,"h1Count":1,"chunks":10,"slowChunk":"29ms index-J56z2ukC.js","apiCalls":2,"slowApi":"18ms /api/public-site/homepage/","state":""}
+{"round":1,"width":390,"name":"tracking","dcl":92,"h1":486,"h1Count":1,"chunks":16,"slowChunk":"32ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"27ms /api/public-site/homepage/","state":""}
+{"round":1,"width":390,"name":"customer","dcl":82,"h1":937,"h1Count":1,"chunks":14,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"97ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":1,"width":390,"name":"missing","dcl":100,"h1":951,"h1Count":1,"chunks":14,"slowChunk":"32ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"81ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":1,"width":390,"name":"employee","dcl":112,"h1":975,"h1Count":1,"chunks":18,"slowChunk":"32ms chunk-react-9KRrXCAI.js","apiCalls":6,"slowApi":"117ms /api/admin/orders/5/","state":""}
+{"round":1,"width":390,"name":"admin","dcl":83,"h1":931,"h1Count":1,"chunks":19,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"73ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":1,"width":390,"name":"provider","dcl":89,"h1":976,"h1Count":1,"chunks":12,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"70ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":1,"width":430,"name":"home","dcl":98,"h1":239,"h1Count":1,"chunks":10,"slowChunk":"43ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":430,"name":"services","dcl":105,"h1":191,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":430,"name":"search","dcl":78,"h1":156,"h1Count":1,"chunks":10,"slowChunk":"24ms chunk-charts-DVmG1OP6.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":430,"name":"service","dcl":80,"h1":243,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":3,"slowApi":"46ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":1,"width":430,"name":"register","dcl":84,"h1":168,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":1,"width":430,"name":"login","dcl":84,"h1":165,"h1Count":1,"chunks":10,"slowChunk":"26ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"18ms /api/public-site/homepage/","state":""}
+{"round":1,"width":430,"name":"tracking","dcl":79,"h1":461,"h1Count":1,"chunks":16,"slowChunk":"25ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"19ms /api/public-site/homepage/","state":""}
+{"round":1,"width":430,"name":"customer","dcl":86,"h1":931,"h1Count":1,"chunks":14,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"76ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":1,"width":430,"name":"missing","dcl":88,"h1":939,"h1Count":1,"chunks":14,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"89ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":1,"width":430,"name":"employee","dcl":93,"h1":966,"h1Count":1,"chunks":18,"slowChunk":"36ms timelinePresentation-C6juEicF.js","apiCalls":6,"slowApi":"119ms /api/admin/orders/5/","state":""}
+{"round":1,"width":430,"name":"admin","dcl":92,"h1":948,"h1Count":1,"chunks":19,"slowChunk":"31ms chunk-charts-DVmG1OP6.js","apiCalls":5,"slowApi":"76ms /api/admin/orders/5/","state":""}
+{"round":1,"width":430,"name":"provider","dcl":79,"h1":947,"h1Count":1,"chunks":12,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"67ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":1,"width":768,"name":"home","dcl":84,"h1":210,"h1Count":1,"chunks":10,"slowChunk":"31ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":768,"name":"services","dcl":81,"h1":161,"h1Count":1,"chunks":10,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":768,"name":"search","dcl":79,"h1":158,"h1Count":1,"chunks":10,"slowChunk":"27ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":768,"name":"service","dcl":82,"h1":230,"h1Count":1,"chunks":10,"slowChunk":"24ms chunk-charts-DVmG1OP6.js","apiCalls":3,"slowApi":"45ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":1,"width":768,"name":"register","dcl":86,"h1":206,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":1,"width":768,"name":"login","dcl":89,"h1":174,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"17ms /api/public-site/homepage/","state":""}
+{"round":1,"width":768,"name":"tracking","dcl":82,"h1":471,"h1Count":1,"chunks":16,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":1,"width":768,"name":"customer","dcl":89,"h1":957,"h1Count":1,"chunks":14,"slowChunk":"32ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"76ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":1,"width":768,"name":"missing","dcl":92,"h1":958,"h1Count":1,"chunks":14,"slowChunk":"34ms chunk-react-9KRrXCAI.js","apiCalls":4,"slowApi":"74ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":1,"width":768,"name":"employee","dcl":96,"h1":966,"h1Count":1,"chunks":18,"slowChunk":"39ms chunk-charts-DVmG1OP6.js","apiCalls":6,"slowApi":"134ms /api/admin/orders/5/","state":""}
+{"round":1,"width":768,"name":"admin","dcl":107,"h1":986,"h1Count":1,"chunks":19,"slowChunk":"34ms chunk-charts-DVmG1OP6.js","apiCalls":5,"slowApi":"73ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":1,"width":768,"name":"provider","dcl":100,"h1":979,"h1Count":1,"chunks":12,"slowChunk":"28ms chunk-charts-DVmG1OP6.js","apiCalls":5,"slowApi":"69ms /api/help/current/?screen_key=provider_dashboard","state":""}
+{"round":1,"width":1366,"name":"home","dcl":99,"h1":242,"h1Count":1,"chunks":10,"slowChunk":"41ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":1366,"name":"services","dcl":81,"h1":196,"h1Count":1,"chunks":10,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":1366,"name":"search","dcl":102,"h1":196,"h1Count":1,"chunks":10,"slowChunk":"29ms chunk-react-9KRrXCAI.js","apiCalls":0,"slowApi":"","state":""}
+{"round":1,"width":1366,"name":"service","dcl":98,"h1":286,"h1Count":1,"chunks":10,"slowChunk":"30ms chunk-charts-DVmG1OP6.js","apiCalls":3,"slowApi":"66ms /api/services/client-audit-qa-202610-service/","state":""}
+{"round":1,"width":1366,"name":"register","dcl":88,"h1":180,"h1Count":1,"chunks":10,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":2,"slowApi":"17ms /api/public-site/homepage/","state":""}
+{"round":1,"width":1366,"name":"login","dcl":83,"h1":172,"h1Count":1,"chunks":10,"slowChunk":"28ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"18ms /api/public-site/homepage/","state":""}
+{"round":1,"width":1366,"name":"tracking","dcl":84,"h1":467,"h1Count":1,"chunks":16,"slowChunk":"28ms chunk-charts-DVmG1OP6.js","apiCalls":2,"slowApi":"21ms /api/public-site/homepage/","state":""}
+{"round":1,"width":1366,"name":"customer","dcl":83,"h1":939,"h1Count":1,"chunks":14,"slowChunk":"27ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"74ms /api/help/current/?screen_key=customer_dashboard","state":""}
+{"round":1,"width":1366,"name":"missing","dcl":81,"h1":940,"h1Count":1,"chunks":14,"slowChunk":"29ms chunk-charts-DVmG1OP6.js","apiCalls":4,"slowApi":"75ms /api/help/current/?screen_key=customer_missing_documents","state":""}
+{"round":1,"width":1366,"name":"employee","dcl":88,"h1":956,"h1Count":1,"chunks":18,"slowChunk":"30ms chunk-react-9KRrXCAI.js","apiCalls":6,"slowApi":"137ms /api/admin/orders/5/","state":""}
+{"round":1,"width":1366,"name":"admin","dcl":85,"h1":954,"h1Count":1,"chunks":19,"slowChunk":"32ms chunk-charts-DVmG1OP6.js","apiCalls":5,"slowApi":"70ms /api/help/current/?screen_key=admin_order_details","state":""}
+{"round":1,"width":1366,"name":"provider","dcl":92,"h1":996,"h1Count":1,"chunks":12,"slowChunk":"28ms chunk-react-9KRrXCAI.js","apiCalls":5,"slowApi":"64ms /api/help/current/?screen_key=provider_dashboard","state":""}
+SUMMARY pages=96 max_h1=996 over12s_or_missing=0

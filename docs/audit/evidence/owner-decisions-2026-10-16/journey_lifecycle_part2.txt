@@ -1,0 +1,14 @@
+PASS pre: order READY_FOR_DELIVERY with unverified final doc :: {"status":"READY_FOR_DELIVERY","final":[37,"uploaded","FINAL_RESULT"]}
+PASS pre: customer cannot see unapproved final result :: [36,35]
+PASS 16a final result appears in employee verify queue :: "queue contains order number"
+PASS 16b approve enabled after preview loads :: "approve button"
+PASS 16c final result approved (UI) :: "approved"
+PASS 17a complete button available after approval :: ""
+PASS 17 order COMPLETED via employee UI :: {"status":"COMPLETED","dialogBtns":["نعم، أكمل الطلب"]}
+PASS 18a completion notification created for customer :: {"title":"اكتمل الطلب","is_read":false,"channel":"system","status":"sent"}
+PASS 18 completion notification rendered in bell :: ["اكتمل الطلب\n\nاكتمل الطلب KH-2026-000024.\n\n١٦ تشرين الأول ٢٠٢٦، ٤:٠٣ م","الطلب جاهز للتسليم\n\nالطلب KH-2026-000024 جاهز للتسليم.\n\n١٦ تشرين الأول ٢٠٢٦، ٤:٠٣ م","تم رفع النتيجة النهائية\n\nرفع مزود الخدمة النتيجة النهائية للطلب KH-2026-000024.\n\n١٦ تشرين الأول ٢٠٢٦، ٤:٠٣ م"]
+PASS 19a customer sees COMPLETED status :: "مكتمل"
+PASS 19b final result now visible to customer (API) :: {"id":37,"name":"qa-final-distinct.pdf"}
+PASS 19 customer downloads FINAL result via UI :: {"name":"qa-final-distinct.pdf","pdf":true,"matchesFinalDocBytes":true,"cardFound":1}
+PASS 20 re-login preserves COMPLETED :: ""
+PASS 21 one order; no duplicate transitions; notifications :: {"transitions":["->NEW","NEW->UNDER_REVIEW","UNDER_REVIEW->WAITING_CUSTOMER","WAITING_CUSTOMER->UNDER_REVIEW","UNDER_REVIEW->ASSIGNED","ASSIGNED->IN_PROGRESS","IN_PROGRESS->READY_FOR_DELIVERY","READY_FOR_DELIVERY->COMPLETED"],"dupTransitions":[],"notifications":[["order_completed","اكتمل الطلب","2026-10-16T16:03:51.576813+03:00"],["order_ready_for_delivery","الطلب جاهز للتسليم","2026-10-16T16:03:14.526990+03:00"],["provider_completed_work","تم رفع النتيجة النهائية","2026-10-16T16:03:14.492900+03

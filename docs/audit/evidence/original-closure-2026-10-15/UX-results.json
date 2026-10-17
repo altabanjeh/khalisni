@@ -1,0 +1,174 @@
+{
+ "U02_1366": {
+  "categoriesBefore": true,
+  "titles": [
+   {
+    "href": "/services/business_company_registration",
+    "top": 526
+   }
+  ],
+  "visibleCategoryLinks": 0,
+  "countText": [
+   "1\n\nنتيجة",
+   "1 خدمة"
+  ],
+  "vh": 900,
+  "url": "http://127.0.0.1:4320/services?search=%D8%AA%D8%A3%D8%B3%D9%8A%D8%B3",
+  "overflowX": 0,
+  "zero": [
+   "لا توجد نتائج مطابقة"
+  ],
+  "afterClear": {
+   "url": "",
+   "catLinks": 7
+  }
+ },
+ "U02_390": {
+  "categoriesBefore": true,
+  "titles": [
+   {
+    "href": "/services/business_company_registration",
+    "top": 779
+   }
+  ],
+  "visibleCategoryLinks": 0,
+  "countText": [
+   "1\n\nنتيجة",
+   "1 خدمة"
+  ],
+  "vh": 844,
+  "url": "http://127.0.0.1:4320/services?search=%D8%AA%D8%A3%D8%B3%D9%8A%D8%B3",
+  "overflowX": 0,
+  "zero": [
+   "لا توجد نتائج مطابقة"
+  ],
+  "afterClear": {
+   "url": "",
+   "catLinks": 7
+  }
+ },
+ "U03_A_KH-2026-000005": {
+  "apiStatus": 200,
+  "apiKeys": [
+   "id",
+   "order_number",
+   "status",
+   "timeline",
+   "missing_documents",
+   "missing_document_details",
+   "final_documents"
+  ],
+  "apiBody": "{\"id\":5,\"order_number\":\"KH-2026-000005\",\"status\":\"WAITING_CUSTOMER\",\"timeline\":[{\"id\":14,\"old_status\":\"NEW\",\"new_status\":\"UNDER_REVIEW\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:45.351144+03:00\"},{\"id\":15,\"old_status\":\"UNDER_REVIEW\",\"new_status\":\"WAITING_CUSTOMER\",\"note\":\"Please upload the QA authorization PDF.\",\"created_at\":\"2026-10-15T22:59:45.455035+03:00\"}],\"missing_documents\":[\"client-audit-qa-202610-authorization\"],\"missing_document_details\":[{\"document_type\":\"client-audit-qa-202610-authorization\",\"name_ar\":\"تفويض تجريبي\",\"name_en\":\"QA authorization\"}],\"final_documents\":[]}",
+  "links": [
+   "سجل الدخول لرفع المستندات -> /login?next=%2Fcustomer%2Forders%2F5%2Fmissing-docs"
+  ],
+  "hasCode": false,
+  "latin": [
+   "Please upload the QA authorization PDF"
+  ],
+  "afterAction": "http://127.0.0.1:4319/login?next=%2Fcustomer%2Forders%2F5%2Fmissing-docs"
+ },
+ "U03_A_KH-2026-000001": {
+  "apiStatus": 200,
+  "apiKeys": [
+   "id",
+   "order_number",
+   "status",
+   "timeline",
+   "missing_documents",
+   "missing_document_details",
+   "final_documents"
+  ],
+  "apiBody": "{\"id\":1,\"order_number\":\"KH-2026-000001\",\"status\":\"WAITING_CUSTOMER\",\"timeline\":[{\"id\":1,\"old_status\":\"\",\"new_status\":\"NEW\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:33.276064+03:00\"},{\"id\":2,\"old_status\":\"NEW\",\"new_status\":\"UNDER_REVIEW\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:33.344948+03:00\"},{\"id\":3,\"old_status\":\"UNDER_REVIEW\",\"new_status\":\"WAITING_CUSTOMER\",\"note\":\"Please upload the missing authorization letter.\",\"created_at\":\"2026-10-15T22:59:33.434043+03:00\"}],\"missing_documents\":[\"authorization-letter\"],\"missing_document_details\":[{\"document_type\":\"authorization-letter\",\"name_ar\":\"خطاب تفويض\",\"name_en\":\"Authorization Letter\"}],\"final_documents\":[]}",
+  "links": [
+   "سجل الدخول لرفع المستندات -> /login?next=%2Fcustomer%2Forders%2F1%2Fmissing-docs"
+  ],
+  "hasCode": false,
+  "latin": [
+   "Please upload the missing authorization letter"
+  ],
+  "afterAction": "http://127.0.0.1:4319/login?next=%2Fcustomer%2Forders%2F1%2Fmissing-docs"
+ },
+ "U03_B_KH-2026-000001": {
+  "apiStatus": 200,
+  "apiKeys": [
+   "id",
+   "order_number",
+   "status",
+   "timeline",
+   "missing_documents",
+   "missing_document_details",
+   "final_documents"
+  ],
+  "apiBody": "{\"id\":1,\"order_number\":\"KH-2026-000001\",\"status\":\"WAITING_CUSTOMER\",\"timeline\":[{\"id\":1,\"old_status\":\"\",\"new_status\":\"NEW\",\"note\":\"\",\"created_at\":\"2026-05-04T12:28:12.759824+03:00\"},{\"id\":5,\"old_status\":\"NEW\",\"new_status\":\"UNDER_REVIEW\",\"note\":\"\",\"created_at\":\"2026-05-04T12:28:12.876427+03:00\"},{\"id\":6,\"old_status\":\"UNDER_REVIEW\",\"new_status\":\"WAITING_CUSTOMER\",\"note\":\"يرجى رفع صورة أوضح للهوية الشخصية\",\"created_at\":\"2026-05-04T12:28:12.898797+03:00\"}],\"missing_documents\":[],\"missing_document_details\":[],\"final_documents\":[]}",
+  "links": [],
+  "hasCode": false,
+  "latin": [
+   "support",
+   "khalisni",
+   "local"
+  ]
+ },
+ "U03_A_KH-2026-000008": {
+  "apiStatus": 200,
+  "apiKeys": [
+   "id",
+   "order_number",
+   "status",
+   "timeline",
+   "missing_documents",
+   "missing_document_details",
+   "final_documents"
+  ],
+  "apiBody": "{\"id\":8,\"order_number\":\"KH-2026-000008\",\"status\":\"READY_FOR_DELIVERY\",\"timeline\":[{\"id\":19,\"old_status\":\"NEW\",\"new_status\":\"UNDER_REVIEW\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:45.975487+03:00\"},{\"id\":20,\"old_status\":\"UNDER_REVIEW\",\"new_status\":\"ASSIGNED\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:46.072105+03:00\"},{\"id\":21,\"old_status\":\"ASSIGNED\",\"new_status\":\"IN_PROGRESS\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:46.146259+03:00\"},{\"id\":22,\"old_status\":\"IN_PROGRESS\",\"new_status\":\"READY_FOR_DELIVERY\",\"note\":\"\",\"created_at\":\"2026-10-15T22:59:46.307375+03:00\"}],\"missing_documents\":[],\"missing_document_details\":[],\"final_documents\":[]}",
+  "links": [],
+  "hasCode": false,
+  "latin": []
+ },
+ "U04/register": {
+  "labels": [
+   "الاسم الكامل(مطلوب)",
+   "رقم الهاتف(مطلوب)",
+   "البريد الإلكتروني(مطلوب)",
+   "الرقم الوطني(اختياري)",
+   "كلمة المرور(مطلوب)"
+  ],
+  "hints": [
+   "إنشاء حساب عميل",
+   "بعد إنشاء الحساب ستتمكن من إرسال الطلبات ورفع المستندات ومتابعة الحالة من بوابة العميل.",
+   "(مطلوب)",
+   "(اختياري)",
+   "ثمانية أحرف على الأقل.",
+   "لديك حساب بالفعل؟ سجل الدخول"
+  ],
+  "errorsAfterEmptySubmit": [
+   "الاسم الكامل مطلوب",
+   "رقم الهاتف مطلوب",
+   "البريد الإلكتروني مطلوب",
+   "كلمة المرور مطلوبة"
+  ]
+ },
+ "U04/contact": {
+  "labels": [
+   "الاسم(مطلوب)",
+   "الهاتف(مطلوب)",
+   "البريد الإلكتروني(اختياري)",
+   "الرسالة(مطلوب)"
+  ],
+  "hints": [
+   "تواصل معنا",
+   "فريق خلصني جاهز لمساعدتك في اختيار الخدمة، متابعة الطلب، أو توضيح المتطلبات.",
+   "(مطلوب)",
+   "(اختياري)",
+   "الدعم المباشر",
+   "استخدم زر الدعم العائم أو صفحة التتبع عند وجود طلب قائم.",
+   "استفسارات الخدمات",
+   "اذكر الخدمة المطلوبة وأي تفاصيل تساعدنا على توجيهك بسرعة."
+  ],
+  "errorsAfterEmptySubmit": [
+   "الاسم مطلوب",
+   "الهاتف مطلوب",
+   "الرسالة مطلوبة"
+  ]
+ }
+}

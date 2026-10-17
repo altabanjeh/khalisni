@@ -1,0 +1,2 @@
+DRY RUN: 1 waiting order(s) need attention.
+- KH-2026-000001 (id 1, customer 2 ***0002): no_request_no_recorded_types; recorded types=[]; open request=None None; recommended: return-to-review (staff decides what to request next)

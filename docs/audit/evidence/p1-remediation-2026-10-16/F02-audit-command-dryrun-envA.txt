@@ -1,0 +1,3 @@
+DRY RUN: 2 waiting order(s) need attention.
+- KH-2026-000001 (id 1, customer 3 ***0002): ok; recorded types=['authorization-letter']; open request=1 ['authorization-letter']; recommended: none
+- KH-2026-000005 (id 5, customer 8 ***0103): ok; recorded types=['client-audit-qa-202610-authorization']; open request=2 ['client-audit-qa-202610-authorization']; recommended: none

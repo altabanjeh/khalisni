@@ -1,0 +1,251 @@
+{
+ "emp_5": {
+  "readyClaims": [],
+  "blockers": [
+   "لم يُرفع بعد",
+   "معتمد",
+   "معتمد فقط، دون كتابة رسالة حرة."
+  ],
+  "english": [
+   "QA Customer A",
+   "client-audit-qa-",
+   "customer",
+   "QA Employee",
+   "INTERNAL QA NOTE: must remain private",
+   "Please upload the QA authorization PDF.",
+   "QA review",
+   "QA Provider A",
+   "QA service provider ",
+   "Approved",
+   "QA Provider B",
+   "QA Provider A ",
+   "QA Provider B "
+  ],
+  "codes": false,
+  "assignDisabled": "n/a",
+  "reqSection": null
+ },
+ "emp_6": {
+  "readyClaims": [],
+  "blockers": [
+   "بانتظار التحقق",
+   "معتمد",
+   "معتمد فقط، دون كتابة رسالة حرة."
+  ],
+  "english": [
+   "QA Customer A",
+   "client-audit-qa-",
+   "customer",
+   "qa-upload-pending.pdf ",
+   "qa-upload-pending.pdf",
+   "QA upload review",
+   "QA Provider A",
+   "QA service provider ",
+   "Approved",
+   "QA Provider B",
+   "QA Provider A ",
+   "QA Provider B "
+  ],
+  "codes": false,
+  "assignDisabled": "n/a",
+  "reqSection": null
+ },
+ "emp_7": {
+  "readyClaims": [],
+  "blockers": [
+   "معتمد",
+   "معتمد",
+   "معتمد",
+   "معتمد فقط، دون كتابة رسالة حرة."
+  ],
+  "english": [
+   "QA Customer B",
+   "client-audit-qa-",
+   "customer",
+   "qa-authorization.pdf ",
+   "qa-authorization.pdf",
+   "QA second customer",
+   "Order assigned to provider.",
+   "QA Provider A",
+   "QA service provider ",
+   "Approved",
+   "QA Provider B",
+   "QA Provider A ",
+   "QA Provider B "
+  ],
+  "codes": false,
+  "assignDisabled": "n/a",
+  "reqSection": null
+ },
+ "emp_9": {
+  "readyClaims": [],
+  "blockers": [
+   "مرفوض",
+   "مرفوض",
+   "معتمد",
+   "معتمد فقط، دون كتابة رسالة حرة."
+  ],
+  "english": [
+   "QA Customer A",
+   "client-audit-qa-",
+   "customer",
+   "qa-valid.png ",
+   "qa-valid.png",
+   "qa-valid.pdf",
+   "QA Employee",
+   "Order under review",
+   "Customer uploaded all requested missing documents",
+   "QA Provider A",
+   "QA service provider ",
+   "Approved",
+   "QA Provider B",
+   "QA Provider A ",
+   "QA Provider B "
+  ],
+  "codes": false,
+  "assignDisabled": "n/a",
+  "reqSection": null
+ },
+ "emp_1": {
+  "readyClaims": [],
+  "blockers": [
+   "لم يُرفع بعد",
+   "لم يُرفع بعد",
+   "معتمد",
+   "معتمد فقط، دون كتابة رسالة حرة."
+  ],
+  "english": [
+   "Demo Customer",
+   "customer",
+   "khalisni.local",
+   "Employee Demo",
+   "Please upload the missing authorization letter.",
+   "Initial employee review"
+  ],
+  "codes": false,
+  "assignDisabled": "n/a",
+  "reqSection": null
+ },
+ "admin_5": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": [
+   "الإجراء التالي غير متاح بعد: resume_review — Requested documents still need upload: client-audit-qa-202610-authorization."
+  ]
+ },
+ "admin_6": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": [
+   "الإجراء التالي غير متاح بعد: assign_provider — Required documents are incomplete."
+  ]
+ },
+ "admin_7": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": [
+   "الإجراء التالي غير متاح بعد: provider_start_work — Role 'admin' cannot move order from ASSIGNED to IN_PROGRESS."
+  ]
+ },
+ "admin_8": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": []
+ },
+ "admin_4": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": []
+ },
+ "admin_1": {
+  "selects": [],
+  "buttons": [],
+  "blockedText": [
+   "الإجراء التالي غير متاح بعد: resume_review — Requested documents still need upload: authorization-letter."
+  ]
+ },
+ "rules_page": {
+  "hasWaitingCustomer": false,
+  "excerpt": null
+ },
+ "U01_390": {
+  "headerHeight": 68,
+  "headerBottom": 80,
+  "viewport": 844,
+  "pctViewport": 8,
+  "visibleControls": [
+   "فتح القائمة الجانبية",
+   "الإشعارات",
+   "المزيد من الخيارات"
+  ],
+  "overflowX": 0,
+  "firstContentTop": null,
+  "menuItems": [
+   "الدليل",
+   "العربية",
+   "English",
+   "الموقع العام",
+   "تسجيل الخروج"
+  ]
+ },
+ "U01_430": {
+  "headerHeight": 68,
+  "headerBottom": 80,
+  "viewport": 844,
+  "pctViewport": 8,
+  "visibleControls": [
+   "فتح القائمة الجانبية",
+   "الإشعارات",
+   "المزيد من الخيارات"
+  ],
+  "overflowX": 0,
+  "firstContentTop": null,
+  "menuItems": [
+   "الدليل",
+   "العربية",
+   "English",
+   "الموقع العام",
+   "تسجيل الخروج"
+  ]
+ },
+ "U01_768": {
+  "headerHeight": 76,
+  "headerBottom": 92,
+  "viewport": 844,
+  "pctViewport": 9,
+  "visibleControls": [
+   "فتح القائمة الجانبية",
+   "خلصني",
+   "الإشعارات",
+   "المزيد من الخيارات"
+  ],
+  "overflowX": 0,
+  "firstContentTop": null,
+  "menuItems": [
+   "الدليل",
+   "العربية",
+   "English",
+   "الموقع العام",
+   "تسجيل الخروج"
+  ]
+ },
+ "U01_1366": {
+  "headerHeight": 76,
+  "headerBottom": 100,
+  "viewport": 900,
+  "pctViewport": 8,
+  "visibleControls": [
+   "الإشعارات",
+   "المزيد من الخيارات"
+  ],
+  "overflowX": 0,
+  "firstContentTop": null,
+  "menuItems": [
+   "الدليل",
+   "العربية",
+   "English",
+   "الموقع العام",
+   "تسجيل الخروج"
+  ]
+ }
+}

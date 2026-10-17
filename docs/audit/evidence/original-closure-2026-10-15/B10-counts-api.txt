@@ -1,0 +1,4 @@
+admin services 200 count= 38 returned= 20 next= http://127.0.0.1:8010/api/admin/services/?page=2
+public services 32
+categories 13 [('???', None, 1), ('???', None, 1), ('???', None, 1), ('الأحوال المدنية والجوازات', None, 2), ('الأحوال المدنية والجوازات', None, 1), ('العقارات والأراضي', None, 18), ('خدمات الأعمال والشركات', None, 9), ('خدمات عامة سريعة', None, 1), ('ضريبة الدخل والمبيعات', None, 1), ('الخدمات البلدية', None, 1)]
+users verified flags [('admin@khalisni.local', False, None), ('admin-debug@example.com', False, None), ('admin-debug-2@example.com', False, None), ('admin-debug-3@example.com', False, None), ('audit-login@example.com', False, None), ('customer@khalisni.local', False, None)]

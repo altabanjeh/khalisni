@@ -1,0 +1,18 @@
+{
+ "F01_bellUnreadLine": "غير المقروءة: 2",
+ "F01_apiUnreadCount": {
+  "unread": 2
+ },
+ "B07_saveDraftButton": 1,
+ "B07_afterReload": {
+  "full_name": "Draft Persist QA",
+  "city": "Zarqa"
+ },
+ "B07_draftKeys": [
+  "khalisni-client-order-draft:9"
+ ],
+ "B07_draftKeysAfterLogout": [],
+ "B07_afterRelogin": {
+  "full_name": "QA Customer B"
+ }
+}

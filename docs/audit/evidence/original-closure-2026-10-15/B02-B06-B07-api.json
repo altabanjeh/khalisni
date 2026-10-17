@@ -1,0 +1,276 @@
+{
+ "B07_first": [
+  201,
+  "KH-2026-000009"
+ ],
+ "B07_replay_same_key": [
+  200,
+  "KH-2026-000009"
+ ],
+ "B07_same_key_changed_payload": [
+  409,
+  "{'detail': 'This submission key was used for different request data.', 'code': 'submission_key_conflict'}"
+ ],
+ "B07_same_key_other_customer": 400,
+ "X": 9,
+ "X_initial": [
+  "NEW",
+  {
+   "requirements_complete": false,
+   "documents": [
+    {
+     "document_type": "client-audit-qa-202610-authorization",
+     "name_ar": "تفويض تجريبي",
+     "name_en": "QA authorization",
+     "is_required": true,
+     "state": "pending_review",
+     "document_id": 10
+    }
+   ],
+   "blocking_reasons": [
+    {
+     "code": "pending_review",
+     "document_type": "client-audit-qa-202610-authorization"
+    }
+   ]
+  }
+ ],
+ "X_start_review": 200,
+ "X_request_docs_empty": [
+  400,
+  {
+   "document_types": [
+    "Select at least one configured document requirement."
+   ]
+  }
+ ],
+ "X_request_docs_unknown": [
+  400,
+  {
+   "document_types": [
+    "Unknown or inactive service document requirement: legal_authorization."
+   ]
+  }
+ ],
+ "X_request_docs_ok": 200,
+ "X_customer_view_waiting": {
+  "status": "WAITING_CUSTOMER",
+  "missing": [
+   "client-audit-qa-202610-authorization"
+  ],
+  "aa": {
+   "can_upload_customer_document": true,
+   "can_view_missing_documents_form": true
+  }
+ },
+ "up_exe": [
+  400,
+  {
+   "file": [
+    "Unsupported file extension."
+   ]
+  }
+ ],
+ "up_oversize_11MB": [
+  400,
+  {
+   "file": [
+    "File exceeds maximum allowed size."
+   ]
+  }
+ ],
+ "up_html_renamed_pdf": [
+  400,
+  {
+   "file": [
+    "File content does not match its extension."
+   ]
+  }
+ ],
+ "status_after_invalid": "WAITING_CUSTOMER",
+ "up_png_on_pdf_only_requirement": [
+  201,
+  {
+   "id": 11
+  }
+ ],
+ "status_after_png": "UNDER_REVIEW",
+ "B06_custB_upload_to_A_order": 404,
+ "status_after_valid": "UNDER_REVIEW",
+ "X_docs_employee": [
+  [
+   11,
+   "uploaded",
+   null
+  ],
+  [
+   10,
+   "uploaded",
+   null
+  ]
+ ],
+ "reject_without_reason": [
+  400,
+  {
+   "note": [
+    "A rejection note is required when rejecting a document."
+   ]
+  }
+ ],
+ "reject_with_reason": 200,
+ "customer_sees_after_reject": {
+  "status": "UNDER_REVIEW",
+  "docs": [
+   {
+    "id": 11,
+    "status": "rejected",
+    "verification_note": "",
+    "rejection_reason": null,
+    "is_verified": false
+   },
+   {
+    "id": 10,
+    "status": "uploaded",
+    "verification_note": "",
+    "rejection_reason": null,
+    "is_verified": false
+   }
+  ],
+  "readiness": {
+   "requirements_complete": false,
+   "documents": [
+    {
+     "document_type": "client-audit-qa-202610-authorization",
+     "name_ar": "تفويض تجريبي",
+     "name_en": "QA authorization",
+     "is_required": true,
+     "state": "rejected",
+     "document_id": 11
+    }
+   ],
+   "blocking_reasons": [
+    {
+     "code": "rejected",
+     "document_type": "client-audit-qa-202610-authorization"
+    }
+   ]
+  },
+  "aa_upload": true
+ },
+ "employee_readiness_after_reject": {
+  "requirements_complete": false,
+  "documents": [
+   {
+    "document_type": "client-audit-qa-202610-authorization",
+    "name_ar": "تفويض تجريبي",
+    "name_en": "QA authorization",
+    "is_required": true,
+    "state": "rejected",
+    "document_id": 11
+   }
+  ],
+  "blocking_reasons": [
+   {
+    "code": "rejected",
+    "document_type": "client-audit-qa-202610-authorization"
+   }
+  ]
+ },
+ "dl_token_owner": [
+  200,
+  [
+   "token",
+   "expires_in"
+  ]
+ ],
+ "dl_owner": [
+  200,
+  "image/png",
+  "b'\\x89PNG\\r\\n\\x1a\\n'"
+ ],
+ "dl_token_without_auth_header": 200,
+ "dl_token_custB": 404,
+ "dl_token_provA_unassigned": 404,
+ "dl_direct_custB_no_token": 404,
+ "custB_get_A_order5": 404,
+ "custB_cancel_A_order5": 404,
+ "custA_get_B_order7": 404,
+ "custA_admin_endpoint": 403,
+ "custA_list_ids": [
+  "KH-2026-000005",
+  "KH-2026-000006",
+  "KH-2026-000008",
+  "KH-2026-000009"
+ ],
+ "custB_list_ids": [
+  "KH-2026-000007"
+ ],
+ "provA_list": [
+  "KH-2026-000008"
+ ],
+ "provB_list": [
+  "KH-2026-000007"
+ ],
+ "provA_get_B_order7": 404,
+ "provB_get_A_order8": 404,
+ "provA_get_unassigned_order5": 404,
+ "provA_status_on_order7": 404,
+ "provA_customer_endpoint": 403,
+ "provA_admin_endpoint": 403,
+ "provB_dl_token_A_doc8": 404,
+ "provA_dl_token_own_final9": 200,
+ "custA_dl_token_final9_before_completion": 403,
+ "custB_dl_token_own_doc7": 200,
+ "custA_dl_token_B_doc7": 404,
+ "custA_order5_internal_note_leak": false,
+ "custA_order5_keys": [
+  "allowed_actions",
+  "assigned_employee",
+  "assigned_provider",
+  "city",
+  "completed_at",
+  "created_at",
+  "customer",
+  "customer_notes",
+  "documents",
+  "expected_delivery_date",
+  "final_price",
+  "id",
+  "is_archived",
+  "missing_document_types",
+  "notes",
+  "order_number",
+  "organization_name_snapshot",
+  "priority",
+  "rating",
+  "rejection_reason",
+  "required_documents",
+  "service",
+  "service_category_name_snapshot",
+  "service_name_snapshot",
+  "status",
+  "status_logs",
+  "updated_at"
+ ],
+ "custA_order5_assigned_employee": null,
+ "custB_order7_provider_field": {
+  "id": 3,
+  "full_name": "QA Provider B",
+  "provider_type": "QA service provider",
+  "city": "Amman",
+  "rating": "0.00",
+  "is_available": true
+ },
+ "custB_order7_has_internal_notes_key": false,
+ "provA_order8_internal_note_leak": false,
+ "track5_leak": [],
+ "track_wrong_phone": [
+  404,
+  {
+   "detail": "No Order matches the given query."
+  }
+ ],
+ "track7_provider_leak": false,
+ "emp_admin_rules": 403,
+ "emp_admin_users": 403
+}

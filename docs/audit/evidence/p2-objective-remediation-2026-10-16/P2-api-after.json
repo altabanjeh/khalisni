@@ -1,0 +1,223 @@
+{
+ "reg_missing_phone": [
+  400,
+  {
+   "phone": [
+    "رقم الهاتف مطلوب."
+   ]
+  }
+ ],
+ "reg_blank_phone": [
+  400,
+  {
+   "phone": [
+    "رقم الهاتف مطلوب."
+   ]
+  }
+ ],
+ "reg_bad_phone": [
+  400,
+  {
+   "phone": [
+    "أدخل رقم هاتف صحيحاً من 8 إلى 15 رقماً، مثل 0791234567 أو ‎+962791234567."
+   ]
+  }
+ ],
+ "reg_valid_phone": [
+  201,
+  {
+   "id": 20,
+   "full_name": "QA Reg P2",
+   "phone": "0791920186",
+   "email": "p2-ok-920186@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_valid_intl_phone": [
+  201,
+  {
+   "id": 21,
+   "full_name": "QA Reg P2",
+   "phone": "+962 78 1920186",
+   "email": "p2-intl-920186@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_dup_email_ar": [
+  400,
+  {
+   "email": [
+    "يوجد حساب مسجّل بهذا البريد الإلكتروني. سجّل الدخول أو استخدم خيار «نسيت كلمة المرور»."
+   ]
+  }
+ ],
+ "reg_dup_email_en": [
+  400,
+  {
+   "email": [
+    "An account with this email already exists. Sign in or use “Forgot password”."
+   ]
+  }
+ ],
+ "reg_dup_phone": [
+  400,
+  {
+   "phone": [
+    "رقم الهاتف هذا مستخدم في حساب آخر. سجّل الدخول أو استخدم رقماً آخر."
+   ]
+  }
+ ],
+ "reg_numeric_password": [
+  400,
+  {
+   "password": [
+    "كلمة المرور هذه شائعة جداً.",
+    "كلمة المرور هذه تتكون من أرقام فقط."
+   ]
+  }
+ ],
+ "services_api": {
+  "count": 38,
+  "page1Rows": 20,
+  "next": "/api/admin/services/?page=2"
+ },
+ "users_api": {
+  "count": 13,
+  "sampleKeys": [
+   "is_active",
+   "is_verified",
+   "is_email_verified",
+   "is_phone_verified"
+  ],
+  "rows": [
+   {
+    "id": 1,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": true,
+    "is_phone_verified": false
+   },
+   {
+    "id": 5,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 7,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 10,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 13,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 2,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": true,
+    "is_phone_verified": false
+   },
+   {
+    "id": 3,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": true,
+    "is_phone_verified": false
+   },
+   {
+    "id": 4,
+    "role": "employee",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": true,
+    "is_phone_verified": false
+   },
+   {
+    "id": 9,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 12,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 6,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 8,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   },
+   {
+    "id": 11,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false,
+    "is_email_verified": false,
+    "is_phone_verified": false
+   }
+  ]
+ },
+ "forgot_ar": [
+  200,
+  {
+   "detail": "If this email is registered, a password reset link has been sent."
+  }
+ ],
+ "forgot_en": [
+  200,
+  {
+   "detail": "If this email is registered, a password reset link has been sent."
+  }
+ ],
+ "reset_emails": [
+  {
+   "file": "20261016-122841-2640367458480.log",
+   "subject": "إعادة تعيين كلمة المرور في خلّصني",
+   "body": "مرحباً QA Customer A،\nتلقّينا طلباً لإعادة تعيين كلمة المرور لحسابك في خلّصني.\nاستخدم الرابط التالي خلال 30 دقيقة:\nhttp://127.0.0.1:4351/reset-password/<redacted>\nإذا لم تطلب هذا التغيير، يمكنك تجاهل هذه الرسالة وستبقى كلمة المرور الحالية كما هي.\nفريق خلّصني\n\n-------------------------------------------------------------------------------\n"
+  },
+  {
+   "file": "20261016-122844-2640372170576.log",
+   "subject": "Khalsni password reset",
+   "body": "Hello QA Customer B,\nWe received a request to reset your Khalsni password.\nUse this link within 30 minutes:\nhttp://127.0.0.1:4351/reset-password/<redacted>\nIf you did not request this change, you can ignore this email and your current password stays the same.\nThe Khalsni team\n\n-------------------------------------------------------------------------------\n"
+  }
+ ]
+}

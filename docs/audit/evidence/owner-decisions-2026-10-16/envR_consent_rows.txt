@@ -1,0 +1,25 @@
+53 objects imported automatically (use -v 2 for details).
+
+KH-2026-000001 consent_rows= 0
+KH-2026-000002 consent_rows= 0
+KH-2026-000003 consent_rows= 0
+KH-2026-000004 consent_rows= 0
+KH-2026-000005 consent_rows= 0
+KH-2026-000006 consent_rows= 0
+KH-2026-000007 consent_rows= 0
+KH-2026-000008 consent_rows= 0
+KH-2026-000009 consent_rows= 1
+KH-2026-000010 consent_rows= 1
+KH-2026-000011 consent_rows= 1
+KH-2026-000012 consent_rows= 1
+KH-2026-000013 consent_rows= 1
+KH-2026-000014 consent_rows= 1
+KH-2026-000015 consent_rows= 1
+KH-2026-000016 consent_rows= 1
+KH-2026-000017 consent_rows= 1
+KH-2026-000018 consent_rows= 1
+KH-2026-000019 consent_rows= 1
+KH-2026-000020 consent_rows= 1
+KH-2026-000021 consent_rows= 1
+KH-2026-000022 consent_rows= 1
+KH-2026-000023 consent_rows= 1

@@ -1,0 +1,133 @@
+{
+ "id": 11,
+ "number": "KH-2026-000011",
+ "steps": [
+  {
+   "step": "B07 consent unchecked by default",
+   "result": "PASS",
+   "detail": "consent checkbox initial state"
+  },
+  {
+   "step": "1 customer submits valid request (UI wizard)",
+   "result": "PASS",
+   "detail": {
+    "number": "KH-2026-000011",
+    "id": 11
+   }
+  },
+  {
+   "step": "B07 double-click submit creates one order",
+   "result": "PASS",
+   "detail": {
+    "postRequests": 1,
+    "ordersCreated": 1
+   }
+  },
+  {
+   "step": "B07 refresh after submit creates no extra order",
+   "result": "PASS",
+   "detail": "reload on success page"
+  },
+  {
+   "step": "2 employee sees request in queue",
+   "result": "PASS",
+   "detail": "KH-2026-000011"
+  },
+  {
+   "step": "2b employee starts review (UI)",
+   "result": "PASS",
+   "detail": "UNDER_REVIEW"
+  },
+  {
+   "step": "3 employee requests missing document (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "WAITING_CUSTOMER",
+    "missing": [
+     "client-audit-qa-202610-authorization"
+    ]
+   }
+  },
+  {
+   "step": "4 customer receives in-app notification (bell)",
+   "result": "PASS",
+   "detail": "bell shows missing-doc notice for KH-2026-000011"
+  },
+  {
+   "step": "4b bell opens the correct missing-docs page",
+   "result": "PASS",
+   "detail": "http://127.0.0.1:4319/customer/orders/11/missing-docs"
+  },
+  {
+   "step": "5-6 customer uploads + resubmits (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "UNDER_REVIEW",
+    "url": "http://127.0.0.1:4319/customer/orders/11"
+   }
+  },
+  {
+   "step": "7-8 employee reviews/accepts document (UI)",
+   "result": "PASS",
+   "detail": {
+    "requirements_complete": true,
+    "documents": [
+     {
+      "document_type": "client-audit-qa-202610-authorization",
+      "name_ar": "تفويض تجريبي",
+      "name_en": "QA authorization",
+      "is_required": true,
+      "state": "approved",
+      "document_id": 16
+     }
+    ],
+    "blocking_reasons": []
+   }
+  },
+  {
+   "step": "9 eligible provider assigned (UI); readiness text shown before",
+   "result": "PASS",
+   "detail": {
+    "status": "ASSIGNED",
+    "readyTextShown": true,
+    "providerOptions": [
+     "اختر مزوّد الخدمة",
+     "QA Provider A — Amman ",
+     "QA Provider B — Amman "
+    ]
+   }
+  },
+  {
+   "step": "10 provider receives the request (list)",
+   "result": "PASS",
+   "detail": "KH-2026-000011"
+  },
+  {
+   "step": "11 provider opens it; internal note hidden",
+   "result": "PASS",
+   "detail": "provider detail"
+  },
+  {
+   "step": "12 provider updates progress (UI)",
+   "result": "PASS",
+   "detail": "IN_PROGRESS"
+  },
+  {
+   "step": "13 customer sees progress",
+   "result": "PASS",
+   "detail": "قيد التنفيذ"
+  },
+  {
+   "step": "14 internal note hidden from customer",
+   "result": "PASS",
+   "detail": {
+    "providerNameVisibleToCustomer": false
+   }
+  },
+  {
+   "step": "15 provider supplies final result (UI)",
+   "result": "PASS",
+   "detail": "READY_FOR_DELIVERY"
+  }
+ ]
+}
