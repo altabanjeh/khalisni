@@ -442,6 +442,8 @@ function formatDefinitionSummary(definition, isArabic) {
   return `${extensions} | ${sizeOption?.label || (isArabic ? 'حجم مخصص' : 'Custom size')}`
 }
 
+const EMPTY_SERVICE_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
+
 function ServicesManagementPage() {
   const { isArabic } = useLanguage()
   const { toast } = useToast()
@@ -455,11 +457,43 @@ function ServicesManagementPage() {
     [categoryStatus],
     [],
   )
-  const { data: services = [], loading: servicesLoading, reload: reloadServices } = useAsyncData(
-    () => api.getAdminServices({ ...(serviceFilterCategory ? { category: serviceFilterCategory } : {}), status: serviceStatus }),
-    [serviceFilterCategory, serviceStatus],
-    [],
+  // The services table pages on the server: every service is reachable and
+  // status, category and search apply to the whole catalogue (audit B10-6).
+  const [servicePage, setServicePage] = useState(1)
+  const [serviceSearchInput, setServiceSearchInput] = useState('')
+  const [serviceSearch, setServiceSearch] = useState('')
+  const [servicePageSize, setServicePageSize] = useState(20)
+  useEffect(() => {
+    const next = serviceSearchInput.trim()
+    if (next === serviceSearch) return undefined
+    const timer = setTimeout(() => {
+      setServiceSearch(next)
+      setServicePage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [serviceSearchInput, serviceSearch])
+  const {
+    data: servicePageData,
+    loading: servicesLoading,
+    error: servicesError,
+    reload: reloadServices,
+  } = useAsyncData(
+    () => api.getAdminServicesPage({ page: servicePage, status: serviceStatus, category: serviceFilterCategory, search: serviceSearch }),
+    [servicePage, serviceStatus, serviceFilterCategory, serviceSearch],
+    EMPTY_SERVICE_PAGE,
   )
+  const services = useMemo(() => servicePageData?.results || [], [servicePageData])
+  const serviceTotal = servicePageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (servicePageData?.hasNext && servicePageData.results.length) setServicePageSize(servicePageData.results.length)
+  }, [servicePageData])
+  useEffect(() => {
+    // The last row of the last page was removed: go back to a page that exists.
+    if (servicesError?.response?.status === 404 && servicePage > 1) setServicePage((page) => Math.max(1, page - 1))
+  }, [servicesError, servicePage])
+  // Reloaded with the service list so a save, delete or restore updates it.
+  const { data: serviceCounts } = useAsyncData(() => api.getAdminServiceCounts(), [servicePageData], null)
   const { data: definitions = [], loading: definitionsLoading, reload: reloadDefinitions } = useAsyncData(
     () => api.getAdminRequiredDocumentDefinitions({ status: definitionStatus }),
     [definitionStatus],
@@ -982,7 +1016,11 @@ function ServicesManagementPage() {
       label: tr('الفئة', 'Category'),
       render: (row) => (isArabic ? row.category?.name_ar : row.category?.name_en) || row.category?.name_ar || row.category_name || tr('غير مصنّفة', 'Unassigned'),
     },
-    { key: 'duration_display', label: tr('التسليم', 'Delivery') },
+    {
+      key: 'duration_display',
+      label: tr('التسليم', 'Delivery'),
+      render: (row) => (isArabic ? row.duration_display_ar : row.duration_display_en) || row.duration_display || '—',
+    },
     { key: 'required_documents', label: tr('الوثائق', 'Documents'), render: (row) => row.required_documents?.length || 0 },
     { key: 'show_on_public_site', label: tr('الموقع العام', 'Public site'), render: (row) => (row.show_on_public_site ? tr('ظاهرة', 'Visible') : tr('مخفية', 'Hidden')) },
     { key: 'is_active', label: tr('الحالة', 'Status'), render: statusCell },
@@ -1129,6 +1167,26 @@ function ServicesManagementPage() {
         />
       </SectionCard>
 
+      {serviceCounts ? (
+        <section aria-label={tr('أعداد الخدمات', 'Service counts')} className="panel-muted p-4">
+          {/* The counts differ on purpose; each label says what it counts. */}
+          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { key: 'total', label: tr('إجمالي الخدمات', 'Total services'), hint: tr('كل الخدمات غير المحذوفة', 'All services that are not deleted') },
+              { key: 'active', label: tr('نشطة', 'Active'), hint: tr('الخدمات المفعّلة', 'Services switched on') },
+              { key: 'published', label: tr('منشورة للعامة', 'Published'), hint: tr('نشطة وظاهرة في الموقع العام ضمن فئة نشطة وظاهرة', 'Active and shown on the public site, in an active, shown category') },
+              { key: 'customer_visible', label: tr('ظاهرة للعميل', 'Visible to customer'), hint: tr('المنشورة التي يراها عميل المنصة بعد قواعد الجهة', 'Published services a platform customer sees after organization rules') },
+            ].map((item) => (
+              <div className="rounded-2xl border border-border bg-white px-4 py-3" key={item.key}>
+                <dt className="text-xs font-bold text-slate-600">{item.label}</dt>
+                <dd className="mt-1 text-2xl font-black text-ink" data-testid={`service-count-${item.key}`}>{serviceCounts[item.key] ?? 0}</dd>
+                <dd className="mt-1 text-xs leading-5 text-slate-600">{item.hint}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
+
       <SectionCard
         action={
           <button className="btn-primary" onClick={() => openServiceForm()} type="button">
@@ -1146,16 +1204,29 @@ function ServicesManagementPage() {
           columns={serviceColumns}
           emptyDescription={tr('أضف أول خدمة لتظهر في الموقع ولوحات التشغيل.', 'Add the first service so it appears on the site and operational boards.')}
           emptyTitle={tr('لا توجد خدمات', 'No services')}
+          ariaLabel={tr('جدول الخدمات', 'Services table')}
+          error={servicesError?.response?.status === 404 ? null : servicesError}
           loading={servicesLoading}
           mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
+          onRetry={reloadServices}
+          pagination={{ page: servicePage, pageSize: servicePageSize, total: serviceTotal, onChange: setServicePage }}
           rowClassName={(row) => (row.is_deleted ? 'opacity-60' : '')}
           rows={services}
           toolbar={
-            <div className="grid gap-3 md:grid-cols-2">
-              <select aria-label={tr('حالة الخدمات', 'Service status')} className="field" value={serviceStatus} onChange={(event) => setServiceStatus(event.target.value)}>
+            <div className="grid gap-3 md:grid-cols-3">
+              <input
+                aria-label={tr('بحث في الخدمات', 'Search services')}
+                className="field"
+                data-testid="admin-services-search"
+                onChange={(event) => setServiceSearchInput(event.target.value)}
+                placeholder={tr('ابحث باسم الخدمة أو رابطها', 'Search by service name or slug')}
+                type="search"
+                value={serviceSearchInput}
+              />
+              <select aria-label={tr('حالة الخدمات', 'Service status')} className="field" value={serviceStatus} onChange={(event) => { setServiceStatus(event.target.value); setServicePage(1) }}>
                 {statusFilterOptions}
               </select>
-              <select aria-label={tr('تصفية حسب التصنيف', 'Filter by category')} className="field" value={serviceFilterCategory} onChange={(event) => setServiceFilterCategory(event.target.value)}>
+              <select aria-label={tr('تصفية حسب التصنيف', 'Filter by category')} className="field" value={serviceFilterCategory} onChange={(event) => { setServiceFilterCategory(event.target.value); setServicePage(1) }}>
                 <option value="">{tr('كل الفئات', 'All categories')}</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>

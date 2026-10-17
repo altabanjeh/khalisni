@@ -1,0 +1,5 @@
+FAIL: test_only_admin_can_write_public_site_content (public_site.tests.PublicSiteAPITests.test_only_admin_can_write_public_site_content)
+AssertionError: 400 != 200
+Ran 647 tests in 575.162s
+FAILED (failures=1, skipped=7)
+exit=1

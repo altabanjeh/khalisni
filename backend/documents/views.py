@@ -9,6 +9,7 @@ from rest_framework.generics import RetrieveAPIView
 from core.throttling import ResilientScopedRateThrottle
 from rest_framework.views import APIView
 
+from accounts.validators import phones_match
 from audit.utils import create_audit_log
 from config.permissions import CanVerifyDocuments, IsAdminRole
 from core.delete_guard import AdminDeleteGuardMixin
@@ -104,7 +105,7 @@ class DocumentDownloadAPIView(RetrieveAPIView):
             order_number
             and phone
             and order_number == order.order_number
-            and phone == (order.customer.phone or "").strip()
+            and phones_match(phone, order.customer.phone)
             and document.is_final_document
             and is_customer_visible_document(document)
         ):
@@ -134,7 +135,8 @@ class StaffDocumentListAPIView(generics.ListAPIView):
         order_id = self.request.query_params.get("order")
         if order_id:
             queryset = queryset.filter(order_id=order_id)
-        return queryset
+        # Newest first; pk breaks ties so rows never move between pages.
+        return queryset.order_by("-created_at", "-pk")
 
 
 class StaffDocumentVerifyAPIView(APIView):

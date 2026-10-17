@@ -1,0 +1,4 @@
+  Apply all migrations: accounts, admin, audit, auth, authtoken, contenttypes, documents, help_guides, notifications, orders, organizations, payment, providers, public_site, services, sessions, token_blacklist
+Running migrations:
+  Applying orders.0018_order_consent... OK
+  Applying services.0014_apply_owner_catalogue_decisions... OK

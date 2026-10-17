@@ -8,8 +8,8 @@ Written 2026-10-13. For the operator of the Docker Compose deployment (Coolify o
 |---|---|
 | `scripts/backup.sh`, `scripts/restore.sh` | Run on a local Compose stack built from this release (PostgreSQL 16, production settings). **Not run against the deployed stack.** |
 | Backup failure handling | Tested locally: with the database container stopped, and separately with the backend container stopped, the script exits 1 and leaves only a `.partial` directory. |
-| Restore drill, database and media | Done locally on 2026-10-13 into a separate Compose project: 12 s, row counts identical, the test document readable, `check_system_consistency` clean. Local seeded data, not a production copy. |
-| Scheduled backups, off-server copy | **Do not exist.** Nothing in the repository schedules a backup. Until this is set up, losing the server disk loses every order and every customer document. |
+| Restore drill, database and media | Done locally on 2026-10-13 into a separate Compose project: 12 s, row counts identical, the test document readable, `check_system_consistency` clean. Repeated on 2026-10-17 with the database-role layout (`db-init`): backup, `verify_backup.sh`, then `restore.sh` over a modified stack in 52 s; row counts back to the backup, all objects owned by the owner role, the consent trigger enabled, the backend connected as the app role. Local seeded data, not a production copy. |
+| Scheduled backups, off-server copy | `scripts/backup_scheduled.sh` and `scripts/verify_backup.sh` exist (section 3, Schedule). **Nothing is scheduled on any server yet**: until the cron entry and the off-server copy are set up on production, losing the server disk loses every order and every customer document. |
 
 ## 1. Where the data lives
 
@@ -31,7 +31,7 @@ If `AWS_STORAGE_BUCKET_NAME` is set, uploads go to object storage instead of `ba
 | Lost | Effect | Recovery |
 |---|---|---|
 | Frontend container | Site unreachable; no data lost | `docker compose -f docker-compose.yml up -d --build frontend` |
-| Backend container | API down; no data lost | `docker compose -f docker-compose.yml up -d --build backend`. Start-up applies migrations. |
+| Backend container | API down; no data lost | `docker compose -f docker-compose.yml up -d --build backend`. The `db-init` job (owner role) applies any pending migrations before the backend starts. |
 | Redis | Rate limits stop counting; requests are allowed and each failure is logged (`khalsni.throttle`). No data lost. | `docker compose -f docker-compose.yml up -d redis` |
 | Database volume | Everything in section 1, row 1 | Restore the latest dump (section 3). Data since that dump is gone. |
 | Media volume | Every uploaded document. Orders remain but their files return errors on download. | Restore the latest media archive (section 3). |
@@ -86,11 +86,26 @@ If `manifest.txt` shows a bucket name instead of `object_storage_bucket=none`, u
 
 Nightly is the minimum for a service that holds customer identity documents:
 
+`scripts/backup_scheduled.sh` runs one scheduled cycle: `backup.sh`, then `verify_backup.sh` on the new backup, then an optional off-server copy, then optional rotation. It exits non-zero if any step fails.
+
 ```cron
-15 2 * * * cd /srv/khalsni && sh scripts/backup.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
+15 2 * * * cd /srv/khalsni && KHALSNI_BACKUP_COPY_COMMAND="<copy command>" sh scripts/backup_scheduled.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
 ```
 
-Add the off-server copy and a retention rule (for example 14 daily, 8 weekly). How long backups of identity documents may be kept is a client policy decision, not an engineering one.
+| Variable | Meaning | Default |
+|---|---|---|
+| `KHALSNI_BACKUP_COPY_COMMAND` | Command that copies one finished backup off the server; the backup directory is appended as the last argument (for example an `rclone copy` or `rsync` invocation). | Unset: a warning is logged and the backup stays only on this server. |
+| `KHALSNI_BACKUP_KEEP` | Number of newest complete local backups to keep. Older complete backups are deleted; `.partial` directories are never deleted. | Unset: nothing is deleted. |
+
+There is deliberately no default retention. How long backups of identity documents may be kept is a client policy decision (D06), not an engineering one; set `KHALSNI_BACKUP_KEEP` (and the retention of the off-server copy) once that policy exists. Production schedule confirmation remains a release gate.
+
+### Verify a backup
+
+```sh
+sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
+```
+
+Needs no running stack, so it can be run on the off-server copy as well. It checks the checksums, that the media archive is readable, that the database file is a PostgreSQL custom-format dump, and that the manifest records the time, commit and row counts. It does not prove the backup restores; only the restore drill (section 4) does.
 
 ### Restore
 
@@ -101,7 +116,7 @@ docker compose -f docker-compose.yml exec backend python manage.py check_system_
 docker compose -f docker-compose.yml exec backend python manage.py audit_requirements_snapshot --strict
 ```
 
-The restore verifies the checksums, stops the application, replaces the database contents and the media folder, then starts the application, which applies any migrations newer than the backup. Restore database and media from the **same** backup: a newer database with older media has document rows whose files are missing.
+The restore verifies the checksums, stops the application, replaces the database contents and the media folder, runs `db-init` (which gives the restored objects back to the owner role, applies any migrations newer than the backup as the owner and re-grants the app role), then starts the application as the app role. Restore database and media from the **same** backup: a newer database with older media has document rows whose files are missing.
 
 ## 4. Restore drill
 
@@ -144,12 +159,42 @@ Local result on 2026-10-13: backup of 21 users, 33 audit rows and 1 media file; 
 
 ## 5. Rolling back a release
 
-1. Redeploy the previous commit.
-2. Schema: the only recent schema change is `orders.0015` (adds the nullable `requirements_snapshot` column) with data migration `orders.0016`. `python manage.py migrate orders 0014` removes the column and nothing else. Tested forward and backward on PostgreSQL 16 in this audit and in the previous one. The previous code runs without the column.
-3. This audit adds **no migration**, so rolling back its code needs no schema step.
-4. A rollback does not undo data written by the newer code (orders, documents). It does not need to: the newer code writes the same tables.
+Updated 2026-10-17 for the migrations added by the audit remediation chain.
 
-No other migration was tested for reversal. Treat every other backward migration as untested.
+### The rule
+
+**Restore from a backup taken just before the deploy is the preferred recovery.** Code can be redeployed freely, but most of the recent migrations change data or add evidence that a reverse migration either does not restore or would destroy. Do not run a backward `migrate` on production unless the table below says it is safe, and even then take and verify a backup first.
+
+### Migrations added since the previous runbook
+
+| Migration | Forward effect | Reverse | Safe to reverse on production? |
+|---|---|---|---|
+| `orders.0015` | Adds nullable `Order.requirements_snapshot` | Drops the column | Yes, tested on PostgreSQL 16 (previous audits); the older code runs without it |
+| `orders.0016` | Backfills `requirements_snapshot` in batches | No-op (`RunPython.noop`) | Reversing it changes nothing; reverse `0015` instead if needed |
+| `orders.0017` | Adds `OrderStatusLog.system_event` (code for system-written timeline notes) | Drops the column | Technically yes. Notes keep their English text, so older code still shows a timeline. Not tested backward in this chain. |
+| `orders.0018` | Creates `OrderConsent` (append-only consent evidence per order) | Drops the table **and every consent record in it** | **No.** Reversing destroys legal evidence that cannot be re-created. Once any order has been submitted under this release, treat `0018` as irreversible. |
+| `orders.0019` | Makes consent evidence append-only: guarded manager, and database triggers refusing `UPDATE`/`DELETE` on `orders_orderconsent` (SQLite and PostgreSQL) | Drops the triggers (tested forward and backward on PostgreSQL 16) | **No, except to recover from a trigger defect.** Reversing removes the database protection while the data stays. |
+| `services.0014` | Applies the approved catalogue decisions: D02 wording in price and delivery notes, the parcel/basin yes/no gate, optional "additional notes" | No-op: the old wording and field shapes are not restored | Reversing changes nothing. To undo the data, restore the catalogue from backup. |
+| `services.0015` | National-ID form fields `number` → `text` (type only) | No-op | Reversing changes nothing. Older code renders `text` fields correctly. |
+
+No migration in this chain rewrites orders, documents or users. The catalogue migrations touch only `Service` note and schema columns, and prices are unchanged.
+
+### What a rollback means once consent data exists
+
+- **Redeploying older code is not a database rollback.** Code older than `orders.0018` does not know `OrderConsent`. While the table is still there, submitting orders with that code writes no consent evidence. Customers would submit without a consent record, so do not run pre-`0018` code for order intake.
+- **Keep the schema forward.** If a release must be withdrawn, redeploy the previous code **without** reversing `0018`/`0019`. Newer columns and tables are ignored by older code (`0017` adds a column the older code does not read).
+- **The triggers block any data cleanup.** Nothing, the application owner role included, can update or delete consent rows while `0019` is applied. That is intended. A database owner can still drop the triggers deliberately, which is recorded in `docs/audit/KHALSNI_FINAL_PRE_RELEASE_HARDENING.md` section 3.
+- **Full rollback means a backup restore.** Restore the backup taken before the deploy (section 3). This also removes orders and consent records created after that backup, so record what is lost before you do it.
+
+### Database roles after a rollback or restore
+
+The backend runs as the app role and does not migrate (see `docs/DEPLOYMENT.md`, "Database roles"). Migrations, forward or backward, run as the owner role:
+
+```bash
+docker compose -f docker-compose.yml run --rm --entrypoint sh db-init -c 'POSTGRES_USER="$KHALSNI_DB_OWNER_USER" POSTGRES_PASSWORD="$KHALSNI_DB_OWNER_PASSWORD" python manage.py showmigrations orders services'
+```
+
+After any manual schema work or restore, run `docker compose -f docker-compose.yml run --rm db-init`. It restores ownership to the owner role and re-grants the app role. `scripts/restore.sh` does this automatically.
 
 ## 6. After any recovery
 

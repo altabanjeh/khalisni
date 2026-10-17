@@ -1,0 +1,662 @@
+Creating test database for alias 'default'...
+D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py:61: UserWarning: No directory at: D:\p2base\backend\staticfiles\
+  mw_instance = middleware(adapted_handler)
+FFF..FFFE2026-10-16 13:08:23,265 ERROR django.request Internal Server Error: /api/auth/register/
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 120, in create
+    return CustomUser.objects.create_user(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\models.py", line 25, in create_user
+    user.save(using=self._db)
+  File "D:\p2base\backend\accounts\models.py", line 146, in save
+    self.full_clean()
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'email': ['النموذج User والحقل Email موجود مسبقاً.']}
+EFFFEEEEEEF2026-10-16 13:08:24,130 ERROR django.request Internal Server Error: /api/auth/register/
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 124, in create
+    phone=validated_data["phone"],
+          ~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+E2026-10-16 13:08:24,135 ERROR django.request Internal Server Error: /api/auth/register/
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 124, in create
+    phone=validated_data["phone"],
+          ~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+EFF.E.F...EEEEEFEsEEEE
+======================================================================
+ERROR: test_canonical_validator_rule (accounts.tests_p2_remediation.RegistrationValidationTests.test_canonical_validator_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 100, in test_canonical_validator_rule
+    self.assertEqual(phone_number_error(""), "required")
+                     ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_duplicate_email_detected_after_normalisation_and_for_soft_deleted_accounts (accounts.tests_p2_remediation.RegistrationValidationTests.test_duplicate_email_detected_after_normalisation_and_for_soft_deleted_accounts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 122, in test_duplicate_email_detected_after_normalisation_and_for_soft_deleted_accounts
+    response = self.register(payload(email="new-customer@EXAMPLE.TEST", phone="0791111111"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 57, in register
+    return self.client.post(REGISTER_URL, data, format="json", HTTP_ACCEPT_LANGUAGE=language)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 283, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 197, in post
+    return self.generic('POST', path, data, content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 221, in generic
+    return super().generic(
+           ^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 273, in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 225, in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 120, in create
+    return CustomUser.objects.create_user(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\models.py", line 25, in create_user
+    user.save(using=self._db)
+  File "D:\p2base\backend\accounts\models.py", line 146, in save
+    self.full_clean()
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'email': ['النموذج User والحقل Email موجود مسبقاً.']}
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='079-abc-1234')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='1234567')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='+')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='++962791234567')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='0791234567890123')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='07912345 67x')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 86, in test_malformed_phone_rejected
+    self.assertIn("0791234567", response.data["phone"][0])  # the example is part of the guidance
+                                ~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_missing_phone_is_a_structured_400 (accounts.tests_p2_remediation.RegistrationValidationTests.test_missing_phone_is_a_structured_400)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 61, in test_missing_phone_is_a_structured_400
+    response = self.register(payload(phone=None))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 57, in register
+    return self.client.post(REGISTER_URL, data, format="json", HTTP_ACCEPT_LANGUAGE=language)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 283, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 197, in post
+    return self.generic('POST', path, data, content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 221, in generic
+    return super().generic(
+           ^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 273, in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 225, in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 124, in create
+    phone=validated_data["phone"],
+          ~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_missing_phone_message_follows_screen_language (accounts.tests_p2_remediation.RegistrationValidationTests.test_missing_phone_message_follows_screen_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 67, in test_missing_phone_message_follows_screen_language
+    response = self.register(payload(phone=None), language="en")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 57, in register
+    return self.client.post(REGISTER_URL, data, format="json", HTTP_ACCEPT_LANGUAGE=language)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 283, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 197, in post
+    return self.generic('POST', path, data, content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 221, in generic
+    return super().generic(
+           ^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 273, in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\test.py", line 225, in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "D:\ghassan\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "D:\p2base\backend\accounts\views.py", line 66, in perform_create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\p2base\backend\accounts\serializers.py", line 124, in create
+    phone=validated_data["phone"],
+          ~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'phone'
+
+======================================================================
+ERROR: test_admin_users_api_reports_active_and_each_verification_flag (accounts.tests_p2_remediation.UserVerificationFieldsTests.test_admin_users_api_reports_active_and_each_verification_flag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 185, in test_admin_users_api_reports_active_and_each_verification_flag
+    self.assertEqual((active["is_active"], active["is_verified"], active["is_email_verified"], active["is_phone_verified"]),
+                                                                  ~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'is_email_verified'
+
+======================================================================
+ERROR: test_staff_queue_has_names_for_every_document (orders.tests_p2_remediation.DocumentNameTests.test_staff_queue_has_names_for_every_document)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 213, in test_staff_queue_has_names_for_every_document
+    self.assertEqual(rows[upload.pk]["document_type_label"], {"ar": "تفويض تجريبي", "en": "Test authorization"})
+                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'document_type_label'
+
+======================================================================
+ERROR: test_unknown_code_gets_a_generic_name_not_the_code (orders.tests_p2_remediation.DocumentNameTests.test_unknown_code_gets_a_generic_name_not_the_code)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 221, in test_unknown_code_gets_a_generic_name_not_the_code
+    self.assertEqual(rows[unknown.pk]["document_type_label"], {"ar": "مستند", "en": "Document"})
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'document_type_label'
+
+======================================================================
+ERROR: test_exact_legacy_sentences_render_in_arabic_and_stay_english_in_english (orders.tests_p2_remediation.LegacyNotificationTests.test_exact_legacy_sentences_render_in_arabic_and_stay_english_in_english)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 237, in test_exact_legacy_sentences_render_in_arabic_and_stay_english_in_english
+    self.assertEqual(rows["تم استلام الطلب"], "تم إنشاء الطلب KH-2026-000001 بنجاح.")
+                     ~~~~^^^^^^^^^^^^^^^^^^^
+KeyError: 'تم استلام الطلب'
+
+======================================================================
+ERROR: test_typed_text_is_never_translated (orders.tests_p2_remediation.LegacyNotificationTests.test_typed_text_is_never_translated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 251, in test_typed_text_is_never_translated
+    self.assertEqual(rows["مستندات إضافية مطلوبة"], "Please upload a clearer ID copy.")
+                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'مستندات إضافية مطلوبة'
+
+======================================================================
+ERROR: test_admin_service_duration_in_both_languages (orders.tests_p2_remediation.LocalizedLabelTests.test_admin_service_duration_in_both_languages)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 269, in test_admin_service_duration_in_both_languages
+    self.assertTrue(row["duration_display_ar"].startswith("المدة المتوقعة"))
+                    ~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'duration_display_ar'
+
+======================================================================
+ERROR: test_customer_sees_codes_only_where_notes_are_customer_facing (orders.tests_p2_remediation.TimelineSystemEventTests.test_customer_sees_codes_only_where_notes_are_customer_facing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 179, in test_customer_sees_codes_only_where_notes_are_customer_facing
+    self.assertEqual((entry["note"], entry["system_event"]), ("", ""))
+                                     ~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'system_event'
+
+======================================================================
+ERROR: test_legacy_row_without_a_stored_code_is_recognised_at_read_time (orders.tests_p2_remediation.TimelineSystemEventTests.test_legacy_row_without_a_stored_code_is_recognised_at_read_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\options.py", line 683, in get_field
+    return self.fields_map[field_name]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'system_event'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 158, in test_legacy_row_without_a_stored_code_is_recognised_at_read_time
+    OrderStatusLog.objects.filter(pk=log.pk).update(system_event="")  # shape of a pre-migration row
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\query.py", line 1237, in update
+    query.add_update_values(kwargs)
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\sql\subqueries.py", line 88, in add_update_values
+    field = self.get_meta().get_field(name)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\ghassan\.venv\Lib\site-packages\django\db\models\options.py", line 685, in get_field
+    raise FieldDoesNotExist(
+django.core.exceptions.FieldDoesNotExist: OrderStatusLog has no field named 'system_event'
+
+======================================================================
+ERROR: test_new_system_note_is_stored_with_a_code (orders.tests_p2_remediation.TimelineSystemEventTests.test_new_system_note_is_stored_with_a_code)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 143, in test_new_system_note_is_stored_with_a_code
+    self.assertEqual(log.system_event, "order_under_review")
+                     ^^^^^^^^^^^^^^^^
+AttributeError: 'OrderStatusLog' object has no attribute 'system_event'
+
+======================================================================
+ERROR: test_recovery_note_keeps_the_typed_reason_as_a_parameter (orders.tests_p2_remediation.TimelineSystemEventTests.test_recovery_note_keeps_the_typed_reason_as_a_parameter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 169, in test_recovery_note_keeps_the_typed_reason_as_a_parameter
+    self.assertEqual(log.system_event, "missing_request_recovered")
+                     ^^^^^^^^^^^^^^^^
+AttributeError: 'OrderStatusLog' object has no attribute 'system_event'
+
+======================================================================
+ERROR: test_typed_note_is_never_coded (orders.tests_p2_remediation.TimelineSystemEventTests.test_typed_note_is_never_coded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 151, in test_typed_note_is_never_coded
+    self.assertEqual(order.status_logs.get(new_status=Order.Status.UNDER_REVIEW).system_event, "")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'OrderStatusLog' object has no attribute 'system_event'
+
+======================================================================
+FAIL: test_password_changed_email_follows_the_reset_request_language (accounts.tests_p2_remediation.PasswordEmailLanguageTests.test_password_changed_email_follows_the_reset_request_language) (language='ar')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 263, in test_password_changed_email_follows_the_reset_request_language
+    self.assertEqual(mail.outbox[0].subject, subject)
+AssertionError: 'Khalsni password changed' != 'تم تغيير كلمة المرور في خلّصني'
+- Khalsni password changed
++ تم تغيير كلمة المرور في خلّصني
+
+
+======================================================================
+FAIL: test_reset_email_defaults_to_arabic_without_a_language (accounts.tests_p2_remediation.PasswordEmailLanguageTests.test_reset_email_defaults_to_arabic_without_a_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 242, in test_reset_email_defaults_to_arabic_without_a_language
+    self.assertEqual(mail.outbox[0].subject, "إعادة تعيين كلمة المرور في خلّصني")
+AssertionError: 'Khalsni password reset' != 'إعادة تعيين كلمة المرور في خلّصني'
+- Khalsni password reset
++ إعادة تعيين كلمة المرور في خلّصني
+
+
+======================================================================
+FAIL: test_reset_email_in_arabic (accounts.tests_p2_remediation.PasswordEmailLanguageTests.test_reset_email_in_arabic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 225, in test_reset_email_in_arabic
+    self.assertEqual(message.subject, "إعادة تعيين كلمة المرور في خلّصني")
+AssertionError: 'Khalsni password reset' != 'إعادة تعيين كلمة المرور في خلّصني'
+- Khalsni password reset
++ إعادة تعيين كلمة المرور في خلّصني
+
+
+======================================================================
+FAIL: test_blank_and_whitespace_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_blank_and_whitespace_phone_rejected) (value='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 76, in test_blank_and_whitespace_phone_rejected
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_blank_and_whitespace_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_blank_and_whitespace_phone_rejected) (value='   ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 77, in test_blank_and_whitespace_phone_rejected
+    self.assertIn("phone", response.data)
+AssertionError: 'phone' not found in {'email': [ErrorDetail(string='النموذج User والحقل email موجود مسبقاً.', code='unique')]}
+
+======================================================================
+FAIL: test_blank_and_whitespace_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_blank_and_whitespace_phone_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 78, in test_blank_and_whitespace_phone_rejected
+    self.assertFalse(CustomUser.objects.filter(email="new-customer@example.test").exists())
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_duplicate_email_message_is_customer_facing (accounts.tests_p2_remediation.RegistrationValidationTests.test_duplicate_email_message_is_customer_facing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 114, in test_duplicate_email_message_is_customer_facing
+    self.assertNotIn("User", text)
+AssertionError: 'User' unexpectedly found in 'النموذج User والحقل email موجود مسبقاً.'
+
+======================================================================
+FAIL: test_duplicate_phone_message_is_customer_facing (accounts.tests_p2_remediation.RegistrationValidationTests.test_duplicate_phone_message_is_customer_facing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 133, in test_duplicate_phone_message_is_customer_facing
+    self.assertNotIn("User", response.data["phone"][0])
+AssertionError: 'User' unexpectedly found in ErrorDetail(string='النموذج User والحقل phone موجود مسبقاً.', code='unique')
+
+======================================================================
+FAIL: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected) (value='abc')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 85, in test_malformed_phone_rejected
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
+AssertionError: 201 != 400 : {'id': 1, 'full_name': 'عميل جديد', 'phone': 'abc', 'email': 'new-customer@example.test', 'national_id': ''}
+
+======================================================================
+FAIL: test_malformed_phone_rejected (accounts.tests_p2_remediation.RegistrationValidationTests.test_malformed_phone_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 87, in test_malformed_phone_rejected
+    self.assertEqual(CustomUser.objects.filter(email="new-customer@example.test").count(), 0)
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_password_validator_messages_follow_screen_language (accounts.tests_p2_remediation.RegistrationValidationTests.test_password_validator_messages_follow_screen_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 141, in test_password_validator_messages_follow_screen_language
+    self.assertIn("This password is entirely numeric.", english.data["password"])
+AssertionError: 'This password is entirely numeric.' not found in [ErrorDetail(string='كلمة المرور هذه شائعة جداً.', code='invalid'), ErrorDetail(string='كلمة المرور هذه تتكون من أرقام فقط.', code='invalid')]
+
+======================================================================
+FAIL: test_profile_phone_change_uses_the_same_rule (accounts.tests_p2_remediation.RegistrationValidationTests.test_profile_phone_change_uses_the_same_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\accounts\tests_p2_remediation.py", line 148, in test_profile_phone_change_uses_the_same_rule
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 200 != 400
+
+======================================================================
+FAIL: test_category_search_and_deleted_filters_are_server_side (orders.tests_p2_remediation.AdminServicePaginationTests.test_category_search_and_deleted_filters_are_server_side)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 113, in test_category_search_and_deleted_filters_are_server_side
+    self.assertEqual([row["id"] for row in deleted["results"]], [doomed.pk])
+AssertionError: Lists differ: [2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] != [3]
+
+First differing element 0:
+2
+3
+
+First list contains 19 additional elements.
+First extra element 1:
+3
+
+- [2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
++ [3]
+
+======================================================================
+FAIL: test_provider_approval_label_follows_language (orders.tests_p2_remediation.LocalizedLabelTests.test_provider_approval_label_follows_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\p2base\backend\orders\tests_p2_remediation.py", line 262, in test_provider_approval_label_follows_language
+    self.assertEqual(arabic["results"][0]["approval_status_label"], "معتمد")
+AssertionError: 'Approved' != 'معتمد'
+- Approved
++ معتمد
+
+
+----------------------------------------------------------------------
+Ran 34 tests in 23.620s
+
+FAILED (failures=14, errors=21, skipped=1)
+Destroying test database for alias 'default'...
+Found 34 test(s).
+System check identified no issues (0 silenced).

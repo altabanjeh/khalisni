@@ -1,0 +1,3 @@
+Ran 647 tests in 576.283s
+OK (skipped=7)
+exit=0

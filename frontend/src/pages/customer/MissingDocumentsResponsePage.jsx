@@ -70,6 +70,31 @@ function MissingDocumentsResponsePage() {
     )
   }
 
+  // A waiting order whose request names nothing uploadable (legacy records)
+  // cannot be answered here: no form, no resubmit, no success message.
+  if (allowedActions.missing_document_request_valid === false || !requestedDocuments.length) {
+    return (
+      <div className="space-y-4" data-testid="missing-documents-unavailable">
+        <EmptyState
+          description={isArabic
+            ? 'لا توجد حالياً مستندات قابلة للرفع لهذا الطلب. يرجى انتظار مراجعة الطلب من فريق خلصني أو التواصل مع الدعم.'
+            : 'There are currently no documents you can upload for this request. Please wait for the Khalsni team to review it, or contact support.'}
+          icon={CircleAlert}
+          title={isArabic ? `لا يمكن الرد على الطلب ${order.order_number} حالياً` : `Request ${order.order_number} cannot be answered right now`}
+        />
+        {customerNotes.length ? (
+          <section className="rounded-[var(--radius-lg)] border border-border bg-card p-4 text-sm font-semibold leading-7 text-slate-700">
+            <p className="text-xs font-black text-slate-500">{isArabic ? 'ملاحظة الفريق' : 'Note from the team'}</p>
+            {customerNotes.map((note) => <p key={note.id}>{note.note}</p>)}
+          </section>
+        ) : null}
+        <button className="btn-secondary w-full sm:w-auto" onClick={() => navigate(`/customer/orders/${id}`)} type="button">
+          {isArabic ? 'العودة إلى تفاصيل الطلب' : 'Back to the request details'}
+        </button>
+      </div>
+    )
+  }
+
   function docState(type) {
     const doc = existingDocs.find((d) => (d.document_type || d.type) === type)
     if (!doc) return null
@@ -82,6 +107,7 @@ function MissingDocumentsResponsePage() {
 
   async function onSubmit(formValues) {
     clearErrors('root.server')
+    let uploadedNow = 0
     try {
       for (let index = 0; index < requestedDocuments.length; index += 1) {
         const file = formValues[`file_${index}`]?.[0]
@@ -96,9 +122,21 @@ function MissingDocumentsResponsePage() {
           throw uploadError
         }
         uploadedTypesRef.current.add(requestedDocuments[index])
+        uploadedNow += 1
       }
-      toast(isArabic ? 'تم رفع المستندات وإعادة إرسال الطلب للمراجعة.' : 'Documents uploaded and the request was resubmitted for review.', 'success')
-      navigate(`/customer/orders/${id}`)
+      if (!uploadedNow) {
+        setError('root.server', { message: isArabic ? 'لم يُرفع أي مستند. اختر ملفاً لكل مستند مطلوب.' : 'Nothing was uploaded. Choose a file for each requested document.' })
+        return
+      }
+      // Success is reported from the server's resulting state, not assumed.
+      const refreshed = await api.getCustomerOrder(id)
+      if (refreshed?.status && refreshed.status !== 'WAITING_CUSTOMER') {
+        toast(isArabic ? 'تم رفع المستندات وإعادة إرسال الطلب للمراجعة.' : 'Documents uploaded and the request was resubmitted for review.', 'success')
+        navigate(`/customer/orders/${id}`)
+      } else {
+        toast(isArabic ? 'تم رفع المستندات، وما زال الطلب بانتظار مستندات أخرى.' : 'Documents uploaded; the request is still waiting for other documents.', 'info')
+        reload()
+      }
     } catch (submitError) {
       applyServerFieldErrors({
         error: submitError,

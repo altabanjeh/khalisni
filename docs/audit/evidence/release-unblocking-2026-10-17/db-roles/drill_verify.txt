@@ -1,0 +1,5 @@
+Backup verified: backups/khalsni-20261016T215616Z
+backup_utc=20261016T215616Z
+orders=5
+documents=5
+users=5

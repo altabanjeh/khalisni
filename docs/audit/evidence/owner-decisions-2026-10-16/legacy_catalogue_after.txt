@@ -1,0 +1,9 @@
+services_mentioning_admin_panel: 0
+price_note_rows: [('', '', 4), ('يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.', 'Final fees are confirmed after document review.', 34)]
+delivery_approved_rows: [('تُحدَّد مدة الإنجاز بعد مراجعة الطلب.', 'The completion time is confirmed after your request is reviewed.', 9)]
+schema_fields: [(('additional_notes', 'textarea', False, False), 17), (('basin_number', 'text', True, False), 15), (('basin_number', 'text', True, True), 2), (('field_2fa52c6cfa', 'select', False, False), 2), (('parcel_number', 'text', True, False), 15), (('parcel_number', 'text', True, True), 2)]
+fees_checksum: (38, 161, 76, 102)
+price_types: [('fixed', 11), ('quotation', 27)]
+orders: 6 notes_checksum: 52
+order_consents: 0
+cadastral_map_order: [('full_name', 'text', True, None), ('national_id', 'number', True, None), ('phone_number', 'tel', True, None), ('field_2fa52c6cfa', 'select', False, None), ('parcel_number', 'text', True, {'field': 'field_2fa52c6cfa', 'equals': 'yes'}), ('basin_number', 'text', True, {'field': 'field_2fa52c6cfa', 'equals': 'yes'}), ('region', 'text', True, None), ('governorate', 'text', True, None)]

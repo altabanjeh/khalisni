@@ -14,6 +14,13 @@ from django.db import transaction
 from django.utils.text import slugify
 
 from services.catalog_defaults import suggest_category_icon
+from services.catalogue_rules import (
+    APPROVED_PRICE_NOTE,
+    apply_identifier_rules,
+    apply_schema_rules,
+    approved_delivery_note,
+    approved_price_note,
+)
 from services.models import RequiredDocumentDefinition, Service, ServiceCategory, ServiceRequiredDocument
 
 
@@ -133,10 +140,11 @@ def _map_field_type(source_type, label):
         return "date"
     if "phone" in haystack or "هاتف" in haystack:
         return "tel"
-    if "number" in haystack or "currency" in haystack or "رقم" in haystack or "عدد" in haystack or "رأس مال" in haystack:
-        return "number"
+    # A yes/no question is never a number, even when it mentions one ("هل تعرف رقم ...؟").
     if "yes/no" in haystack or label.startswith("هل "):
         return "checkbox"
+    if "number" in haystack or "currency" in haystack or "رقم" in haystack or "عدد" in haystack or "رأس مال" in haystack:
+        return "number"
     return "text"
 
 
@@ -369,7 +377,7 @@ def _parse_paragraph_service(doc):
         "government_fee": "0.00",
         "service_fee": "0.00",
         "show_total_price_public": False if _contains_later(price_note) or _contains_later(service_fee_note) else True,
-        "public_price_note_ar": "يحدد بعد المراجعة من لوحة الإدارة." if _contains_later(price_note) or _contains_later(service_fee_note) else "",
+        "public_price_note_ar": APPROVED_PRICE_NOTE["ar"] if _contains_later(price_note) or _contains_later(service_fee_note) else "",
         "delivery_note_ar": duration_note,
         "government_fee_note_ar": government_fee_note,
         "source_completeness_level": "complete" if fields and required_documents else "partial",
@@ -463,7 +471,7 @@ def _parse_business_catalog(doc):
                 "government_fee": "0.00",
                 "service_fee": "0.00",
                 "show_total_price_public": False if _contains_later(json.dumps(price_values, ensure_ascii=False)) else True,
-                "public_price_note_ar": "يحدد بعد المراجعة من لوحة الإدارة." if _contains_later(json.dumps(price_values, ensure_ascii=False)) else "",
+                "public_price_note_ar": APPROVED_PRICE_NOTE["ar"] if _contains_later(json.dumps(price_values, ensure_ascii=False)) else "",
                 "delivery_note_ar": price_values.get("المدة المتوقعة", ""),
                 "government_fee_note_ar": price_values.get("الرسوم الرسمية", ""),
                 "source_completeness_level": "complete" if fields and required_documents else "partial",
@@ -688,6 +696,12 @@ def apply_import(result):
 
 
 def _service_defaults(service_data, category):
+    # Owner decisions D02, B10-1/2/3 and B10-4 (services/catalogue_rules.py).
+    price_note_ar, price_note_en = approved_price_note(
+        service_data.get("public_price_note_ar", ""),
+        APPROVED_PRICE_NOTE["en"] if service_data.get("public_price_note_ar") else "",
+    )
+    delivery_note_ar, delivery_note_en = approved_delivery_note(service_data.get("delivery_note_ar", ""), "")
     return {
         "category": category,
         "name_ar": service_data["name_ar"],
@@ -696,7 +710,7 @@ def _service_defaults(service_data, category):
         "short_description_en": "",
         "description_ar": service_data.get("description_ar") or service_data.get("short_description_ar") or service_data["name_ar"],
         "description_en": "",
-        "required_information_schema": service_data.get("fields", []),
+        "required_information_schema": apply_identifier_rules(apply_schema_rules(service_data.get("fields", []))),
         "price_type": service_data.get("price_type") or Service.PriceType.QUOTATION,
         "base_price": Decimal(service_data.get("base_price", "0.00")),
         "government_fee": Decimal(service_data.get("government_fee", "0.00")),
@@ -704,13 +718,13 @@ def _service_defaults(service_data, category):
         "show_total_price_public": bool(service_data.get("show_total_price_public", False)),
         "show_government_fee_public": False,
         "show_company_fee_public": False,
-        "public_price_note_ar": service_data.get("public_price_note_ar", ""),
-        "public_price_note_en": "Shared after review." if service_data.get("public_price_note_ar") else "",
+        "public_price_note_ar": price_note_ar,
+        "public_price_note_en": price_note_en,
         "estimated_duration": 1,
         "estimated_duration_unit": Service.DurationUnit.DAYS,
         "delivery_time_mode": Service.DeliveryTimeMode.DURATION,
-        "delivery_note_ar": service_data.get("delivery_note_ar", ""),
-        "delivery_note_en": "",
+        "delivery_note_ar": delivery_note_ar,
+        "delivery_note_en": delivery_note_en,
         "terms_ar": service_data.get("terms_ar", ""),
         "terms_en": "",
         "is_online": True,

@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext'
 import { useToast } from '../context/ToastContext'
 import StatusBadge from './StatusBadge'
 import { findRequiredDocument, getRequiredDocumentLabel } from '../utils/serviceForms'
+import { getDocumentTypeLabel } from '../utils/documentPresentation'
 
 function triggerBlobDownload(blob, filename) {
   const url = URL.createObjectURL(blob)
@@ -17,7 +18,7 @@ function triggerBlobDownload(blob, filename) {
   URL.revokeObjectURL(url)
 }
 
-function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [], staff = false }) {
+function DocumentList({ documents = [], orderNumber, phone, variant = 'default', requiredDocuments = [] }) {
   const { isArabic, language } = useLanguage()
   const { toast } = useToast()
 
@@ -26,7 +27,8 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default',
     if (document.is_final_document) return isArabic ? 'النتيجة النهائية' : 'Final result'
     const requirement = findRequiredDocument(requiredDocuments, document.document_type)
     if (requirement) return getRequiredDocumentLabel(requirement, language)
-    if (staff) return document.document_type
+    // Server-provided name (requirement or master definition); never the raw code.
+    if (document.document_type_label) return getDocumentTypeLabel(document, language)
     return isArabic ? 'مستند مرفوع' : 'Uploaded document'
   }
   const [downloading, setDownloading] = useState({})
@@ -75,6 +77,14 @@ function DocumentList({ documents = [], orderNumber, phone, variant = 'default',
             <div className="min-w-0 flex-1">
               <p className={isPublic ? 'font-semibold text-ink' : 'font-semibold text-ink'}>{document.original_filename}</p>
               <p className={isPublic ? 'mt-1 text-xs text-slate-500' : 'mt-1 text-xs text-slate-500'}>{documentLabel(document)}</p>
+              {/* Owner decision F04: the API sends the staff reason only to the
+                  order's customer and to staff, so it is shown whenever present. */}
+              {String(document.status || '').toUpperCase() === 'REJECTED' && document.rejection_reason ? (
+                <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold leading-6 text-red-800">
+                  <span className="font-black">{isArabic ? 'سبب الرفض: ' : 'Rejection reason: '}</span>
+                  {document.rejection_reason}
+                </p>
+              ) : null}
             </div>
             <div className="flex items-center gap-3">
               {document.status ? <StatusBadge status={document.status} /> : null}

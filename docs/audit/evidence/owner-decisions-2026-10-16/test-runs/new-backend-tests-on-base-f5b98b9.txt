@@ -1,0 +1,707 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+
+Found 66 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: core, corsheaders, django_filters, messages, rest_framework, staticfiles, workflow
+  Apply all migrations: accounts, admin, audit, auth, authtoken, contenttypes, documents, help_guides, notifications, orders, organizations, payment, providers, public_site, services, sessions, token_blacklist
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying providers.0001_initial... OK
+  Applying services.0001_initial... OK
+  Applying services.0002_address_services_ad_user_id_244737_idx_and_more... OK
+  Applying services.0003_alter_service_options... OK
+  Applying services.0004_servicerequireddocument_rule_flags... OK
+  Applying services.0005_servicerelation... OK
+  Applying services.0006_alter_servicecategory_options_servicecategory_color_and_more... OK
+  Applying organizations.0001_initial... OK
+  Applying accounts.0002_customuser_unique_non_empty_user_phone_and_more... OK
+  Applying accounts.0003_alter_customuser_options... OK
+  Applying accounts.0004_customerprofile_organization... OK
+  Applying accounts.0005_passwordresettoken... OK
+  Applying accounts.0006_customuser_delete_reason_customuser_deleted_at_and_more... OK
+  Applying accounts.0007_customuser_token_version... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_alter_auditlog_action... OK
+  Applying audit.0003_auditlog_user_role... OK
+  Applying audit.0004_rename_audit_audit_user_ro_845dd3_idx_audit_audit_user_ro_531f85_idx... OK
+  Applying audit.0005_alter_auditlog_action... OK
+  Applying authtoken.0001_initial... OK
+  Applying authtoken.0002_auto_20160226_1747... OK
+  Applying authtoken.0003_tokenproxy... OK
+  Applying authtoken.0004_alter_tokenproxy_options... OK
+  Applying providers.0002_initial... OK
+  Applying orders.0001_initial... OK
+  Applying orders.0002_initial... OK
+  Applying orders.0003_order_order_final_price_gte_0... OK
+  Applying orders.0004_alter_order_options... OK
+  Applying orders.0005_alter_order_options... OK
+  Applying orders.0006_order_assigned_employee_and_more... OK
+  Applying orders.0007_order_missing_document_types... OK
+  Applying orders.0008_missingdocumentrequest... OK
+  Applying orders.0009_add_order_deleted_status_index... OK
+  Applying documents.0001_initial... OK
+  Applying documents.0002_initial... OK
+  Applying documents.0003_document_document_file_size_gte_0... OK
+  Applying documents.0004_alter_document_options... OK
+  Applying documents.0005_alter_document_options... OK
+  Applying documents.0006_document_auto_approved_by_rule... OK
+  Applying documents.0007_add_order_deleted_status_index... OK
+  Applying services.0007_service_organization_service_scope_and_more... OK
+  Applying help_guides.0001_initial... OK
+  Applying help_guides.0002_seed_help_guides... OK
+  Applying help_guides.0003_helpguide_internal_notes_helpguide_main_workflow_and_more... OK
+  Applying help_guides.0004_manual_guide_library... OK
+  Applying help_guides.0005_helpguide_slug_state... OK
+  Applying help_guides.0006_helpguide_delete_reason_helpguide_deleted_at_and_more... OK
+  Applying notifications.0001_initial... OK
+  Applying notifications.0002_initial... OK
+  Applying notifications.0003_notification_template_and_more... OK
+  Applying notifications.0004_alter_notification_options... OK
+  Applying notifications.0005_notification_target_service_and_more... OK
+  Applying notifications.0006_notification_delete_reason_notification_deleted_at_and_more... OK
+  Applying providers.0003_providerprofile_organization... OK
+  Applying services.0008_requireddocumentdefinition_and_more... OK
+  Applying services.0009_service_estimated_duration_max_and_more... OK
+  Applying providers.0004_providerprofile_delete_reason_and_more... OK
+  Applying services.0010_alter_serviceproviderassignment_provider_and_more... OK
+  Applying services.0011_backfill_required_document_definitions... OK
+  Applying services.0012_repair_known_public_arabic_catalog_values... OK
+  Applying services.0013_normalize_legacy_schema_locale_fields... OK
+  Applying organizations.0002_branch_delete_reason_branch_deleted_at_and_more... OK
+  Applying orders.0010_order_service_category_name_snapshot_and_more... OK
+  Applying orders.0011_order_assigned_provider_organization_order_branch_and_more... OK
+  Applying orders.0012_order_expected_delivery_end_date_and_more... OK
+  Applying orders.0013_orderissue_delete_reason_orderissue_deleted_at_and_more... OK
+  Applying orders.0014_order_submission_fingerprint_order_submission_key_and_more... OK
+  Applying orders.0015_order_requirements_snapshot... OK
+  Applying orders.0016_backfill_order_requirements_snapshot... OK
+  Applying orders.0017_orderstatuslog_system_event... OK
+  Applying payment.0001_initial... OK
+  Applying payment.0002_alter_payment_options... OK
+  Applying payment.0003_payment_organization_commissionrule_invoice_and_more... OK
+  Applying public_site.0001_initial... OK
+  Applying public_site.0002_missingservicerequest... OK
+  Applying public_site.0003_publicpagecontent_footer_text_en_and_more... OK
+  Applying public_site.0004_advertisement_delete_reason_advertisement_deleted_at_and_more... OK
+  Applying public_site.0005_contactinquiry... OK
+  Applying public_site.0006_alter_publicpagecontent_contact_phone_and_more... OK
+  Applying public_site.0007_publicpagecontent_privacy_policy_ar_and_more... OK
+  Applying sessions.0001_initial... OK
+  Applying token_blacklist.0001_initial... OK
+  Applying token_blacklist.0002_outstandingtoken_jti_hex... OK
+  Applying token_blacklist.0003_auto_20171017_2007... OK
+  Applying token_blacklist.0004_auto_20171017_2013... OK
+  Applying token_blacklist.0005_remove_outstandingtoken_jti... OK
+  Applying token_blacklist.0006_auto_20171017_2113... OK
+  Applying token_blacklist.0007_auto_20171017_2214... OK
+  Applying token_blacklist.0008_migrate_to_bigautofield... OK
+  Applying token_blacklist.0010_fix_migrate_to_bigautofield... OK
+  Applying token_blacklist.0011_linearizes_history... OK
+  Applying token_blacklist.0012_alter_outstandingtoken_user... OK
+  Applying token_blacklist.0013_alter_blacklistedtoken_options_and_more...test_admin_manual_ledger_remains_usable (payment.tests_owner_decisions.PaymentOutOfReleaseTests.test_admin_manual_ledger_remains_usable) ... D:\ghassan\.venv\Lib\site-packages\django\core\handlers\base.py:61: UserWarning: No directory at: <scratch>\odi\base\backend\staticfiles\
+  mw_instance = middleware(adapted_handler)
+ok
+test_customer_can_still_read_existing_payment_records (payment.tests_owner_decisions.PaymentOutOfReleaseTests.test_customer_can_still_read_existing_payment_records) ... ok
+test_customer_payment_create_is_blocked_and_creates_nothing (payment.tests_owner_decisions.PaymentOutOfReleaseTests.test_customer_payment_create_is_blocked_and_creates_nothing) ... FAIL
+test_accepted_consent_creates_evidence_with_version_text_time_and_language (orders.tests_owner_decisions.ConsentEvidenceTests.test_accepted_consent_creates_evidence_with_version_text_time_and_language) ... ERROR
+test_consent_evidence_is_append_only (orders.tests_owner_decisions.ConsentEvidenceTests.test_consent_evidence_is_append_only) ... ERROR
+test_historical_orders_are_not_backfilled (orders.tests_owner_decisions.ConsentEvidenceTests.test_historical_orders_are_not_backfilled) ... ERROR
+test_mobile_statement_and_unversioned_clients (orders.tests_owner_decisions.ConsentEvidenceTests.test_mobile_statement_and_unversioned_clients) ... ERROR
+test_order_cannot_be_submitted_without_consent (orders.tests_owner_decisions.ConsentEvidenceTests.test_order_cannot_be_submitted_without_consent) ... ERROR
+test_unknown_statement_version_is_refused (orders.tests_owner_decisions.ConsentEvidenceTests.test_unknown_statement_version_is_refused) ... FAIL
+test_customer_phone_is_stored_canonical (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_customer_phone_is_stored_canonical) ... FAIL
+test_order_form_phone_is_canonical_and_same_number_is_no_change (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_order_form_phone_is_canonical_and_same_number_is_no_change) ... FAIL
+test_order_form_rejects_an_invalid_phone (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_order_form_rejects_an_invalid_phone) ... FAIL
+test_public_final_download_compares_canonical_numbers (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_public_final_download_compares_canonical_numbers) ... FAIL
+test_soft_deleted_documents_cannot_be_downloaded (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_soft_deleted_documents_cannot_be_downloaded) ... ok
+test_tracking_matches_a_legacy_unnormalized_stored_phone (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_tracking_matches_a_legacy_unnormalized_stored_phone) ... FAIL
+test_tracking_rejects_a_different_number (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_tracking_rejects_a_different_number) ... ok
+test_tracking_works_with_every_equivalent_format (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_tracking_works_with_every_equivalent_format) ... FAIL
+test_customer_notifications_have_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_customer_notifications_have_no_provider_identity) ... FAIL
+test_customer_order_list_and_detail_have_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_customer_order_list_and_detail_have_no_provider_identity) ... FAIL
+test_staff_and_provider_apis_are_unaffected (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_staff_and_provider_apis_are_unaffected) ... ok
+test_tracking_has_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_tracking_has_no_provider_identity) ... FAIL
+test_another_customer_cannot_read_the_reason (orders.tests_owner_decisions.RejectionReasonTests.test_another_customer_cannot_read_the_reason) ... ok
+test_customer_notification_points_to_the_order (orders.tests_owner_decisions.RejectionReasonTests.test_customer_notification_points_to_the_order) ... ok
+test_owning_customer_sees_the_exact_staff_reason (orders.tests_owner_decisions.RejectionReasonTests.test_owning_customer_sees_the_exact_staff_reason) ... ERROR
+test_provider_visibility_is_unchanged (orders.tests_owner_decisions.RejectionReasonTests.test_provider_visibility_is_unchanged) ... ok
+test_public_tracking_does_not_expose_the_reason (orders.tests_owner_decisions.RejectionReasonTests.test_public_tracking_does_not_expose_the_reason) ... ok
+test_serializer_drops_the_reason_for_a_non_owner (orders.tests_owner_decisions.RejectionReasonTests.test_serializer_drops_the_reason_for_a_non_owner) ... ERROR
+test_staff_still_see_the_stored_reason (orders.tests_owner_decisions.RejectionReasonTests.test_staff_still_see_the_stored_reason) ... ok
+test_guest_reuse_finds_the_account_in_any_format (accounts.tests_phone_normalization.GuestAccountReuseTests.test_guest_reuse_finds_the_account_in_any_format) ... FAIL
+test_apply_changes_only_safe_rows_and_rollback_restores_them (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_apply_changes_only_safe_rows_and_rollback_restores_them) ... ERROR
+test_apply_requires_explicit_confirmation_and_a_report (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_apply_requires_explicit_confirmation_and_a_report) ... ok
+test_default_output_masks_numbers (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_default_output_masks_numbers) ... ERROR
+test_dry_run_reports_normalizations_invalid_values_and_collisions_and_changes_nothing (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_dry_run_reports_normalizations_invalid_values_and_collisions_and_changes_nothing) ... ERROR
+test_admin_created_user_and_provider_phone_uniqueness_is_canonical (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_admin_created_user_and_provider_phone_uniqueness_is_canonical) ... FAIL
+test_admin_user_search_finds_any_format (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_admin_user_search_finds_any_format) ... FAIL
+test_contact_inquiry_phone_is_validated_and_canonical (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_contact_inquiry_phone_is_validated_and_canonical) ... FAIL
+test_duplicate_account_is_blocked_after_normalization (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_duplicate_account_is_blocked_after_normalization) ... FAIL
+test_international_registration_is_kept_international (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_international_registration_is_kept_international) ... FAIL
+test_invalid_phone_is_refused_with_a_localized_message (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_invalid_phone_is_refused_with_a_localized_message) ... FAIL
+test_profile_cannot_take_another_accounts_number_in_another_format (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_profile_cannot_take_another_accounts_number_in_another_format) ... FAIL
+test_profile_same_number_in_another_format_is_not_a_change (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_profile_same_number_in_another_format_is_not_a_change) ... FAIL
+test_registration_stores_the_canonical_number (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_registration_stores_the_canonical_number) ... FAIL
+test_soft_deleted_account_still_owns_its_number (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_soft_deleted_account_still_owns_its_number) ... FAIL
+test_additional_notes_are_optional_and_other_fields_unchanged (services.tests_owner_decisions.CatalogueDataMigrationTests.test_additional_notes_are_optional_and_other_fields_unchanged) ... FAIL
+test_admin_panel_wording_is_replaced_in_arabic_and_english (services.tests_owner_decisions.CatalogueDataMigrationTests.test_admin_panel_wording_is_replaced_in_arabic_and_english) ... FAIL
+test_existing_order_snapshot_is_not_mutated (services.tests_owner_decisions.CatalogueDataMigrationTests.test_existing_order_snapshot_is_not_mutated) ... ok
+test_migration_is_idempotent (services.tests_owner_decisions.CatalogueDataMigrationTests.test_migration_is_idempotent) ... ok
+test_no_public_service_mentions_the_admin_panel (services.tests_owner_decisions.CatalogueDataMigrationTests.test_no_public_service_mentions_the_admin_panel) ... FAIL
+test_parcel_and_basin_are_required_only_when_the_answer_is_yes (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_and_basin_are_required_only_when_the_answer_is_yes) ... ERROR
+test_parcel_and_basin_identifiers_are_text_so_leading_zeros_survive (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_and_basin_identifiers_are_text_so_leading_zeros_survive) ... FAIL
+test_parcel_question_becomes_a_yes_no_select_asked_before_the_numbers (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_question_becomes_a_yes_no_select_asked_before_the_numbers) ... FAIL
+test_prices_and_price_types_are_unchanged (services.tests_owner_decisions.CatalogueDataMigrationTests.test_prices_and_price_types_are_unchanged) ... ok
+test_services_without_the_question_keep_the_numbers_always_required (services.tests_owner_decisions.CatalogueDataMigrationTests.test_services_without_the_question_keep_the_numbers_always_required) ... ok
+test_report_lists_soft_deleted_files_and_deletes_nothing (services.tests_owner_decisions.RetentionReportTests.test_report_lists_soft_deleted_files_and_deletes_nothing) ... ERROR
+test_site_contact_setting_is_no_longer_listed_or_editable (services.tests_owner_decisions.RetiredContactSettingTests.test_site_contact_setting_is_no_longer_listed_or_editable) ... FAIL
+test_converted_schema_is_accepted_by_the_admin_validator (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_converted_schema_is_accepted_by_the_admin_validator) ... ERROR
+test_importer_produces_the_approved_shapes (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_importer_produces_the_approved_shapes) ... FAIL
+test_rules_do_not_modify_their_input (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_rules_do_not_modify_their_input) ... ERROR
+test_visible_when_must_name_an_earlier_field_of_the_form (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_visible_when_must_name_an_earlier_field_of_the_form) ... FAIL
+test_counts_follow_backend_definitions (services.tests_owner_decisions.ServiceCountTests.test_counts_follow_backend_definitions) ... FAIL
+test_counts_need_catalogue_permission (services.tests_owner_decisions.ServiceCountTests.test_counts_need_catalogue_permission) ... ok
+test_equivalent_jordan_formats_normalize_identically (accounts.tests_phone_normalization.NormalizePhoneTests.test_equivalent_jordan_formats_normalize_identically) ... ERROR
+test_international_number_with_country_code_stays_international (accounts.tests_phone_normalization.NormalizePhoneTests.test_international_number_with_country_code_stays_international) ... ERROR
+test_invalid_values_are_identified (accounts.tests_phone_normalization.NormalizePhoneTests.test_invalid_values_are_identified) ... ERROR
+test_jordan_landline (accounts.tests_phone_normalization.NormalizePhoneTests.test_jordan_landline) ... ERROR
+test_phones_match_compares_canonical_numbers (accounts.tests_phone_normalization.NormalizePhoneTests.test_phones_match_compares_canonical_numbers) ... ERROR
+
+======================================================================
+ERROR: test_accepted_consent_creates_evidence_with_version_text_time_and_language (orders.tests_owner_decisions.ConsentEvidenceTests.test_accepted_consent_creates_evidence_with_version_text_time_and_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 244, in test_accepted_consent_creates_evidence_with_version_text_time_and_language
+    record = OrderConsent.objects.get(order=order)
+             ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'objects'
+
+======================================================================
+ERROR: test_consent_evidence_is_append_only (orders.tests_owner_decisions.ConsentEvidenceTests.test_consent_evidence_is_append_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 275, in test_consent_evidence_is_append_only
+    record = OrderConsent.objects.get(order_id=response.data["id"])
+             ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'objects'
+
+======================================================================
+ERROR: test_historical_orders_are_not_backfilled (orders.tests_owner_decisions.ConsentEvidenceTests.test_historical_orders_are_not_backfilled)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 286, in test_historical_orders_are_not_backfilled
+    self.assertFalse(OrderConsent.objects.filter(order=legacy).exists())
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'objects'
+
+======================================================================
+ERROR: test_mobile_statement_and_unversioned_clients (orders.tests_owner_decisions.ConsentEvidenceTests.test_mobile_statement_and_unversioned_clients)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 259, in test_mobile_statement_and_unversioned_clients
+    record = OrderConsent.objects.get(order_id=mobile.data["id"])
+             ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'objects'
+
+======================================================================
+ERROR: test_order_cannot_be_submitted_without_consent (orders.tests_owner_decisions.ConsentEvidenceTests.test_order_cannot_be_submitted_without_consent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 237, in test_order_cannot_be_submitted_without_consent
+    self.assertFalse(OrderConsent.objects.exists())
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'objects'
+
+======================================================================
+ERROR: test_owning_customer_sees_the_exact_staff_reason (orders.tests_owner_decisions.RejectionReasonTests.test_owning_customer_sees_the_exact_staff_reason)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 119, in test_owning_customer_sees_the_exact_staff_reason
+    self.assertEqual(row["rejection_reason"], REASON)
+                     ~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'rejection_reason'
+
+======================================================================
+ERROR: test_serializer_drops_the_reason_for_a_non_owner (orders.tests_owner_decisions.RejectionReasonTests.test_serializer_drops_the_reason_for_a_non_owner)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 145, in test_serializer_drops_the_reason_for_a_non_owner
+    self.assertEqual(DocumentSerializer(self.document, context={"request": request}).data["rejection_reason"], REASON)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'rejection_reason'
+
+======================================================================
+ERROR: test_apply_changes_only_safe_rows_and_rollback_restores_them (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_apply_changes_only_safe_rows_and_rollback_restores_them)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 110, in call_command
+    app_name = get_commands()[command_name]
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'normalize_phones'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 244, in test_apply_changes_only_safe_rows_and_rollback_restores_them
+    self.run_command("--apply", "--confirm", "NORMALIZE", "--report", self.report)
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 212, in run_command
+    call_command("normalize_phones", *args, stdout=out)
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 112, in call_command
+    raise CommandError("Unknown command: %r" % command_name)
+django.core.management.base.CommandError: Unknown command: 'normalize_phones'
+
+======================================================================
+ERROR: test_default_output_masks_numbers (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_default_output_masks_numbers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 110, in call_command
+    app_name = get_commands()[command_name]
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'normalize_phones'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 232, in test_default_output_masks_numbers
+    output = self.run_command()
+             ^^^^^^^^^^^^^^^^^^
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 212, in run_command
+    call_command("normalize_phones", *args, stdout=out)
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 112, in call_command
+    raise CommandError("Unknown command: %r" % command_name)
+django.core.management.base.CommandError: Unknown command: 'normalize_phones'
+
+======================================================================
+ERROR: test_dry_run_reports_normalizations_invalid_values_and_collisions_and_changes_nothing (accounts.tests_phone_normalization.NormalizePhonesCommandTests.test_dry_run_reports_normalizations_invalid_values_and_collisions_and_changes_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 110, in call_command
+    app_name = get_commands()[command_name]
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'normalize_phones'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 221, in test_dry_run_reports_normalizations_invalid_values_and_collisions_and_changes_nothing
+    output = self.run_command("--unmasked")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 212, in run_command
+    call_command("normalize_phones", *args, stdout=out)
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 112, in call_command
+    raise CommandError("Unknown command: %r" % command_name)
+django.core.management.base.CommandError: Unknown command: 'normalize_phones'
+
+======================================================================
+ERROR: test_parcel_and_basin_are_required_only_when_the_answer_is_yes (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_and_basin_are_required_only_when_the_answer_is_yes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 132, in test_parcel_and_basin_are_required_only_when_the_answer_is_yes
+    self.assertEqual(fields[key]["visible_when"], {"field": QUESTION_KEY, "equals": "yes"})
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'visible_when'
+
+======================================================================
+ERROR: test_report_lists_soft_deleted_files_and_deletes_nothing (services.tests_owner_decisions.RetentionReportTests.test_report_lists_soft_deleted_files_and_deletes_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 110, in call_command
+    app_name = get_commands()[command_name]
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'report_document_retention'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 269, in test_report_lists_soft_deleted_files_and_deletes_nothing
+    call_command("report_document_retention", stdout=out)
+  File "D:\ghassan\.venv\Lib\site-packages\django\core\management\__init__.py", line 112, in call_command
+    raise CommandError("Unknown command: %r" % command_name)
+django.core.management.base.CommandError: Unknown command: 'report_document_retention'
+
+======================================================================
+ERROR: test_converted_schema_is_accepted_by_the_admin_validator (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_converted_schema_is_accepted_by_the_admin_validator)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 181, in test_converted_schema_is_accepted_by_the_admin_validator
+    self.assertEqual(self.patch(apply_schema_rules(legacy_land_schema())).status_code, 200)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_rules_do_not_modify_their_input (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_rules_do_not_modify_their_input)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 177, in test_rules_do_not_modify_their_input
+    apply_schema_rules(schema)
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_equivalent_jordan_formats_normalize_identically (accounts.tests_phone_normalization.NormalizePhoneTests.test_equivalent_jordan_formats_normalize_identically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 33, in test_equivalent_jordan_formats_normalize_identically
+    self.assertEqual(normalize_phone(typed), "+962791234567", typed)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_international_number_with_country_code_stays_international (accounts.tests_phone_normalization.NormalizePhoneTests.test_international_number_with_country_code_stays_international)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 41, in test_international_number_with_country_code_stays_international
+    self.assertEqual(normalize_phone("+44 20 7946 0958"), "+442079460958")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_invalid_values_are_identified (accounts.tests_phone_normalization.NormalizePhoneTests.test_invalid_values_are_identified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 50, in test_invalid_values_are_identified
+    self.assertIsNone(normalize_phone(typed), typed)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_jordan_landline (accounts.tests_phone_normalization.NormalizePhoneTests.test_jordan_landline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 36, in test_jordan_landline
+    self.assertEqual(normalize_phone("06 560 9000"), "+96265609000")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+ERROR: test_phones_match_compares_canonical_numbers (accounts.tests_phone_normalization.NormalizePhoneTests.test_phones_match_compares_canonical_numbers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 56, in test_phones_match_compares_canonical_numbers
+    self.assertTrue(phones_match("0791234567", "+962791234567"))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+======================================================================
+FAIL: test_customer_payment_create_is_blocked_and_creates_nothing (payment.tests_owner_decisions.PaymentOutOfReleaseTests.test_customer_payment_create_is_blocked_and_creates_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\payment\tests_owner_decisions.py", line 44, in test_customer_payment_create_is_blocked_and_creates_nothing
+    self.assertEqual(response.status_code, 405, response.data)
+AssertionError: 201 != 405 : {'id': 2, 'payment_number': 'PAY-000002', 'order': 1, 'order_number': 'KH-2026-000001', 'customer_name': 'B05 Customer', 'organization_name': 'Platform Owner', 'payment_type': 'full', 'method': 'cash', 'status': 'pending', 'amount': '18.00', 'currency': 'JOD', 'gateway_name': '', 'gateway_transaction_id': '', 'gateway_payment_url': '', 'reference_number': '', 'failure_reason': '', 'notes': '', 'paid_at': None, 'refunded_at': None, 'created_at': '2026-10-16T15:03:48.009010+03:00', 'updated_at': '2026-10-16T15:03:48.009010+03:00'}
+
+======================================================================
+FAIL: test_unknown_statement_version_is_refused (orders.tests_owner_decisions.ConsentEvidenceTests.test_unknown_statement_version_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 270, in test_unknown_statement_version_is_refused
+    self.assertEqual(response.status_code, 400)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_customer_phone_is_stored_canonical (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_customer_phone_is_stored_canonical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 300, in test_customer_phone_is_stored_canonical
+    self.assertEqual(self.customer.phone, "+962791200001")
+AssertionError: '0791200001' != '+962791200001'
+- 0791200001
+? ^
++ +962791200001
+? ^^^^
+
+
+======================================================================
+FAIL: test_order_form_phone_is_canonical_and_same_number_is_no_change (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_order_form_phone_is_canonical_and_same_number_is_no_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 355, in test_order_form_phone_is_canonical_and_same_number_is_no_change
+    self.assertEqual(self.customer.phone, "+962791200001")
+AssertionError: '079 120 0001' != '+962791200001'
+- 079 120 0001
++ +962791200001
+
+
+======================================================================
+FAIL: test_order_form_rejects_an_invalid_phone (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_order_form_rejects_an_invalid_phone)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 363, in test_order_form_rejects_an_invalid_phone
+    self.assertEqual(response.status_code, 400)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_public_final_download_compares_canonical_numbers (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_public_final_download_compares_canonical_numbers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 334, in test_public_final_download_compares_canonical_numbers
+    self.assertEqual(self.client.get(url, {"order_number": self.order.order_number, "phone": "00962791200001"}).status_code, 200)
+AssertionError: 404 != 200
+
+======================================================================
+FAIL: test_tracking_matches_a_legacy_unnormalized_stored_phone (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_tracking_matches_a_legacy_unnormalized_stored_phone)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 319, in test_tracking_matches_a_legacy_unnormalized_stored_phone
+    self.assertEqual(response.status_code, 200)
+AssertionError: 404 != 200
+
+======================================================================
+FAIL: test_tracking_works_with_every_equivalent_format (orders.tests_owner_decisions.PhoneIdentityTrackingTests.test_tracking_works_with_every_equivalent_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 307, in test_tracking_works_with_every_equivalent_format
+    self.assertEqual(response.status_code, 200, typed)
+AssertionError: 404 != 200 : 079 120 0001
+
+======================================================================
+FAIL: test_customer_notifications_have_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_customer_notifications_have_no_provider_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 202, in test_customer_notifications_have_no_provider_identity
+    self.assert_no_provider_identity(response.data)
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 182, in assert_no_provider_identity
+    self.assertNotIn(secret, dumped)
+AssertionError: 'Provider Person Name' unexpectedly found in '{"count": 1, "next": null, "previous": null, "results": [{"notification_id": 1, "title": "t", "message": "m", "order_id": 1, "recipient_name": "Customer", "actor_name": "Provider Person Name", "order_number": "KH-2026-000001", "is_deleted": false, "deleted_at": null, "delete_reason": "", "notification_type": "system", "channel": "system", "status": "pending", "priority": "normal", "template_key": "", "context_data": {}, "recipient_email": "", "recipient_phone": "", "external_message_id": "", "provider_response": null, "retry_count": 0, "max_retries": 3, "last_error": "", "next_retry_at": null, "is_read": false, "read_at": null, "queued_at": null, "sent_at": null, "delivered_at": null, "failed_at": null, "created_at": "2026-10-16T15:04:07.123127+03:00", "updated_at": "2026-10-16T15:04:07.123127+03:00", "deleted_by": null, "recipient": 1, "actor": 5, "order": 1, "target_service": null, "template": null, "id": 1}]}'
+
+======================================================================
+FAIL: test_customer_order_list_and_detail_have_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_customer_order_list_and_detail_have_no_provider_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 193, in test_customer_order_list_and_detail_have_no_provider_identity
+    self.assert_no_provider_identity(listed.data)
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 182, in assert_no_provider_identity
+    self.assertNotIn(secret, dumped)
+AssertionError: 'Provider Person Name' unexpectedly found in '{"count": 1, "next": null, "previous": null, "results": [{"id": 1, "order_number": "KH-2026-000001", "service_name_snapshot": "خدمة", "service_category_name_snapshot": "تصنيف", "organization_name_snapshot": "", "customer": {"id": 1, "full_name": "Customer", "phone": "0791200001", "email": "odi-customer@example.test", "national_id": ""}, "city": "Amman", "service": {"id": 1, "name_ar": "خدمة", "name_en": "Service", "slug": "odi-service", "estimated_duration": 1, "category_name": "تصنيف"}, "status": "IN_PROGRESS", "priority": "NORMAL", "assigned_employee": null, "assigned_provider": {"id": 1, "full_name": "Provider Person Name", "provider_type": "Licensed office", "city": "Zarqa", "rating": "0.00", "is_available": true}, "expected_delivery_date": "2026-10-17", "final_price": "0.00", "missing_document_types": [], "created_at": "2026-10-16T15:04:08.442236+03:00", "updated_at": "2026-10-16T15:04:08.442236+03:00", "allowed_actions": {"can_view": true, "available_status_transitions": [], "workflow_transitions": [{"to_status": "WAITING_GOVERNMENT", "action": "provider_pause_for_government", "channel": "provider_status", "available": false, "blocked_reasons": ["Role \'customer\' cannot move order from IN_PROGRESS to WAITING_GOVERNMENT."], "blocked": [{"code": "role_not_allowed", "params": {"allowed_roles": ["provider"]}}], "reason_required": false}, {"to_status": "READY_FOR_DELIVERY", "action": "mark_ready_for_delivery", "channel": "dedicated", "available": false, "blocked_reasons": ["Role \'customer\' cannot move order from IN_PROGRESS to READY_FOR_DELIVERY."], "blocked": [{"code": "role_not_allowed", "params": {"allowed_roles": ["admin", "employee", "provider", "support"]}}], "reason_required": false}, {"to_status": "REJECTED", "action": "reject_order", "channel": "dedicated", "available": false, "blocked_reasons": ["Role \'customer\' cannot move order from IN_PROGRESS to REJECTED."], "blocked": [{"code": "role_not_allowed", "params": {"allowed_roles": ["admin", "employee", "support"]}}], "reason_required": true}, {"to_status": "CANCELLED", "action": "cancel_order", "channel": "dedicated", "available": false, "blocked_reasons": ["Role \'customer\' cannot move order from IN_PROGRESS to CANCELLED."], "blocked": [{"code": "role_not_allowed", "params": {"allowed_roles": ["admin"]}}], "reason_required": true}], "readiness": {"requirements_complete": true, "documents": [], "blocking_reasons": []}, "can_cancel": false, "can_upload_customer_document": false, "can_view_missing_documents_form": false, "missing_document_request_valid": null, "can_recover_missing_document_request": false, "can_submit_rating": false, "can_request_documents": false, "can_assign_provider": false, "can_add_internal_note": false, "can_add_customer_note": false, "can_verify_documents": false, "can_send_manual_notification": false, "can_reject": false, "can_complete": false, "can_upload_final_document": false}}]}'
+
+======================================================================
+FAIL: test_tracking_has_no_provider_identity (orders.tests_owner_decisions.ProviderIdentityPrivacyTests.test_tracking_has_no_provider_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\orders\tests_owner_decisions.py", line 208, in test_tracking_has_no_provider_identity
+    self.assertEqual(response.status_code, 200)
+AssertionError: 404 != 200
+
+======================================================================
+FAIL: test_guest_reuse_finds_the_account_in_any_format (accounts.tests_phone_normalization.GuestAccountReuseTests.test_guest_reuse_finds_the_account_in_any_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 184, in test_guest_reuse_finds_the_account_in_any_format
+    self.assertEqual(existing.pk, again.pk)
+AssertionError: 1 != 2
+
+======================================================================
+FAIL: test_admin_created_user_and_provider_phone_uniqueness_is_canonical (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_admin_created_user_and_provider_phone_uniqueness_is_canonical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 158, in test_admin_created_user_and_provider_phone_uniqueness_is_canonical
+    self.assertEqual(provider.status_code, 400, provider.data)
+AssertionError: 201 != 400 : {'id': 1, 'full_name': 'Prov', 'email': 'prov@example.test', 'phone': '+962 79 123 4567', 'provider_type': 'Office', 'company_name': '', 'commercial_registration_number': '', 'tax_number': '', 'address': '', 'service_categories': [], 'service_category_ids': [], 'city': 'Amman', 'is_available': True, 'is_approved': False, 'account_active': True, 'rating': '0.00', 'total_completed_orders': 0, 'is_deleted': False, 'deleted_at': None, 'delete_reason': '', 'created_at': '2026-10-16T15:04:25.742688+03:00', 'approval_status_label': 'قيد المراجعة'}
+
+======================================================================
+FAIL: test_admin_user_search_finds_any_format (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_admin_user_search_finds_any_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 145, in test_admin_user_search_finds_any_format
+    self.assertIn(target.pk, [row["id"] for row in rows], typed)
+AssertionError: 2 not found in [] : 00962791234567
+
+======================================================================
+FAIL: test_contact_inquiry_phone_is_validated_and_canonical (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_contact_inquiry_phone_is_validated_and_canonical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 172, in test_contact_inquiry_phone_is_validated_and_canonical
+    self.assertEqual(bad.status_code, 400)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_duplicate_account_is_blocked_after_normalization (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_duplicate_account_is_blocked_after_normalization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 95, in test_duplicate_account_is_blocked_after_normalization
+    self.assertEqual(response.status_code, 400, variant)
+AssertionError: 201 != 400 : +962791234567
+
+======================================================================
+FAIL: test_international_registration_is_kept_international (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_international_registration_is_kept_international)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 111, in test_international_registration_is_kept_international
+    self.assertEqual(CustomUser.objects.get(email="phone-uk@example.test").phone, "+442079460958")
+AssertionError: '+44 20 7946 0958' != '+442079460958'
+- +44 20 7946 0958
+?    -  -    -
++ +442079460958
+
+
+======================================================================
+FAIL: test_invalid_phone_is_refused_with_a_localized_message (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_invalid_phone_is_refused_with_a_localized_message)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 115, in test_invalid_phone_is_refused_with_a_localized_message
+    self.assertEqual(response.status_code, 400)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_profile_cannot_take_another_accounts_number_in_another_format (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_profile_cannot_take_another_accounts_number_in_another_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 133, in test_profile_cannot_take_another_accounts_number_in_another_format
+    self.assertEqual(response.status_code, 400)
+AssertionError: 200 != 400
+
+======================================================================
+FAIL: test_profile_same_number_in_another_format_is_not_a_change (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_profile_same_number_in_another_format_is_not_a_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 122, in test_profile_same_number_in_another_format_is_not_a_change
+    self.assertEqual(response.status_code, 200, response.data)
+AssertionError: 400 != 200 : {'current_password': [ErrorDetail(string='Enter your current password to change your email or phone number.', code='invalid')]}
+
+======================================================================
+FAIL: test_registration_stores_the_canonical_number (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_registration_stores_the_canonical_number)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 88, in test_registration_stores_the_canonical_number
+    self.assertEqual(CustomUser.objects.get(email="phone-a@example.test").phone, "+962791234567")
+AssertionError: '079 123 4567' != '+962791234567'
+- 079 123 4567
++ +962791234567
+
+
+======================================================================
+FAIL: test_soft_deleted_account_still_owns_its_number (accounts.tests_phone_normalization.PhoneIdentityApiTests.test_soft_deleted_account_still_owns_its_number)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\accounts\tests_phone_normalization.py", line 106, in test_soft_deleted_account_still_owns_its_number
+    self.assertEqual(self.register("+962791234567", "phone-b@example.test").status_code, 400)
+AssertionError: 201 != 400
+
+======================================================================
+FAIL: test_additional_notes_are_optional_and_other_fields_unchanged (services.tests_owner_decisions.CatalogueDataMigrationTests.test_additional_notes_are_optional_and_other_fields_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 152, in test_additional_notes_are_optional_and_other_fields_unchanged
+    self.assertFalse(fields["additional_notes"]["required"])
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_admin_panel_wording_is_replaced_in_arabic_and_english (services.tests_owner_decisions.CatalogueDataMigrationTests.test_admin_panel_wording_is_replaced_in_arabic_and_english)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 83, in test_admin_panel_wording_is_replaced_in_arabic_and_english
+    self.assertEqual((self.quotation.public_price_note_ar, self.quotation.public_price_note_en),
+AssertionError: Tuples differ: ('يحدد بعد المراجعة من لوحة الإدارة.', 'Shar[13 chars]ew.') != ('يتم تأكيد الرسوم النهائية بعد مراجعة الوثا[51 chars]ew.')
+
+First differing element 0:
+'يحدد بعد المراجعة من لوحة الإدارة.'
+'يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+
+- ('يحدد بعد المراجعة من لوحة الإدارة.', 'Shared after review.')
++ ('يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.',
++  'Final fees are confirmed after document review.')
+
+======================================================================
+FAIL: test_no_public_service_mentions_the_admin_panel (services.tests_owner_decisions.CatalogueDataMigrationTests.test_no_public_service_mentions_the_admin_panel)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 96, in test_no_public_service_mentions_the_admin_panel
+    self.assertNotIn("لوحة الإدارة", json.dumps(listed.data, ensure_ascii=False, default=str))
+AssertionError: 'لوحة الإدارة' unexpectedly found in '[{"id": 3, "category": {"id": 1, "name": "أراضي", "name_ar": "أراضي", "name_en": "Land", "slug": "odc-land", "parent": null, "description": "", "description_ar": "", "description_en": "", "icon": "", "color": "", "image": null, "image_url": "", "display_order": 0, "sort_order": 0, "is_active": true, "is_deleted": false, "show_on_public_site": true, "service_count": 0, "full_path_name": "أراضي", "full_path_name_en": "Land", "children": []}, "organization_id": null, "scope": "global", "name_ar": "جواز", "name_en": "Passport", "display_name": "جواز", "slug": "odc-passport", "image": null, "image_url": "", "description_ar": "وصف", "description_en": "", "estimated_duration": 1, "estimated_duration_unit": "days", "base_price": null, "government_fee": null, "service_fee": null, "total_fee": "64.00", "effective_total_fee": "64.00", "pricing": {"total_price": "64.00", "government_fee": null, "company_fee": null, "public_note_ar": "يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.", "public_note_en": "Final fees are confirmed after document review."}, "delivery_time": {"mode": "duration", "label": "Expected completion: 1 days", "label_ar": "المدة المتوقعة: 1 يوم", "label_en": "Expected completion: 1 days", "start_date": null, "end_date": null, "expected_duration": 1, "expected_duration_min": null, "expected_duration_max": null, "expected_duration_unit": "days", "note_ar": "سيتم إشعارك عند كل تحديث مهم على الطلب.", "note_en": "You will be notified at every important request update."}, "is_featured": false, "is_active": true, "show_on_public_site": true}, {"id": 1, "category": {"id": 1, "name": "أراضي", "name_ar": "أراضي", "name_en": "Land", "slug": "odc-land", "parent": null, "description": "", "description_ar": "", "description_en": "", "icon": "", "color": "", "image": null, "image_url": "", "display_order": 0, "sort_order": 0, "is_active": true, "is_deleted": false, "show_on_public_site": true, "service_count": 0, "full_path_name": "أراضي", "full_path_name_en": "Land", "children": []}, "organization_id": null, "scope": "global", "name_ar": "سند", "name_en": "Deed", "display_name": "سند", "slug": "odc-deed", "image": null, "image_url": "", "description_ar": "وصف", "description_en": "", "estimated_duration": 1, "estimated_duration_unit": "days", "base_price": null, "government_fee": null, "service_fee": null, "total_fee": "0.00", "effective_total_fee": "0.00", "pricing": {"total_price": "0.00", "government_fee": null, "company_fee": null, "public_note_ar": "يحدد بعد المراجعة من لوحة الإدارة.", "public_note_en": "Shared after review."}, "delivery_time": {"mode": "duration", "label": "Expected completion: 1 days", "label_ar": "المدة المتوقعة: 1 يوم", "label_en": "Expected completion: 1 days", "start_date": null, "end_date": null, "expected_duration": 1, "expected_duration_min": null, "expected_duration_max": null, "expected_duration_unit": "days", "note_ar": "تُحدد من لوحة الإدارة", "note_en": ""}, "is_featured": false, "is_active": true, "show_on_public_site": true}, {"id": 2, "category": {"id": 1, "name": "أراضي", "name_ar": "أراضي", "name_en": "Land", "slug": "odc-land", "parent": null, "description": "", "description_ar": "", "description_en": "", "icon": "", "color": "", "image": null, "image_url": "", "display_order": 0, "sort_order": 0, "is_active": true, "is_deleted": false, "show_on_public_site": true, "service_count": 0, "full_path_name": "أراضي", "full_path_name_en": "Land", "children": []}, "organization_id": null, "scope": "global", "name_ar": "مخطط", "name_en": "Map", "display_name": "مخطط", "slug": "odc-map", "image": null, "image_url": "", "description_ar": "وصف", "description_en": "", "estimated_duration": 1, "estimated_duration_unit": "days", "base_price": null, "government_fee": null, "service_fee": null, "total_fee": "0.00", "effective_total_fee": "0.00", "pricing": {"total_price": "0.00", "government_fee": null, "company_fee": null, "public_note_ar": "يحدد بعد المراجعة من لوحة الإدارة.", "public_note_en": "Shared after review."}, "delivery_time": {"mode": "duration", "label": "Expected completion: 1 days", "label_ar": "المدة المتوقعة: 1 يوم", "label_en": "Expected completion: 1 days", "start_date": null, "end_date": null, "expected_duration": 1, "expected_duration_min": null, "expected_duration_max": null, "expected_duration_unit": "days", "note_ar": "حسب إجراءات دائرة الأراضي والمساحة.", "note_en": ""}, "is_featured": false, "is_active": true, "show_on_public_site": true}]'
+
+======================================================================
+FAIL: test_parcel_and_basin_identifiers_are_text_so_leading_zeros_survive (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_and_basin_identifiers_are_text_so_leading_zeros_survive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 145, in test_parcel_and_basin_identifiers_are_text_so_leading_zeros_survive
+    self.assertEqual(fields["parcel_number"]["type"], "text")
+AssertionError: 'number' != 'text'
+- number
++ text
+
+
+======================================================================
+FAIL: test_parcel_question_becomes_a_yes_no_select_asked_before_the_numbers (services.tests_owner_decisions.CatalogueDataMigrationTests.test_parcel_question_becomes_a_yes_no_select_asked_before_the_numbers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 118, in test_parcel_question_becomes_a_yes_no_select_asked_before_the_numbers
+    self.assertEqual(question["type"], "select")
+AssertionError: 'number' != 'select'
+- number
++ select
+
+
+======================================================================
+FAIL: test_site_contact_setting_is_no_longer_listed_or_editable (services.tests_owner_decisions.RetiredContactSettingTests.test_site_contact_setting_is_no_longer_listed_or_editable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 259, in test_site_contact_setting_is_no_longer_listed_or_editable
+    self.assertEqual([row["key"] for row in listed.data], ["site.homepage"])
+AssertionError: Lists differ: ['site.contact', 'site.homepage'] != ['site.homepage']
+
+First differing element 0:
+'site.contact'
+'site.homepage'
+
+First list contains 1 additional elements.
+First extra element 1:
+'site.homepage'
+
+- ['site.contact', 'site.homepage']
++ ['site.homepage']
+
+======================================================================
+FAIL: test_importer_produces_the_approved_shapes (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_importer_produces_the_approved_shapes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 195, in test_importer_produces_the_approved_shapes
+    self.assertEqual(question["type"], "checkbox")  # never "number"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'number' != 'checkbox'
+- number
++ checkbox
+
+
+======================================================================
+FAIL: test_visible_when_must_name_an_earlier_field_of_the_form (services.tests_owner_decisions.SchemaRuleAndValidatorTests.test_visible_when_must_name_an_earlier_field_of_the_form)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 187, in test_visible_when_must_name_an_earlier_field_of_the_form
+    self.assertEqual(self.patch(schema).status_code, 400, condition)
+AssertionError: 200 != 400 : {'field': 'missing', 'equals': 'yes'}
+
+======================================================================
+FAIL: test_counts_follow_backend_definitions (services.tests_owner_decisions.ServiceCountTests.test_counts_follow_backend_definitions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>\odi\base\backend\services\tests_owner_decisions.py", line 230, in test_counts_follow_backend_definitions
+    self.assertEqual(response.status_code, 200, response.data)
+AssertionError: 404 != 200 : {'detail': ErrorDetail(string='غير موجود.', code='not_found')}
+
+----------------------------------------------------------------------
+Ran 66 tests in 47.585s
+
+FAILED (failures=31, errors=19)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+
+ OK
+System check identified no issues (0 silenced).

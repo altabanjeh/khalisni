@@ -1,0 +1,725 @@
+URL: http://127.0.0.1:4320/admin/services
+TITLE: خلصني | Khalsni
+DIR: rtl LANG: ar
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+بوابة العمل
+
+لوحة الإدارة
+
+نظرة عامة
+
+لوحة الإدارة
+
+العمليات
+
+إدارة الطلبات
+طلبات الخدمات الجديدة
+المدفوعات
+قواعد التشغيل
+الإشعارات
+
+إدارة الخدمات
+
+تصنيفات الخدمات
+الخدمات
+علاقات الخدمات
+
+المستخدمون والمزوّدون
+
+المستخدمون والأدوار
+المزوّدون
+خدمات المزوّدين
+
+المحتوى والموقع العام
+
+الموقع العام
+محتوى الرئيسية
+الإعلانات
+المظهر العام
+معاينة الواجهة
+إدارة الدليل
+
+التقارير والتدقيق
+
+التقارير
+سجل التدقيق
+
+الإعدادات
+
+إعدادات النظام
+الدليل
+لوحة الإدارة
+
+الخدمات
+
+إدارة الخدمات
+
+إدارة موحدة للفئات والخدمات وتعريفات الوثائق الرئيسية. الوثيقة تُنشأ مرة واحدة، ثم تُربط بالخدمة من داخل نموذج الخدمة نفسه.
+
+الفئات
+
+نظّم كروت الموقع العام ومسارات العرض من نفس الصفحة.
+
+الخدمات
+
+تحكم بالتسعير، مدة التسليم، الظهور العام، والبيانات المطلوبة من العميل.
+
+تعريفات الوثائق
+
+أنشئ تعريف الوثيقة مرة واحدة ثم اختره من الخدمات بدل تكرار نفس النصوص.
+
+الفئات
+
+أنشئ الفئات وعدّلها وعطّلها من شاشة الخدمات نفسها.
+
++ فئة جديدة
+عدد العناصر الظاهرة: 13
+نشط
+محذوف
+الكل
+الفئة	المعرّف	الترتيب	الحالة	الإجراءات
+
+???
+	category-debug	0	نشط	
+تعديل
+حذف
+
+
+???
+	category-debug-2	0	نشط	
+تعديل
+حذف
+
+
+???
+	category-debug-3	0	نشط	
+تعديل
+حذف
+
+
+الأحوال المدنية والجوازات
+	civil-status	1	نشط	
+تعديل
+حذف
+
+
+الأحوال المدنية والجوازات
+	civil-status-and-passports	1	نشط	
+تعديل
+حذف
+
+
+العقارات والأراضي
+	land-and-survey	1	نشط	
+تعديل
+حذف
+
+
+خدمات الأعمال والشركات
+	business_services	2	نشط	
+تعديل
+حذف
+
+
+خدمات عامة سريعة
+	quick-public-services	2	نشط	
+تعديل
+حذف
+
+
+ضريبة الدخل والمبيعات
+	tax	3	نشط	
+تعديل
+حذف
+
+
+الخدمات البلدية
+	municipal-services	4	نشط	
+تعديل
+حذف
+
+
+الخدمات العامة السريعة
+	general	4	نشط	
+تعديل
+حذف
+
+
+وزارة العمل
+	ministry-of-labour	5	نشط	
+تعديل
+حذف
+
+
+الضمان الاجتماعي
+	social-security	7	نشط	
+تعديل
+حذف
+الخدمات
+
+كل خصائص الخدمة الأساسية موجودة هنا، بما فيها اختيار الوثائق الرئيسية وآلية عرض الأسعار للعامة.
+
++ خدمة جديدة
+عدد العناصر الظاهرة: 20
+نشط
+محذوف
+الكل
+كل الفئات
+???
+???
+???
+الأحوال المدنية والجوازات
+الأحوال المدنية والجوازات
+العقارات والأراضي
+خدمات الأعمال والشركات
+خدمات عامة سريعة
+ضريبة الدخل والمبيعات
+الخدمات البلدية
+الخدمات العامة السريعة
+وزارة العمل
+الضمان الاجتماعي
+الخدمة	الفئة	التسليم	الوثائق	الموقع العام	الحالة	الإجراءات
+
+????
+	???	Expected completion: 3 days	0	مخفية	نشط	
+تعديل
+حذف
+
+
+????
+	???	Expected completion: 3 days	0	مخفية	نشط	
+تعديل
+حذف
+
+
+????
+	???	Expected completion: 3 days	0	مخفية	نشط	
+تعديل
+حذف
+
+
+حجز موعد جواز سفر
+	الأحوال المدنية والجوازات	Expected completion: 1 to 3 days	2	ظاهرة	نشط	
+تعديل
+حذف
+
+
+شهادة عدم محكومية
+	الأحوال المدنية والجوازات	Expected completion: 2 days	2	مخفية	نشط	
+تعديل
+حذف
+
+
+طلب تأسيس شركة
+	خدمات الأعمال والشركات	Expected completion: 1 days	6	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب سند تسجيل
+	العقارات والأراضي	Expected completion: 1 days	3	ظاهرة	نشط	
+تعديل
+حذف
+
+
+تجديد جواز سفر
+	الأحوال المدنية والجوازات	Expected completion: 2 to 4 days	2	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب تعديل بيانات شركة
+	خدمات الأعمال والشركات	Expected completion: 1 days	6	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب مخطط أراضٍ
+	العقارات والأراضي	Expected completion: 1 days	3	ظاهرة	نشط	
+تعديل
+حذف
+
+
+دفع مخالفات السير
+	خدمات عامة سريعة	Expected completion: 3 to 5 days	2	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب إضافة غايات لشركة قائمة
+	خدمات الأعمال والشركات	Expected completion: 1 days	4	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب نقل ملكية عقار
+	العقارات والأراضي	Expected completion: 1 days	5	ظاهرة	نشط	
+تعديل
+حذف
+
+
+براءة ذمة ضريبية
+	ضريبة الدخل والمبيعات	Expected completion: 4 to 6 days	2	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب إصدار سجل تجاري
+	خدمات الأعمال والشركات	Expected completion: 1 days	3	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب تسجيل إرث
+	العقارات والأراضي	Expected completion: 1 days	5	ظاهرة	نشط	
+تعديل
+حذف
+
+
+تجديد رخصة مهن
+	الخدمات البلدية	Expected completion: 5 to 7 days	2	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب إصدار شهادة اسم تجاري
+	خدمات الأعمال والشركات	Expected completion: 1 days	3	ظاهرة	نشط	
+تعديل
+حذف
+
+
+طلب هبة عقار
+	العقارات والأراضي	Expected completion: 1 days	5	ظاهرة	نشط	
+تعديل
+حذف
+
+
+إصدار سند تسجيل عقار
+	العقارات والأراضي	Expected completion: 6 to 8 days	2	ظاهرة	نشط	
+تعديل
+حذف
+تعريفات الوثائق
+
+هذه هي القائمة الرئيسية التي يختار منها المسؤول الوثائق المطلوبة لكل خدمة.
+
++ تعريف وثيقة
+عدد العناصر الظاهرة: 69
+نشط
+محذوف
+الكل
+الوثيقة	الكود	الامتدادات	الحد الأقصى للحجم	الترتيب	الحالة	الإجراءات
+
+أي بيانات تساعد في تحديد العقار
+	document_74a2f98299	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+أي مستندات إضافية تطلبها الجهة المختصة
+	document_b03d952538	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+أي وثائق إضافية تطلبها الجهة المختصة
+	document_b0f143ad16	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إثبات شخصية صاحب الطلب
+	document_197c7d7fc0	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إثبات شخصية صاحب العلاقة/مقدم الطلب
+	document_b7393c5318	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إثبات شخصية مالك العلامة
+	document_fd135ce03f	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إثبات شخصية مقدم الطلب
+	document_85697877bb	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إذن إشغال
+	document_602b0a206b	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+إذن المحكمة المختصة
+	document_c82005f833	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+المخططات الهندسية
+	document_3443627d36	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+الهوية
+	document_a4c4fed3af	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+براءات ذمة/موافقات إضافية من الجهات المختصة
+	document_6192cecaba	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+براءة ذمة من الضمان الاجتماعي
+	document_ddc0c08e82	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+براءة ذمة من ضريبة الدخل والمبيعات
+	document_7713142b41	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تفويض أو وكالة للشخص الذي يتابع الإجراءات
+	document_3bee74c311	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تفويض إن وجد
+	authorization-letter	صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تفويض خطي
+	document_11714fabf5	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تفويض خطي أو وكالة
+	document_d038474c7a	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تفويض خطي أو وكالة عدلية
+	document_f56c2e0812	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+تقرير المصفي وتقارير التصفية
+	document_37e2d6c45c	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+حجة حصر الإرث
+	inheritance_certificate	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+رخصة المهن الحالية
+	document_ef81fa254a	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي
+	document_69e9a26d6e	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+سند تسجيل العقار
+	property_registration_certificate	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+سندات تسجيل جميع القطع
+	document_7c6a69c2f4	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+شهادة الوفاة
+	document_443aae22bf	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+شهادة تسجيل العلامة السابقة
+	document_7672fa9fbe	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+شهادة شطب الاسم التجاري
+	document_8e430fe32b	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+شهادة/بيانات تسجيل الشركة أو المنشأة
+	document_322e004de0	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+شهادة/سجل الشركة أو المؤسسة
+	document_d7d63d7027	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صور هويات الورثة
+	document_c3a3aa1c50	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة الهوية
+	national_id_copy	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة هوية البائع
+	seller_national_id_copy	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة هوية المشتري
+	buyer_national_id_copy	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة هوية الموهوب له
+	document_11667481fd	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة هوية الواهب
+	document_564406e175	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة هوية/جواز سفر الشركاء
+	document_b84500235f	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+صورة واضحة للعلامة / الشعار
+	document_5eb4193ba1	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+عقد إيجار ساري أو سند ملكية
+	document_1c40b3e58a	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+عقد التمويل أو اتفاقية الرهن (إن وجدت)
+	document_5c2f8f95d1	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+عقد ونظام الشركة المعدلان أو النماذج المعتمدة
+	document_39a02bfad7	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+عقد/نظام معدل أو النموذج المعتمد
+	document_ec8d545fbf	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+عقد/وثائق تحويل الحصص
+	document_e6d6a52927	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+قرار/طلب الشطب أو التصفية موقع حسب الأصول
+	document_f0fbb87902	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+كتاب أو موافقة فك الرهن من الجهة المرتهنة
+	document_d2024a06a1	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+كتاب تفويض من الشركة
+	document_5ca1add6b9	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات
+	document_cdd8ce3328	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة
+	document_cb35245bcf	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+مخطط أراضٍ
+	cadastral_map	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+مخطط أراضٍ إن وجد
+	document_0cc19c2317	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+مخطط موقع تنظيمي
+	document_3775124a52	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+مستند يبرر استخدام اسم خاص/أجنبي
+	document_1b1707d621	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+مستندات داعمة للتعديل
+	document_56caf9c71a	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقات الجهات المختصة
+	document_04defb9ccb	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقات الجهات المختصة بالنشاط
+	document_3df268a71b	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقات مسبقة على الغايات/الأنشطة
+	document_a7c41b216c	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقات مسبقة على الغاية الجديدة
+	document_cc8affb2cc	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقات/قرارات الشركاء على التصفية والتقرير النهائي
+	document_652dd91fc4	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+موافقة مالك العقار
+	document_5375b03f66	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+هوية الأطراف المعنية بالتعديل
+	document_bb343bc1a7	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+هوية شخصية
+	national-id	صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وثائق الحصص العينية
+	document_d6f5694849	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وثائق الشركة الأجنبية مصدقة ومترجمة
+	document_6a5fef1088	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وثائق المستفيد الحقيقي
+	document_bf9b841bf1	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وثائق نقل الملكية ونماذج التنازل/النقل
+	document_fb697280d9	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وكالة عدلية
+	document_af883d59b3	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وكالة عدلية أو تفويض خطي
+	legal_authorization	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وكالة قانونية (إن وجدت)
+	legal_power_of_attorney	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف
+
+
+وكالة قانونية إن وجدت
+	document_e95445e836	ملف Word DOC، ملف Word DOCX، صورة JPEG، صورة JPG، ملف PDF، صورة PNG	10 MB	0	نشط	
+تعديل
+حذف

@@ -1,5 +1,5 @@
 import { ClipboardCheck, FolderKanban, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DataTable from '../../components/DataTable'
 import PageHeader from '../../components/PageHeader'
@@ -10,18 +10,42 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 
-const PAGE_SIZE = 20
-const ACTION_NEEDED = ['UNDER_REVIEW', 'WAITING_CUSTOMER', 'NEW']
-const IN_EXECUTION = ['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITING_PROVIDER']
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false, statusCounts: null }
 
 function OrdersManagementPage() {
   const { language, isArabic } = useLanguage()
-  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getAdminOrders(), [], [])
+  // The table pages on the server: every request is reachable, and the chip,
+  // the search and the chip counts are answered over all rows, not one page.
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  useEffect(() => {
+    const next = searchInput.trim()
+    if (next === search) return undefined
+    const timer = setTimeout(() => {
+      setSearch(next)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput, search])
+  const { data: pageData, loading, error, reload } = useAsyncData(
+    () => api.getAdminOrdersPage({ page, statusGroup: statusFilter, search }),
+    [page, statusFilter, search],
+    EMPTY_PAGE,
+  )
+  const rows = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  useEffect(() => {
+    // The last row of the last page went away: go back to a page that exists.
+    if (error?.response?.status === 404 && page > 1) setPage((current) => Math.max(1, current - 1))
+  }, [error, page])
 
-  const list = useMemo(() => (Array.isArray(orders) ? orders : []), [orders])
   const notSet = isArabic ? 'غير محددة' : 'Not set'
   const unavailable = isArabic ? 'غير متاح' : 'Unavailable'
   const unassigned = isArabic ? 'غير معيّن' : 'Unassigned'
@@ -33,33 +57,8 @@ function OrdersManagementPage() {
     { key: 'completed', label: isArabic ? 'مكتملة' : 'Completed' },
   ]
 
-  const counts = useMemo(() => ({
-    all: list.length,
-    action: list.filter((o) => ACTION_NEEDED.includes(String(o.status).toUpperCase())).length,
-    execution: list.filter((o) => IN_EXECUTION.includes(String(o.status).toUpperCase())).length,
-    completed: list.filter((o) => ['COMPLETED', 'DELIVERED', 'CLOSED'].includes(String(o.status).toUpperCase())).length,
-  }), [list])
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return list
-      .filter((order) => {
-        const s = String(order.status).toUpperCase()
-        if (statusFilter === 'action') return ACTION_NEEDED.includes(s)
-        if (statusFilter === 'execution') return IN_EXECUTION.includes(s)
-        if (statusFilter === 'completed') return ['COMPLETED', 'DELIVERED', 'CLOSED'].includes(s)
-        return true
-      })
-      .filter((order) => {
-        if (!q) return true
-        return [order.order_number, order.customer?.full_name, order.service?.name_ar, order.service?.name_en, order.assigned_provider?.full_name, order.city]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(q))
-      })
-  }, [list, search, statusFilter])
-
-  const total = filtered.length
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  // Counts come from the server (same scope and search as the list).
+  const counts = pageData?.statusCounts || {}
 
   const columns = [
     { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink">#{row.order_number}</span> },
@@ -92,10 +91,10 @@ function OrdersManagementPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          { icon: ClipboardCheck, label: isArabic ? 'إجمالي الطلبات' : 'Total requests', value: counts.all },
-          { icon: Search, label: isArabic ? 'يحتاج إجراء' : 'Action needed', value: counts.action, warn: true },
-          { icon: ShieldCheck, label: isArabic ? 'قيد التنفيذ' : 'In execution', value: counts.execution },
-          { icon: TriangleAlert, label: isArabic ? 'مكتملة' : 'Completed', value: counts.completed },
+          { icon: ClipboardCheck, label: isArabic ? 'إجمالي الطلبات' : 'Total requests', value: counts.all ?? 0 },
+          { icon: Search, label: isArabic ? 'يحتاج إجراء' : 'Action needed', value: counts.action ?? 0, warn: true },
+          { icon: ShieldCheck, label: isArabic ? 'قيد التنفيذ' : 'In execution', value: counts.execution ?? 0 },
+          { icon: TriangleAlert, label: isArabic ? 'مكتملة' : 'Completed', value: counts.completed ?? 0 },
         ].map(({ icon: Icon, label, value, warn }) => (
           <div className={`glass-panel p-4 ${warn && value ? 'ring-1 ring-amber-200' : ''}`} key={label}>
             <div className="flex items-center gap-3">
@@ -113,7 +112,8 @@ function OrdersManagementPage() {
         columns={columns}
         emptyDescription={isArabic ? 'ستظهر هنا الطلبات عند توفرها أو بعد تعديل البحث والتصفية.' : 'Requests will appear here, or after adjusting the search and filters.'}
         emptyTitle={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
-        error={error}
+        ariaLabel={isArabic ? 'جدول الطلبات' : 'Requests table'}
+        error={error?.response?.status === 404 ? null : error}
         loading={loading}
         onRetry={reload}
         mobileCard={(row) => (
@@ -130,8 +130,8 @@ function OrdersManagementPage() {
             <Link className="btn-secondary w-full" to={`/admin/orders/${row.id}`}>{isArabic ? 'فتح الطلب' : 'Open request'}</Link>
           </div>
         )}
-        pagination={{ page, pageSize: PAGE_SIZE, total, onChange: setPage }}
-        rows={paginated}
+        pagination={{ page, pageSize, total, onChange: setPage }}
+        rows={rows}
         toolbar={
           <div className="space-y-3">
             <div className="relative">
@@ -139,9 +139,10 @@ function OrdersManagementPage() {
               <input
                 aria-label={isArabic ? 'بحث في الطلبات' : 'Search requests'}
                 className="field ps-9 text-sm"
-                onChange={(event) => { setSearch(event.target.value); setPage(1) }}
+                onChange={(event) => setSearchInput(event.target.value)}
                 placeholder={isArabic ? 'ابحث برقم الطلب أو العميل أو الخدمة أو المزوّد' : 'Search by request number, customer, service or provider'}
-                value={search}
+                type="search"
+                value={searchInput}
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -154,7 +155,7 @@ function OrdersManagementPage() {
                   type="button"
                 >
                   {item.label}
-                  <span className={statusFilter === item.key ? 'text-white/80' : 'text-slate-400'}>{counts[item.key] ?? 0}</span>
+                  <span className={statusFilter === item.key ? 'text-white' : 'text-slate-600'}>{counts[item.key] ?? 0}</span>
                 </button>
               ))}
             </div>

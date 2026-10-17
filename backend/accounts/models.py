@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 
+from accounts.validators import normalize_phone
 from core.choices import UserRole
 from core.models import SoftDeleteModel
 
@@ -139,6 +140,11 @@ class CustomUser(SoftDeleteModel, AbstractBaseUser, PermissionsMixin):
     def clean(self):
         if self.email:
             self.email = self.__class__.objects.normalize_email(self.email)
+        # One canonical phone identity (owner phone policy). A legacy value that
+        # cannot be normalized is left as it is; `normalize_phones` reports it.
+        canonical = normalize_phone(self.phone)
+        if canonical:
+            self.phone = canonical
         if self.role == self.Role.PROVIDER and not self.phone:
             raise ValidationError({"phone": "Provider accounts require a phone number."})
 

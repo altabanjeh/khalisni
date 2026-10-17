@@ -622,6 +622,10 @@ class OrderStatusLog(models.Model):
 
     note = models.TextField(blank=True)
 
+    # Code of a system-written note (orders/system_events.py) so screens can
+    # render it in their language; empty for text a person typed.
+    system_event = models.CharField(max_length=64, blank=True, default="")
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
@@ -639,6 +643,13 @@ class OrderStatusLog(models.Model):
 
     def __str__(self):
         return f"{self.order} | {self.old_status} -> {self.new_status}"
+
+    def save(self, *args, **kwargs):
+        if not self.system_event:
+            from orders.system_events import system_event_for_note
+
+            self.system_event = system_event_for_note(self.note)[0]
+        super().save(*args, **kwargs)
 
 
 class OrderNote(SoftDeleteModel):
@@ -939,3 +950,60 @@ class MissingDocumentRequest(models.Model):
 
     def __str__(self):
         return f"MissingDocRequest #{self.pk} for {self.order_id} ({len(self.document_types)} types)"
+
+
+class OrderConsentQuerySet(models.QuerySet):
+    """Refuses the bulk paths that skip ``OrderConsent.save()``/``delete()``."""
+
+    def update(self, **kwargs):
+        raise ValidationError("Consent evidence is append-only and cannot be changed.")
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError("Consent evidence is append-only and cannot be changed.")
+
+    def delete(self):
+        raise ValidationError("Consent evidence is append-only and cannot be deleted.")
+
+    delete.alters_data = True
+    delete.queryset_only = True
+    update.alters_data = True
+
+
+class OrderConsent(models.Model):
+    """Append-only evidence that the customer accepted the order consent statement.
+
+    Rows are written once at order submission and never edited or deleted.
+    Orders submitted before this table existed have no row: their consent is
+    unknown and is not reconstructed (see ``orders/consent.py``).
+    """
+
+    consent_id = models.BigAutoField(primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="consents")
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="order_consents")
+    accepted = models.BooleanField()
+    consent_version = models.CharField(max_length=64)
+    consent_text = models.TextField(blank=True)
+    language = models.CharField(max_length=8, blank=True)
+    source = models.CharField(max_length=16)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = OrderConsentQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["created_at", "consent_id"]
+        indexes = [models.Index(fields=["order", "created_at"])]
+        # Related managers and Django's internal lookups use the base manager;
+        # pointing it at the guarded manager closes the ``_base_manager`` path.
+        base_manager_name = "objects"
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None and not self._state.adding:
+            raise ValidationError("Consent evidence is append-only and cannot be changed.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Consent evidence is append-only and cannot be deleted.")
+
+    @property
+    def id(self):
+        return self.pk

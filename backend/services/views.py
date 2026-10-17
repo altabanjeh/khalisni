@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from audit.utils import create_audit_log
 from config.permissions import PlatformRecordWriteMixin, CanManageServicePrices, CanManageServiceRelations, CanViewOrManageServiceCatalog
 from core.delete_guard import AdminDeleteGuardMixin
-from organizations.selectors import can_administer_organization, has_scoped_memberships, active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
+from organizations.selectors import resolve_organization_by_ref, can_administer_organization, has_scoped_memberships, active_memberships_for_user, enforce_organization_scope, is_partner_admin, is_platform_super_admin
 from services.models import (
     Address,
     RequiredDocumentDefinition,
@@ -26,6 +26,7 @@ from services.selectors import (
     resolve_service_organization_from_request,
     visible_service_categories_queryset,
     visible_services_queryset,
+    service_counts,
 )
 from services.serializers import (
     AddressAdminSerializer,
@@ -215,12 +216,25 @@ class ServiceAdminViewSet(AdminDeleteGuardMixin, AdminAuditMixin, viewsets.Model
             queryset = queryset.filter(category_id=category_id)
         if active is not None:
             queryset = queryset.filter(is_active=active)
-        return queryset
+        # With include_deleted, is_deleted narrows the list on the server so a
+        # paginated "deleted only" view counts and pages correctly (audit B10-6).
+        deleted = _as_bool(self.request.query_params.get("is_deleted"))
+        if deleted is not None and _include_deleted(self.request):
+            queryset = queryset.filter(is_deleted=deleted)
+        # Unique tiebreak: equal names must not move between pages.
+        return queryset.order_by("display_order", "name_ar", "pk")
 
     def get_serializer_class(self):
         if self.action in {"list", "retrieve"}:
             return AdminServiceRuleSerializer
         return AdminServiceRuleSerializer
+
+    @action(detail=False, methods=["get"])
+    def counts(self, request):
+        """Total / active / published / visible-to-customer counts, computed by the same filters the API uses."""
+        scoped = enforce_organization_scope(Service.objects.all(), user=request.user, organization_field="organization")
+        organization = resolve_organization_by_ref(request.query_params.get("organization"))
+        return Response({**service_counts(scoped, organization=organization), "customer_scope": getattr(organization, "slug", None) or "platform"})
 
     def _assert_tenant_boundary(self, serializer):
         """An organization-scoped editor manages only that organization's own services."""
@@ -464,7 +478,9 @@ class RequiredDocumentAdminViewSet(PlatformRecordWriteMixin, AdminDeleteGuardMix
             queryset = queryset.filter(service_id=service_id)
         if active is not None:
             queryset = queryset.filter(is_active=active)
-        return queryset
+        # Model order plus a unique tiebreak, so reading every page returns
+        # each rule exactly once (audit B10-6).
+        return queryset.order_by(*ServiceRequiredDocument._meta.ordering, "pk")
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

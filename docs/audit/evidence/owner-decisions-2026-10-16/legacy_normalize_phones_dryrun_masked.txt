@@ -1,0 +1,18 @@
+normalize  user#1: 0790****01 -> +962*******01 orders=0 guest=no
+normalize  user#2: 0790****02 -> +962*******02 orders=4 guest=no
+normalize  user#3: 0790****03 -> +962*******03 orders=0 guest=no
+normalize  user#4: 0790****04 -> +962*******04 orders=0 guest=no
+normalize  user#5: 0799****01 -> +962*******01 orders=0 guest=no
+normalize  user#6: 0799****02 -> +962*******02 orders=0 guest=no
+normalize  user#7: 0799****01 -> +962*******01 orders=0 guest=no
+normalize  user#8: 0799****02 -> +962*******02 orders=0 guest=no
+normalize  user#9: 0799****03 -> +962*******03 orders=1 guest=yes
+normalize  user#10: 0799****01 -> +962*******01 orders=0 guest=no
+normalize  user#11: 0799****02 -> +962*******02 orders=0 guest=no
+normalize  user#12: 0799****03 -> +962*******03 orders=1 guest=yes
+normalize  user#13: 0793****99 -> +962*******99 orders=0 guest=no
+normalize  missing_service_request#1: 0790****99 -> +962*******99
+Summary:
+  missing_service_request  normalize  1
+  user                     normalize  13
+Dry run: nothing was changed.

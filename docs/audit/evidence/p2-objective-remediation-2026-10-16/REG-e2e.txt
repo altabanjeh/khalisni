@@ -1,0 +1,293 @@
+
+Running 78 tests using 1 worker
+
+[1/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /
+[2/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /services
+[3/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /track-order
+[4/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /login
+[5/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /register
+[6/78] [desktop-1440] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /faq
+[7/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer
+[8/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders
+[9/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders/new
+[10/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/profile
+[11/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee
+[12/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/orders
+[13/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify
+[14/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/reports
+[15/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin
+[16/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders
+[17/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/services
+[18/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/service-categories
+[19/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/users
+[20/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/providers
+[21/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider
+[22/78] [desktop-1440] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider/orders
+[23/78] [desktop-1440] › e2e\client-audit-acceptance.spec.js:12:1 › fresh client audit request completes through customer, employee, and provider
+[24/78] [desktop-1440] › e2e\client-audit-acceptance.spec.js:221:1 › published CMS content appears on the public homepage and its admin preview
+[25/78] [desktop-1440] › e2e\client-audit-idempotency.spec.js:11:1 › valid multipart retry creates one logical order and rejects changed payload under the same key
+[26/78] [desktop-1440] › e2e\client-audit-idempotency.spec.js:56:1 › customer draft survives refresh and rapid final submit creates one order
+[27/78] [desktop-1440] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic
+[28/78] [desktop-1440] › e2e\client-audit-role-reentry.spec.js:13:1 › each QA role can log in, refresh, log out and re-enter in an isolated session
+[29/78] [desktop-1440] › e2e\client-audit-ux.spec.js:9:1 › mobile work header keeps secondary controls in its menu
+[30/78] [desktop-1440] › e2e\client-audit-ux.spec.js:30:1 › search results and localized tracking action are visible on mobile
+[31/78] [desktop-1440] › e2e\client-audit-ux.spec.js:71:1 › contact form confirms a stored inquiry
+[32/78] [desktop-1440] › e2e\hardening-access.spec.js:10:1 › logged-out, cross-account, guessed-id and stale-session access fail closed
+[33/78] [desktop-1440] › e2e\hardening-closure.spec.js:33:1 › customer order details are complete in English and Arabic with no internal identifiers
+[34/78] [desktop-1440] › e2e\hardening-closure.spec.js:68:1 › staff rejection needs a written reason and irreversible actions ask first
+[35/78] [desktop-1440] › e2e\p2-accessibility.spec.js:22:1 › employee verify queue: selected item text has enough contrast
+[36/78] [desktop-1440] › e2e\p2-accessibility.spec.js:33:1 › admin orders: active status filter chip count has enough contrast
+[37/78] [desktop-1440] › e2e\p2-accessibility.spec.js:46:1 › order timeline: stage and date text have enough contrast
+[38/78] [desktop-1440] › e2e\p2-accessibility.spec.js:55:1 › scrollable data table region is focusable and scrolls with the keyboard
+[39/78] [desktop-1440] › e2e\p2-accessibility.spec.js:76:1 › footer links meet the 24px minimum target size
+[40/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /
+[41/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /services
+[42/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /track-order
+[43/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /login
+[44/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /register
+[45/78] [mobile-390] › e2e\a11y.spec.js:13:3 › no serious accessibility violations: /faq
+[46/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer
+[47/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders
+[48/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/orders/new
+[49/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (customer) /customer/profile
+[50/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee
+[51/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/orders
+[52/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/documents/verify
+[53/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (employee) /employee/reports
+[54/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin
+[55/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/orders
+[56/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/services
+[57/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/service-categories
+[58/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/users
+[59/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (admin) /admin/providers
+[60/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider
+[61/78] [mobile-390] › e2e\axe-auth.spec.js:13:5 › axe (provider) /provider/orders
+[62/78] [mobile-390] › e2e\client-audit-acceptance.spec.js:12:1 › fresh client audit request completes through customer, employee, and provider
+[63/78] [mobile-390] › e2e\client-audit-acceptance.spec.js:221:1 › published CMS content appears on the public homepage and its admin preview
+[64/78] [mobile-390] › e2e\client-audit-idempotency.spec.js:11:1 › valid multipart retry creates one logical order and rejects changed payload under the same key
+[65/78] [mobile-390] › e2e\client-audit-idempotency.spec.js:56:1 › customer draft survives refresh and rapid final submit creates one order
+[66/78] [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic
+  1) [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic 
+
+    Error: missing did not render its page content
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('h1').first()
+    Expected: visible
+    Timeout: 12000ms
+    Error: element(s) not found
+
+    Call log:
+      - missing did not render its page content locator('h1').first() with timeout 12000ms
+      - waiting for locator('h1').first()
+
+
+      61 |       }, { token: role ? tokens[role] : null })
+      62 |       await page.goto(path, { waitUntil: 'domcontentloaded' })
+    > 63 |       await expect(page.locator('h1').first(), `${name} did not render its page content`).toBeVisible()
+         |                                                                                           ^
+      64 |       const metrics = await page.evaluate(() => ({
+      65 |         scrollWidth: document.documentElement.scrollWidth,
+      66 |         viewportWidth: document.documentElement.clientWidth,
+        at D:\ghassan\frontend\e2e\client-audit-responsive.spec.js:63:91
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-5.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-6.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-7.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-8.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #9: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-9.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #10: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-10.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #11: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-11.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #12: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-12.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #13: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-13.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #14: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-14.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #15: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-15.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #16: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-16.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #17: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-18.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #18: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-19.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #19: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-17.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #20: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-21.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #21: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-20.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #22: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-23.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #23: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-22.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #24: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-25.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #25: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-24.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #26: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-26.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #27: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-27.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #28: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-28.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #29: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-29.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #30: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-30.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #31: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-31.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #32: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-34.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #33: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-32.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #34: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-35.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #35: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-33.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #36: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-37.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #37: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-38.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #38: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-36.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #39: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-41.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #40: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-39.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #41: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-40.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #42: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-42.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #43: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-43.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #44: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-44.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #45: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\test-failed-45.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e-results\artifacts\client-audit-responsive-pu-8f592-hromium-viewports-in-Arabic-mobile-390\error-context.md
+
+
+[67/78] [mobile-390] › e2e\client-audit-role-reentry.spec.js:13:1 › each QA role can log in, refresh, log out and re-enter in an isolated session
+[68/78] [mobile-390] › e2e\client-audit-ux.spec.js:9:1 › mobile work header keeps secondary controls in its menu
+[69/78] [mobile-390] › e2e\client-audit-ux.spec.js:30:1 › search results and localized tracking action are visible on mobile
+[70/78] [mobile-390] › e2e\client-audit-ux.spec.js:71:1 › contact form confirms a stored inquiry
+[71/78] [mobile-390] › e2e\hardening-access.spec.js:10:1 › logged-out, cross-account, guessed-id and stale-session access fail closed
+[72/78] [mobile-390] › e2e\hardening-closure.spec.js:33:1 › customer order details are complete in English and Arabic with no internal identifiers
+[73/78] [mobile-390] › e2e\hardening-closure.spec.js:68:1 › staff rejection needs a written reason and irreversible actions ask first
+[74/78] [mobile-390] › e2e\p2-accessibility.spec.js:22:1 › employee verify queue: selected item text has enough contrast
+[75/78] [mobile-390] › e2e\p2-accessibility.spec.js:33:1 › admin orders: active status filter chip count has enough contrast
+[76/78] [mobile-390] › e2e\p2-accessibility.spec.js:46:1 › order timeline: stage and date text have enough contrast
+[77/78] [mobile-390] › e2e\p2-accessibility.spec.js:55:1 › scrollable data table region is focusable and scrolls with the keyboard
+[78/78] [mobile-390] › e2e\p2-accessibility.spec.js:76:1 › footer links meet the 24px minimum target size
+  1 failed
+    [mobile-390] › e2e\client-audit-responsive.spec.js:10:1 › public and role pages fit emulated Chromium viewports in Arabic 
+  2 skipped
+  75 passed (6.9m)

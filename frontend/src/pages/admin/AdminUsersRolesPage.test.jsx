@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event'
 import AdminUsersRolesPage from './AdminUsersRolesPage'
 import { api } from '../../api/services'
 
+// The users table reads one server page (release hardening: latent pagination).
+function mockAdminUsersPage(rows) {
+  return vi.spyOn(api, 'getAdminUsersPage').mockResolvedValue({ results: rows, count: rows.length, hasNext: false, hasPrevious: false })
+}
+
 const fullNamePlaceholder = 'الاسم الكامل'
 const emailPlaceholder = 'البريد الإلكتروني'
 const passwordPlaceholder = 'كلمة المرور'
@@ -36,7 +41,7 @@ const mockAvailablePermissions = {
 }
 
 test('admin users page can create a new user from the admin flow', async () => {
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue(mockUsers)
+  mockAdminUsersPage(mockUsers)
   const createUserSpy = vi.spyOn(api, 'createAdminUser').mockResolvedValue({ id: 9 })
 
   const user = userEvent.setup()
@@ -70,7 +75,7 @@ test('admin users page can create a new user from the admin flow', async () => {
 })
 
 test('admin can open permissions tab for an existing user and save permission changes', async () => {
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue(mockUsers)
+  mockAdminUsersPage(mockUsers)
   vi.spyOn(api, 'getAvailablePermissions').mockResolvedValue(mockAvailablePermissions)
   const setPermsSpy = vi.spyOn(api, 'setUserPermissions').mockResolvedValue({
     permissions: ['orders.assign_order'],
@@ -113,7 +118,7 @@ test('admin can open permissions tab for an existing user and save permission ch
 
 test('permissions tab shows empty state when user has no current permissions', async () => {
   const usersWithNoPerms = [{ ...mockUsers[0], current_permissions: [] }]
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue(usersWithNoPerms)
+  mockAdminUsersPage(usersWithNoPerms)
   vi.spyOn(api, 'getAvailablePermissions').mockResolvedValue(mockAvailablePermissions)
   vi.spyOn(api, 'setUserPermissions').mockResolvedValue({ permissions: [] })
 
@@ -142,7 +147,7 @@ test('permissions tab shows empty state when user has no current permissions', a
 })
 
 test('an organization admin creates a user inside the organization they administer', async () => {
-  vi.spyOn(api, 'getAdminUsers').mockResolvedValue([
+  mockAdminUsersPage([
     { ...mockUsers[0], role: 'employee', role_options: ['employee', 'provider'] },
   ])
   vi.spyOn(api, 'getMyMemberships').mockResolvedValue([

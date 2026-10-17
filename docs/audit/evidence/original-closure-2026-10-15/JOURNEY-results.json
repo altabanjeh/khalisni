@@ -1,0 +1,202 @@
+{
+ "id": 10,
+ "number": "KH-2026-000010",
+ "steps": [
+  {
+   "step": "B07 consent unchecked by default",
+   "result": "PASS",
+   "detail": "consent checkbox initial state"
+  },
+  {
+   "step": "1 customer submits valid request (UI wizard)",
+   "result": "PASS",
+   "detail": {
+    "number": "KH-2026-000010",
+    "id": 10
+   }
+  },
+  {
+   "step": "B07 double-click submit creates one order",
+   "result": "PASS",
+   "detail": {
+    "postRequests": 1,
+    "ordersCreated": 1
+   }
+  },
+  {
+   "step": "B07 refresh after submit creates no extra order",
+   "result": "PASS",
+   "detail": "reload on success page"
+  },
+  {
+   "step": "2 employee sees request in queue",
+   "result": "PASS",
+   "detail": "KH-2026-000010"
+  },
+  {
+   "step": "2b employee starts review (UI)",
+   "result": "PASS",
+   "detail": "UNDER_REVIEW"
+  },
+  {
+   "step": "3 employee requests missing document (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "WAITING_CUSTOMER",
+    "missing": [
+     "client-audit-qa-202610-authorization"
+    ]
+   }
+  },
+  {
+   "step": "4 customer receives in-app notification (bell)",
+   "result": "PASS",
+   "detail": "bell shows missing-doc notice for KH-2026-000010"
+  },
+  {
+   "step": "4b bell opens the correct missing-docs page",
+   "result": "PASS",
+   "detail": "http://127.0.0.1:4319/customer/orders/10/missing-docs"
+  },
+  {
+   "step": "5-6 customer uploads + resubmits (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "UNDER_REVIEW",
+    "url": "http://127.0.0.1:4319/customer/orders/10"
+   }
+  },
+  {
+   "step": "7-8 employee reviews/accepts document (UI)",
+   "result": "PASS",
+   "detail": {
+    "requirements_complete": true,
+    "documents": [
+     {
+      "document_type": "client-audit-qa-202610-authorization",
+      "name_ar": "تفويض تجريبي",
+      "name_en": "QA authorization",
+      "is_required": true,
+      "state": "approved",
+      "document_id": 13
+     }
+    ],
+    "blocking_reasons": []
+   }
+  },
+  {
+   "step": "9 eligible provider assigned (UI); readiness text shown before",
+   "result": "PASS",
+   "detail": {
+    "status": "ASSIGNED",
+    "readyTextShown": true,
+    "providerOptions": [
+     "اختر مزوّد الخدمة",
+     "QA Provider A — Amman ",
+     "QA Provider B — Amman "
+    ]
+   }
+  },
+  {
+   "step": "10 provider receives the request (list)",
+   "result": "PASS",
+   "detail": "KH-2026-000010"
+  },
+  {
+   "step": "11 provider opens it; internal note hidden",
+   "result": "PASS",
+   "detail": "provider detail"
+  },
+  {
+   "step": "12 provider updates progress (UI)",
+   "result": "PASS",
+   "detail": "IN_PROGRESS"
+  },
+  {
+   "step": "13 customer sees progress",
+   "result": "PASS",
+   "detail": "قيد التنفيذ"
+  },
+  {
+   "step": "14 internal note hidden from customer",
+   "result": "PASS",
+   "detail": {
+    "providerNameVisibleToCustomer": false
+   }
+  },
+  {
+   "step": "15 provider supplies final result (UI)",
+   "result": "PASS",
+   "detail": "READY_FOR_DELIVERY"
+  },
+  {
+   "step": "16a complete action visible to employee",
+   "result": "FAIL",
+   "detail": "button present"
+  },
+  {
+   "step": "16-17 required approval occurs and order COMPLETED (UI)",
+   "result": "FAIL",
+   "detail": {
+    "status": "READY_FOR_DELIVERY",
+    "finalDoc": {
+     "id": 14,
+     "status": "uploaded"
+    }
+   }
+  },
+  {
+   "step": "18 customer receives completion notification",
+   "result": "PASS",
+   "detail": "bell"
+  },
+  {
+   "step": "19 customer downloads final result (UI)",
+   "result": "PASS",
+   "detail": {
+    "dlName": "qa-valid.pdf"
+   }
+  },
+  {
+   "step": "20 reload and re-login preserve COMPLETED state",
+   "result": "PASS",
+   "detail": {
+    "reload": true,
+    "relogin": true
+   }
+  },
+  {
+   "step": "21 one order, no duplicate timeline/notifications",
+   "result": "FAIL",
+   "detail": {
+    "sameNum": 1,
+    "timeline": [
+     "NEW",
+     "UNDER_REVIEW",
+     "WAITING_CUSTOMER",
+     "UNDER_REVIEW",
+     "ASSIGNED",
+     "IN_PROGRESS",
+     "READY_FOR_DELIVERY"
+    ],
+    "notificationKeys": [
+     "order_ready_for_delivery",
+     "provider_completed_work",
+     "provider_started_work",
+     "provider_assigned",
+     "document_verified",
+     "document_verified",
+     "missing_documents_requested",
+     "order_under_review",
+     "order_submitted"
+    ],
+    "dupStatuses": [
+     "UNDER_REVIEW"
+    ],
+    "dupKeys": [
+     "document_verified"
+    ]
+   }
+  }
+ ]
+}

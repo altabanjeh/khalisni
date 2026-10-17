@@ -116,18 +116,47 @@ export function getServiceSchemaFields(service, language = 'ar') {
         placeholder: getCatalogText(field, { ar: 'placeholder_ar', en: 'placeholder_en' }, language, ''),
         helpText: getCatalogText(field, { ar: 'help_text_ar', en: 'help_text_en' }, language, ''),
         options: normalizeOptions(field.options || field.choices || field.values, language),
+        visibleWhen: normalizeVisibleWhen(field.visible_when),
       }
     })
     .filter(Boolean)
 }
 
+function normalizeVisibleWhen(condition) {
+  if (!condition || typeof condition !== 'object' || condition.field == null) return null
+  return { field: String(condition.field), equals: String(condition.equals ?? '') }
+}
+
+/**
+ * A field with `visible_when` is shown only while the field it names holds
+ * the expected answer (owner decision B10-1/2/3: parcel and basin numbers
+ * appear when the customer answers "yes" to "do you know them?"). A hidden
+ * field is neither required nor sent.
+ */
+export function isSchemaFieldVisible(field, schemaFields, values) {
+  if (!field?.visibleWhen) return true
+  const controller = schemaFields.find((candidate) => candidate.key === field.visibleWhen.field)
+  if (!controller || !isSchemaFieldVisible(controller, schemaFields, values)) return false
+  return String(values?.[controller.inputName] ?? '') === field.visibleWhen.equals
+}
+
+export function visibleSchemaFields(schemaFields, values) {
+  return schemaFields.filter((field) => isSchemaFieldVisible(field, schemaFields, values))
+}
+
 export function buildDynamicNotes(baseNotes, schemaFields, values) {
-  const extraLines = schemaFields
+  const extraLines = visibleSchemaFields(schemaFields, values)
     .map((field) => {
       const rawValue = values?.[field.inputName]
 
       if (field.type === 'checkbox') {
         return rawValue ? `${field.label}: نعم` : ''
+      }
+
+      if (field.type === 'select') {
+        // Staff read the answer as the customer saw it, not the option code.
+        const option = field.options.find((candidate) => candidate.value === String(rawValue ?? ''))
+        if (option) return `${field.label}: ${option.label}`
       }
 
       if (Array.isArray(rawValue)) {

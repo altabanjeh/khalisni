@@ -1,0 +1,63 @@
+{
+ "customer_a": {
+  "landing": "/customer",
+  "afterRefresh": "/customer",
+  "foreign": {
+   "/admin": "/",
+   "/employee/orders": "/",
+   "/provider/orders": "/"
+  },
+  "afterLogout": "/login",
+  "protectedAfterLogout": "/login",
+  "storageAfterLogout": [],
+  "relogin": "/customer",
+  "invalidTokenLandsOn": "/login"
+ },
+ "employee": {
+  "landing": "/employee",
+  "afterRefresh": "/employee",
+  "foreign": {
+   "/admin/users": "/",
+   "/provider": "/",
+   "/customer": "/"
+  },
+  "afterLogout": "/login",
+  "protectedAfterLogout": "/login",
+  "storageAfterLogout": [],
+  "relogin": "/employee",
+  "invalidTokenLandsOn": "/login"
+ },
+ "admin": {
+  "landing": "/admin",
+  "afterRefresh": "/admin",
+  "foreign": {
+   "/provider/orders": "/",
+   "/customer": "/"
+  },
+  "afterLogout": "/login",
+  "protectedAfterLogout": "/login",
+  "storageAfterLogout": [],
+  "relogin": "/admin",
+  "invalidTokenLandsOn": "/login"
+ },
+ "provider_a": {
+  "landing": "/provider",
+  "afterRefresh": "/provider",
+  "foreign": {
+   "/customer": "/",
+   "/admin/orders": "/",
+   "/employee": "/"
+  },
+  "afterLogout": "/login",
+  "protectedAfterLogout": "/login",
+  "storageAfterLogout": [],
+  "relogin": "/provider",
+  "invalidTokenLandsOn": "/login"
+ },
+ "inactive": {
+  "deactivate": 200,
+  "oldAccessTokenMe": 401,
+  "oldRefresh": 401,
+  "newLogin": 401
+ }
+}

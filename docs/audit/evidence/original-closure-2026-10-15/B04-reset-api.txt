@@ -1,0 +1,6 @@
+--- link_host: ["http://127.0.0.1:4319/reset-password"]
+--- mismatch: [400, {"confirm_new_password": ["Passwords do not match."]}]
+--- reset_ok: [200, {"detail": "Your password has been reset. You can now log in."}]
+--- reset_reuse: [400, {"detail": "This password reset link is invalid or has expired."}]
+--- login_new: "OK"
+--- login_old: "rejected"

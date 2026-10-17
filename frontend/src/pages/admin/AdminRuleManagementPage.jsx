@@ -22,6 +22,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getLocalizedField } from '../../utils/i18n'
+import { describeRule, getRoleLabel, getWorkflowActionLabel, getWorkflowChannelLabel, getWorkflowCheckLabel } from '../../utils/workflowPresentation'
 
 const SERVICE_TABS = [
   { id: 'services', icon: SlidersHorizontal },
@@ -137,7 +138,9 @@ const DOCUMENT_SIZE_OPTIONS = [1, 2, 5, 10, 15, 20].map((sizeInMb) => ({
   label: `${sizeInMb} MB`,
 }))
 const PAYMENT_STATUS_OPTIONS = ['pending', 'processing', 'paid', 'failed', 'cancelled', 'refunded', 'partially_refunded']
-const SYSTEM_SETTING_KEYS = ['site.homepage', 'site.contact']
+// Public contact details are edited only in the public-site content screen
+// (one runtime source); the old `site.contact` setting is retired.
+const SYSTEM_SETTING_KEYS = ['site.homepage']
 const SETTING_DEFINITIONS = {
   'site.homepage': {
     label: { ar: 'محتوى الصفحة الرئيسية', en: 'Homepage content' },
@@ -155,25 +158,6 @@ const SETTING_DEFINITIONS = {
         label: { ar: 'النص الداعم', en: 'Supporting text' },
         control: 'textarea',
         help_text: { ar: 'وصف داعم قصير أسفل العنوان.', en: 'Short supporting description below the title.' },
-      },
-    ],
-  },
-  'site.contact': {
-    label: { ar: 'بيانات التواصل', en: 'Contact details' },
-    help_text: { ar: 'بيانات التواصل العامة التي يستخدمها العملاء عند الحاجة للمساعدة.', en: 'Public contact details used by clients when they need help.' },
-    warning: { ar: 'تظهر التغييرات للعملاء فوراً.', en: 'Changes appear to clients immediately.' },
-    fields: [
-      {
-        key: 'phone',
-        label: { ar: 'رقم الهاتف', en: 'Phone number' },
-        control: 'text',
-        help_text: { ar: 'رقم هاتف دعم العملاء الظاهر للجمهور.', en: 'Visible customer support phone number.' },
-      },
-      {
-        key: 'email',
-        label: { ar: 'البريد الإلكتروني', en: 'Email address' },
-        control: 'email',
-        help_text: { ar: 'بريد دعم العملاء الظاهر للجمهور.', en: 'Visible customer support email address.' },
       },
     ],
   },
@@ -242,6 +226,14 @@ function ToggleField({ label, help, checked, onChange }) {
 function SectionMessage({ message }) {
   if (!message) return null
   return <p className={`text-sm ${message.type === 'error' ? 'text-danger' : 'text-success'}`}>{message.text}</p>
+}
+
+const RULES_TABLE_PAGE_SIZE = 20
+
+function pageOf(rows, page) {
+  const lastPage = Math.max(1, Math.ceil(rows.length / RULES_TABLE_PAGE_SIZE))
+  const current = Math.min(page, lastPage)
+  return rows.slice((current - 1) * RULES_TABLE_PAGE_SIZE, current * RULES_TABLE_PAGE_SIZE)
 }
 
 function TabButton({ active, icon: Icon, label, onClick }) {
@@ -319,6 +311,10 @@ function AdminRuleManagementPage() {
   }
 
   const [activeTab, setActiveTab] = useState('services')
+  // Services and document rules are loaded in full (every server page) and
+  // paged here, so nothing past the first 20 rows is hidden (audit B10-6).
+  const [servicesTablePage, setServicesTablePage] = useState(1)
+  const [documentsTablePage, setDocumentsTablePage] = useState(1)
   const [feedback, setFeedback] = useState({})
   const [confirmState, setConfirmState] = useState({
     open: false,
@@ -874,7 +870,11 @@ function AdminRuleManagementPage() {
     { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
     { key: 'category_name', label: tx('التصنيف', 'Category') },
     { key: 'base_price', label: tx('السعر الأساسي', 'Base price'), render: (row) => formatPriceWithCurrency(row.base_price) },
-    { key: 'duration_display', label: tx('المدة التقديرية', 'Estimated duration') },
+    {
+      key: 'duration_display',
+      label: tx('المدة التقديرية', 'Estimated duration'),
+      render: (row) => (isArabic ? row.duration_display_ar : row.duration_display_en) || row.duration_display || '—',
+    },
     { key: 'provider_required', label: tx('يتطلب مزوداً', 'Provider required'), render: (row) => (row.provider_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'requires_manual_review', label: tx('مراجعة الموظف', 'Employee review'), render: (row) => (row.requires_manual_review ? tx('مطلوبة', 'Required') : tx('غير مطلوبة', 'Not required')) },
     { key: 'is_active', label: tx('الحالة', 'Status'), render: (row) => (row.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive')) },
@@ -989,12 +989,15 @@ function AdminRuleManagementPage() {
     },
   ]
 
+  // Rule metadata comes from the server as codes; present it in the screen
+  // language. The rules themselves are read-only here.
+  const listSeparator = isArabic ? '، ' : ', '
   const workflowColumns = [
-    { key: 'summary', label: tx('القاعدة', 'Rule') },
-    { key: 'action', label: tx('الإجراء', 'Action') },
-    { key: 'channel', label: tx('مسار الإجراء', 'Action route'), render: (row) => row.channel === 'status' ? tx('تحديث الحالة', 'Status update') : row.channel === 'provider_status' ? tx('تحديث المزوّد', 'Provider update') : tx('إجراء مخصص', 'Dedicated action') },
-    { key: 'validation_checks', label: tx('الشروط', 'Checks'), render: (row) => row.validation_checks?.join(', ') || tx('لا توجد شروط إضافية', 'No additional checks') },
-    { key: 'allowed_role_labels', label: tx('من يمكنه التنفيذ', 'Who can do it'), render: (row) => row.allowed_role_labels.join(', ') },
+    { key: 'summary', label: tx('القاعدة', 'Rule'), render: (row) => describeRule(row, language) },
+    { key: 'action', label: tx('الإجراء', 'Action'), render: (row) => getWorkflowActionLabel(row.action, language) },
+    { key: 'channel', label: tx('مسار الإجراء', 'Action route'), render: (row) => getWorkflowChannelLabel(row.channel, language) },
+    { key: 'validation_checks', label: tx('الشروط', 'Checks'), render: (row) => (row.validation_checks || []).map((check) => getWorkflowCheckLabel(check, language)).join(listSeparator) || tx('لا توجد شروط إضافية', 'No additional checks') },
+    { key: 'allowed_role_labels', label: tx('من يمكنه التنفيذ', 'Who can do it'), render: (row) => (row.allowed_roles || []).map((role) => getRoleLabel(role, language)).join(listSeparator) },
     { key: 'reason_required', label: tx('يتطلب سبباً', 'Reason required'), render: (row) => (row.reason_required ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'notification_trigger', label: tx('يرسل إشعاراً', 'Sends notification'), render: (row) => (row.notification_trigger ? tx('نعم', 'Yes') : tx('لا', 'No')) },
     { key: 'change_request_supported', label: tx('تعديل مباشر', 'Direct edit'), render: () => tx('غير مسموح', 'Not allowed') },
@@ -1156,10 +1159,13 @@ function AdminRuleManagementPage() {
             </button>
           </div>
           <DataTable
+            ariaLabel={tabLabels.services}
             columns={serviceColumns}
             emptyDescription={tx('أنشئ أول خدمة لبدء استقبال الطلبات.', 'Create the first service to start taking orders.')}
             emptyTitle={tx('لا توجد خدمات', 'No services found')}
-            rows={services}
+            loading={servicesLoading}
+            pagination={{ page: servicesTablePage, pageSize: RULES_TABLE_PAGE_SIZE, total: services.length, onChange: setServicesTablePage }}
+            rows={pageOf(services, servicesTablePage)}
           />
           <SectionMessage message={feedback.services} />
         </section>
@@ -1181,10 +1187,13 @@ function AdminRuleManagementPage() {
             </button>
           </div>
           <DataTable
+            ariaLabel={tabLabels.documents}
             columns={documentColumns}
             emptyDescription={tx('أضف أول قاعدة مستند لخدمة ما.', 'Add the first document rule for a service.')}
             emptyTitle={tx('لا توجد قواعد مستندات', 'No document rules found')}
-            rows={documents}
+            loading={documentsLoading}
+            pagination={{ page: documentsTablePage, pageSize: RULES_TABLE_PAGE_SIZE, total: documents.length, onChange: setDocumentsTablePage }}
+            rows={pageOf(documents, documentsTablePage)}
           />
           <SectionMessage message={feedback.documents} />
         </section>

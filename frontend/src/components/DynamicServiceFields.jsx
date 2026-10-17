@@ -1,24 +1,33 @@
-import { getServiceSchemaFields } from '../utils/serviceForms'
+import { getServiceSchemaFields, isSchemaFieldVisible } from '../utils/serviceForms'
 import { useLanguage } from '../context/LanguageContext'
 
-function DynamicServiceFields({ service, register, errors = {} }) {
+function DynamicServiceFields({ service, register, errors = {}, watch }) {
   const { language, isArabic } = useLanguage()
   const fields = getServiceSchemaFields(service, language)
+  const values = typeof watch === 'function' ? watch() : {}
 
   if (!fields.length) return null
 
   return (
     <div className="space-y-4">
       {fields.map((field) => {
+        if (!isSchemaFieldVisible(field, fields, values)) return null
         const requiredMessage = isArabic ? `الحقل ${field.label} مطلوب` : `${field.label} is required`
         const validationRules =
           field.type === 'checkbox'
             ? {
                 validate: field.required ? (value) => value || requiredMessage : undefined,
               }
-            : {
-                required: field.required ? requiredMessage : false,
-              }
+            : field.visibleWhen
+              ? {
+                  // Checked against the current answers: once the controlling
+                  // answer changes, a hidden field is no longer required.
+                  validate: (value, formValues) =>
+                    !field.required || !isSchemaFieldVisible(field, fields, formValues) || String(value ?? '').trim() !== '' || requiredMessage,
+                }
+              : {
+                  required: field.required ? requiredMessage : false,
+                }
 
         return (
           <div key={field.inputName}>

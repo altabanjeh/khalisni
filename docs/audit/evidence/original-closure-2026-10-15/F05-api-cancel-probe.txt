@@ -1,0 +1,4 @@
+generic status WAITING->UNDER_REVIEW (400, {'status': ['This transition is not available through the generic status endpoint.']})
+generic status WAITING->CANCELLED (400, {'status': ['This transition is not available through the generic status endpoint.']})
+dedicated cancel (admin) on WAITING_CUSTOMER order 1 (200, {'status': 'CANCELLED', 'reason': 'F05 audit probe - disposable env'})
+after CANCELLED

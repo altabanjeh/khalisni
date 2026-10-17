@@ -1,0 +1,16 @@
+Dumping database...
+Archiving media (customer documents, payment receipts, catalog images)...
+Recording what was captured...
+Backup written to backups/khalsni-20261016T215616Z
+backup_utc=20261016T215616Z
+release_commit=unknown
+media_files_archived=5
+media_files_live=5
+object_storage_bucket=none
+postgres=16.15
+orders=5
+documents=5
+users=5
+payments=0
+audit_logs=32
+migrations=115

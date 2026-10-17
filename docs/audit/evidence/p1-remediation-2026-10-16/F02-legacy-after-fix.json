@@ -1,0 +1,64 @@
+{
+ "customer": {
+  "statusBefore": "WAITING_CUSTOMER",
+  "flag": false,
+  "safeState": true,
+  "message": true,
+  "progress00": false,
+  "fileInputs": 0,
+  "resubmitButtons": 0,
+  "falseSuccess": false,
+  "nonGetRequests": [
+   "POST http://127.0.0.1:8020/api/customer/orders/1/documents/"
+  ],
+  "statusAfter": "WAITING_CUSTOMER"
+ },
+ "staff": {
+  "panelVisible": true,
+  "statusAfter": "UNDER_REVIEW",
+  "timeline": [
+   {
+    "from": "WAITING_CUSTOMER",
+    "to": "UNDER_REVIEW",
+    "by": "Admin",
+    "note": "Missing-document request recovered by staff: طلب قديم لا يحدد مستنداً قابلاً للرفع - تدقيق P1",
+    "at": "2026-10-16T10:51:33.596739+03:00"
+   }
+  ],
+  "audit": [
+   {
+    "action": "recover_missing_document_request_detail",
+    "old": {
+     "status": "WAITING_CUSTOMER",
+     "missing_document_types": [],
+     "open_requests": []
+    },
+    "new": {
+     "status": "UNDER_REVIEW",
+     "reason": "طلب قديم لا يحدد مستنداً قابلاً للرفع - تدقيق P1"
+    },
+    "at": "2026-10-16T10:51:33.598755+03:00"
+   },
+   {
+    "action": "recover_missing_document_request",
+    "old": {
+     "status": "WAITING_CUSTOMER"
+    },
+    "new": {
+     "status": "UNDER_REVIEW",
+     "note": "Missing-document request recovered by staff: طلب قديم لا يحدد مستنداً قابلاً للرفع - تدقيق P1"
+    },
+    "at": "2026-10-16T10:51:33.597738+03:00"
+   }
+  ],
+  "requestFormAfterRecovery": true
+ },
+ "newRequest": {
+  "status": "WAITING_CUSTOMER",
+  "missing": [
+   "national-id"
+  ],
+  "customerFileInputs": 1,
+  "afterCustomerUpload": "UNDER_REVIEW"
+ }
+}

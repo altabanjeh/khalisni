@@ -1,0 +1,12 @@
+PASS D02 service page shows the approved price wording :: "public service page"
+PASS D02 service page has no admin-panel wording :: "public service page"
+PASS D02 services list has no admin-panel wording :: "/services"
+PASS B10-1 question is a yes/no select :: ["اختر القيمة","نعم","لا"]
+PASS B10-2 parcel/basin hidden before an answer :: "hidden"
+PASS B10-3 help text says staff can assist :: "help text"
+PASS B10-2 "yes" shows parcel and basin as text inputs :: "text"
+PASS B10 leading zero kept in the parcel field :: "012"
+PASS B10-2 "no" hides parcel and basin :: "hidden after no"
+PASS B10-4 additional notes field present :: 1
+PASS B10-4 empty notes and hidden parcel/basin raise no required error :: ["*","*","*","المدينة مطلوبة","الحقل الاسم الكامل مطلوب","الحقل الرقم الوطني مطلوب","الحقل رقم الهاتف مطلوب","الحقل المنطقة مطلوب","الحقل المحافظة مطلوب"]
+SUMMARY 11/11 PASS

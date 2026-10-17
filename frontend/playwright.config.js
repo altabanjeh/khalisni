@@ -8,7 +8,11 @@ import { defineConfig, devices } from '@playwright/test'
  *     a built frontend yourself, then
  *       E2E_BASE_URL=http://127.0.0.1:4319 E2E_API_URL=http://127.0.0.1:8009 npm run e2e
  *  2. Managed servers (CI): leave E2E_BASE_URL unset and Playwright boots both
- *     (Django on 8009 with `seed_demo`, Vite preview on 4319) via `webServer`.
+ *     (Django on 8009, Vite preview on 4319) via `webServer`. The backend
+ *     command migrates and runs `seed_demo`; with E2E_QA_MODE=1 it also runs
+ *     `seed_client_audit_qa` on a fresh database file. Full suite, one command:
+ *       CI=1 E2E_QA_MODE=1 KHALSNI_QA_PASSWORD=<12+ chars> E2E_DB_PATH=<throwaway .sqlite3> npx playwright test
+ *     (docs/testing/E2E_SETUP.md).
  *
  * Uses the system Chrome (`channel: 'chrome'`) so no browser download is needed.
  */
@@ -19,6 +23,17 @@ const BASE_URL = process.env.E2E_BASE_URL || `http://127.0.0.1:${WEB_PORT}`
 const API_URL = process.env.E2E_API_URL || `http://127.0.0.1:${API_PORT}`
 const EXTERNAL = Boolean(process.env.E2E_BASE_URL)
 const QA_MODE = process.env.E2E_QA_MODE === '1'
+// QA runs start from an empty database so no result depends on an older run;
+// E2E_KEEP_DB=1 reuses the file, E2E_FRESH_DB=1 also empties it outside QA mode.
+const FRESH_DB = (QA_MODE || process.env.E2E_FRESH_DB === '1') && process.env.E2E_KEEP_DB !== '1'
+// The one setup the whole suite needs: schema, the demo accounts most specs
+// sign in with, and (QA mode) the client-audit fixtures.
+const SEED_COMMANDS = [
+  ...(FRESH_DB ? [`python -c "import os; p = os.environ['DJANGO_SQLITE_NAME']; os.path.exists(p) and os.remove(p)"`] : []),
+  'python manage.py migrate --noinput',
+  'python manage.py seed_demo',
+  ...(QA_MODE ? ['python manage.py seed_client_audit_qa --rebuild-owned'] : []),
+]
 
 export default defineConfig({
   testDir: './e2e',
@@ -62,8 +77,7 @@ export default defineConfig({
     : [
         {
           command:
-            `python manage.py migrate --noinput && python manage.py ${QA_MODE ? 'seed_client_audit_qa --rebuild-owned' : 'seed_demo'} && ` +
-            `python manage.py runserver 127.0.0.1:${API_PORT} --noreload`,
+            `${SEED_COMMANDS.join(' && ')} && python manage.py runserver 127.0.0.1:${API_PORT} --noreload`,
           cwd: '../backend',
           env: {
             POSTGRES_DB: '',

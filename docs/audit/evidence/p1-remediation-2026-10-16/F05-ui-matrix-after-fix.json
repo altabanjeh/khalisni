@@ -1,0 +1,297 @@
+{
+ "states": [
+  {
+   "order": "KH-2026-000004",
+   "status": "NEW",
+   "rules": [
+    "archive_order",
+    "start_review",
+    "cancel_order"
+   ],
+   "api": [
+    "archive_order:available",
+    "start_review:available",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [
+     "ARCHIVED",
+     "UNDER_REVIEW"
+    ],
+    "blocked": [],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000006",
+   "status": "UNDER_REVIEW",
+   "rules": [
+    "request_missing_documents",
+    "assign_provider",
+    "reject_order",
+    "cancel_order"
+   ],
+   "api": [
+    "request_missing_documents:available",
+    "assign_provider:blocked",
+    "reject_order:available",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": true,
+    "recovery": false,
+    "assign": false,
+    "reject": true,
+    "complete": false,
+    "statusOptions": [],
+    "blocked": [
+     "تعيين مزوّد الخدمة: لم تُرفع وتُعتمد جميع المستندات المطلوبة بعد."
+    ],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000005",
+   "status": "WAITING_CUSTOMER",
+   "rules": [
+    "resume_review",
+    "cancel_order"
+   ],
+   "api": [
+    "resume_review:blocked",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [],
+    "blocked": [
+     "استئناف المراجعة: بانتظار رفع العميل للمستندات: تفويض تجريبي."
+    ],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000007",
+   "status": "ASSIGNED",
+   "rules": [
+    "cancel_order"
+   ],
+   "api": [
+    "provider_start_work:blocked",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [],
+    "blocked": [
+     "بدء التنفيذ من مزوّد الخدمة: هذا الإجراء من صلاحية مزوّد الخدمة."
+    ],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000002",
+   "status": "IN_PROGRESS",
+   "rules": [
+    "mark_ready_for_delivery",
+    "reject_order",
+    "cancel_order"
+   ],
+   "api": [
+    "provider_pause_for_government:blocked",
+    "mark_ready_for_delivery:available",
+    "reject_order:available",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": true,
+    "complete": false,
+    "statusOptions": [],
+    "blocked": [
+     "انتظار جهة حكومية: هذا الإجراء من صلاحية مزوّد الخدمة."
+    ],
+    "indirect": [
+     "تجهيز النتيجة للتسليم: يتم عند رفع مزوّد الخدمة للنتيجة النهائية من بوابته."
+    ]
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000008",
+   "status": "READY_FOR_DELIVERY",
+   "rules": [
+    "return_to_internal_review",
+    "return_to_provider",
+    "complete_order",
+    "cancel_order"
+   ],
+   "api": [
+    "return_to_internal_review:available",
+    "return_to_provider:available",
+    "complete_order:available",
+    "cancel_order:available"
+   ],
+   "ui": {
+    "cancel": true,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": true,
+    "statusOptions": [
+     "UNDER_REVIEW",
+     "IN_PROGRESS"
+    ],
+    "blocked": [],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000003",
+   "status": "COMPLETED",
+   "rules": [
+    "reopen_order",
+    "archive_order"
+   ],
+   "api": [
+    "reopen_order:available",
+    "archive_order:available"
+   ],
+   "ui": {
+    "cancel": false,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [
+     "UNDER_REVIEW",
+     "ARCHIVED"
+    ],
+    "blocked": [],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000010",
+   "status": "CANCELLED",
+   "rules": [
+    "archive_order"
+   ],
+   "api": [
+    "archive_order:available"
+   ],
+   "ui": {
+    "cancel": false,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [
+     "ARCHIVED"
+    ],
+    "blocked": [],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  },
+  {
+   "order": "KH-2026-000006",
+   "status": "REJECTED",
+   "rules": [
+    "archive_order"
+   ],
+   "api": [
+    "archive_order:available"
+   ],
+   "ui": {
+    "cancel": false,
+    "requestDocs": false,
+    "recovery": false,
+    "assign": false,
+    "reject": false,
+    "complete": false,
+    "statusOptions": [
+     "ARCHIVED"
+    ],
+    "blocked": [],
+    "indirect": []
+   },
+   "mismatches": [],
+   "rawTextInUi": []
+  }
+ ],
+ "executed": [
+  {
+   "step": "NEW→UNDER_REVIEW via status form",
+   "order": "KH-2026-000010",
+   "result": "UNDER_REVIEW",
+   "expected": "UNDER_REVIEW",
+   "pass": true
+  },
+  {
+   "step": "UNDER_REVIEW→WAITING_CUSTOMER via request-documents form",
+   "order": "KH-2026-000010",
+   "result": "WAITING_CUSTOMER",
+   "expected": "WAITING_CUSTOMER",
+   "pass": true
+  },
+  {
+   "step": "WAITING_CUSTOMER→CANCELLED via cancel action",
+   "order": "KH-2026-000010",
+   "result": "CANCELLED",
+   "expected": "CANCELLED",
+   "pass": true
+  },
+  {
+   "step": "CANCELLED→ARCHIVED via status form",
+   "order": "KH-2026-000010",
+   "result": "ARCHIVED",
+   "expected": "ARCHIVED",
+   "pass": true
+  },
+  {
+   "step": "UNDER_REVIEW→REJECTED via reject action",
+   "order": "KH-2026-000006",
+   "result": "REJECTED",
+   "expected": "REJECTED",
+   "pass": true
+  }
+ ]
+}

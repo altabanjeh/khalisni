@@ -28,6 +28,11 @@ async function withTestValue(requester, testValue) {
   return requester()
 }
 
+// Test-mode stand-in for one server page: the whole mock list on page one.
+function mockPage(rows, extra = {}) {
+  return { results: rows, count: rows.length, hasNext: false, hasPrevious: false, ...extra }
+}
+
 function filterSoftDeleted(records, params = {}) {
   const status = String(params?.status || '').trim().toLowerCase()
   if (status === 'deleted') return records.filter((record) => record?.is_deleted)
@@ -134,16 +139,6 @@ const mockSystemSettings = [
       hero_subtitle: 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ù…Ù† Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯.',
     },
     description: 'Public homepage content blocks',
-    updated_at: '2026-05-01T09:00:00Z',
-  },
-  {
-    id: 2,
-    key: 'site.contact',
-    value: {
-      phone: '',
-      email: '',
-    },
-    description: 'Public contact information',
     updated_at: '2026-05-01T09:00:00Z',
   },
 ]
@@ -471,6 +466,8 @@ export const api = {
     }),
 
   getCustomerOrders: async () => withTestValue(() => ordersApi.getCustomerOrders(), mockCustomerOrders),
+  getCustomerOrdersPage: async (params = {}) =>
+    withTestValue(() => ordersApi.getCustomerOrdersPage(params), mockPage(mockCustomerOrders, { statusCounts: null })),
   getCustomerOrder: async (id) =>
     withTestValue(
       () => ordersApi.getCustomerOrder(id),
@@ -491,12 +488,14 @@ export const api = {
   completeEmployeeOrder: ordersApi.completeEmployeeOrder,
   cancelEmployeeOrder: ordersApi.cancelEmployeeOrder,
   getStaffDocuments: async (params = {}) => withTestValue(() => documentsApi.getStaffDocuments(params), mockDocuments),
+  getStaffDocumentsPage: async (params = {}) => withTestValue(() => documentsApi.getStaffDocumentsPage(params), mockPage(mockDocuments)),
   verifyStaffDocument: documentsApi.verifyStaffDocument,
   getDownloadToken: documentsApi.getDownloadToken,
   downloadDocumentWithToken: documentsApi.downloadDocumentWithToken,
 
   getAdminDashboard: async () => withTestValue(() => ordersApi.getAdminDashboard(), mockAdminDashboard),
   getAdminOrders: async () => withTestValue(() => ordersApi.getAdminOrders(), mockOrders),
+  getAdminOrdersPage: async (params = {}) => withTestValue(() => ordersApi.getAdminOrdersPage(params), mockPage(mockOrders, { statusCounts: null })),
   getAdminOrder: ordersApi.getAdminOrder,
   changeOrderStatus: ordersApi.changeOrderStatus,
   assignOrder: ordersApi.assignOrder,
@@ -505,8 +504,21 @@ export const api = {
   uploadAdminFinalDocument: documentsApi.uploadAdminFinalDocument,
   completeOrder: ordersApi.completeOrder,
   rejectOrder: ordersApi.rejectOrder,
+  cancelAdminOrder: ordersApi.cancelAdminOrder,
+  recoverMissingDocumentRequest: ordersApi.recoverMissingDocumentRequest,
 
   getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), filterSoftDeleted(mockServices, params)),
+  getAdminServiceCounts: async () => {
+    const alive = mockServices.filter((record) => !record?.is_deleted)
+    const active = alive.filter((record) => record?.is_active !== false)
+    return withTestValue(() => servicesApi.getAdminServiceCounts(), {
+      total: alive.length, active: active.length, published: active.length, customer_visible: active.length,
+    })
+  },
+  getAdminServicesPage: async (params = {}) => {
+    const rows = filterSoftDeleted(mockServices, params)
+    return withTestValue(() => servicesApi.getAdminServicesPage(params), { results: rows, count: rows.length, hasNext: false, hasPrevious: false })
+  },
   getAdminCategories: async (params = {}) => withTestValue(() => servicesApi.getAdminCategories(params), filterSoftDeleted(mockCategories, params)),
   reorderAdminCategories: servicesApi.reorderAdminCategories,
   getAdminServiceDocuments: async (params = {}) => withTestValue(() => servicesApi.getAdminServiceDocuments(params), filterSoftDeleted([], params)),
@@ -543,6 +555,7 @@ export const api = {
   deleteAdminService: servicesApi.deleteAdminService,
   restoreAdminService: async (id) => withTestValue(() => servicesApi.restoreAdminService(id), null),
   getAdminUsers: async (params = {}) => withTestValue(() => servicesApi.getAdminUsers(params), filterSoftDeleted(mockUsers, params)),
+  getAdminUsersPage: async (params = {}) => withTestValue(() => authApi.getAdminUsersPage(params), mockPage(filterSoftDeleted(mockUsers, params))),
   createAdminUser: servicesApi.createAdminUser,
   getMyMemberships: async () => withTestValue(() => servicesApi.getMyMemberships(), []),
   updateAdminUser: servicesApi.updateAdminUser,
@@ -665,6 +678,8 @@ export const api = {
     }),
 
   getProviders: async (params = {}) => withTestValue(() => providersApi.getProviders(params), filterSoftDeleted(mockProviderRecords, params)),
+  getProvidersPage: async (params = {}) =>
+    withTestValue(() => providersApi.getProvidersPage(params), mockPage(filterSoftDeleted(mockProviderRecords, params))),
   createProvider: providersApi.createProvider,
   updateProvider: providersApi.updateProvider,
   deleteProvider: async (id, payload = {}) =>
@@ -689,6 +704,7 @@ export const api = {
   updateProviderApproval: providersApi.updateProviderApproval,
   updateProviderActivation: providersApi.updateProviderActivation,
   getNotifications: async () => withTestValue(() => notificationsApi.getNotifications(), mockNotifications),
+  getNotificationsPage: async (params = {}) => withTestValue(() => notificationsApi.getNotificationsPage(params), mockPage(mockNotifications)),
   getNotificationCenter: async () => withTestValue(() => notificationsApi.getNotificationCenter(), mockNotificationCenter),
   getNotificationUnreadCount: async () =>
     withTestValue(
@@ -1002,6 +1018,8 @@ export const api = {
       provider: mockProviderRecords[0],
     }),
   getProviderOrders: async () => withTestValue(() => providersApi.getProviderOrders(), mockProviderOrders),
+  getProviderOrdersPage: async (params = {}) =>
+    withTestValue(() => providersApi.getProviderOrdersPage(params), mockPage(mockProviderOrders, { statusCounts: null })),
   getProviderOrder: providersApi.getProviderOrder,
   providerChangeStatus: providersApi.providerChangeStatus,
   providerAddNote: providersApi.providerAddNote,

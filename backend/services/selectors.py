@@ -17,15 +17,37 @@ def resolve_service_organization_from_request(request):
     return None
 
 
-def visible_services_queryset(*, organization=None):
-    base_queryset = Service.objects.filter(
+def published_services_queryset():
+    """Published: active, shown on the public site, in an active published category (count label "Published")."""
+    return Service.objects.filter(
         is_active=True,
         is_deleted=False,
         show_on_public_site=True,
         category__is_active=True,
         category__is_deleted=False,
         category__show_on_public_site=True,
-    ).select_related("category", "organization")
+    )
+
+
+def service_counts(queryset, *, organization=None):
+    """The four service counts with labelled meanings (audit B10-7).
+
+    ``queryset`` is the caller's scope of services. Each count is a subset of
+    the previous one: total (not deleted) >= active >= published >= visible to
+    the customer of ``organization`` (``None``: a platform customer).
+    """
+    alive = queryset.filter(is_deleted=False)
+    return {
+        "total": alive.count(),
+        "active": alive.filter(is_active=True).count(),
+        "published": alive.filter(pk__in=published_services_queryset().values("pk")).count(),
+        "customer_visible": alive.filter(pk__in=visible_services_queryset(organization=organization).values("pk")).count(),
+    }
+
+
+def visible_services_queryset(*, organization=None):
+    """Visible to a customer: published plus the organization's scope rules."""
+    base_queryset = published_services_queryset().select_related("category", "organization")
 
     # A platform customer has no partner-specific catalog configuration.
     # Keep global services visible after their first order links their profile

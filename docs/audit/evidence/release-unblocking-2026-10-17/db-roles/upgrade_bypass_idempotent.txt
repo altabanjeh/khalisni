@@ -1,0 +1,26 @@
+== bypass attempts after upgrade
+
+connected as: ('khalsni_app', False)
+consent row: 1 KH-2026-000005 True order-consent-web-v1 ar web
+UPDATE consent row: refused (IntegrityError: Consent evidence is append-only. UPDATE refused.)
+DELETE consent row: refused (IntegrityError: Consent evidence is append-only. DELETE refused.)
+ALTER TABLE DISABLE TRIGGER: refused (ProgrammingError: must be owner of table orders_orderconsent)
+ALTER TABLE DISABLE TRIGGER ALL: refused (ProgrammingError: must be owner of table orders_orderconsent)
+DROP TRIGGER: refused (ProgrammingError: must be owner of relation orders_orderconsent)
+DROP FUNCTION: refused (ProgrammingError: must be owner of function orders_orderconsent_append_only)
+TRUNCATE orders_orderconsent: refused (ProgrammingError: permission denied for table orders_orderconsent)
+DROP TABLE orders_orderconsent: refused (ProgrammingError: must be owner of table orders_orderconsent)
+ALTER TABLE add column: refused (ProgrammingError: must be owner of table orders_orderconsent)
+SET session_replication_role = replica: refused (ProgrammingError: permission denied to set parameter "session_replication_role")
+CREATE TABLE in public: refused (ProgrammingError: permission denied for schema public)
+ALTER ROLE self SUPERUSER: refused (ProgrammingError: permission denied to alter role)
+hard DELETE parent order: refused (IntegrityError: update or delete on table "orders_order" violates foreign key constraint "orders_orderstatuslog_orde)
+after: consent row intact: True order-consent-web-v1 1
+== second db-init run
+db_bootstrap: role khalsni_owner updated.
+db_bootstrap: role khalsni_app updated.
+db_bootstrap: 0 object(s) moved to khalsni_owner.
+db_bootstrap: DML grants for khalsni_app applied.
+  No migrations to apply.
+db_bootstrap: DML grants for khalsni_app applied.
+db-init: done.

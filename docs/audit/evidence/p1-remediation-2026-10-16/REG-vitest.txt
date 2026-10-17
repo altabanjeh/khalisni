@@ -1,0 +1,191 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/ghassan/frontend[39m
+
+ [32m✓[39m src/pages/customer/MissingDocumentsResponsePage.legacy.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[33m 468[2mms[22m[39m
+   [33m[2m✓[22m[39m legacy request with nothing to upload renders a safe blocked state [33m 341[2mms[22m[39m
+ [32m✓[39m src/pages/employee/EmployeeOrderReviewPage.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[33m 565[2mms[22m[39m
+   [33m[2m✓[22m[39m employee can start review for new orders from the review page [33m 368[2mms[22m[39m
+[90mstderr[2m | src/pages/provider/ProviderOrderDetailsPage.safety.test.jsx[2m > [22m[2man empty internal note is not sent
+[22m[39mError: AggregateError
+    at Object.dispatchError (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js:62:19)
+    at Request.<anonymous> (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js:655:18)
+    at Request.emit (node:events:521:24)
+    at ClientRequest.<anonymous> (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\helpers\http-request.js:127:14)
+    at ClientRequest.emit (node:events:509:28)
+    at emitErrorEvent (node:_http_client:109:11)
+    at Socket.socketErrorListener (node:_http_client:593:5)
+    at Socket.emit (node:events:509:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3) [90mundefined[39m
+
+ [32m✓[39m src/pages/public/HomePage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 822[2mms[22m[39m
+   [33m[2m✓[22m[39m homepage renders approved hero, real search, categories, and services [33m 476[2mms[22m[39m
+   [33m[2m✓[22m[39m homepage search shows live service suggestions [33m 343[2mms[22m[39m
+ [32m✓[39m src/pages/provider/ProviderOrderDetailsPage.safety.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 809[2mms[22m[39m
+   [33m[2m✓[22m[39m a rapid double click uploads the final result once [33m 612[2mms[22m[39m
+[90mstderr[2m | src/pages/customer/CustomerOrderDetailsPage.test.jsx[2m > [22m[2mcancelling asks first and a double click cancels once
+[22m[39mAn update to CustomerOrderDetailsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CustomerOrderDetailsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ToastProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/pages/customer/CustomerOrderDetailsPage.test.jsx[2m > [22m[2mcancelling asks first and a double click cancels once
+[22m[39mAn update to CustomerOrderDetailsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/pages/customer/CustomerOrderDetailsPage.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 660[2mms[22m[39m
+ [32m✓[39m src/pages/customer/MissingDocumentsResponsePage.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[33m 1062[2mms[22m[39m
+   [33m[2m✓[22m[39m missing documents flow uploads required document types from order details [33m 606[2mms[22m[39m
+   [33m[2m✓[22m[39m a second submit works after the server rejects the file with a `file` error [33m 342[2mms[22m[39m
+ [32m✓[39m src/pages/public/TrackOrderPage.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[33m 1834[2mms[22m[39m
+   [33m[2m✓[22m[39m entering a valid order number and phone shows the order status [33m 987[2mms[22m[39m
+   [33m[2m✓[22m[39m missing document tracking shows a localized name and a safe sign-in action [33m 747[2mms[22m[39m
+[90mstderr[2m | src/pages/employee/EmployeeOrderReviewPage.safety.test.jsx[2m > [22m[2ma refused note keeps what the reviewer typed
+[22m[39mError: AggregateError
+    at Object.dispatchError (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js:62:19)
+    at Request.<anonymous> (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js:655:18)
+    at Request.emit (node:events:521:24)
+    at ClientRequest.<anonymous> (D:\ghassan\frontend\node_modules\jsdom\lib\jsdom\living\helpers\http-request.js:127:14)
+    at ClientRequest.emit (node:events:509:28)
+    at emitErrorEvent (node:_http_client:109:11)
+    at Socket.socketErrorListener (node:_http_client:593:5)
+    at Socket.emit (node:events:509:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3) [90mundefined[39m
+
+ [32m✓[39m src/pages/admin/ProvidersManagementPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[33m 2143[2mms[22m[39m
+   [33m[2m✓[22m[39m providers management page can create a provider from the admin flow [33m 2141[2mms[22m[39m
+ [32m✓[39m src/pages/public/ContactPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 2438[2mms[22m[39m
+   [33m[2m✓[22m[39m contact form shows required fields and confirms only a persisted submission [33m 1375[2mms[22m[39m
+   [33m[2m✓[22m[39m contact form reports storage failure without a success claim [33m 1061[2mms[22m[39m
+ [32m✓[39m src/pages/admin/AdminOrderDetailsPage.test.jsx [2m([22m[2m7 tests[22m[2m)[22m[33m 2312[2mms[22m[39m
+   [33m[2m✓[22m[39m admin cancel needs a reason, calls the dedicated API and refreshes the order [33m 766[2mms[22m[39m
+   [33m[2m✓[22m[39m request-documents form appears only when allowed and sends configured types [33m 654[2mms[22m[39m
+   [33m[2m✓[22m[39m staff recovery panel appears for an unusable legacy request and is audited server-side [33m 562[2mms[22m[39m
+[90mstderr[2m | src/pages/employee/EmployeeOrderReviewPage.safety.test.jsx[2m > [22m[2mcompleting a request asks for confirmation first and submits once
+[22m[39mAn update to EmployeeOrderReviewPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to EmployeeOrderReviewPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ToastProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/pages/employee/EmployeeOrderReviewPage.safety.test.jsx[2m > [22m[2mcompleting a request asks for confirmation first and submits once
+[22m[39mAn update to EmployeeOrderReviewPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/pages/employee/EmployeeOrderReviewPage.safety.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[33m 2634[2mms[22m[39m
+   [33m[2m✓[22m[39m rejection needs a written reason and sends exactly that reason [33m 1478[2mms[22m[39m
+   [33m[2m✓[22m[39m a rapid double click saves an internal note once and disables the control meanwhile [33m 503[2mms[22m[39m
+   [33m[2m✓[22m[39m a refused note keeps what the reviewer typed [33m 427[2mms[22m[39m
+ [32m✓[39m src/pages/public/RegisterPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 2869[2mms[22m[39m
+   [33m[2m✓[22m[39m successful registration redirects to login with registered flag and pre-filled email [33m 1665[2mms[22m[39m
+   [33m[2m✓[22m[39m duplicate email shows field error [33m 1203[2mms[22m[39m
+ [32m✓[39m src/pages/admin/AdminUsersRolesPage.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[33m 3702[2mms[22m[39m
+   [33m[2m✓[22m[39m admin users page can create a new user from the admin flow [33m 1695[2mms[22m[39m
+   [33m[2m✓[22m[39m admin can open permissions tab for an existing user and save permission changes [33m 437[2mms[22m[39m
+   [33m[2m✓[22m[39m an organization admin creates a user inside the organization they administer [33m 1349[2mms[22m[39m
+ [32m✓[39m src/components/CatalogImageCards.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 293[2mms[22m[39m
+ [32m✓[39m src/pages/provider/ProviderOrderDetailsPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[33m 366[2mms[22m[39m
+   [33m[2m✓[22m[39m provider upload flow defaults final document type and hides invalid ready status action [33m 364[2mms[22m[39m
+ [32m✓[39m src/pages/public/LoginPage.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 4132[2mms[22m[39m
+   [33m[2m✓[22m[39m successful customer login redirects to customer dashboard [33m 1157[2mms[22m[39m
+   [33m[2m✓[22m[39m successful admin login redirects to admin portal [33m 653[2mms[22m[39m
+   [33m[2m✓[22m[39m login respects ?next= redirect parameter [33m 810[2mms[22m[39m
+   [33m[2m✓[22m[39m remember me stores tokens in localStorage only [33m 850[2mms[22m[39m
+   [33m[2m✓[22m[39m wrong credentials show error message [33m 659[2mms[22m[39m
+ [32m✓[39m src/pages/admin/ServiceProviderAssignmentsPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[33m 539[2mms[22m[39m
+   [33m[2m✓[22m[39m service provider assignments page can link a provider to a service [33m 534[2mms[22m[39m
+ [32m✓[39m src/pages/public/ServicesPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 302[2mms[22m[39m
+ [32m✓[39m src/pages/public/ServiceDetailsPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 404[2mms[22m[39m
+ [32m✓[39m src/components/NotificationPanel.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 361[2mms[22m[39m
+ [32m✓[39m src/pages/admin/ServicesManagementPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[33m 4847[2mms[22m[39m
+   [33m[2m✓[22m[39m services management page builds required information schema from visual fields [33m 4845[2mms[22m[39m
+ [32m✓[39m src/pages/public/ServiceCategoryPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 308[2mms[22m[39m
+ [32m✓[39m src/api/client.test.js [2m([22m[2m11 tests[22m[2m)[22m[32m 172[2mms[22m[39m
+ [32m✓[39m src/components/brand/KhalsniLogo.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 126[2mms[22m[39m
+ [32m✓[39m src/pages/admin/AdminRuleManagementPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 112[2mms[22m[39m
+ [32m✓[39m src/pages/customer/MyOrdersPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 148[2mms[22m[39m
+ [32m✓[39m src/pages/admin/AdminRuleManagementPage.workflow.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 236[2mms[22m[39m
+ [32m✓[39m src/pages/customer/orderDrafts.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/test/publicBranding.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/pages/public/NotFoundPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 129[2mms[22m[39m
+ [32m✓[39m src/components/StatusBadge.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m src/utils/serviceFormsErrors.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/api/clientHardening.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/pages/employee/EmployeeReportsPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32m✓[39m src/pages/public/CreateOrderPage.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 70[2mms[22m[39m
+ [32m✓[39m src/pages/public/PrivacyPolicyPage.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m src/utils/servicePresentation.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m37 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m [1m[32m111 passed[39m[22m[90m (111)[39m
+[2m   Start at [22m 10:46:23
+[2m   Duration [22m 12.96s[2m (transform 4.21s, setup 14.98s, collect 42.10s, tests 35.12s, environment 65.57s, prepare 11.16s)[22m
+

@@ -1,0 +1,116 @@
+{
+ "home": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "services": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "service": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "track": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "about": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "contact": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "faq": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "privacy": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "register": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "login": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "forgot": {
+  "title": "خلصني | Khalsni",
+  "dir": "rtl",
+  "overflowX": 0,
+  "console": [],
+  "latin": [
+   "English"
+  ]
+ },
+ "meta": {
+  "title": "خلصني | Khalsni",
+  "metas": [
+   "viewport=width=device-width, initial-scale=1.0",
+   "theme-color=#006BB9",
+   "apple-mobile-web-app-title=خلصني",
+   "application-name=خلصني",
+   "description=خلصني — منصة إلكترونية لإنجاز المعاملات الحكومية والإدارية من مكان واحد. Khalsni — a digital platform for government and administrative services."
+  ],
+  "footer": "خلصني منصة أردنية لتسهيل طلبات الخدمات الحكومية والإدارية ومتابعتها رقمياً.\n\nخدماتنا\nالخدمات\nطلب خاص\nروابط سريعة\nالرئيسية\nالخدمات\nتتبع الطلب\nالأسئلة الشائعة\nسياسة الخصوصية\nتواصل معنا\n+962 6 560 9000\nsupport@khalisni.local\n\nعمان - الشميساني، شارع الملكة نور، مبنى خلصني للخدمات\n\nجميع الحقوق محفوظة © 2026 خلصني",
+  "telLinks": [
+   "tel:+962 6 560 9000",
+   "mailto:support@khalisni.local"
+  ]
+ }
+}

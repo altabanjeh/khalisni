@@ -31,6 +31,7 @@ function DataTable({
   mobileCardClassName,
   error = null,
   onRetry,
+  ariaLabel,
 }) {
   const { direction, t } = useLanguage()
   const [isTableLayout, setIsTableLayout] = useState(() =>
@@ -115,8 +116,16 @@ function DataTable({
           ) : null}
 
           {isTableLayout ? (
-            <div className="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft" dir={direction} role="region">
-              <div className="max-h-[70vh] overflow-auto">
+            <div className="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-card shadow-soft" dir={direction}>
+              {/* The scrolling box takes keyboard focus so it can be scrolled
+                  without a mouse (WCAG 2.1.1; axe scrollable-region-focusable).
+                  The ring is inset because the frame clips outside shadows. */}
+              <div
+                aria-label={ariaLabel || t('common.dataTable', 'جدول البيانات')}
+                className="max-h-[70vh] overflow-auto outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
+                role="region"
+                tabIndex={0}
+              >
                 <table className="min-w-full divide-y divide-border text-sm">
                   <thead className="sticky top-0 z-10 bg-[var(--kh-surface-muted)] backdrop-blur">
                     <tr>

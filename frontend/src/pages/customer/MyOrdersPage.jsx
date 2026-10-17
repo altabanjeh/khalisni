@@ -1,8 +1,9 @@
 import { ClipboardList, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import LoadError from '../../components/LoadError'
 import PageHeader from '../../components/PageHeader'
+import Pagination from '../../components/Pagination'
 import RequestCard from '../../components/RequestCard'
 import { EmptyState, LoadingSkeleton } from '../../components/public/PublicPage'
 import { api } from '../../api/services'
@@ -10,19 +11,42 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { EMPTY_STATE_ILLUSTRATIONS } from '../../utils/catalogImagery'
 
-const PAGE_SIZE = 12
-const TERMINAL = new Set(['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED', 'CANCELLED', 'REJECTED'])
-
-function isActionRequired(order) {
-  return String(order.status).toUpperCase() === 'WAITING_CUSTOMER' || (order.missing_document_types?.length ?? 0) > 0
-}
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false, statusCounts: null }
 
 function MyOrdersPage() {
   const { isArabic } = useLanguage()
+  // Requests page on the server: every request is reachable, and the chip,
+  // the search and the chip counts are answered over all of them.
   const [query, setQuery] = useState('')
+  const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
-  const [visible, setVisible] = useState(PAGE_SIZE)
-  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getCustomerOrders(), [], [])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  useEffect(() => {
+    const next = query.trim()
+    if (next === search) return undefined
+    const timer = setTimeout(() => {
+      setSearch(next)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query, search])
+  const { data: pageData, loading, error, reload } = useAsyncData(
+    () => api.getCustomerOrdersPage({ page, statusGroup: filter, search }),
+    [page, filter, search],
+    EMPTY_PAGE,
+  )
+  const orders = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  const pageGone = error?.response?.status === 404 && page > 1
+  useEffect(() => {
+    // The last request of the last page went away: go back to a page that exists.
+    if (pageGone) setPage((current) => Math.max(1, current - 1))
+  }, [pageGone])
 
   const filters = [
     { key: 'all', label: isArabic ? 'الكل' : 'All' },
@@ -31,33 +55,8 @@ function MyOrdersPage() {
     { key: 'done', label: isArabic ? 'مكتملة' : 'Completed' },
   ]
 
-  const counts = useMemo(() => {
-    const list = Array.isArray(orders) ? orders : []
-    return {
-      all: list.length,
-      action: list.filter(isActionRequired).length,
-      active: list.filter((o) => !TERMINAL.has(String(o.status).toUpperCase()) && !isActionRequired(o)).length,
-      done: list.filter((o) => ['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'].includes(String(o.status).toUpperCase())).length,
-    }
-  }, [orders])
-
-  const filtered = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    return (Array.isArray(orders) ? orders : [])
-      .filter((order) => {
-        if (filter === 'action') return isActionRequired(order)
-        if (filter === 'active') return !TERMINAL.has(String(order.status).toUpperCase()) && !isActionRequired(order)
-        if (filter === 'done') return ['COMPLETED', 'DELIVERED', 'CLOSED', 'VERIFIED'].includes(String(order.status).toUpperCase())
-        return true
-      })
-      .filter((order) => {
-        if (!normalizedQuery) return true
-        return `${order.order_number} ${order.service?.name_ar || ''} ${order.service?.name_en || ''}`
-          .toLowerCase()
-          .includes(normalizedQuery)
-      })
-      .sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0))
-  }, [orders, query, filter])
+  // Counts come from the server (same search as the list), not from one page.
+  const counts = pageData?.statusCounts || {}
 
   return (
     <div className="space-y-6">
@@ -74,10 +73,8 @@ function MyOrdersPage() {
           <Search className="pointer-events-none absolute inset-inline-start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             className="field ps-9"
-            onChange={(event) => {
-              setQuery(event.target.value)
-              setVisible(PAGE_SIZE)
-            }}
+            aria-label={isArabic ? 'بحث في الطلبات' : 'Search requests'}
+            onChange={(event) => setQuery(event.target.value)}
             placeholder={isArabic ? 'ابحث برقم الطلب أو اسم الخدمة' : 'Search by request number or service'}
             value={query}
           />
@@ -94,7 +91,7 @@ function MyOrdersPage() {
               key={item.key}
               onClick={() => {
                 setFilter(item.key)
-                setVisible(PAGE_SIZE)
+                setPage(1)
               }}
               role="tab"
               type="button"
@@ -106,26 +103,20 @@ function MyOrdersPage() {
         </div>
       </section>
 
-      {loading ? (
+      {loading || pageGone ? (
         <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
           {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton className="h-64" key={index} />)}
         </div>
       ) : error ? (
         <LoadError error={error} onRetry={reload} title={isArabic ? 'تعذر تحميل طلباتك' : 'Could not load your requests'} />
-      ) : filtered.length ? (
+      ) : orders.length ? (
         <>
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18rem,22rem))]">
-            {filtered.slice(0, visible).map((order) => (
+            {orders.map((order) => (
               <RequestCard key={order.id} order={order} />
             ))}
           </div>
-          {filtered.length > visible ? (
-            <div className="flex justify-center">
-              <button className="btn-secondary" onClick={() => setVisible((current) => current + PAGE_SIZE)} type="button">
-                {isArabic ? 'عرض المزيد' : 'Show more'} ({filtered.length - visible})
-              </button>
-            </div>
-          ) : null}
+          <Pagination onChange={setPage} page={page} pageSize={pageSize} total={total} />
         </>
       ) : (
         <EmptyState

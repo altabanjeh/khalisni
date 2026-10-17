@@ -32,6 +32,34 @@ services:
     expose:
       - "6379"
 
+  # One-shot: creates/updates the database OWNER and APP roles, applies
+  # migrations as the owner, then grants the app role DML only, and exits.
+  # It is the only service that receives the cluster admin and owner
+  # credentials. Re-run after a restore: docker compose -f docker-compose.yml run --rm db-init
+  db-init:
+    build:
+      context: ./backend
+    restart: "no"
+    command: ["sh", "/app/ops/db_init.sh"]
+    environment:
+      POSTGRES_DB:              ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_ADMIN_USER:      ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_ADMIN_PASSWORD:  ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      KHALSNI_DB_OWNER_USER:     ${KHALSNI_DB_OWNER_USER:?KHALSNI_DB_OWNER_USER is required}
+      KHALSNI_DB_OWNER_PASSWORD: ${KHALSNI_DB_OWNER_PASSWORD:?KHALSNI_DB_OWNER_PASSWORD is required}
+      KHALSNI_DB_APP_USER:       ${KHALSNI_DB_APP_USER:?KHALSNI_DB_APP_USER is required}
+      KHALSNI_DB_APP_PASSWORD:   ${KHALSNI_DB_APP_PASSWORD:?KHALSNI_DB_APP_PASSWORD is required}
+      POSTGRES_HOST:            db
+      POSTGRES_PORT:            "5432"
+      # Django settings need these to load for `migrate`; nothing is served.
+      DJANGO_SECRET_KEY:        ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY is required}
+      DJANGO_DEBUG:             "False"
+      DJANGO_ALLOWED_HOSTS:     ${DJANGO_ALLOWED_HOSTS}
+      DJANGO_TIME_ZONE:         ${DJANGO_TIME_ZONE:-Asia/Amman}
+    depends_on:
+      db:
+        condition: service_healthy
+
   backend:
     build:
       context: ./backend
@@ -50,8 +78,10 @@ services:
       DJANGO_SESSION_COOKIE_SECURE: ${DJANGO_SESSION_COOKIE_SECURE:-True}
       DJANGO_CSRF_COOKIE_SECURE: ${DJANGO_CSRF_COOKIE_SECURE:-True}
       POSTGRES_DB:          ${POSTGRES_DB:?POSTGRES_DB is required}
-      POSTGRES_USER:        ${POSTGRES_USER:?POSTGRES_USER is required}
-      POSTGRES_PASSWORD:    ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      # The running backend connects as the APP role (DML only, owns nothing),
+      # never as the cluster admin in POSTGRES_USER.
+      POSTGRES_USER:        ${KHALSNI_DB_APP_USER:?KHALSNI_DB_APP_USER is required}
+      POSTGRES_PASSWORD:    ${KHALSNI_DB_APP_PASSWORD:?KHALSNI_DB_APP_PASSWORD is required}
       POSTGRES_HOST:        db
       POSTGRES_PORT:        "5432"
       FILE_UPLOAD_MAX_SIZE: ${FILE_UPLOAD_MAX_SIZE:-10485760}
@@ -102,6 +132,8 @@ services:
     depends_on:
       db:
         condition: service_started
+      db-init:
+        condition: service_completed_successfully
       redis:
         condition: service_started
     healthcheck:

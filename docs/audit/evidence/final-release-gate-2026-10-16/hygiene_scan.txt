@@ -1,0 +1,17 @@
+Committed Chrome profile files:
+792
+Root bundles:
+live-index-qDIlOwN4.js
+live.js
+Committed evidence PNGs:
+12
+Remote refs:
+ba7f94ccc01d29cd4483c6a2d78e1ffc9ba7fc64	HEAD
+ba7f94ccc01d29cd4483c6a2d78e1ffc9ba7fc64	refs/heads/main
+Unpushed commits:
+f69a8de Final pre-release hardening: provider create 500, verification note in tracking, consent immutability, mobile language, national ID type
+9b5335e Implement approved owner decisions and release hardening
+3f0af8f Add owner/client decision dossier
+f5b98b9 Fix P2 objective audit findings U04/B04, B10-6, B10-8, D03 and accessibility
+ec3e70c Fix P1 audit findings B02, F05 and F02
+df0be19 Add independent closure verdict for the original client audit

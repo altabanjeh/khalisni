@@ -60,7 +60,8 @@ class AdversarialBase(APITestCase):
         def mk(role, key, **extra):
             return CustomUser.objects.create_user(
                 email=f"adv-{key}@example.com", password="Password@123", full_name=f"Adv {key}",
-                phone=f"07{9000000 + hash(key) % 900000}", role=role, **extra,
+                # A valid 10-digit Jordanian mobile (07x xxx xxxx); phones are canonical since the phone policy.
+                phone=f"079{abs(hash(key)) % 10_000_000:07d}", role=role, **extra,
             )
         cls.customer = mk(CustomUser.Role.CUSTOMER, "cust")
         cls.other_customer = mk(CustomUser.Role.CUSTOMER, "cust2")

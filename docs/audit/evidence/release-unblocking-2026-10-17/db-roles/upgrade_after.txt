@@ -1,0 +1,19 @@
+backend: healthy
+== db-init (upgrade)
+db-init: bootstrapping roles...
+db_bootstrap: role khalsni_owner created.
+db_bootstrap: role khalsni_app created.
+db_bootstrap: 59 object(s) moved to khalsni_owner.
+db_bootstrap: DML grants for khalsni_app applied.
+db-init: applying migrations as khalsni_owner...
+  No migrations to apply.
+db-init: applying app-role grants...
+db_bootstrap: DML grants for khalsni_app applied.
+db-init: done.
+== after upgrade
+table owners|khalsni_owner|58
+sequence owners|khalsni_owner|56
+trigger function owner|khalsni_owner
+trigger|orders_orderconsent_append_only|O
+data|5|1|t|5
+backend connects as khalsni_app

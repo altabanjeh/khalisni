@@ -1,0 +1,195 @@
+{
+ "reg_missing_phone": [
+  500,
+  "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n  <meta name=\"robots\" content=\"NONE,NOARCHIVE\">\n  "
+ ],
+ "reg_blank_phone": [
+  201,
+  {
+   "id": 12,
+   "full_name": "QA Reg P2",
+   "phone": "",
+   "email": "p2-blank-900591@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_bad_phone": [
+  201,
+  {
+   "id": 13,
+   "full_name": "QA Reg P2",
+   "phone": "abc",
+   "email": "p2-abc-900591@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_valid_phone": [
+  201,
+  {
+   "id": 14,
+   "full_name": "QA Reg P2",
+   "phone": "0791900591",
+   "email": "p2-ok-900591@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_valid_intl_phone": [
+  201,
+  {
+   "id": 15,
+   "full_name": "QA Reg P2",
+   "phone": "+962 78 1900591",
+   "email": "p2-intl-900591@example.test",
+   "national_id": ""
+  }
+ ],
+ "reg_dup_email_ar": [
+  400,
+  {
+   "email": [
+    "النموذج User والحقل email موجود مسبقاً."
+   ]
+  }
+ ],
+ "reg_dup_email_en": [
+  400,
+  {
+   "email": [
+    "النموذج User والحقل email موجود مسبقاً."
+   ]
+  }
+ ],
+ "reg_dup_phone": [
+  400,
+  {
+   "phone": [
+    "النموذج User والحقل phone موجود مسبقاً."
+   ]
+  }
+ ],
+ "reg_numeric_password": [
+  400,
+  {
+   "password": [
+    "كلمة المرور هذه شائعة جداً.",
+    "كلمة المرور هذه تتكون من أرقام فقط."
+   ]
+  }
+ ],
+ "services_api": {
+  "count": 38,
+  "page1Rows": 20,
+  "next": "/api/admin/services/?page=2"
+ },
+ "users_api": {
+  "count": 13,
+  "sampleKeys": [
+   "is_active",
+   "is_verified"
+  ],
+  "rows": [
+   {
+    "id": 1,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 5,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 7,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 10,
+    "role": "admin",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 13,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 2,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 3,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 4,
+    "role": "employee",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 9,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 12,
+    "role": "customer",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 6,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 8,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false
+   },
+   {
+    "id": 11,
+    "role": "provider",
+    "is_active": true,
+    "is_verified": false
+   }
+  ]
+ },
+ "forgot_ar": [
+  200,
+  {
+   "detail": "If this email is registered, a password reset link has been sent."
+  }
+ ],
+ "forgot_en": [
+  200,
+  {
+   "detail": "If this email is registered, a password reset link has been sent."
+  }
+ ],
+ "reset_emails": [
+  {
+   "file": "20261016-113823-2472635840080.log",
+   "subject": "Khalsni password reset",
+   "body": "We received a request to reset your Khalsni password.\nUse this link within 30 minutes:\nhttp://127.0.0.1:4341/reset-password/<redacted>\nIf you did not request this change, you can ignore this email.\n-------------------------------------------------------------------------------\n"
+  },
+  {
+   "file": "20261016-113826-2472637385328.log",
+   "subject": "Khalsni password reset",
+   "body": "We received a request to reset your Khalsni password.\nUse this link within 30 minutes:\nhttp://127.0.0.1:4341/reset-password/<redacted>\nIf you did not request this change, you can ignore this email.\n-------------------------------------------------------------------------------\n"
+  }
+ ]
+}

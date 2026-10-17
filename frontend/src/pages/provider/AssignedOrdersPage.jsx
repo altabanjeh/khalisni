@@ -1,5 +1,5 @@
 import { ClipboardList, FolderCheck, Search, TimerReset } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DataTable from '../../components/DataTable'
 import PageHeader from '../../components/PageHeader'
@@ -10,21 +10,44 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 
-const ACTIVE = ['ASSIGNED', 'IN_PROGRESS', 'WAITING_GOVERNMENT', 'WAITING_PROVIDER']
+const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false, statusCounts: null }
 
 function AssignedOrdersPage() {
   const { language, isArabic } = useLanguage()
-  const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getProviderOrders(), [], [])
+  // The queue pages on the server: every assigned request is reachable, and
+  // the chip, the search and the chip counts are answered over all of them.
   const [query, setQuery] = useState('')
+  const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  useEffect(() => {
+    const next = query.trim()
+    if (next === search) return undefined
+    const timer = setTimeout(() => {
+      setSearch(next)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query, search])
+  const { data: pageData, loading, error, reload } = useAsyncData(
+    () => api.getProviderOrdersPage({ page, statusGroup: filter, search }),
+    [page, filter, search],
+    EMPTY_PAGE,
+  )
+  const rows = useMemo(() => pageData?.results || [], [pageData])
+  const total = pageData?.count || 0
+  useEffect(() => {
+    // A full page that has a successor tells the server's page size.
+    if (pageData?.hasNext && pageData.results.length) setPageSize(pageData.results.length)
+  }, [pageData])
+  useEffect(() => {
+    // The last row of the last page went away: go back to a page that exists.
+    if (error?.response?.status === 404 && page > 1) setPage((current) => Math.max(1, current - 1))
+  }, [error, page])
 
-  const list = useMemo(() => (Array.isArray(orders) ? orders : []), [orders])
-  const counts = useMemo(() => ({
-    all: list.length,
-    active: list.filter((o) => ACTIVE.includes(String(o.status).toUpperCase())).length,
-    ready: list.filter((o) => String(o.status).toUpperCase() === 'READY_FOR_DELIVERY').length,
-    done: list.filter((o) => String(o.status).toUpperCase() === 'COMPLETED').length,
-  }), [list])
+  // Counts come from the server (same search as the list), not from one page.
+  const counts = pageData?.statusCounts || {}
 
   const filters = [
     { key: 'all', label: isArabic ? 'الكل' : 'All' },
@@ -32,19 +55,6 @@ function AssignedOrdersPage() {
     { key: 'ready', label: isArabic ? 'جاهزة للتسليم' : 'Ready' },
     { key: 'done', label: isArabic ? 'مكتملة' : 'Completed' },
   ]
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return list
-      .filter((order) => {
-        const s = String(order.status).toUpperCase()
-        if (filter === 'active') return ACTIVE.includes(s)
-        if (filter === 'ready') return s === 'READY_FOR_DELIVERY'
-        if (filter === 'done') return s === 'COMPLETED'
-        return true
-      })
-      .filter((order) => !q || [order.order_number, order.service?.name_ar, order.service?.name_en, order.city].filter(Boolean).some((v) => String(v).toLowerCase().includes(q)))
-  }, [list, query, filter])
 
   const columns = [
     { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request', render: (row) => <span className="font-bold text-ink">#{row.order_number}</span> },
@@ -74,10 +84,10 @@ function AssignedOrdersPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          { icon: ClipboardList, label: isArabic ? 'كل الطلبات' : 'All requests', value: counts.all },
-          { icon: TimerReset, label: isArabic ? 'قيد التنفيذ' : 'Active', value: counts.active },
-          { icon: FolderCheck, label: isArabic ? 'جاهزة للتسليم' : 'Ready for delivery', value: counts.ready },
-          { icon: ClipboardList, label: isArabic ? 'مكتملة' : 'Completed', value: counts.done },
+          { icon: ClipboardList, label: isArabic ? 'كل الطلبات' : 'All requests', value: counts.all ?? 0 },
+          { icon: TimerReset, label: isArabic ? 'قيد التنفيذ' : 'Active', value: counts.active ?? 0 },
+          { icon: FolderCheck, label: isArabic ? 'جاهزة للتسليم' : 'Ready for delivery', value: counts.ready ?? 0 },
+          { icon: ClipboardList, label: isArabic ? 'مكتملة' : 'Completed', value: counts.done ?? 0 },
         ].map(({ icon: Icon, label, value }) => (
           <div className="glass-panel p-4" key={label}>
             <div className="flex items-center gap-3">
@@ -95,7 +105,8 @@ function AssignedOrdersPage() {
         columns={columns}
         emptyDescription={isArabic ? 'ستظهر هنا الطلبات المسندة إليك، أو بعد تعديل البحث والتصفية.' : 'Assigned requests will appear here, or after adjusting the search and filters.'}
         emptyTitle={isArabic ? 'لا توجد طلبات مطابقة' : 'No matching requests'}
-        error={error}
+        ariaLabel={isArabic ? 'جدول الطلبات المعيّنة' : 'Assigned requests table'}
+        error={error?.response?.status === 404 ? null : error}
         loading={loading}
         onRetry={reload}
         mobileCard={(row) => (
@@ -109,7 +120,8 @@ function AssignedOrdersPage() {
             <Link className="btn-secondary w-full" to={`/provider/orders/${row.id}`}>{isArabic ? 'فتح الطلب' : 'Open request'}</Link>
           </div>
         )}
-        rows={filtered}
+        pagination={{ page, pageSize, total, onChange: setPage }}
+        rows={rows}
         toolbar={
           <div className="space-y-3">
             <div className="relative">
@@ -119,6 +131,7 @@ function AssignedOrdersPage() {
                 className="field ps-9"
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={isArabic ? 'ابحث برقم الطلب أو الخدمة أو المدينة' : 'Search by request number, service or city'}
+                type="search"
                 value={query}
               />
             </div>
@@ -128,7 +141,7 @@ function AssignedOrdersPage() {
                   aria-pressed={filter === item.key}
                   className={`kh-focusable inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${filter === item.key ? 'border-transparent bg-brand-600 text-white' : 'border-border bg-card text-slate-600 hover:bg-brand-50'}`}
                   key={item.key}
-                  onClick={() => setFilter(item.key)}
+                  onClick={() => { setFilter(item.key); setPage(1) }}
                   type="button"
                 >
                   {item.label}

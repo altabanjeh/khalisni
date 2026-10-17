@@ -1,0 +1,7 @@
+services_mentioning_admin_panel: 27
+price_note_rows: [('', '', 4), ('يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.', 'Final fees are confirmed after document review.', 7), ('يحدد بعد المراجعة من لوحة الإدارة.', 'Shared after review.', 27)]
+delivery_admin_rows: [('تُحدد من لوحة الإدارة', '', 9)]
+schema_fields: [(('additional_notes', 'textarea', True, False), 17), (('basin_number', 'number', True, False), 17), (('field_2fa52c6cfa', 'number', False, False), 2), (('parcel_number', 'number', True, False), 17)]
+fees_checksum: (38, 161, 76, 102)
+price_types: [('fixed', 11), ('quotation', 27)]
+orders: 6 notes_checksum: 52

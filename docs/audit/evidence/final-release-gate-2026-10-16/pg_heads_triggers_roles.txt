@@ -1,0 +1,27 @@
+== migration head per app
+accounts|0007_customuser_token_version
+admin|0003_logentry_add_action_flag_choices
+audit|0005_alter_auditlog_action
+auth|0012_alter_user_first_name_max_length
+authtoken|0004_alter_tokenproxy_options
+contenttypes|0002_remove_content_type_name
+documents|0007_add_order_deleted_status_index
+help_guides|0006_helpguide_delete_reason_helpguide_deleted_at_and_more
+notifications|0006_notification_delete_reason_notification_deleted_at_and_more
+orders|0019_order_consent_append_only
+organizations|0002_branch_delete_reason_branch_deleted_at_and_more
+payment|0003_payment_organization_commissionrule_invoice_and_more
+providers|0004_providerprofile_delete_reason_and_more
+public_site|0007_publicpagecontent_privacy_policy_ar_and_more
+services|0015_national_id_fields_as_text
+sessions|0001_initial
+token_blacklist|0013_alter_blacklistedtoken_options_and_more
+== consent triggers
+orders_orderconsent_append_only|O
+== owner of orders_orderconsent / orders_order
+orders_order|khalsni_migrator
+orders_orderconsent|khalsni_migrator
+== roles
+khalsni_app|f|f|f|f
+khalsni_migrator|f|f|f|f
+khalsni_owner|t|t|t|t

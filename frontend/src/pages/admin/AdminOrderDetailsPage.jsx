@@ -1,10 +1,11 @@
-import { FileText, MessageSquare, ShieldCheck, UserRoundPlus } from 'lucide-react'
+import { Ban, FilePlus2, FileText, MessageSquare, ShieldCheck, UserRoundPlus, Workflow } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import MissingRequestRecovery from '../../components/MissingRequestRecovery'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
@@ -15,6 +16,8 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { getOrderAllowedActions } from '../../utils/authz'
 import { formatDate, getStatusLabel } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
+import { getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
+import { describeTransitionBlock } from '../../utils/workflowPresentation'
 
 function Panel({ icon: Icon, title, description, children, tone }) {
   return (
@@ -31,6 +34,19 @@ function Panel({ icon: Icon, title, description, children, tone }) {
   )
 }
 
+// Allowed actions that intentionally have no button on this screen, with the
+// place where they actually happen.
+const INDIRECT_ACTION_NOTES = {
+  mark_ready_for_delivery: {
+    ar: 'تجهيز النتيجة للتسليم: يتم عند رفع مزوّد الخدمة للنتيجة النهائية من بوابته.',
+    en: 'Ready for delivery: happens when the provider uploads the final result from the provider portal.',
+  },
+  resume_review: {
+    ar: 'استئناف المراجعة: يتم تلقائياً عند رفع العميل لكل المستندات المطلوبة.',
+    en: 'Resume review: happens automatically once the customer uploads every requested document.',
+  },
+}
+
 function AdminOrderDetailsPage() {
   const { id } = useParams()
   const { toast } = useToast()
@@ -41,6 +57,8 @@ function AdminOrderDetailsPage() {
   const [pendingAssign, setPendingAssign] = useState(null)
   const [submitting, setSubmitting] = useState('')
   const [rejectReason, setRejectReason] = useState('')
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
   const runningRef = useRef('')
 
   const { data: order, loading, error, reload } = useAsyncData(() => api.getAdminOrder(id), [id], null)
@@ -48,6 +66,7 @@ function AdminOrderDetailsPage() {
   const statusForm = useForm()
   const noteForm = useForm({ defaultValues: { visibility: 'INTERNAL' } })
   const assignForm = useForm()
+  const docsForm = useForm({ defaultValues: { note: '', document_types: [] } })
 
   if (error) return <div className="rounded-[var(--radius-xl)] border border-red-200 bg-red-50 p-6 text-sm font-bold text-danger">{getDisplayError(error)}</div>
   if (loading || !order) return <LoadingSpinner />
@@ -55,7 +74,19 @@ function AdminOrderDetailsPage() {
   const notSet = isArabic ? 'غير محددة' : 'Not set'
   const allowedActions = getOrderAllowedActions(order)
   const transitions = allowedActions.available_status_transitions || []
-  const blockedWorkflow = (allowedActions.workflow_transitions || []).find((option) => !option.available && option.blocked_reasons?.length)
+  // Every workflow option comes from the server: generic status moves go to the
+  // status form, dedicated commands get their own controls, and unavailable
+  // options are explained in the screen language.
+  const workflow = allowedActions.workflow_transitions || []
+  const cancelOption = workflow.find((option) => option.action === 'cancel_order')
+  const canCancel = cancelOption?.available === true
+  const cancelReasonRequired = cancelOption?.reason_required !== false
+  const requirementDocuments = allowedActions.readiness?.documents?.length ? allowedActions.readiness.documents : (order.required_documents || [])
+  const isOtherRoleBlock = (option) => (option.blocked || []).some((item) => item.code === 'role_not_allowed')
+  const blockedOptions = workflow.filter((option) => !option.available)
+  const blockedWorkflow = blockedOptions.find((option) => !isOtherRoleBlock(option)) || blockedOptions[0]
+  const describeBlock = (option) => describeTransitionBlock(option, { language, documents: requirementDocuments })
+  const indirectOptions = workflow.filter((option) => option.available && INDIRECT_ACTION_NOTES[option.action])
   const noteVisibilityOptions = [
     ...(allowedActions.can_add_internal_note ? [{ value: 'INTERNAL', label: isArabic ? 'داخلية' : 'Internal' }] : []),
     ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: isArabic ? 'مرئية للعميل' : 'Visible to customer' }] : []),
@@ -99,6 +130,22 @@ function AdminOrderDetailsPage() {
     setConfirmComplete(false)
     await run('complete', () => api.completeOrder(id, { admin_confirmation: true }), isArabic ? 'تم إكمال الطلب.' : 'Request completed.')
   }
+  async function handleCancel() {
+    const reason = cancelReason.trim()
+    if (cancelReasonRequired && !reason) return
+    const ok = await run('cancel', () => api.cancelAdminOrder(id, { reason: reason || (isArabic ? 'ألغاه المدير' : 'Cancelled by admin') }), isArabic ? 'تم إلغاء الطلب.' : 'Request cancelled.')
+    if (ok) setCancelReason('')
+    setConfirmCancel(false)
+  }
+  async function handleRequestDocuments(values) {
+    const documentTypes = [].concat(values.document_types || []).filter(Boolean)
+    if (!documentTypes.length) {
+      docsForm.setError('document_types', { message: isArabic ? 'اختر مستنداً واحداً على الأقل.' : 'Select at least one document.' })
+      return
+    }
+    const ok = await run('docs', () => api.requestDocuments(id, { note: values.note, document_types: documentTypes }), isArabic ? 'تم إرسال طلب المستندات إلى العميل.' : 'Document request sent to the customer.')
+    if (ok) docsForm.reset({ note: '', document_types: [] })
+  }
   async function handleReject() {
     // The customer receives this text, so it is written by the administrator.
     const reason = rejectReason.trim()
@@ -123,7 +170,7 @@ function AdminOrderDetailsPage() {
       : transitions.length
         ? (isArabic ? 'تحديث الحالة متاح لهذه المرحلة.' : 'A status update is available for this stage.')
         : blockedWorkflow
-          ? `${isArabic ? 'الإجراء التالي غير متاح بعد' : 'Next workflow action is blocked'}: ${blockedWorkflow.action} — ${blockedWorkflow.blocked_reasons.join(' ')}`
+          ? `${isArabic ? 'الإجراء التالي غير متاح بعد' : 'Next workflow action is blocked'} — ${describeBlock(blockedWorkflow)}`
           : (isArabic ? 'لا يوجد إجراء مطلوب الآن.' : 'No action required right now.')
 
   return (
@@ -157,7 +204,7 @@ function AdminOrderDetailsPage() {
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <Panel icon={FileText} title={isArabic ? 'الوثائق المرفوعة' : 'Uploaded documents'} description={isArabic ? 'راجع كل الوثائق قبل تحديث الحالة أو اتخاذ قرار نهائي.' : 'Review every document before changing status or making a final decision.'}>
-            <DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} staff />
+            <DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} />
           </Panel>
           <Panel icon={MessageSquare} title={isArabic ? 'الخط الزمني' : 'Timeline'} description={isArabic ? 'تسلسل كامل لكل التحديثات والحركات على الطلب.' : 'A complete sequence of every update and action on the request.'}>
             <OrderTimeline items={order.status_logs || []} />
@@ -165,6 +212,46 @@ function AdminOrderDetailsPage() {
         </div>
 
         <div className="space-y-6">
+          <MissingRequestRecovery allowedActions={allowedActions} onRecovered={reload} orderId={id} />
+
+          <Panel icon={Workflow} title={isArabic ? 'إجراءات سير العمل' : 'Workflow actions'} description={isArabic ? 'الإجراءات المتاحة لك في هذه المرحلة، وسبب عدم توفر غيرها.' : 'The actions available to you at this stage, and why others are not.'}>
+            {canCancel ? (
+              <button className="btn-danger w-full" data-testid="admin-cancel-order" disabled={Boolean(submitting)} onClick={() => setConfirmCancel(true)} type="button">
+                <Ban className="me-2 inline h-4 w-4" />{isArabic ? 'إلغاء الطلب' : 'Cancel request'}
+              </button>
+            ) : null}
+            {blockedOptions.length ? (
+              <ul className={`space-y-2 text-sm font-semibold text-slate-600 ${canCancel ? 'mt-4' : ''}`} data-testid="admin-blocked-actions">
+                {blockedOptions.map((option) => <li className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-3 py-2" key={option.action}>{describeBlock(option)}</li>)}
+              </ul>
+            ) : null}
+            {indirectOptions.length ? (
+              <ul className="mt-4 space-y-2 text-sm font-semibold text-slate-600" data-testid="admin-indirect-actions">
+                {indirectOptions.map((option) => <li className="rounded-[var(--radius-md)] border border-border bg-card px-3 py-2" key={option.action}>{INDIRECT_ACTION_NOTES[option.action][isArabic ? 'ar' : 'en']}</li>)}
+              </ul>
+            ) : null}
+            {!canCancel && !blockedOptions.length && !indirectOptions.length ? <p className="text-sm font-semibold text-slate-500">{isArabic ? 'لا توجد إجراءات إضافية في هذه المرحلة.' : 'No further actions at this stage.'}</p> : null}
+          </Panel>
+
+          {allowedActions.can_request_documents ? (
+            <Panel icon={FilePlus2} title={isArabic ? 'طلب مستندات ناقصة' : 'Request missing documents'} description={isArabic ? 'اختر من مستندات الخدمة المعرّفة واكتب ملاحظة واضحة للعميل.' : 'Choose from the configured service documents and write a clear note to the customer.'}>
+              <form className="space-y-3" data-testid="admin-request-documents" onSubmit={docsForm.handleSubmit(handleRequestDocuments)}>
+                <textarea aria-label={isArabic ? 'ملاحظة للعميل' : 'Note to the customer'} className="field min-h-20" placeholder={isArabic ? 'اشرح المطلوب بوضوح.' : 'Explain clearly what is needed.'} {...docsForm.register('note', { required: isArabic ? 'ملاحظة الطلب مطلوبة' : 'A request note is required' })} />
+                {docsForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{docsForm.formState.errors.note.message}</p> : null}
+                <div className="space-y-2 rounded-[var(--radius-md)] border border-border bg-card p-3">
+                  {(order.required_documents || []).map((document, index) => (
+                    <label className="flex items-center gap-3 text-sm text-ink" key={getRequiredDocumentType(document, index)}>
+                      <input type="checkbox" value={getRequiredDocumentType(document, index)} {...docsForm.register('document_types')} />
+                      <span>{getRequiredDocumentLabel(document, language)}</span>
+                    </label>
+                  ))}
+                </div>
+                {docsForm.formState.errors.document_types ? <p className="text-sm font-bold text-danger">{docsForm.formState.errors.document_types.message}</p> : null}
+                <button className="btn-secondary w-full" disabled={submitting === 'docs'} type="submit">{submitting === 'docs' ? (isArabic ? 'جارٍ الإرسال...' : 'Sending...') : (isArabic ? 'إرسال الطلب للعميل' : 'Send to the customer')}</button>
+              </form>
+            </Panel>
+          ) : null}
+
           <Panel icon={ShieldCheck} title={isArabic ? 'تحديث حالة الطلب' : 'Update request status'} description={isArabic ? 'تظهر فقط التحوّلات المسموح بها لهذه المرحلة.' : 'Only transitions allowed for this stage are shown.'}>
             <form className="space-y-3" onSubmit={statusForm.handleSubmit(handleStatus)}>
               <label className="block text-sm font-bold text-ink" htmlFor="admin-status">{isArabic ? 'الحالة الجديدة' : 'New status'}</label>
@@ -249,6 +336,26 @@ function AdminOrderDetailsPage() {
           onChange={(event) => setRejectReason(event.target.value)}
           placeholder={isArabic ? 'اشرح للعميل سبب رفض الطلب.' : 'Explain to the customer why the request is rejected.'}
           value={rejectReason}
+        />
+      </ConfirmModal>
+      <ConfirmModal
+        confirmDisabled={cancelReasonRequired && !cancelReason.trim()}
+        confirmLabel={isArabic ? 'نعم، ألغِ الطلب' : 'Yes, cancel it'}
+        description={isArabic ? 'سيُلغى الطلب ويُشعر العميل. هذا الإجراء نهائي.' : 'The request will be cancelled and the customer notified. This is final.'}
+        loading={submitting === 'cancel'}
+        onClose={() => setConfirmCancel(false)}
+        onConfirm={handleCancel}
+        open={confirmCancel}
+        title={isArabic ? 'تأكيد إلغاء الطلب' : 'Confirm cancellation'}
+        variant="danger"
+      >
+        <label className="block text-sm font-bold text-ink" htmlFor="admin-cancel-reason">{cancelReasonRequired ? (isArabic ? 'سبب الإلغاء (مطلوب)' : 'Cancellation reason (required)') : (isArabic ? 'سبب الإلغاء (اختياري)' : 'Cancellation reason (optional)')}</label>
+        <textarea
+          className="field mt-2 min-h-24"
+          id="admin-cancel-reason"
+          maxLength={1000}
+          onChange={(event) => setCancelReason(event.target.value)}
+          value={cancelReason}
         />
       </ConfirmModal>
       <ConfirmModal

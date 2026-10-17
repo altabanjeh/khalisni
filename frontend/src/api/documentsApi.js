@@ -1,4 +1,4 @@
-import { buildQuery, http, unwrapList } from './client'
+import { buildQuery, fetchPage, http, unwrapList } from './client'
 
 export const documentsApi = {
   uploadCustomerDocument(id, formData) {
@@ -7,6 +7,11 @@ export const documentsApi = {
 
   async getStaffDocuments(params = {}) {
     return unwrapList(await http.get(`/staff/documents/${buildQuery(params)}`))
+  },
+
+  // One page of the verification queue (optionally one order's documents).
+  getStaffDocumentsPage({ page = 1, order = '' } = {}) {
+    return fetchPage('/staff/documents/', { page, order })
   },
 
   verifyStaffDocument(id, payload) {

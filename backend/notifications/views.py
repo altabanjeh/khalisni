@@ -25,6 +25,16 @@ class AdminNotificationListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminRole]
     queryset = Notification.objects.select_related("recipient", "actor", "order", "template").filter(is_deleted=False)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        params = self.request.query_params
+        for field in ("status", "channel"):
+            value = (params.get(field) or "").strip()
+            if value:
+                queryset = queryset.filter(**{field: value})
+        # Newest first; pk breaks ties so rows never move between pages.
+        return queryset.order_by("-created_at", "-pk")
+
     def get_serializer_class(self):
         if self.request.method == "GET":
             return NotificationSerializer

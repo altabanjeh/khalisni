@@ -327,6 +327,41 @@ export function unwrapList(data) {
   return []
 }
 
+// unwrapList keeps only the first page of a paginated answer (20 rows). Lists
+// a screen needs in full -- bounded catalogue configuration used in pickers
+// and rule tables -- read every page instead; growing lists use fetchPage with
+// pager controls (audit B10-6). Past the cap the load fails loudly rather than
+// truncating silently.
+const MAX_LIST_PAGES = 50
+
+export async function fetchAllPages(path, params = {}) {
+  const first = await http.get(`${path}${buildQuery(params)}`)
+  if (!Array.isArray(first?.results)) return unwrapList(first)
+  const rows = [...first.results]
+  let next = first.next
+  let page = 1
+  while (next) {
+    if (page >= MAX_LIST_PAGES) throw new Error(`List ${path} has more than ${MAX_LIST_PAGES} pages.`)
+    page += 1
+    const data = await http.get(`${path}${buildQuery({ ...params, page })}`)
+    rows.push(...(data?.results || []))
+    next = data?.next
+  }
+  return rows
+}
+
+// One server page plus what a pager needs.
+export async function fetchPage(path, params = {}) {
+  const data = await http.get(`${path}${buildQuery(params)}`)
+  if (Array.isArray(data)) return { results: data, count: data.length, hasNext: false, hasPrevious: false }
+  return {
+    results: data?.results || [],
+    count: Number(data?.count ?? 0),
+    hasNext: Boolean(data?.next),
+    hasPrevious: Boolean(data?.previous),
+  }
+}
+
 export function withId(record, ...keys) {
   if (!record) return record
   if (record.id != null) return record

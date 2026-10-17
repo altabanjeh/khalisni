@@ -2,8 +2,12 @@ from organizations.services import assert_can_assign_membership
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError, transaction
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
+from accounts.fields import CanonicalPhoneField
+from accounts.validators import phone_identity
+from core.i18n import pick, request_language
 from core.delete_guard import get_delete_guard_setting, update_delete_guard_password
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from organizations.models import Branch, Organization, OrganizationMembership
@@ -26,6 +30,14 @@ else:
     SIMPLEJWT_AVAILABLE = True
 
 
+# Public contact details have one runtime source: the active public-site
+# content row (PublicPageContent contact_phone / email / whatsapp_number /
+# office_address), which is what the public footer reads. The old
+# "site.contact" setting was never read by a public page and is retired; an
+# existing row is kept untouched in the database but is no longer listed or
+# editable.
+RETIRED_SYSTEM_SETTINGS = ("site.contact",)
+
 SAFE_SYSTEM_SETTINGS = {
     "site.homepage": {
         "label": "Homepage content",
@@ -44,26 +56,6 @@ SAFE_SYSTEM_SETTINGS = {
                 "label": "Supporting text",
                 "control": "textarea",
                 "help_text": "Short supporting description below the title.",
-            },
-        ),
-    },
-    "site.contact": {
-        "label": "Contact details",
-        "help_text": "Public contact details used by clients when they need help.",
-        "warning": "Changes appear to clients immediately.",
-        "requires_super_admin": False,
-        "fields": (
-            {
-                "key": "phone",
-                "label": "Phone number",
-                "control": "text",
-                "help_text": "Visible customer support phone number.",
-            },
-            {
-                "key": "email",
-                "label": "Email address",
-                "control": "email",
-                "help_text": "Visible customer support email address.",
             },
         ),
     },
@@ -98,8 +90,63 @@ class UserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer)
         return MembershipSummarySerializer(memberships, many=True).data
 
 
+REGISTER_DUPLICATE_MESSAGES = {
+    # Registration cannot hide that an address is taken without an activation
+    # step (a product decision, audit B04); the answer is throttled and names
+    # no model or field internals.
+    "email": {
+        "ar": "يوجد حساب مسجّل بهذا البريد الإلكتروني. سجّل الدخول أو استخدم خيار «نسيت كلمة المرور».",
+        "en": "An account with this email already exists. Sign in or use “Forgot password”.",
+    },
+    "phone": {
+        "ar": "رقم الهاتف هذا مستخدم في حساب آخر. سجّل الدخول أو استخدم رقماً آخر.",
+        "en": "This phone number is already used by another account. Sign in or use a different number.",
+    },
+    "national_id": {
+        "ar": "الرقم الوطني هذا مستخدم في حساب آخر.",
+        "en": "This national ID is already used by another account.",
+    },
+}
+
+
 class RegisterSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, trim_whitespace=False)
+    # Declared explicitly so uniqueness is answered with the customer-facing
+    # messages below instead of the generated "model and field" text.
+    email = serializers.EmailField(max_length=254)
+    # Stored in canonical E.164 form (owner phone policy, accounts/validators.py).
+    phone = CanonicalPhoneField()
+
+    class Meta:
+        model = CustomUser
+        fields = ("id", "full_name", "phone", "email", "password", "national_id")
+        validators = []
+
+    def _language(self):
+        return request_language(self.context.get("request"))
+
+    def _taken(self, field, value):
+        # Soft-deleted accounts still own their unique values.
+        return CustomUser._base_manager.filter(**{field: value}).exists()
+
+    def validate_email(self, value):
+        email = CustomUser.objects.normalize_email(value.strip())
+        if self._taken("email", email):
+            raise serializers.ValidationError(pick(REGISTER_DUPLICATE_MESSAGES["email"], self._language()))
+        return email
+
+    def validate_phone(self, value):
+        # ``value`` is already canonical, so 079..., +96279... and 0096279...
+        # are the same number here.
+        if self._taken("phone", value):
+            raise serializers.ValidationError(pick(REGISTER_DUPLICATE_MESSAGES["phone"], self._language()))
+        return value
+
+    def validate_national_id(self, value):
+        value = (value or "").strip()
+        if value and self._taken("national_id", value):
+            raise serializers.ValidationError(pick(REGISTER_DUPLICATE_MESSAGES["national_id"], self._language()))
+        return value
 
     def validate(self, attrs):
         # Same password policy as password reset (AUTH_PASSWORD_VALIDATORS).
@@ -112,19 +159,25 @@ class RegisterSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
             raise serializers.ValidationError({"password": list(exc.messages)})
         return attrs
 
-    class Meta:
-        model = CustomUser
-        fields = ("id", "full_name", "phone", "email", "password", "national_id")
-
     def create(self, validated_data):
-        return CustomUser.objects.create_user(
-            email=validated_data["email"],
-            password=validated_data["password"],
-            full_name=validated_data["full_name"],
-            phone=validated_data["phone"],
-            national_id=validated_data.get("national_id", ""),
-            role=CustomUser.Role.CUSTOMER,
-        )
+        try:
+            with transaction.atomic():
+                return CustomUser.objects.create_user(
+                    email=validated_data["email"],
+                    password=validated_data["password"],
+                    full_name=validated_data["full_name"],
+                    phone=validated_data["phone"],
+                    national_id=validated_data.get("national_id", ""),
+                    role=CustomUser.Role.CUSTOMER,
+                )
+        except IntegrityError:
+            # A concurrent registration took a unique value after validation.
+            language = self._language()
+            for field in ("email", "phone", "national_id"):
+                value = validated_data.get(field)
+                if value and self._taken(field, value):
+                    raise serializers.ValidationError({field: [pick(REGISTER_DUPLICATE_MESSAGES[field], language)]})
+            raise
 
 
 class ForgotPasswordRequestSerializer(serializers.Serializer):
@@ -179,6 +232,7 @@ class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Model
     IDENTITY_FIELDS = ("email", "phone")
 
     current_password = serializers.CharField(write_only=True, required=False, allow_blank=True, trim_whitespace=False)
+    phone = CanonicalPhoneField(required=False, allow_blank=True)
 
     class Meta:
         model = CustomUser
@@ -187,11 +241,22 @@ class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Model
     def validate(self, attrs):
         current_password = attrs.pop("current_password", "")
         user = self.instance
+        def stored(field):
+            value = getattr(user, field, "") or ""
+            return phone_identity(value) if field == "phone" else value
+
         changed = [
             field for field in self.IDENTITY_FIELDS
-            if field in attrs and (attrs[field] or "") != (getattr(user, field, "") or "")
+            if field in attrs and (attrs[field] or "") != stored(field)
         ]
         self.identity_fields_changed = changed
+        # The phone arrives canonical, so typing the same number in another
+        # format is not a change. A real change must not take a number that
+        # another account (soft-deleted ones included) already owns.
+        if "phone" in changed and attrs["phone"]:
+            if CustomUser._base_manager.filter(phone=attrs["phone"]).exclude(pk=getattr(user, "pk", None)).exists():
+                language = request_language(self.context.get("request"))
+                raise serializers.ValidationError({"phone": [pick(REGISTER_DUPLICATE_MESSAGES["phone"], language)]})
         if changed and user is not None and user.has_usable_password():
             if not current_password:
                 raise serializers.ValidationError(
@@ -215,6 +280,7 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
     membership_role = serializers.ChoiceField(choices=OrganizationMembership.MembershipRole.choices, required=False, allow_null=True, write_only=True)
     memberships = MembershipSummarySerializer(source="organization_memberships", many=True, read_only=True)
     is_staff = serializers.BooleanField(read_only=True)
+    phone = CanonicalPhoneField(required=False, allow_blank=True)
     is_super_admin = serializers.SerializerMethodField()
     role_options = serializers.SerializerMethodField()
     current_permissions = serializers.SerializerMethodField()
@@ -235,6 +301,8 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
             "is_active",
             "is_staff",
             "is_verified",
+            "is_email_verified",
+            "is_phone_verified",
             "is_super_admin",
             "role_options",
             "current_permissions",
@@ -245,7 +313,17 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("created_at", "updated_at", "is_staff", "is_super_admin", "role_options", "current_permissions")
+        read_only_fields = (
+            "created_at",
+            "updated_at",
+            "is_staff",
+            "is_super_admin",
+            "role_options",
+            "current_permissions",
+            # Shown, never set from this screen: who verifies what is not decided (audit B10-8).
+            "is_email_verified",
+            "is_phone_verified",
+        )
 
     def get_current_permissions(self, obj):
         return sorted(
@@ -287,6 +365,11 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
         return value
 
     def validate(self, attrs):
+        phone = attrs.get("phone")
+        if phone and CustomUser._base_manager.filter(phone=phone).exclude(pk=getattr(self.instance, "pk", None)).exists():
+            # Compared in canonical form, so another spelling of a taken number is refused too.
+            language = request_language(self.context.get("request"))
+            raise serializers.ValidationError({"phone": [pick(REGISTER_DUPLICATE_MESSAGES["phone"], language)]})
         branch = attrs.get("branch_id")
         organization = attrs.get("organization_id")
         membership_role = attrs.get("membership_role")
@@ -389,8 +472,6 @@ class SafeSystemSettingSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mod
     value = serializers.SerializerMethodField()
     hero_title = serializers.CharField(required=False, allow_blank=True, write_only=True)
     hero_subtitle = serializers.CharField(required=False, allow_blank=True, write_only=True)
-    phone = serializers.CharField(required=False, allow_blank=True, write_only=True)
-    email = serializers.EmailField(required=False, allow_blank=True, write_only=True)
     fields = serializers.SerializerMethodField(method_name="get_setting_fields")
 
     class Meta:
@@ -408,8 +489,6 @@ class SafeSystemSettingSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mod
             "fields",
             "hero_title",
             "hero_subtitle",
-            "phone",
-            "email",
         )
         read_only_fields = ("setting_id", "updated_at", "label", "help_text", "warning", "requires_super_admin", "value", "fields")
 

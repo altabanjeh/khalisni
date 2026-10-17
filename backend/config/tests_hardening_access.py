@@ -441,21 +441,32 @@ class TenantWriteBoundaryTests(TenantBase):
 
 
 class CustomerPaymentRecordTests(HardeningBase):
-    """KHS-021: the payer cannot write platform-owned payment fields."""
+    """KHS-021: the payer cannot write payment records.
+
+    Owner decision B05 took online payment out of the release, so the customer
+    write path is closed entirely: no payment field, platform-owned or not, can
+    be written by a customer.
+    """
 
     def _post(self, order, **payload):
         self._as(self.customer)
         return self.client.post("/api/customer/payments/", {"order": order.pk, "method": "cash", **payload}, format="json")
 
     def test_customer_cannot_record_refund_or_non_positive_amount(self):
+        from payment.models import Payment
+
         order = self._order_for(self.customer)
-        self.assertEqual(self._post(order, payment_type="refund", amount="5.00").status_code, 400)
-        self.assertEqual(self._post(order, payment_type="full", amount="0").status_code, 400)
-        self.assertEqual(self._post(order, payment_type="full", amount="-5").status_code, 400)
+        self.assertEqual(self._post(order, payment_type="refund", amount="5.00").status_code, 405)
+        self.assertEqual(self._post(order, payment_type="full", amount="0").status_code, 405)
+        self.assertEqual(self._post(order, payment_type="full", amount="-5").status_code, 405)
+        self.assertFalse(Payment.objects.filter(order=order).exists())
 
     def test_customer_cannot_pay_for_another_customers_order(self):
+        from payment.models import Payment
+
         order = self._order_for(self.other_customer)
-        self.assertIn(self._post(order, payment_type="full", amount="5.00").status_code, (400, 403, 404))
+        self.assertIn(self._post(order, payment_type="full", amount="5.00").status_code, (403, 404, 405))
+        self.assertFalse(Payment.objects.filter(order=order).exists())
 
 
 class CatalogSchemaValidationTests(HardeningBase):

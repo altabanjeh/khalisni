@@ -1,0 +1,625 @@
+[
+ {
+  "from_status": "NEW",
+  "to_status": "ARCHIVED",
+  "from_status_label": "New",
+  "to_status_label": "Archived",
+  "action": "archive_order",
+  "channel": "status",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "New to Archived by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "NEW",
+  "to_status": "UNDER_REVIEW",
+  "from_status_label": "New",
+  "to_status_label": "Under review",
+  "action": "start_review",
+  "channel": "status",
+  "validation_checks": [
+   "internal_actor_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "New to Under review by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "NEW",
+  "to_status": "CANCELLED",
+  "from_status_label": "New",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "customer_owns_order"
+  ],
+  "allowed_roles": [
+   "admin",
+   "customer"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Customer"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "New to Cancelled by Admin, Customer",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "UNDER_REVIEW",
+  "to_status": "WAITING_CUSTOMER",
+  "from_status_label": "Under review",
+  "to_status_label": "Waiting customer",
+  "action": "request_missing_documents",
+  "channel": "dedicated",
+  "validation_checks": [
+   "note_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Under review to Waiting customer by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "UNDER_REVIEW",
+  "to_status": "ASSIGNED",
+  "from_status_label": "Under review",
+  "to_status_label": "Assigned",
+  "action": "assign_provider",
+  "channel": "dedicated",
+  "validation_checks": [
+   "provider_required",
+   "required_documents_approved",
+   "provider_approved",
+   "provider_available",
+   "provider_service_match"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Under review to Assigned by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "UNDER_REVIEW",
+  "to_status": "REJECTED",
+  "from_status_label": "Under review",
+  "to_status_label": "Rejected",
+  "action": "reject_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "reason_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Under review to Rejected by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "UNDER_REVIEW",
+  "to_status": "CANCELLED",
+  "from_status_label": "Under review",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "assigned_employee_or_unassigned"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Under review to Cancelled by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "WAITING_CUSTOMER",
+  "to_status": "UNDER_REVIEW",
+  "from_status_label": "Waiting customer",
+  "to_status_label": "Under review",
+  "action": "resume_review",
+  "channel": "dedicated",
+  "validation_checks": [
+   "all_missing_documents_uploaded"
+  ],
+  "allowed_roles": [
+   "admin",
+   "customer",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Customer",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Waiting customer to Under review by Admin, Customer, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "WAITING_CUSTOMER",
+  "to_status": "CANCELLED",
+  "from_status_label": "Waiting customer",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "assigned_employee_or_unassigned"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Waiting customer to Cancelled by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "ASSIGNED",
+  "to_status": "IN_PROGRESS",
+  "from_status_label": "Assigned",
+  "to_status_label": "In progress",
+  "action": "provider_start_work",
+  "channel": "provider_status",
+  "validation_checks": [
+   "assigned_provider_only"
+  ],
+  "allowed_roles": [
+   "provider"
+  ],
+  "allowed_role_labels": [
+   "Provider"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Assigned to In progress by Provider",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "ASSIGNED",
+  "to_status": "CANCELLED",
+  "from_status_label": "Assigned",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Assigned to Cancelled by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "IN_PROGRESS",
+  "to_status": "WAITING_GOVERNMENT",
+  "from_status_label": "In progress",
+  "to_status_label": "Waiting government",
+  "action": "provider_pause_for_government",
+  "channel": "provider_status",
+  "validation_checks": [
+   "assigned_provider_only"
+  ],
+  "allowed_roles": [
+   "provider"
+  ],
+  "allowed_role_labels": [
+   "Provider"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "In progress to Waiting government by Provider",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "IN_PROGRESS",
+  "to_status": "READY_FOR_DELIVERY",
+  "from_status_label": "In progress",
+  "to_status_label": "Ready for delivery",
+  "action": "mark_ready_for_delivery",
+  "channel": "dedicated",
+  "validation_checks": [
+   "final_document_required",
+   "required_documents_approved"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "provider",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Provider",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "In progress to Ready for delivery by Admin, Employee, Provider, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "IN_PROGRESS",
+  "to_status": "REJECTED",
+  "from_status_label": "In progress",
+  "to_status_label": "Rejected",
+  "action": "reject_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "reason_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "In progress to Rejected by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "IN_PROGRESS",
+  "to_status": "CANCELLED",
+  "from_status_label": "In progress",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "In progress to Cancelled by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "WAITING_GOVERNMENT",
+  "to_status": "IN_PROGRESS",
+  "from_status_label": "Waiting government",
+  "to_status_label": "In progress",
+  "action": "provider_resume_work",
+  "channel": "provider_status",
+  "validation_checks": [
+   "assigned_provider_only"
+  ],
+  "allowed_roles": [
+   "provider"
+  ],
+  "allowed_role_labels": [
+   "Provider"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Waiting government to In progress by Provider",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "WAITING_GOVERNMENT",
+  "to_status": "READY_FOR_DELIVERY",
+  "from_status_label": "Waiting government",
+  "to_status_label": "Ready for delivery",
+  "action": "mark_ready_for_delivery",
+  "channel": "dedicated",
+  "validation_checks": [
+   "final_document_required",
+   "required_documents_approved"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "provider",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Provider",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Waiting government to Ready for delivery by Admin, Employee, Provider, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "WAITING_GOVERNMENT",
+  "to_status": "CANCELLED",
+  "from_status_label": "Waiting government",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Waiting government to Cancelled by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "READY_FOR_DELIVERY",
+  "to_status": "UNDER_REVIEW",
+  "from_status_label": "Ready for delivery",
+  "to_status_label": "Under review",
+  "action": "return_to_internal_review",
+  "channel": "status",
+  "validation_checks": [
+   "reason_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Ready for delivery to Under review by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "READY_FOR_DELIVERY",
+  "to_status": "IN_PROGRESS",
+  "from_status_label": "Ready for delivery",
+  "to_status_label": "In progress",
+  "action": "return_to_provider",
+  "channel": "status",
+  "validation_checks": [
+   "assigned_provider_required",
+   "reason_required"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": true,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Ready for delivery to In progress by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "READY_FOR_DELIVERY",
+  "to_status": "COMPLETED",
+  "from_status_label": "Ready for delivery",
+  "to_status_label": "Completed",
+  "action": "complete_order",
+  "channel": "dedicated",
+  "validation_checks": [
+   "final_document_verified_or_admin_override"
+  ],
+  "allowed_roles": [
+   "admin",
+   "employee",
+   "support"
+  ],
+  "allowed_role_labels": [
+   "Admin",
+   "Employee",
+   "Support"
+  ],
+  "reason_required": false,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Ready for delivery to Completed by Admin, Employee, Support",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "READY_FOR_DELIVERY",
+  "to_status": "CANCELLED",
+  "from_status_label": "Ready for delivery",
+  "to_status_label": "Cancelled",
+  "action": "cancel_order",
+  "channel": "dedicated",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Ready for delivery to Cancelled by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "COMPLETED",
+  "to_status": "UNDER_REVIEW",
+  "from_status_label": "Completed",
+  "to_status_label": "Under review",
+  "action": "reopen_order",
+  "channel": "status",
+  "validation_checks": [
+   "reason_required"
+  ],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": true,
+  "notification_trigger": true,
+  "audit_required": true,
+  "summary": "Completed to Under review by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "COMPLETED",
+  "to_status": "ARCHIVED",
+  "from_status_label": "Completed",
+  "to_status_label": "Archived",
+  "action": "archive_order",
+  "channel": "status",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Completed to Archived by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "REJECTED",
+  "to_status": "ARCHIVED",
+  "from_status_label": "Rejected",
+  "to_status_label": "Archived",
+  "action": "archive_order",
+  "channel": "status",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Rejected to Archived by Admin",
+  "change_request_supported": false
+ },
+ {
+  "from_status": "CANCELLED",
+  "to_status": "ARCHIVED",
+  "from_status_label": "Cancelled",
+  "to_status_label": "Archived",
+  "action": "archive_order",
+  "channel": "status",
+  "validation_checks": [],
+  "allowed_roles": [
+   "admin"
+  ],
+  "allowed_role_labels": [
+   "Admin"
+  ],
+  "reason_required": false,
+  "notification_trigger": false,
+  "audit_required": true,
+  "summary": "Cancelled to Archived by Admin",
+  "change_request_supported": false
+ }
+]

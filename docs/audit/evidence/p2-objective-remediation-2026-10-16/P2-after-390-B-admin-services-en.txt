@@ -1,0 +1,1596 @@
+URL: http://127.0.0.1:4352/admin/services
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+WORK PORTAL
+
+Admin dashboard
+
+OVERVIEW
+
+Admin dashboard
+
+OPERATIONS
+
+Requests
+New service requests
+Payments
+Operating rules
+Notifications
+
+SERVICE MANAGEMENT
+
+Service categories
+Services
+Service relations
+
+USERS & PROVIDERS
+
+Users & roles
+Providers
+Provider services
+
+CONTENT & PUBLIC SITE
+
+Public site
+Homepage content
+Advertisements
+Appearance
+Preview site
+Guide management
+
+REPORTING & AUDIT
+
+Reports
+Audit log
+
+SETTINGS
+
+System settings
+Manual
+Admin dashboard
+
+Services
+
+Service management
+
+Unified management of categories, services and master document definitions. A document is created once, then linked to a service from the service form itself.
+
+Categories
+
+Organise public site cards and browsing paths from the same page.
+
+Services
+
+Control pricing, delivery time, public visibility and the information required from the customer.
+
+Document definitions
+
+Create a document definition once, then pick it from services instead of retyping the same text.
+
+Categories
+
+Create, edit and deactivate categories from the services screen itself.
+
++ New category
+Visible items: 13
+Active
+Deleted
+All
+Category
+Category
+Slug
+category-debug
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Category
+Slug
+category-debug-2
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Category
+Slug
+category-debug-3
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Civil Status
+Slug
+civil-status
+Order
+1
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Civil Status and Passports
+Slug
+civil-status-and-passports
+Order
+1
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Land and Survey
+Slug
+land-and-survey
+Order
+1
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Business Services
+Slug
+business_services
+Order
+2
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Quick Public Services
+Slug
+quick-public-services
+Order
+2
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Tax
+Slug
+tax
+Order
+3
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Municipal Services
+Slug
+municipal-services
+Order
+4
+Status
+Active
+Actions
+Edit
+Delete
+Category
+General
+Slug
+general
+Order
+4
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Ministry of Labour
+Slug
+ministry-of-labour
+Order
+5
+Status
+Active
+Actions
+Edit
+Delete
+Category
+Social Security
+Slug
+social-security
+Order
+7
+Status
+Active
+Actions
+Edit
+Delete
+Services
+
+All core service attributes live here, including master document selection and how prices are shown to the public.
+
++ New service
+Visible items: 20
+Active
+Deleted
+All
+All categories
+???
+???
+???
+الأحوال المدنية والجوازات
+الأحوال المدنية والجوازات
+العقارات والأراضي
+خدمات الأعمال والشركات
+خدمات عامة سريعة
+ضريبة الدخل والمبيعات
+الخدمات البلدية
+الخدمات العامة السريعة
+وزارة العمل
+الضمان الاجتماعي
+Service
+Service
+Category
+Category
+Delivery
+Expected completion: 3 days
+Documents
+0
+Public site
+Hidden
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Service
+Category
+Category
+Delivery
+Expected completion: 3 days
+Documents
+0
+Public site
+Hidden
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Service
+Category
+Category
+Delivery
+Expected completion: 3 days
+Documents
+0
+Public site
+Hidden
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Passport Appointment Booking
+Category
+Civil Status and Passports
+Delivery
+Expected completion: 1 to 3 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+No Criminal Record
+Category
+Civil Status
+Delivery
+Expected completion: 2 days
+Documents
+2
+Public site
+Hidden
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Company Registration
+Category
+Business Services
+Delivery
+Expected completion: 1 days
+Documents
+6
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Property Registration Certificate
+Category
+Land and Survey
+Delivery
+Expected completion: 1 days
+Documents
+3
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Passport Renewal
+Category
+Civil Status
+Delivery
+Expected completion: 2 to 4 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Company Information Amendment
+Category
+Business Services
+Delivery
+Expected completion: 1 days
+Documents
+6
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Cadastral Map
+Category
+Land and Survey
+Delivery
+Expected completion: 1 days
+Documents
+3
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Traffic Fines Payment
+Category
+Quick Public Services
+Delivery
+Expected completion: 3 to 5 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request to Add Business Activities to an Existing Company
+Category
+Business Services
+Delivery
+Expected completion: 1 days
+Documents
+4
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Property Ownership Transfer
+Category
+Land and Survey
+Delivery
+Expected completion: 1 days
+Documents
+5
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Tax Clearance
+Category
+Tax
+Delivery
+Expected completion: 4 to 6 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Commercial Registration Certificate
+Category
+Business Services
+Delivery
+Expected completion: 1 days
+Documents
+3
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Inheritance Registration
+Category
+Land and Survey
+Delivery
+Expected completion: 1 days
+Documents
+5
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Business License Renewal
+Category
+Municipal Services
+Delivery
+Expected completion: 5 to 7 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Trade Name Certificate
+Category
+Business Services
+Delivery
+Expected completion: 1 days
+Documents
+3
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Request Property Gift Transfer
+Category
+Land and Survey
+Delivery
+Expected completion: 1 days
+Documents
+5
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+Service
+Property Registration Deed
+Category
+Land and Survey
+Delivery
+Expected completion: 6 to 8 days
+Documents
+2
+Public site
+Visible
+Status
+Active
+Actions
+Edit
+Delete
+
+Showing 1–20 of 38
+
+1
+2
+Document definitions
+
+This is the master list the admin picks required documents from for each service.
+
++ Document definition
+Visible items: 69
+Active
+Deleted
+All
+Document
+أي بيانات تساعد في تحديد العقار
+Code
+document_74a2f98299
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+أي مستندات إضافية تطلبها الجهة المختصة
+Code
+document_b03d952538
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+أي وثائق إضافية تطلبها الجهة المختصة
+Code
+document_b0f143ad16
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إثبات شخصية صاحب الطلب
+Code
+document_197c7d7fc0
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إثبات شخصية صاحب العلاقة/مقدم الطلب
+Code
+document_b7393c5318
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إثبات شخصية مالك العلامة
+Code
+document_fd135ce03f
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إثبات شخصية مقدم الطلب
+Code
+document_85697877bb
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إذن إشغال
+Code
+document_602b0a206b
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+إذن المحكمة المختصة
+Code
+document_c82005f833
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+المخططات الهندسية
+Code
+document_3443627d36
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+الهوية
+Code
+document_a4c4fed3af
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+براءات ذمة/موافقات إضافية من الجهات المختصة
+Code
+document_6192cecaba
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+براءة ذمة من الضمان الاجتماعي
+Code
+document_ddc0c08e82
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+براءة ذمة من ضريبة الدخل والمبيعات
+Code
+document_7713142b41
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+تفويض أو وكالة للشخص الذي يتابع الإجراءات
+Code
+document_3bee74c311
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+authorization-letter
+Code
+authorization-letter
+Extensions
+JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+تفويض خطي
+Code
+document_11714fabf5
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+تفويض خطي أو وكالة
+Code
+document_d038474c7a
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+تفويض خطي أو وكالة عدلية
+Code
+document_f56c2e0812
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+تقرير المصفي وتقارير التصفية
+Code
+document_37e2d6c45c
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Inheritance certificate
+Code
+inheritance_certificate
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+رخصة المهن الحالية
+Code
+document_ef81fa254a
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي
+Code
+document_69e9a26d6e
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Property registration certificate
+Code
+property_registration_certificate
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+سندات تسجيل جميع القطع
+Code
+document_7c6a69c2f4
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+شهادة الوفاة
+Code
+document_443aae22bf
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+شهادة تسجيل العلامة السابقة
+Code
+document_7672fa9fbe
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+شهادة شطب الاسم التجاري
+Code
+document_8e430fe32b
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+شهادة/بيانات تسجيل الشركة أو المنشأة
+Code
+document_322e004de0
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+شهادة/سجل الشركة أو المؤسسة
+Code
+document_d7d63d7027
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+صور هويات الورثة
+Code
+document_c3a3aa1c50
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+National ID copy
+Code
+national_id_copy
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Seller national ID copy
+Code
+seller_national_id_copy
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Buyer national ID copy
+Code
+buyer_national_id_copy
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+صورة هوية الموهوب له
+Code
+document_11667481fd
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+صورة هوية الواهب
+Code
+document_564406e175
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+صورة هوية/جواز سفر الشركاء
+Code
+document_b84500235f
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+صورة واضحة للعلامة / الشعار
+Code
+document_5eb4193ba1
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+عقد إيجار ساري أو سند ملكية
+Code
+document_1c40b3e58a
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+عقد التمويل أو اتفاقية الرهن (إن وجدت)
+Code
+document_5c2f8f95d1
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+عقد ونظام الشركة المعدلان أو النماذج المعتمدة
+Code
+document_39a02bfad7
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+عقد/نظام معدل أو النموذج المعتمد
+Code
+document_ec8d545fbf
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+عقد/وثائق تحويل الحصص
+Code
+document_e6d6a52927
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+قرار/طلب الشطب أو التصفية موقع حسب الأصول
+Code
+document_f0fbb87902
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+كتاب أو موافقة فك الرهن من الجهة المرتهنة
+Code
+document_d2024a06a1
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+كتاب تفويض من الشركة
+Code
+document_5ca1add6b9
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات
+Code
+document_cdd8ce3328
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة
+Code
+document_cb35245bcf
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Cadastral map
+Code
+cadastral_map
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+مخطط أراضٍ إن وجد
+Code
+document_0cc19c2317
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+مخطط موقع تنظيمي
+Code
+document_3775124a52
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+مستند يبرر استخدام اسم خاص/أجنبي
+Code
+document_1b1707d621
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+مستندات داعمة للتعديل
+Code
+document_56caf9c71a
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقات الجهات المختصة
+Code
+document_04defb9ccb
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقات الجهات المختصة بالنشاط
+Code
+document_3df268a71b
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقات مسبقة على الغايات/الأنشطة
+Code
+document_a7c41b216c
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقات مسبقة على الغاية الجديدة
+Code
+document_cc8affb2cc
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقات/قرارات الشركاء على التصفية والتقرير النهائي
+Code
+document_652dd91fc4
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+موافقة مالك العقار
+Code
+document_5375b03f66
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+هوية الأطراف المعنية بالتعديل
+Code
+document_bb343bc1a7
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+national-id
+Code
+national-id
+Extensions
+JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وثائق الحصص العينية
+Code
+document_d6f5694849
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وثائق الشركة الأجنبية مصدقة ومترجمة
+Code
+document_6a5fef1088
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وثائق المستفيد الحقيقي
+Code
+document_bf9b841bf1
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وثائق نقل الملكية ونماذج التنازل/النقل
+Code
+document_fb697280d9
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وكالة عدلية
+Code
+document_af883d59b3
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Legal authorization
+Code
+legal_authorization
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+Legal power of attorney
+Code
+legal_power_of_attorney
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete
+Document
+وكالة قانونية إن وجدت
+Code
+document_e95445e836
+Extensions
+Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image
+Max size
+10 MB
+Order
+0
+Status
+Active
+Actions
+Edit
+Delete

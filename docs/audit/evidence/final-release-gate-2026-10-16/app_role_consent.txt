@@ -1,0 +1,14 @@
+connected as: khalsni_app
+APP insert service (ordinary admin data): 9
+APP create order: 201 {'id': 9, 'order_number': 'KH-2026-000009', 'status': OrderStatus.NEW, 'warnings': []}
+APP consent row: 1 True order-consent-web-v1 ar web
+APP ordinary order update (status-independent field): True
+BYPASS UPDATE consent row: refused (IntegrityError: Consent evidence is append-only. UPDATE refused.)
+BYPASS DELETE consent row: refused (IntegrityError: Consent evidence is append-only. DELETE refused.)
+BYPASS DISABLE TRIGGER: refused (ProgrammingError: must be owner of table orders_orderconsent)
+BYPASS DROP TRIGGER: refused (ProgrammingError: must be owner of relation orders_orderconsent)
+BYPASS session_replication_role=replica: refused (ProgrammingError: permission denied to set parameter "session_replication_role")
+BYPASS TRUNCATE: refused (ProgrammingError: permission denied for table orders_orderconsent)
+BYPASS DROP TABLE: refused (ProgrammingError: must be owner of table orders_orderconsent)
+BYPASS hard DELETE parent order: refused (IntegrityError: update or delete on table "orders_order" violates foreign key constraint "orders_orderstat)
+AFTER consent row intact: True order-consent-web-v1 1

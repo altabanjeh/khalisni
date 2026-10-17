@@ -1,20 +1,23 @@
-import os
 import re
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from core.i18n import request_language
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 
+from accounts.fields import CanonicalPhoneField
 from accounts.models import CustomUser
 from core.choices import DocumentType
-from documents.file_validation import sniff_matches_extension
+from documents.file_validation import requirement_upload_error
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
 from documents.services import can_user_download_document, is_customer_visible_document
 from organizations.models import Branch
 from organizations.selectors import customer_organization_for_user, resolve_organization_by_ref
+from orders.consent import CONSENT_TEXTS, SOURCES, consent_evidence
 from orders.models import Order, OrderIssue, OrderNote, OrderStatusLog, Rating
 from orders.allowed_actions import get_order_allowed_actions
+from orders.system_events import describe_status_log
 from orders.readiness import order_requirement_rows, order_requirements
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
@@ -66,10 +69,28 @@ class ProviderBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
 
 class OrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
     changed_by_name = serializers.CharField(source="changed_by.full_name", read_only=True)
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "changed_by", "changed_by_name", "note", "created_at")
+        fields = (
+            "id",
+            "old_status",
+            "new_status",
+            "changed_by",
+            "changed_by_name",
+            "note",
+            "system_event",
+            "system_event_params",
+            "created_at",
+        )
+
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0]
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1]
 
 
 # Transitions whose reason is written for the customer. Every other status-log
@@ -83,13 +104,25 @@ class CustomerOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializer
     """Timeline for the order owner and public tracking: no staff identity, no internal reasons."""
 
     note = serializers.SerializerMethodField()
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "note", "created_at")
+        fields = ("id", "old_status", "new_status", "note", "system_event", "system_event_params", "created_at")
+
+    def _note_visible(self, obj):
+        return obj.new_status in CUSTOMER_FACING_NOTE_STATUSES
 
     def get_note(self, obj):
-        return obj.note if obj.new_status in CUSTOMER_FACING_NOTE_STATUSES else ""
+        return obj.note if self._note_visible(obj) else ""
+
+    # The code follows the note: hidden notes stay hidden in every language.
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0] if self._note_visible(obj) else ""
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1] if self._note_visible(obj) else {}
 
 
 def _is_customer_request(request):
@@ -103,6 +136,17 @@ class OrderNoteSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
     class Meta:
         model = OrderNote
         fields = ("id", "user", "user_name", "note", "visibility", "created_at")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        if self.context.get("public_track", False) or _is_customer_request(request):
+            # A customer-visible note written by a provider or staff member
+            # must not name its author (owner decision B06).
+            if instance.user_id != getattr(getattr(request, "user", None), "pk", None):
+                data["user"] = None
+                data["user_name"] = None
+        return data
 
 
 class RatingSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -152,6 +196,10 @@ class OrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
         if _is_customer_request(self.context.get("request")):
             # Who inside the operations team holds the order is not customer data.
             data["assigned_employee"] = None
+            # Owner decision B06: provider identity is hidden from customers.
+            # The key is dropped, not nulled, so no provider id, name, type,
+            # city, rating or availability can reach the customer payload.
+            data.pop("assigned_provider", None)
         return data
 
 
@@ -202,9 +250,11 @@ class OrderDetailSerializer(OrderListSerializer):
     notes = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
     required_documents = serializers.SerializerMethodField()
+    consent = serializers.SerializerMethodField()
 
     class Meta(OrderListSerializer.Meta):
         fields = OrderListSerializer.Meta.fields + (
+            "consent",
             "customer",
             "city",
             "customer_notes",
@@ -250,6 +300,21 @@ class OrderDetailSerializer(OrderListSerializer):
     def get_required_documents(self, obj):
         return order_requirement_rows(obj)
 
+    def get_consent(self, obj):
+        # Orders submitted before consent evidence existed stay "legacy_unknown":
+        # no acceptance is reconstructed for them.
+        record = obj.consents.order_by("-created_at", "-consent_id").first()
+        if record is None:
+            return {"status": "legacy_unknown"}
+        return {
+            "status": "recorded",
+            "accepted": record.accepted,
+            "version": record.consent_version,
+            "language": record.language,
+            "source": record.source,
+            "accepted_at": record.created_at,
+        }
+
     def get_notes(self, obj):
         public_track = self.context.get("public_track", False)
         request = self.context.get("request")
@@ -258,7 +323,7 @@ class OrderDetailSerializer(OrderListSerializer):
             queryset = queryset.filter(visibility=OrderNote.Visibility.CUSTOMER)
         elif request and request.user.is_authenticated and request.user.role == CustomUser.Role.CUSTOMER:
             queryset = queryset.filter(visibility=OrderNote.Visibility.CUSTOMER)
-        return OrderNoteSerializer(queryset, many=True).data
+        return OrderNoteSerializer(queryset, many=True, context={"request": request, "public_track": public_track}).data
 
     def get_rating(self, obj):
         rating = getattr(obj, "rating", None)
@@ -268,9 +333,18 @@ class OrderDetailSerializer(OrderListSerializer):
 
 
 class ProviderOrderStatusLogSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    system_event = serializers.SerializerMethodField()
+    system_event_params = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderStatusLog
-        fields = ("id", "old_status", "new_status", "note", "created_at")
+        fields = ("id", "old_status", "new_status", "note", "system_event", "system_event_params", "created_at")
+
+    def get_system_event(self, obj):
+        return describe_status_log(obj)[0]
+
+    def get_system_event_params(self, obj):
+        return describe_status_log(obj)[1]
 
 
 class ProviderOrderListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
@@ -333,11 +407,14 @@ class PublicOrderCreateSerializer(serializers.Serializer):
     organization = serializers.CharField(required=False, allow_blank=True)
     branch_id = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), required=False, allow_null=True)
     full_name = serializers.CharField(max_length=255)
-    phone = serializers.CharField(max_length=30)
+    phone = CanonicalPhoneField()
     national_id = serializers.CharField(max_length=32, required=False, allow_blank=True)
     city = serializers.CharField(max_length=120)
     notes = serializers.CharField(required=False, allow_blank=True)
     consent = serializers.BooleanField()
+    # Which consent statement the client showed, and which client it was.
+    consent_version = serializers.CharField(max_length=64, required=False, allow_blank=True)
+    consent_source = serializers.ChoiceField(choices=SOURCES, required=False)
     document_types = serializers.ListField(
         child=serializers.CharField(max_length=120),
         write_only=True,
@@ -369,6 +446,12 @@ class PublicOrderCreateSerializer(serializers.Serializer):
     def validate_consent(self, value):
         if not value:
             raise serializers.ValidationError("Consent is required.")
+        return value
+
+    def validate_consent_version(self, value):
+        value = (value or "").strip()
+        if value and value not in CONSENT_TEXTS:
+            raise serializers.ValidationError("Unknown consent statement version.")
         return value
 
     def validate_service(self, value):
@@ -444,23 +527,11 @@ class PublicOrderCreateSerializer(serializers.Serializer):
                 document_errors.setdefault(document_type, "This document was uploaded more than once.")
                 continue
 
-            extension = os.path.splitext(upload.name or "")[1].lower()
-            allowed_extensions = [str(item).lower() for item in (requirement.allowed_extensions or []) if str(item).strip()]
-            if allowed_extensions and extension not in allowed_extensions:
-                errors[f"documents[{index}]"] = "Unsupported file extension for this document."
-                document_errors.setdefault(document_type, "Unsupported file extension for this document.")
-                continue
-
-            max_file_size = requirement.max_file_size or 0
-            if max_file_size and upload.size > max_file_size:
-                errors[f"documents[{index}]"] = "This document exceeds the allowed file size."
-                document_errors.setdefault(document_type, "This document exceeds the allowed file size.")
-                continue
-
-            # Defect D5: reject files whose real bytes contradict the extension.
-            if not sniff_matches_extension(upload, extension):
-                errors[f"documents[{index}]"] = "File content does not match its extension."
-                document_errors.setdefault(document_type, "File content does not match its extension.")
+            # Extension, size and real-content (defect D5) rules of this requirement.
+            upload_error = requirement_upload_error(upload, requirement)
+            if upload_error:
+                errors[f"documents[{index}]"] = upload_error
+                document_errors.setdefault(document_type, upload_error)
                 continue
 
             seen_types.add(document_type)
@@ -487,6 +558,11 @@ class PublicOrderCreateSerializer(serializers.Serializer):
 
         payload = dict(validated_data)
         payload.pop("consent", None)
+        payload["consent_evidence"] = consent_evidence(
+            version=payload.pop("consent_version", ""),
+            source=payload.pop("consent_source", ""),
+            request_language=request_language(request),
+        )
         payload["organization"] = payload.pop("organization_obj", None)
         payload["branch"] = payload.pop("branch_id", None)
         payload["submission_key"] = self.context.get("submission_key")
@@ -630,3 +706,7 @@ class CompleteOrderSerializer(serializers.Serializer):
 
 class CancelOrderSerializer(serializers.Serializer):
     reason = serializers.CharField()
+
+
+class RecoverMissingDocumentRequestSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=1000)

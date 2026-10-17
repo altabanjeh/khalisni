@@ -55,3 +55,20 @@ Thumbs.db
 /imges/
 /khalasni_design_system.html
 /docs/system_review.zip
+
+# Browser profiles left behind by screenshot tooling (headless Chrome
+# --user-data-dir). They hold cookies, history and local storage; never commit.
+**/chrome-*/Default/
+**/chrome-*/Local State
+**/chrome-*/*Cache*/
+**/User Data/
+**/Default/Cookies*
+**/Default/Login Data*
+**/Default/History*
+**/Default/Local Storage/
+**/Default/Network/
+
+# Built bundles accidentally saved outside frontend/dist
+/live*.js
+/index-*.js
+/assets/

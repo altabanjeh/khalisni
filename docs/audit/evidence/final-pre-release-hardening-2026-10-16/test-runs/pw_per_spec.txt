@@ -1,0 +1,17 @@
+PASSED per spec:
+     30 e2e\a11y.spec.js
+     80 e2e\axe-auth.spec.js
+     10 e2e\client-audit-acceptance.spec.js
+     10 e2e\client-audit-idempotency.spec.js
+      1 e2e\client-audit-responsive.spec.js
+      5 e2e\client-audit-role-reentry.spec.js
+     15 e2e\client-audit-ux.spec.js
+      5 e2e\hardening-access.spec.js
+     10 e2e\hardening-closure.spec.js
+     20 e2e\p2-accessibility.spec.js
+     50 e2e\public.spec.js
+    245 e2e\routes.spec.js
+SKIPPED per spec:
+      4 e2e\client-audit-responsive.spec.js
+     10 e2e\nginx-deployment.spec.js
+      5 e2e\p2-accessibility.spec.js

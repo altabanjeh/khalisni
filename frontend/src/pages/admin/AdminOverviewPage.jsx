@@ -18,7 +18,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import EmptyState from '../../components/EmptyState'
 import { getDisplayError } from '../../api/client'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, getStatusLabel } from '../../utils/format'
 
 function AdminOverviewPage() {
   const { language, isArabic } = useLanguage()
@@ -61,12 +61,13 @@ function AdminOverviewPage() {
           <h2 className="text-xl font-bold text-ink">{isArabic ? "الطلبات حسب الحالة" : "Requests by status"}</h2>
           <div className="mt-6 h-80">
             <ResponsiveContainer height="100%" width="100%">
-              <BarChart data={data.orders_by_status}>
+              {/* Status codes are presented through the shared status labels (audit D03). */}
+              <BarChart data={(data.orders_by_status || []).map((row) => ({ ...row, label: getStatusLabel(row.status, language) }))}>
                 <CartesianGrid stroke="var(--kh-border)" strokeDasharray="3 3" />
-                <XAxis dataKey="status" stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
+                <XAxis dataKey="label" stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
                 <YAxis stroke="var(--kh-text-muted)" tick={{ fill: 'var(--kh-text-muted)', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: 'var(--kh-surface)', border: '1px solid var(--kh-border)', borderRadius: 12, color: 'var(--kh-text)' }} />
-                <Bar dataKey="total" fill="#146ef0" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="total" fill="#146ef0" name={isArabic ? 'عدد الطلبات' : 'Requests'} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

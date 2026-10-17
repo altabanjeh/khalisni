@@ -58,7 +58,7 @@ function renderPage() {
 }
 
 test('a second submit works after the server rejects the file with a `file` error', async () => {
-  vi.spyOn(api, 'getCustomerOrder').mockResolvedValue({
+  const waitingOrder = {
     id: 1,
     order_number: 'KH-2026-000124',
     status: 'WAITING_CUSTOMER',
@@ -66,7 +66,11 @@ test('a second submit works after the server rejects the file with a `file` erro
     required_documents: [{ id: 1, document_type: 'national_id', name_ar: 'الهوية الشخصية', allowed_extensions: ['.pdf'] }],
     notes: [{ id: 1, visibility: 'CUSTOMER', note: 'يرجى رفع الهوية.' }],
     allowed_actions: { can_view_missing_documents_form: true },
-  })
+  }
+  // After the accepted upload the server has resumed review.
+  vi.spyOn(api, 'getCustomerOrder')
+    .mockResolvedValueOnce(waitingOrder)
+    .mockResolvedValue({ ...waitingOrder, status: 'UNDER_REVIEW', missing_document_types: [] })
   // The API answers 400 {"file": [...]}: a key that is not an input on this form.
   const rejection = Object.assign(new Error('الملف مرفوض'), {
     displayMessage: 'الملف مرفوض',

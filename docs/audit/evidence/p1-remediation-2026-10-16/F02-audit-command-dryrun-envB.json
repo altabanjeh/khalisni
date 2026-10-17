@@ -1,0 +1,24 @@
+{
+ "dry_run": true,
+ "count": 1,
+ "orders": [
+  {
+   "order_id": 1,
+   "order_number": "KH-2026-000001",
+   "status": "WAITING_CUSTOMER",
+   "customer_id": 2,
+   "customer_contact": "***0002",
+   "open_request_id": null,
+   "open_request_types": null,
+   "missing_document_types": [],
+   "recorded_types_configured": false,
+   "configured_requirements": [
+    "authorization-letter",
+    "national-id"
+   ],
+   "valid_request": false,
+   "classification": "no_request_no_recorded_types",
+   "recommendation": "return-to-review (staff decides what to request next)"
+  }
+ ]
+}

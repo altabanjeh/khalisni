@@ -1,0 +1,38 @@
+{
+ "rulesWaiting": [
+  "Under review to Waiting customer by Admin, Employee, Support\trequest_missing_documents\tإجراء مخصص\tnote_required\tAdmin, Employee, Support\tنعم\tنعم\tغير مسموح",
+  "Waiting customer to Under review by Admin, Customer, Employee, Support\tresume_review\tإجراء مخصص\tall_missing_documents_uploaded\tAdmin, Customer, Employee, Support\tلا\tلا\tغير مسموح",
+  "Waiting customer to Cancelled by Admin, Employee, Support\tcancel_order\tإجراء مخصص\tassigned_employee_or_unassigned\tAdmin, Employee, Support\tنعم\tنعم\tغير مسموح"
+ ],
+ "F06_editorTitleBefore": "خلّص معاملاتك الحكومية والإدارية بدون تعب",
+ "F06_previewH1Before": "خلّص معاملاتك الحكومية والإدارية بدون تعب",
+ "F06_previewLabel": [
+  "معاينة الواجهة",
+  "معاينة الموقع العام",
+  "هذه الصفحة تعرض الصفحة الرئيسية المنشورة نفسها. يتجدد العرض بعد حفظ المحتوى."
+ ],
+ "F06_publicH1Before": "خلّص معاملاتك الحكومية والإدارية بدون تعب",
+ "F06_saveStatus": 200,
+ "F06_previewH1After": "عنوان تدقيق الإغلاق QA-F06",
+ "F06_publicH1After": "عنوان تدقيق الإغلاق QA-F06",
+ "F06_anonH1After": "عنوان تدقيق الإغلاق QA-F06",
+ "F06_publicH1Restored": "خلّص معاملاتك الحكومية والإدارية بدون تعب",
+ "B10_adminServices": {
+  "rows": 0,
+  "pagination": [],
+  "countText": []
+ },
+ "B10_adminServicesApi": [
+  "GET 200 /api/admin/services/"
+ ],
+ "B10_usersVerifiedCol": [
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق",
+  "تم التحقق"
+ ]
+}

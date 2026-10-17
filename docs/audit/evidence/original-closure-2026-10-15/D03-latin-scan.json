@@ -1,0 +1,92 @@
+{
+ "B/": [],
+ "B/services": [],
+ "B/services/business_company_registration": [],
+ "B/login": [],
+ "B/register": [],
+ "A/track-order": [],
+ "A/customer/orders/new": [],
+ "A/customer/orders/5/missing-docs": [
+  "KH-",
+  "Please upload the QA authorization PDF"
+ ],
+ "A/customer/orders/11": [
+  "Amman",
+  "KH-",
+  "qa-final-distinct.pdf",
+  "qa-valid.pdf",
+  "Journey QA order"
+ ],
+ "A/customer": [
+  "KH-"
+ ],
+ "A/employee/orders/6": [
+  "KH-",
+  "QA Customer A",
+  "Amman",
+  "qa-upload-pending.pdf",
+  "QA upload review",
+  "QA Provider A",
+  "QA service provider",
+  "Approved",
+  "QA Provider B"
+ ],
+ "A/employee/documents/verify": [
+  "qa-valid.pdf",
+  "KH-",
+  "client-audit-qa-",
+  "authorization",
+  "qa-final-result.pdf",
+  "final-result",
+  "qa-upload-pending.pdf",
+  "QA Customer A"
+ ],
+ "A/provider/orders/8": [
+  "KH-",
+  "Amman",
+  "qa-final-result.pdf",
+  "QA final result",
+  "Order assigned to provider",
+  "QA progress update",
+  "Provider completed work and uploaded final result",
+  "JPG",
+  "JPEG",
+  "PNG",
+  "DOC",
+  "DOCX"
+ ],
+ "A/provider/orders": [
+  "KH-",
+  "Amman"
+ ],
+ "A/admin": [
+  "ASSIGNED",
+  "COMPLETED",
+  "NEW",
+  "WAITING",
+  "CUSTOMER"
+ ],
+ "A/admin/orders/6": [
+  "KH-",
+  "assign",
+  "provider",
+  "Required documents are incomplete",
+  "QA Customer A",
+  "Amman",
+  "qa-upload-pending.pdf",
+  "QA upload review"
+ ],
+ "A/admin/orders": [
+  "KH-",
+  "QA Customer A",
+  "QA Provider A",
+  "QA Customer B",
+  "QA Provider B",
+  "Demo Customer",
+  "Demo Provider"
+ ],
+ "A/admin/rules": [
+  "Expected completion",
+  "days"
+ ]
+}

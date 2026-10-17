@@ -1,0 +1,19 @@
+PASS pre: a document waits in the verify queue :: [9,"KH-2026-000008"]
+PASS F04 reject box says the reason is shown to the customer :: "سيظهر هذا السبب للعميل"
+FAIL F04 owner API returns the exact reason :: {"status":200}
+PASS F04 another customer gets 404 :: 404
+FAIL F04 customer UI shows the reason :: "customer order page"
+PASS F04 public tracking carries no reason :: ["id","order_number","status","timeline","old_status","new_status","note","system_event","system_event_params","created_at","missing_documents","missing_document_details","final_documents"]
+PASS B06 customer JSON has no provider keys :: []
+PASS B06 customer JSON has no provider name :: ["QA Provider A","QA Provider B","Demo Provider"]
+PASS B06 staff API still shows the provider :: ["QA Provider A","QA Provider B","Demo Provider"]
+PASS PHONE customer phone stored canonical :: "+9627…"
+PASS PHONE tracking UI accepts the local spaced format :: ["GET 200 /api/orders/track/?order_number=KH-2026-000008&phone=079+880+0103"]
+PASS CONSENT submit without consent refused :: 400
+PASS CONSENT API create needs the service documents; covered by the UI journey instead :: {"status":400,"docsNeeded":1}
+PASS CONSENT seeded (pre-existing) order stays legacy_unknown :: {"status":"legacy_unknown"}
+PASS B05 customer payment create blocked :: 405
+PASS B05 admin ledger still readable :: 200
+PASS B10-7 four labelled counts match the server :: {"total":8,"active":8,"published":8,"customer_visible":8,"customer_scope":"platform"}
+PASS STRUCTURE staff layout has one main landmark :: 1
+SUMMARY 16/18 PASS

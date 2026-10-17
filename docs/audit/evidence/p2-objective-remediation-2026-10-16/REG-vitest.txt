@@ -1,0 +1,8 @@
+ ✓ src/utils/serviceFormsErrors.test.js (7 tests) 8ms
+ ✓ src/utils/servicePresentation.test.js (2 tests) 3ms
+
+ Test Files  43 passed (43)
+      Tests  130 passed (130)
+   Start at  13:09:31
+   Duration  14.54s (transform 4.50s, setup 14.80s, collect 46.06s, tests 42.40s, environment 73.95s, prepare 13.04s)
+

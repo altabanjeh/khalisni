@@ -111,7 +111,7 @@ class OrderAPITests(APITestCase):
         self.assertEqual(order.service_name_snapshot, self.service.name_ar)
         self.assertEqual(order.service_category_name_snapshot, self.category.name_ar)
         self.customer.refresh_from_db()
-        self.assertEqual(self.customer.phone, "0795555555")
+        self.assertEqual(self.customer.phone, "+962795555555")  # canonical form of the submitted 0795555555
 
     def test_submission_key_retries_create_one_order_event_and_notification_set(self):
         self.client.force_authenticate(self.customer)

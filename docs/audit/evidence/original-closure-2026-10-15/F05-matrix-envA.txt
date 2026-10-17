@@ -1,0 +1,56 @@
+RULES (admin-permitted):
+                   NEW -> ARCHIVED             archive_order                    checks=[] channel=status
+                   NEW -> UNDER_REVIEW         start_review                     checks=['internal_actor_required'] channel=status
+                   NEW -> CANCELLED            cancel_order                     checks=['customer_owns_order'] channel=dedicated
+          UNDER_REVIEW -> WAITING_CUSTOMER     request_missing_documents        checks=['note_required'] channel=dedicated
+          UNDER_REVIEW -> ASSIGNED             assign_provider                  checks=['provider_required', 'required_documents_approved', 'provider_approved', 'provider_available', 'provider_service_match'] channel=dedicated
+          UNDER_REVIEW -> REJECTED             reject_order                     checks=['reason_required'] channel=dedicated
+          UNDER_REVIEW -> CANCELLED            cancel_order                     checks=['assigned_employee_or_unassigned'] channel=dedicated
+      WAITING_CUSTOMER -> UNDER_REVIEW         resume_review                    checks=['all_missing_documents_uploaded'] channel=dedicated
+      WAITING_CUSTOMER -> CANCELLED            cancel_order                     checks=['assigned_employee_or_unassigned'] channel=dedicated
+              ASSIGNED -> CANCELLED            cancel_order                     checks=[] channel=dedicated
+           IN_PROGRESS -> READY_FOR_DELIVERY   mark_ready_for_delivery          checks=['final_document_required', 'required_documents_approved'] channel=dedicated
+           IN_PROGRESS -> REJECTED             reject_order                     checks=['reason_required'] channel=dedicated
+           IN_PROGRESS -> CANCELLED            cancel_order                     checks=[] channel=dedicated
+    WAITING_GOVERNMENT -> READY_FOR_DELIVERY   mark_ready_for_delivery          checks=['final_document_required', 'required_documents_approved'] channel=dedicated
+    WAITING_GOVERNMENT -> CANCELLED            cancel_order                     checks=[] channel=dedicated
+    READY_FOR_DELIVERY -> UNDER_REVIEW         return_to_internal_review        checks=['reason_required'] channel=status
+    READY_FOR_DELIVERY -> IN_PROGRESS          return_to_provider               checks=['assigned_provider_required', 'reason_required'] channel=status
+    READY_FOR_DELIVERY -> COMPLETED            complete_order                   checks=['final_document_verified_or_admin_override'] channel=dedicated
+    READY_FOR_DELIVERY -> CANCELLED            cancel_order                     checks=[] channel=dedicated
+             COMPLETED -> UNDER_REVIEW         reopen_order                     checks=['reason_required'] channel=status
+             COMPLETED -> ARCHIVED             archive_order                    checks=[] channel=status
+              REJECTED -> ARCHIVED             archive_order                    checks=[] channel=status
+             CANCELLED -> ARCHIVED             archive_order                    checks=[] channel=status
+KH-2026-000008 READY_FOR_DELIVERY   gen=['UNDER_REVIEW', 'IN_PROGRESS']
+     offered UNDER_REVIEW         return_to_internal_review      available=True blocked=[]
+     offered IN_PROGRESS          return_to_provider             available=True blocked=[]
+     offered COMPLETED            complete_order                 available=True blocked=[]
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000007 ASSIGNED             gen=[]
+     offered IN_PROGRESS          provider_start_work            available=False blocked=["Role 'admin' cannot move order from ASSIGNED to IN_PROGRESS."]
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000006 UNDER_REVIEW         gen=[]
+     offered WAITING_CUSTOMER     request_missing_documents      available=True blocked=[]
+     offered ASSIGNED             assign_provider                available=False blocked=['Required documents are incomplete.']
+     offered REJECTED             reject_order                   available=True blocked=[]
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000005 WAITING_CUSTOMER     gen=[]
+     offered UNDER_REVIEW         resume_review                  available=False blocked=['Requested documents still need upload: client-audit-qa-202610-authorization.']
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000004 NEW                  gen=['ARCHIVED', 'UNDER_REVIEW']
+     offered ARCHIVED             archive_order                  available=True blocked=[]
+     offered UNDER_REVIEW         start_review                   available=True blocked=[]
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000003 COMPLETED            gen=['UNDER_REVIEW', 'ARCHIVED']
+     offered UNDER_REVIEW         reopen_order                   available=True blocked=[]
+     offered ARCHIVED             archive_order                  available=True blocked=[]
+KH-2026-000002 IN_PROGRESS          gen=[]
+     offered WAITING_GOVERNMENT   provider_pause_for_government  available=False blocked=["Role 'admin' cannot move order from IN_PROGRESS to WAITING_GOVERNMENT."]
+     offered READY_FOR_DELIVERY   mark_ready_for_delivery        available=True blocked=[]
+     offered REJECTED             reject_order                   available=True blocked=[]
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+KH-2026-000001 WAITING_CUSTOMER     gen=[]
+     offered UNDER_REVIEW         resume_review                  available=False blocked=['Requested documents still need upload: authorization-letter.']
+     offered CANCELLED            cancel_order                   available=True blocked=[]
+MISMATCHES: [('KH-2026-000007', 'ASSIGNED', 'offered-but-not-admin-rule', None), ('KH-2026-000002', 'IN_PROGRESS', 'offered-but-not-admin-rule', None)]

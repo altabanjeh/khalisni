@@ -1,0 +1,13 @@
+== source (khalsni)
+9 orders, 1 consents, 9 documents, 11 users, 115 migrations, triggers=1
+474306 bytes
+dump seconds: 1
+restore into empty db exit=0 seconds=6
+== restored (empty target)
+9 orders, 1 consents, 9 documents, 11 users, 115 migrations, triggers=1
+restore over existing data exit=0 seconds=8
+== restored again (over existing consent rows + trigger)
+9 orders, 1 consents, 9 documents, 11 users, 115 migrations, triggers=1
+== trigger active after restore
+ERROR:  Consent evidence is append-only. UPDATE refused.
+CONTEXT:  PL/pgSQL function orders_orderconsent_append_only() line 3 at RAISE

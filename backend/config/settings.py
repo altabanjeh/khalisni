@@ -263,7 +263,7 @@ if HAS_DRF:
         authentication_classes.insert(0, "accounts.authentication.VersionedJWTAuthentication")
 
     filter_backends = [
-        "rest_framework.filters.SearchFilter",
+        "core.filters.PhoneAwareSearchFilter",
         "rest_framework.filters.OrderingFilter",
     ]
     if HAS_DJANGO_FILTERS:

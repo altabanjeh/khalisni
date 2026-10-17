@@ -72,7 +72,7 @@ Optional, with their defaults:
 1. Take a PostgreSQL backup.
 2. Restore the backup into a separate database and rehearse the migration (section 5). Do not run it first on production.
 3. Build and deploy both images (the frontend image now includes `nginx-security-headers.conf`).
-4. `entrypoint.sh` runs `migrate`. Migration `orders.0015` adds one nullable column; `orders.0016` fills it in batches of 500 with one commit per batch and can be re-run.
+4. The one-shot `db-init` service runs `migrate` as the database owner role before the backend starts (the backend itself connects as the app role and no longer migrates; see `docs/DEPLOYMENT.md`, "Database roles"). Migration `orders.0015` adds one nullable column; `orders.0016` fills it in batches of 500 with one commit per batch and can be re-run.
 5. Run the checks in section 4.
 
 ## 4. Verification on the deployed site

@@ -10,9 +10,11 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db import connection, transaction
-from django.utils import timezone
+from django.template.loader import render_to_string
+from django.utils import timezone, translation
 
 from core.client_ip import get_client_ip
+from core.i18n import explicit_request_language, pick
 from core.throttling import mark_store_down, store_marked_down
 from accounts.models import CustomUser, PasswordResetToken
 from audit.utils import create_audit_log
@@ -83,43 +85,56 @@ def _build_reset_link(raw_token: str) -> str:
     return f"{base_url}/reset-password/{quote(raw_token)}"
 
 
-def _send_password_reset_email(*, user: CustomUser, raw_token: str) -> None:
-    reset_link = _build_reset_link(raw_token)
+EMAIL_SUBJECTS = {
+    "password_reset": {"ar": "إعادة تعيين كلمة المرور في خلّصني", "en": "Khalsni password reset"},
+    "password_changed": {"ar": "تم تغيير كلمة المرور في خلّصني", "en": "Khalsni password changed"},
+}
+
+
+def _email_request_language(request) -> str:
+    # The web client always names the screen language. Callers that name none
+    # (older or mobile clients) keep the English text they received before.
+    return explicit_request_language(request, default="en")
+
+
+def _email_language() -> str:
+    # The caller activates the language of the request that triggered the email.
+    return "en" if (translation.get_language() or "").lower().startswith("en") else "ar"
+
+
+def _send_account_email(*, kind: str, user: CustomUser, context: dict) -> None:
+    language = _email_language()
+    message = render_to_string(
+        f"accounts/email/{kind}_{language}.txt",
+        {"full_name": user.full_name or user.email, **context},
+    )
     send_mail(
-        subject="Khalsni password reset",
-        message=(
-            "We received a request to reset your Khalsni password.\n\n"
-            f"Use this link within 30 minutes:\n{reset_link}\n\n"
-            "If you did not request this change, you can ignore this email."
-        ),
+        subject=pick(EMAIL_SUBJECTS[kind], language),
+        message=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
         fail_silently=False,
     )
+
+
+def _send_password_reset_email(*, user: CustomUser, raw_token: str) -> None:
+    _send_account_email(kind="password_reset", user=user, context={"reset_link": _build_reset_link(raw_token)})
 
 
 def send_password_changed_notification(*, user: CustomUser) -> None:
-    send_mail(
-        subject="Khalsni password changed",
-        message=(
-            "Your Khalsni password was changed successfully.\n\n"
-            "If you did not perform this change, contact support immediately."
-        ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
-    )
+    _send_account_email(kind="password_changed", user=user, context={})
 
 
-def _send_password_changed_notification_safely(user_id: int) -> None:
+def _send_password_changed_notification_safely(user_id: int, language: str = "en") -> None:
     try:
         user = CustomUser.objects.get(pk=user_id)
-        send_password_changed_notification(user=user)
+        with translation.override(language):
+            send_password_changed_notification(user=user)
     except Exception:
         logger.exception("Failed to send password changed notification for user %s", user_id)
 
 
-def _deliver_password_reset_email(*, user, raw_token: str, token_pk):
+def _deliver_password_reset_email(*, user, raw_token: str, token_pk, language: str = "en"):
     """
     Send the reset email off the request path.
 
@@ -132,7 +147,9 @@ def _deliver_password_reset_email(*, user, raw_token: str, token_pk):
 
     def deliver(*, close_connection):
         try:
-            _send_password_reset_email(user=user, raw_token=raw_token)
+            # Activated inside the delivery thread: translation state is per thread.
+            with translation.override(language):
+                _send_password_reset_email(user=user, raw_token=raw_token)
         except Exception:
             PasswordResetToken.objects.filter(pk=token_pk).delete()
             logger.exception("Failed to send password reset email for user %s", user.pk)
@@ -185,7 +202,9 @@ def request_password_reset(*, email: str, request) -> str:
             request_ip=request_ip or None,
             user_agent=request.META.get("HTTP_USER_AGENT", "") or None,
         )
-        _deliver_password_reset_email(user=user, raw_token=raw_token, token_pk=token_record.pk)
+        _deliver_password_reset_email(
+            user=user, raw_token=raw_token, token_pk=token_record.pk, language=_email_request_language(request)
+        )
     else:
         _hash_value(secrets.token_urlsafe(32))
 
@@ -252,7 +271,10 @@ def reset_password_with_token(*, token_record: PasswordResetToken, raw_password:
                 .update(used_at=now)
             )
 
-            transaction.on_commit(lambda user_id=user.pk: _send_password_changed_notification_safely(user_id))
+            language = _email_request_language(request)
+            transaction.on_commit(
+                lambda user_id=user.pk: _send_password_changed_notification_safely(user_id, language)
+            )
     except PasswordResetToken.DoesNotExist as exc:
         raise InvalidPasswordResetToken(INVALID_RESET_TOKEN_MESSAGE) from exc
 

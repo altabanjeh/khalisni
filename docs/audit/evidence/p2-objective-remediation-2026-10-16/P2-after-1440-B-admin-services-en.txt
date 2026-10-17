@@ -1,0 +1,730 @@
+URL: http://127.0.0.1:4352/admin/services
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+WORK PORTAL
+
+Admin dashboard
+
+OVERVIEW
+
+Admin dashboard
+
+OPERATIONS
+
+Requests
+New service requests
+Payments
+Operating rules
+Notifications
+
+SERVICE MANAGEMENT
+
+Service categories
+Services
+Service relations
+
+USERS & PROVIDERS
+
+Users & roles
+Providers
+Provider services
+
+CONTENT & PUBLIC SITE
+
+Public site
+Homepage content
+Advertisements
+Appearance
+Preview site
+Guide management
+
+REPORTING & AUDIT
+
+Reports
+Audit log
+
+SETTINGS
+
+System settings
+Manual
+Admin dashboard
+
+Services
+
+Service management
+
+Unified management of categories, services and master document definitions. A document is created once, then linked to a service from the service form itself.
+
+Categories
+
+Organise public site cards and browsing paths from the same page.
+
+Services
+
+Control pricing, delivery time, public visibility and the information required from the customer.
+
+Document definitions
+
+Create a document definition once, then pick it from services instead of retyping the same text.
+
+Categories
+
+Create, edit and deactivate categories from the services screen itself.
+
++ New category
+Visible items: 13
+Active
+Deleted
+All
+CATEGORY	SLUG	ORDER	STATUS	ACTIONS
+
+Category
+	category-debug	0	Active	
+Edit
+Delete
+
+
+Category
+	category-debug-2	0	Active	
+Edit
+Delete
+
+
+Category
+	category-debug-3	0	Active	
+Edit
+Delete
+
+
+Civil Status
+	civil-status	1	Active	
+Edit
+Delete
+
+
+Civil Status and Passports
+	civil-status-and-passports	1	Active	
+Edit
+Delete
+
+
+Land and Survey
+	land-and-survey	1	Active	
+Edit
+Delete
+
+
+Business Services
+	business_services	2	Active	
+Edit
+Delete
+
+
+Quick Public Services
+	quick-public-services	2	Active	
+Edit
+Delete
+
+
+Tax
+	tax	3	Active	
+Edit
+Delete
+
+
+Municipal Services
+	municipal-services	4	Active	
+Edit
+Delete
+
+
+General
+	general	4	Active	
+Edit
+Delete
+
+
+Ministry of Labour
+	ministry-of-labour	5	Active	
+Edit
+Delete
+
+
+Social Security
+	social-security	7	Active	
+Edit
+Delete
+Services
+
+All core service attributes live here, including master document selection and how prices are shown to the public.
+
++ New service
+Visible items: 20
+Active
+Deleted
+All
+All categories
+???
+???
+???
+الأحوال المدنية والجوازات
+الأحوال المدنية والجوازات
+العقارات والأراضي
+خدمات الأعمال والشركات
+خدمات عامة سريعة
+ضريبة الدخل والمبيعات
+الخدمات البلدية
+الخدمات العامة السريعة
+وزارة العمل
+الضمان الاجتماعي
+SERVICE	CATEGORY	DELIVERY	DOCUMENTS	PUBLIC SITE	STATUS	ACTIONS
+
+Service
+	Category	Expected completion: 3 days	0	Hidden	Active	
+Edit
+Delete
+
+
+Service
+	Category	Expected completion: 3 days	0	Hidden	Active	
+Edit
+Delete
+
+
+Service
+	Category	Expected completion: 3 days	0	Hidden	Active	
+Edit
+Delete
+
+
+Passport Appointment Booking
+	Civil Status and Passports	Expected completion: 1 to 3 days	2	Visible	Active	
+Edit
+Delete
+
+
+No Criminal Record
+	Civil Status	Expected completion: 2 days	2	Hidden	Active	
+Edit
+Delete
+
+
+Request Company Registration
+	Business Services	Expected completion: 1 days	6	Visible	Active	
+Edit
+Delete
+
+
+Request Property Registration Certificate
+	Land and Survey	Expected completion: 1 days	3	Visible	Active	
+Edit
+Delete
+
+
+Passport Renewal
+	Civil Status	Expected completion: 2 to 4 days	2	Visible	Active	
+Edit
+Delete
+
+
+Request Company Information Amendment
+	Business Services	Expected completion: 1 days	6	Visible	Active	
+Edit
+Delete
+
+
+Request Cadastral Map
+	Land and Survey	Expected completion: 1 days	3	Visible	Active	
+Edit
+Delete
+
+
+Traffic Fines Payment
+	Quick Public Services	Expected completion: 3 to 5 days	2	Visible	Active	
+Edit
+Delete
+
+
+Request to Add Business Activities to an Existing Company
+	Business Services	Expected completion: 1 days	4	Visible	Active	
+Edit
+Delete
+
+
+Request Property Ownership Transfer
+	Land and Survey	Expected completion: 1 days	5	Visible	Active	
+Edit
+Delete
+
+
+Tax Clearance
+	Tax	Expected completion: 4 to 6 days	2	Visible	Active	
+Edit
+Delete
+
+
+Request Commercial Registration Certificate
+	Business Services	Expected completion: 1 days	3	Visible	Active	
+Edit
+Delete
+
+
+Request Inheritance Registration
+	Land and Survey	Expected completion: 1 days	5	Visible	Active	
+Edit
+Delete
+
+
+Business License Renewal
+	Municipal Services	Expected completion: 5 to 7 days	2	Visible	Active	
+Edit
+Delete
+
+
+Request Trade Name Certificate
+	Business Services	Expected completion: 1 days	3	Visible	Active	
+Edit
+Delete
+
+
+Request Property Gift Transfer
+	Land and Survey	Expected completion: 1 days	5	Visible	Active	
+Edit
+Delete
+
+
+Property Registration Deed
+	Land and Survey	Expected completion: 6 to 8 days	2	Visible	Active	
+Edit
+Delete
+
+Showing 1–20 of 38
+
+1
+2
+Document definitions
+
+This is the master list the admin picks required documents from for each service.
+
++ Document definition
+Visible items: 69
+Active
+Deleted
+All
+DOCUMENT	CODE	EXTENSIONS	MAX SIZE	ORDER	STATUS	ACTIONS
+
+أي بيانات تساعد في تحديد العقار
+	document_74a2f98299	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+أي مستندات إضافية تطلبها الجهة المختصة
+	document_b03d952538	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+أي وثائق إضافية تطلبها الجهة المختصة
+	document_b0f143ad16	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إثبات شخصية صاحب الطلب
+	document_197c7d7fc0	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إثبات شخصية صاحب العلاقة/مقدم الطلب
+	document_b7393c5318	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إثبات شخصية مالك العلامة
+	document_fd135ce03f	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إثبات شخصية مقدم الطلب
+	document_85697877bb	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إذن إشغال
+	document_602b0a206b	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+إذن المحكمة المختصة
+	document_c82005f833	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+المخططات الهندسية
+	document_3443627d36	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+الهوية
+	document_a4c4fed3af	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+براءات ذمة/موافقات إضافية من الجهات المختصة
+	document_6192cecaba	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+براءة ذمة من الضمان الاجتماعي
+	document_ddc0c08e82	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+براءة ذمة من ضريبة الدخل والمبيعات
+	document_7713142b41	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+تفويض أو وكالة للشخص الذي يتابع الإجراءات
+	document_3bee74c311	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+authorization-letter
+	authorization-letter	JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+تفويض خطي
+	document_11714fabf5	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+تفويض خطي أو وكالة
+	document_d038474c7a	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+تفويض خطي أو وكالة عدلية
+	document_f56c2e0812	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+تقرير المصفي وتقارير التصفية
+	document_37e2d6c45c	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Inheritance certificate
+	inheritance_certificate	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+رخصة المهن الحالية
+	document_ef81fa254a	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي
+	document_69e9a26d6e	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Property registration certificate
+	property_registration_certificate	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+سندات تسجيل جميع القطع
+	document_7c6a69c2f4	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+شهادة الوفاة
+	document_443aae22bf	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+شهادة تسجيل العلامة السابقة
+	document_7672fa9fbe	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+شهادة شطب الاسم التجاري
+	document_8e430fe32b	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+شهادة/بيانات تسجيل الشركة أو المنشأة
+	document_322e004de0	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+شهادة/سجل الشركة أو المؤسسة
+	document_d7d63d7027	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+صور هويات الورثة
+	document_c3a3aa1c50	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+National ID copy
+	national_id_copy	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Seller national ID copy
+	seller_national_id_copy	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Buyer national ID copy
+	buyer_national_id_copy	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+صورة هوية الموهوب له
+	document_11667481fd	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+صورة هوية الواهب
+	document_564406e175	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+صورة هوية/جواز سفر الشركاء
+	document_b84500235f	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+صورة واضحة للعلامة / الشعار
+	document_5eb4193ba1	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+عقد إيجار ساري أو سند ملكية
+	document_1c40b3e58a	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+عقد التمويل أو اتفاقية الرهن (إن وجدت)
+	document_5c2f8f95d1	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+عقد ونظام الشركة المعدلان أو النماذج المعتمدة
+	document_39a02bfad7	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+عقد/نظام معدل أو النموذج المعتمد
+	document_ec8d545fbf	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+عقد/وثائق تحويل الحصص
+	document_e6d6a52927	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+قرار/طلب الشطب أو التصفية موقع حسب الأصول
+	document_f0fbb87902	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+كتاب أو موافقة فك الرهن من الجهة المرتهنة
+	document_d2024a06a1	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+كتاب تفويض من الشركة
+	document_5ca1add6b9	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات
+	document_cdd8ce3328	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة
+	document_cb35245bcf	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Cadastral map
+	cadastral_map	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+مخطط أراضٍ إن وجد
+	document_0cc19c2317	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+مخطط موقع تنظيمي
+	document_3775124a52	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+مستند يبرر استخدام اسم خاص/أجنبي
+	document_1b1707d621	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+مستندات داعمة للتعديل
+	document_56caf9c71a	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقات الجهات المختصة
+	document_04defb9ccb	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقات الجهات المختصة بالنشاط
+	document_3df268a71b	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقات مسبقة على الغايات/الأنشطة
+	document_a7c41b216c	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقات مسبقة على الغاية الجديدة
+	document_cc8affb2cc	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقات/قرارات الشركاء على التصفية والتقرير النهائي
+	document_652dd91fc4	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+موافقة مالك العقار
+	document_5375b03f66	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+هوية الأطراف المعنية بالتعديل
+	document_bb343bc1a7	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+national-id
+	national-id	JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وثائق الحصص العينية
+	document_d6f5694849	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وثائق الشركة الأجنبية مصدقة ومترجمة
+	document_6a5fef1088	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وثائق المستفيد الحقيقي
+	document_bf9b841bf1	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وثائق نقل الملكية ونماذج التنازل/النقل
+	document_fb697280d9	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وكالة عدلية
+	document_af883d59b3	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Legal authorization
+	legal_authorization	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+Legal power of attorney
+	legal_power_of_attorney	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete
+
+
+وكالة قانونية إن وجدت
+	document_e95445e836	Word DOC، Word DOCX، JPEG image، JPG image، PDF document، PNG image	10 MB	0	Active	
+Edit
+Delete

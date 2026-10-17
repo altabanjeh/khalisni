@@ -1,4 +1,4 @@
-import { buildQuery, http, secureAdminDelete, unwrapList } from './client'
+import { buildQuery, fetchPage, http, secureAdminDelete, unwrapList } from './client'
 
 function normalizeSoftDeleteParams(params = {}) {
   const nextParams = { ...params }
@@ -38,6 +38,12 @@ function withTemplateId(record) {
 export const notificationsApi = {
   async getNotifications() {
     return unwrapList(await http.get('/admin/notifications/')).map(withTemplateId)
+  },
+
+  // One page of the admin notification log, newest first.
+  async getNotificationsPage({ page = 1 } = {}) {
+    const data = await fetchPage('/admin/notifications/', { page })
+    return { ...data, results: data.results.map(withTemplateId) }
   },
 
   async getNotificationCenter() {

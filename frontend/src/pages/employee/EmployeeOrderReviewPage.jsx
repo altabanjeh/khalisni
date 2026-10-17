@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import MissingRequestRecovery from '../../components/MissingRequestRecovery'
 import OrderTimeline from '../../components/OrderTimeline'
 import PageHeader from '../../components/PageHeader'
 import StatusBadge from '../../components/StatusBadge'
@@ -254,7 +255,7 @@ function EmployeeOrderReviewPage() {
                 </Link>
               ) : null}
             </div>
-            <div className="mt-5"><DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} staff /></div>
+            <div className="mt-5"><DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} /></div>
           </SectionCard>
 
           <SectionCard icon={FileText} title={tr('سجل الملاحظات', 'Notes log')} description={tr('الملاحظات الداخلية ورسائل العميل وملاحظات المزوّد في مكان واحد.', 'Internal notes, customer messages and provider notes in one place.')}>
@@ -317,6 +318,8 @@ function EmployeeOrderReviewPage() {
               </div>
             </div>
           </SectionCard>
+
+          <MissingRequestRecovery allowedActions={allowedActions} onRecovered={reload} orderId={id} />
 
           {allowedActions.can_request_documents ? (
             <SectionCard icon={CircleAlert} title={tr('طلب مستندات ناقصة', 'Request missing documents')} description={tr('حدّد المستندات المطلوبة وأرسل ملاحظة واضحة للعميل.', 'Select the required documents and send a clear note to the customer.')}>
@@ -412,7 +415,7 @@ function EmployeeOrderReviewPage() {
 
           {finalDocuments.length ? (
             <SectionCard icon={FileText} title={tr('مراجعة نتيجة المزوّد', 'Review the provider result')} description={tr('اعتمد النتيجة بعد التحقق، أو أعدها للمزوّد أو للمراجعة الداخلية بسبب واضح.', 'Approve the result after verifying it, or return it to the provider or internal review with a clear reason.')}>
-              <DocumentList documents={finalDocuments} staff />
+              <DocumentList documents={finalDocuments} />
               {allowedActions.can_complete ? (
                 <button className="btn-primary mt-4 w-full" disabled={Boolean(busy)} onClick={() => setConfirmComplete(true)} type="button">{tr('اعتماد النتيجة وإكمال الطلب', 'Approve result & complete request')}</button>
               ) : null}

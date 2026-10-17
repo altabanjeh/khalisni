@@ -1,0 +1,164 @@
+[
+ {
+  "width": 1440,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/5",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/4",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/2",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "A",
+  "role": "employee",
+  "route": "/employee/orders/5",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "A",
+  "role": "customer",
+  "route": "/customer/orders/5/missing-docs",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "B",
+  "role": "customer",
+  "route": "/customer/orders/1/missing-docs",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "B",
+  "role": "admin",
+  "route": "/admin/orders/1",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-xs font-semibold text-slate-500\">٤ أيار ٢٠٢٦، ١٢:٢٨ م</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 1440,
+  "env": "B",
+  "role": "admin",
+  "route": "/admin/rules",
+  "seriousOrCritical": [
+   "scrollable-region-focusable: <div class=\"max-h-[70vh] overflow-auto\">"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/5",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-[0.7rem] font-bold uppercase tracking-wide text-slate-500\">بانتظار إجراء | <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/4",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "A",
+  "role": "admin",
+  "route": "/admin/orders/2",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-[0.7rem] font-bold uppercase tracking-wide text-slate-500\">المرحلة الحال | <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "A",
+  "role": "employee",
+  "route": "/employee/orders/5",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-xs font-semibold text-slate-500\">١٦ تشرين الأول ٢٠٢٦، ١٠:٤٧ ص</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "A",
+  "role": "customer",
+  "route": "/customer/orders/5/missing-docs",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "B",
+  "role": "customer",
+  "route": "/customer/orders/1/missing-docs",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "B",
+  "role": "admin",
+  "route": "/admin/orders/1",
+  "seriousOrCritical": [
+   "color-contrast: <span class=\"text-[0.7rem] font-bold uppercase tracking-wide text-slate-500\">بانتظار إجراء | <span class=\"text-xs font-semibold text-slate-500\">٤ أيار ٢٠٢٦، ١٢:٢٨ م</span>"
+  ],
+  "overflowX": 0,
+  "console": []
+ },
+ {
+  "width": 390,
+  "env": "B",
+  "role": "admin",
+  "route": "/admin/rules",
+  "seriousOrCritical": [],
+  "overflowX": 0,
+  "console": []
+ }
+]
