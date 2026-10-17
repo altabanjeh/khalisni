@@ -1,0 +1,22 @@
+{
+  "quote": "tax-clearance",
+  "fixed": "passport-renewal",
+  "cat": "civil-status-and-passports",
+  "missing": 5,
+  "ready": 8,
+  "completed": 3,
+  "underReview": 6,
+  "provider": [
+    [
+      8,
+      "READY_FOR_DELIVERY"
+    ]
+  ],
+  "demoStatuses": [
+    "NEW",
+    "COMPLETED",
+    "IN_PROGRESS",
+    "WAITING_CUSTOMER"
+  ],
+  "adminCount": 8
+}

@@ -1,0 +1,82 @@
+===== PATTERN: \?\?\?
+frontend/src/api/authApi.js:1:import { fetchPage, http } from './client'
+frontend/src/api/authApi.js:2:
+frontend/src/api/authApi.js:3:export const authApi = {
+frontend/src/api/authApi.js:4:  // One page of the admin users table (/admin/users/); the active / deleted /
+frontend/src/api/authApi.js:5:  // all filter and the search are applied by the server.
+frontend/src/api/authApi.js:6:  getAdminUsersPage({ page = 1, status = 'active', search = '' } = {}) {
+frontend/src/api/authApi.js:7:    const params = { page, search: String(search || '').trim() }
+frontend/src/api/authApi.js:8:    if (status === 'all' || status === 'deleted') params.include_deleted = true
+frontend/src/api/authApi.js:9:    if (status === 'deleted') params.is_deleted = true
+frontend/src/api/authApi.js:10:    return fetchPage('/admin/users/', params)
+frontend/src/api/authApi.js:11:  },
+frontend/src/api/authApi.js:12:
+frontend/src/api/authApi.js:13:  register(payload) {
+frontend/src/api/authApi.js:14:    return http.post('/auth/register/', payload)
+frontend/src/api/authApi.js:15:  },
+frontend/src/api/authApi.js:16:
+frontend/src/api/authApi.js:17:  login(payload) {
+frontend/src/api/authApi.js:18:    return http.post('/auth/login/', payload)
+frontend/src/api/authApi.js:19:  },
+frontend/src/api/authApi.js:20:
+frontend/src/api/authApi.js:21:  forgotPassword(payload) {
+frontend/src/api/authApi.js:22:    return http.post('/auth/forgot-password/', payload)
+frontend/src/api/authApi.js:23:  },
+frontend/src/api/authApi.js:24:
+frontend/src/api/authApi.js:25:  resetPassword(token, payload) {
+frontend/src/api/authApi.js:26:    return http.post(`/auth/reset-password/${encodeURIComponent(token)}/`, payload)
+frontend/src/api/authApi.js:27:  },
+frontend/src/api/authApi.js:28:
+frontend/src/api/authApi.js:29:  logout(refresh, config) {
+frontend/src/api/authApi.js:30:    return http.post('/auth/logout/', { refresh }, config)
+frontend/src/api/authApi.js:31:  },
+frontend/src/api/authApi.js:32:
+frontend/src/api/authApi.js:33:  me() {
+frontend/src/api/authApi.js:34:    return http.get('/auth/me/')
+frontend/src/api/authApi.js:35:  },
+frontend/src/api/authApi.js:36:
+frontend/src/api/authApi.js:37:  updateProfile(payload) {
+frontend/src/api/authApi.js:38:    return http.patch('/customer/profile/', payload)
+frontend/src/api/authApi.js:39:  },
+frontend/src/api/authApi.js:40:}
+===== PATTERN: TODO\|FIXME\|XXX\b
+===== PATTERN: -ilorem
+===== PATTERN: example\.com\|\.local\b\|example\.test
+frontend/src/api/services.js:87:    email: 'admin@khalisni.local',
+frontend/src/api/services.js:99:    email: 'customer@khalisni.local',
+frontend/src/api/services.js:111:    email: 'employee@khalisni.local',
+frontend/src/api/services.js:123:    email: 'provider@khalisni.local',
+frontend/src/utils/mockData.js:158:      email: 'customer@khalisni.local',
+frontend/src/utils/mockData.js:218:      email: 'customer@khalisni.local',
+frontend/src/utils/mockData.js:300:    email: 'provider@khalisni.local',
+frontend/src/utils/mockData.js:324:    requester_email: 'sara@example.com',
+===== PATTERN: تجريبي\|تجريبية\|Demo \|demo 
+frontend/src/utils/cover.js:11: *      onError handler flips to `style`). During normal seeded/demo use the
+===== PATTERN: console\.log
+===== PATTERN: debug
+===== PATTERN: لوحة الإدارة
+frontend/src/help/screenRegistry.js:41:  { screen_key: 'admin_dashboard', labels: { ar: 'لوحة الإدارة', en: 'Admin Dashboard' }, pattern: /^\/admin\/?$/ },
+frontend/src/locales/ar.json:148:  "routes.adminPortal": "لوحة الإدارة",
+frontend/src/pages/admin/AdminOverviewPage.jsx:33:        description={error ? getDisplayError(error) : (isArabic ? 'تعذر تحميل لوحة الإدارة.' : 'The admin dashboard could not be loaded.')}
+frontend/src/pages/admin/AdminOverviewPage.jsx:47:        title={isArabic ? 'لوحة الإدارة' : 'Admin dashboard'}
+frontend/src/routes/AppRoutes.jsx:135:    { to: '/admin', label: t('routes.adminPortal', 'لوحة الإدارة'), icon: LayoutDashboard, group: gOverview },
+frontend/src/routes/AppRoutes.jsx:219:            <Route element={<DashboardLayout links={adminLinks} title={t('routes.adminPortal', 'لوحة الإدارة')} />}>
+mobile/src/features/admin/screens/AdminDashboardScreen.tsx:17:    <AppScreen title="لوحة الإدارة" subtitle="رؤية تشغيلية سريعة للطلبات والخدمات والاختناقات الحالية.">
+===== PATTERN: Screenshot required\|placeholder_label
+frontend/src/api/services.js:231:        placeholder_label: 'Screenshot required: Customer orders list',
+frontend/src/api/services.js:253:    placeholder_label: 'Screenshot required: Customer orders list',
+frontend/src/components/HelpGuidePanel.jsx:119:                {shot.placeholder_label || t('manual.screenshotRequired', 'الصورة مطلوبة: {caption}', { caption: shot.caption })}
+frontend/src/locales/en.json:86:  "manual.screenshotRequired": "Screenshot required: {caption}",
+frontend/src/pages/admin/HelpGuideManagementPage.jsx:49:    placeholder_label: '',
+frontend/src/pages/admin/HelpGuideManagementPage.jsx:305:          { name: 'placeholder_label', label: 'Placeholder label', type: 'text' },
+frontend/src/pages/admin/HelpGuideManagementPage.jsx:557:              if (!values.placeholder_label && !values.static_path && !values.image?.[0]) {
+frontend/src/pages/admin/HelpGuideManagementPage.jsx:558:                formData.append('placeholder_label', 'Screenshot required')
+===== PATTERN: 000 0000\|0790000\|0000000
+frontend/src/api/services.js:88:    phone: '0790000001',
+frontend/src/api/services.js:100:    phone: '0790000002',
+frontend/src/api/services.js:112:    phone: '0790000004',
+frontend/src/api/services.js:124:    phone: '0790000003',
+frontend/src/utils/mockData.js:157:      phone: '0790000002',
+frontend/src/utils/mockData.js:217:      phone: '0790000002',
+frontend/src/utils/mockData.js:301:    phone: '0790000003',
+===== PATTERN: Coming soon\|قريباً\|قريبا

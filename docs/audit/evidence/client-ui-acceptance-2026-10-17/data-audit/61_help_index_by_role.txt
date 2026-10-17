@@ -1,0 +1,6 @@
+customer@khalisni.local 8 [(35, 'Login and Account Access'), (1, 'الدليل العام للعميل'), (6, 'لوحة العميل'), (7, 'إنشاء طلب جديد'), (8, 'متابعة الطلبات'), (9, 'تفاصيل الطلب للعميل'), (10, 'الرد على طلب المستندات الناقصة'), (34, 'How to Navigate the System')]
+  quick_links [(34, 'How to Navigate the System'), (35, 'Login and Account Access'), (7, 'إنشاء طلب جديد'), (8, 'متابعة الطلبات')]
+provider@khalisni.local 6 [(35, 'Login and Account Access'), (4, 'الدليل العام للمزود'), (16, 'لوحة المزود'), (17, 'الطلبات المعيّنة للمزود'), (18, 'تفاصيل الطلب للمزود'), (34, 'How to Navigate the System')]
+  quick_links [(34, 'How to Navigate the System'), (35, 'Login and Account Access')]
+employee@khalisni.local 8 [(35, 'Login and Account Access'), (2, 'الدليل العام للموظف'), (11, 'لوحة الموظف'), (12, 'قائمة مراجعة الطلبات'), (13, 'مراجعة الطلب'), (14, 'متابعة الطلبات المنتظرة من العميل'), (15, 'التحقق من الوثائق'), (34, 'How to Navigate the System')]
+  quick_links [(34, 'How to Navigate the System'), (35, 'Login and Account Access'), (13, 'مراجعة الطلب'), (14, 'متابعة الطلبات المنتظرة من العميل'), (15, 'التحقق من الوثائق')]

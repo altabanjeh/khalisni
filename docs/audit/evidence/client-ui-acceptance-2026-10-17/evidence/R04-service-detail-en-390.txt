@@ -1,0 +1,107 @@
+URL: http://127.0.0.1:4351/services/tax-clearance
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Tax
+Tax Clearance
+
+Service for Tax Clearance.
+
+Expected completion: 3 days
+JOD 36.00
+2 documents
+Start request
+All services
+
+Overview
+
+What to know before starting
+
+Service for Tax Clearance.
+
+Duration
+
+Expected completion: 3 days
+
+Category
+
+Tax
+
+Required documents
+
+Prepare files before starting
+
+National ID
+
+Required
+
+Authorization Letter
+
+Required
+
+Process
+
+Clear path from submission to completion
+1
+
+Confirm the request and basic details
+
+2
+
+Upload the required documents
+
+3
+
+Review and process the request
+
+4
+
+Deliver the final result
+
+Service notes
+
+Notes before submitting
+
+Manual review
+
+Khalsni may review the details before continuing.
+
+Provider-supported
+
+An eligible service provider may handle part of your request.
+
+Service summary
+
+Tax Clearance
+
+Duration
+
+Expected completion: 3 days
+
+Start request
+Track existing request
+
+Your data is protected
+
+You can review your request documents from your account after signing in.
+
+Start request
+
+Khalsni is a Jordanian platform for managing government and administrative service requests.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

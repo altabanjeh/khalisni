@@ -1,0 +1,43 @@
+===== manage.py check_public_content
+Published content row: 2 (Khalisni Public Demo Homepage), updated 2026-08-04 17:02
+  contact_phone: +962 6 560 9000
+  whatsapp_number: +962 79 000 0000
+  email: support@khalisni.local
+  office_address: عمان - الشميساني، شارع الملكة نور، مبنى خلصني للخدمات
+  office_address_en: Amman - Shmeisani, Queen Noor Street, Khalisni Services Building
+  phone, WhatsApp and address cannot be verified automatically; the owner confirms them.
+  privacy_policy_ar: (blank); privacy_policy_en: (blank)
+Sender (DEFAULT_FROM_EMAIL): no-reply@khalisni.local
+Needs owner/legal input:
+  - D05 email support@khalisni.local is on a reserved domain: it cannot receive mail and is hidden from the public site.
+  - D06 approved privacy policy text is missing (the page shows the generic built-in principles).
+  - Sender no-reply@khalisni.local is on a reserved domain; set DJANGO_DEFAULT_FROM_EMAIL on the approved domain.
+(exit 0)
+===== manage.py audit_public_catalog_locale
+{"findings": [], "count": 0}
+(exit 0)
+===== manage.py audit_demo_accounts
+Demo / QA account check (read-only; nothing was changed; passwords are never shown)
+- admin@khalisni.local: exists=yes id=1 type=published demo account active=True deleted=False role=admin superuser=True staff=True can_sign_in=True published_password_works=True last_login=never organizations: none
+    remediation: DISABLE now, then DELETE; staff-level demo account
+- customer@khalisni.local: exists=yes id=2 type=published demo account active=True deleted=False role=customer superuser=False staff=False can_sign_in=True published_password_works=True last_login=never organizations: none
+    remediation: DISABLE or ROTATE now; the published password still works
+- employee@khalisni.local: exists=yes id=4 type=published demo account active=True deleted=False role=employee superuser=False staff=False can_sign_in=True published_password_works=True last_login=never organizations: none
+    remediation: DISABLE now, then DELETE; staff-level demo account
+- provider@khalisni.local: exists=yes id=3 type=published demo account active=True deleted=False role=provider superuser=False staff=False can_sign_in=True published_password_works=True last_login=never organizations: none
+    remediation: DISABLE or ROTATE now; the published password still works
+
+Summary: 4 found, 4 can sign in, 4 still use a published password.
+(exit 0)
+===== manage.py check_system_consistency
+[invalid_status_orders] 0 issue(s)
+[completed_without_final_document] 0 issue(s)
+[inactive_provider_assignments] 0 issue(s)
+[pending_missing_documents_moved_forward] 0 issue(s)
+[required_documents_missing] 2 issue(s)
+ - KH-2026-000003: missing approved required documents [authorization-letter, national-id]
+ - KH-2026-000002: missing approved required documents [authorization-letter, national-id]
+[provider_required_without_assignment] 0 issue(s)
+[inconsistent_payments] 0 issue(s)
+Consistency check found 2 issue(s).
+(exit 0)

@@ -1,0 +1,2 @@
+{"key": "company_type", "label_ar": "نوع الشركة", "type": "select", "required": true, "display_order": 1, "help_text": "قائمة أنواع الشركات", "options": [], "source_section": "الحقول", "source_type": "Dropdown", "import_warnings": [], "help_text_ar": "قائمة أنواع الشركات"}
+{"key": "field_ccc9901249", "label_ar": "هل الطلب للمالك أم لمفوض عنه؟", "type": "checkbox", "required": false, "display_order": 10, "help_text": "", "options": [], "source_section": "الأسئلة الديناميكية المقترحة", "source_type": "Yes/No", "import_warnings": []}

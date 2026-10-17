@@ -1,0 +1,259 @@
+
+## users summary by role/active
+-- select role, is_active, is_deleted, is_superuser, count(*) n from accounts_customuser group by 1,2,3,4
+  role='admin' | is_active=1 | is_deleted=0 | is_superuser=0 | n=3
+  role='admin' | is_active=1 | is_deleted=0 | is_superuser=1 | n=1
+  role='customer' | is_active=1 | is_deleted=0 | is_superuser=0 | n=4
+  role='employee' | is_active=1 | is_deleted=0 | is_superuser=0 | n=1
+  role='provider' | is_active=1 | is_deleted=0 | is_superuser=0 | n=4
+  (5 rows)
+
+## users with debug/test/qa/example/.local emails or names
+-- select user_id, email, full_name, role, is_active, is_superuser, is_deleted, created_at from accounts_customuser
+ where lower(email) like '%debug%' or lower(email) like '%test%' or lower(email) like '%qa%' or lower(email) like '%example.%' or lower(email) like '%.local' or lower(email) like '%demo%'
+ or lower(coalesce(full_name,'')) like '%debug%' or lower(coalesce(full_name,'')) like '%test%' or lower(coalesce(full_name,'')) like '%qa%' or coalesce(full_name,'') like '%???%' or lower(coalesce(full_name,'')) like '%demo%' order by user_id
+  user_id=1 | email='admin@khalisni.local' | full_name='Admin' | role='admin' | is_active=1 | is_superuser=1 | is_deleted=0 | created_at='2026-05-04 09:21:55.386188'
+  user_id=2 | email='customer@khalisni.local' | full_name='Demo Customer' | role='customer' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-04 09:21:55.922071'
+  user_id=3 | email='provider@khalisni.local' | full_name='Demo Provider' | role='provider' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-04 09:21:56.466621'
+  user_id=4 | email='employee@khalisni.local' | full_name='Employee Demo' | role='employee' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-04 09:21:56.972427'
+  user_id=5 | email='admin-debug@example.com' | full_name='Admin' | role='admin' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:27:54.478100'
+  user_id=6 | email='provider-debug@example.com' | full_name='Provider' | role='provider' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:27:54.795653'
+  user_id=7 | email='admin-debug-2@example.com' | full_name='Admin' | role='admin' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:21.078043'
+  user_id=8 | email='provider-debug-2@example.com' | full_name='Provider' | role='provider' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:21.343489'
+  user_id=9 | email='0799100003@guest.khalisni.local' | full_name='Guest' | role='customer' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:21.474366'
+  user_id=10 | email='admin-debug-3@example.com' | full_name='Admin' | role='admin' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:40.046701'
+  user_id=11 | email='provider-debug-3@example.com' | full_name='Provider' | role='provider' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:40.334615'
+  user_id=12 | email='0799200003@guest.khalisni.local' | full_name='Guest' | role='customer' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-05 07:28:40.478615'
+  user_id=13 | email='audit-login@example.com' | full_name='Audit User' | role='customer' | is_active=1 | is_superuser=0 | is_deleted=0 | created_at='2026-05-20 13:00:13.326008'
+  (13 rows)
+
+## all users (email domain)
+-- select substr(email, instr(email,'@')+1) domain, count(*) n, sum(is_active) active from accounts_customuser group by 1 order by 2 desc
+  domain='example.com' | n=7 | active=7
+  domain='khalisni.local' | n=4 | active=4
+  domain='guest.khalisni.local' | n=2 | active=2
+  (3 rows)
+
+## orders summary
+-- select status, count(*) n from orders_order group by 1
+  status='COMPLETED' | n=1
+  status='IN_PROGRESS' | n=1
+  status='NEW' | n=1
+  status='WAITING_CUSTOMER' | n=1
+  status='WAITING_GOVERNMENT' | n=2
+  (5 rows)
+
+## orders with QA/debug/test markers
+-- select id, order_number, status, customer_id, service_id, created_at, substr(coalesce(customer_notes,''),1,80) notes from orders_order
+ where lower(coalesce(customer_notes,'')) like '%test%' or lower(coalesce(customer_notes,'')) like '%qa%' or lower(coalesce(customer_notes,'')) like '%debug%' or coalesce(customer_notes,'') like '%???%' or service_id in (4,5,6)
+  id=5 | order_number='KH-2026-000005' | status='WAITING_GOVERNMENT' | customer_id=9 | service_id=5 | created_at='2026-05-05 07:28:21.492347' | notes=''
+  id=6 | order_number='KH-2026-000006' | status='WAITING_GOVERNMENT' | customer_id=12 | service_id=6 | created_at='2026-05-05 07:28:40.495616' | notes=''
+  (2 rows)
+
+## orders by service
+-- select s.slug, count(*) n from orders_order o join services_service s on s.service_id=o.service_id group by 1 order by 2 desc
+  slug='no-criminal-record' | n=2
+  slug='passport-renewal' | n=1
+  slug='service-debug-2' | n=1
+  slug='service-debug-3' | n=1
+  slug='tax-clearance' | n=1
+  (5 rows)
+
+## notification templates
+-- select * from notifications_notificationtemplate
+  (0 rows)
+
+## notifications by language sample (latin-only titles)
+-- select title, count(*) n from notifications_notification group by title order by n desc limit 40
+  title='Order received' | n=6
+  title='طلب خدمة غير موجودة: Demo unlisted service' | n=4
+  title='New assigned order' | n=4
+  title='Order completed' | n=1
+  title='More documents required' | n=1
+  title='Final result uploaded' | n=1
+  (6 rows)
+
+## help guides
+-- select help_guide_id, slug, role, screen_key, is_active, is_deleted, title, substr(short_description,1,90) sd from help_guides_helpguide order by help_guide_id
+  help_guide_id=1 | slug='help-guide' | role='customer' | screen_key='' | is_active=1 | is_deleted=0 | title='الدليل العام للعميل' | sd='مرجع سريع لفهم مسار الطلبات داخل بوابة العميل.'
+  help_guide_id=2 | slug='help-guide-2' | role='employee' | screen_key='' | is_active=1 | is_deleted=0 | title='الدليل العام للموظف' | sd='مرجع تشغيلي لمراجعة الطلبات والتحقق من الوثائق.'
+  help_guide_id=3 | slug='help-guide-3' | role='support' | screen_key='' | is_active=1 | is_deleted=0 | title='الدليل العام للدعم' | sd='مرجع لمتابعة الطلبات الخدمية ومساعدة الفرق على ضبط التصنيفات والعلاقات.'
+  help_guide_id=4 | slug='help-guide-4' | role='provider' | screen_key='' | is_active=1 | is_deleted=0 | title='الدليل العام للمزود' | sd='مرجع سريع لمعالجة الطلبات المعيّنة ورفع النتيجة النهائية.'
+  help_guide_id=5 | slug='help-guide-5' | role='admin' | screen_key='' | is_active=1 | is_deleted=0 | title='الدليل العام للإدارة' | sd='مرجع سريع لإدارة المستخدمين والخدمات والشاشات الإدارية.'
+  help_guide_id=6 | slug='help-guide-6' | role='customer' | screen_key='customer_dashboard' | is_active=1 | is_deleted=0 | title='لوحة العميل' | sd='نقطة البداية لمتابعة النشاط الحالي والتنقل السريع إلى طلباتك.'
+  help_guide_id=7 | slug='help-guide-7' | role='customer' | screen_key='customer_create_order' | is_active=1 | is_deleted=0 | title='إنشاء طلب جديد' | sd='اتبع هذه الخطوات لإرسال طلب مكتمل من أول مرة.'
+  help_guide_id=8 | slug='help-guide-8' | role='customer' | screen_key='customer_orders' | is_active=1 | is_deleted=0 | title='متابعة الطلبات' | sd='استخدم هذه الشاشة للبحث عن أي طلب وفتح تفاصيله.'
+  help_guide_id=9 | slug='help-guide-9' | role='customer' | screen_key='customer_order_details' | is_active=1 | is_deleted=0 | title='تفاصيل الطلب للعميل' | sd='راجع الحالة، المستندات، والملاحظات من شاشة واحدة.'
+  help_guide_id=10 | slug='help-guide-10' | role='customer' | screen_key='customer_missing_documents' | is_active=1 | is_deleted=0 | title='الرد على طلب المستندات الناقصة' | sd='اتبع هذه الخطوات لإرجاع الطلب إلى المراجعة بسرعة.'
+  help_guide_id=11 | slug='help-guide-11' | role='employee' | screen_key='employee_dashboard' | is_active=1 | is_deleted=0 | title='لوحة الموظف' | sd='ملخص سريع للطوابير التي تحتاج إلى معالجة فورية.'
+  help_guide_id=12 | slug='help-guide-12' | role='employee' | screen_key='employee_review_queue' | is_active=1 | is_deleted=0 | title='قائمة مراجعة الطلبات' | sd='استخدم المرشحات للعثور على الطلب المناسب وفتح المراجعة.'
+  help_guide_id=13 | slug='help-guide-13' | role='employee' | screen_key='employee_order_review' | is_active=1 | is_deleted=0 | title='مراجعة الطلب' | sd='نفّذ المراجعة من داخل هذه الشاشة باستخدام الإجراءات المتاحة فقط.'
+  help_guide_id=14 | slug='help-guide-14' | role='employee' | screen_key='employee_order_review' | is_active=1 | is_deleted=0 | title='متابعة الطلبات المنتظرة من العميل' | sd='إرشادات خاصة بالطلبات التي بانتظار رد العميل على النواقص.'
+  help_guide_id=15 | slug='help-guide-15' | role='employee' | screen_key='employee_verify_documents' | is_active=1 | is_deleted=0 | title='التحقق من الوثائق' | sd='راجع كل ملف واربط قرار التحقق بالحالة الفعلية للمستند.'
+  help_guide_id=16 | slug='help-guide-16' | role='provider' | screen_key='provider_dashboard' | is_active=1 | is_deleted=0 | title='لوحة المزود' | sd='تعرض هذه الشاشة ملخص الطلبات المعيّنة لك وحالتها الحالية.'
+  help_guide_id=17 | slug='help-guide-17' | role='provider' | screen_key='provider_orders' | is_active=1 | is_deleted=0 | title='الطلبات المعيّنة للمزود' | sd='قائمة تشغيلية للوصول السريع إلى الطلبات المرسلة إليك.'
+  help_guide_id=18 | slug='help-guide-18' | role='provider' | screen_key='provider_order_details' | is_active=1 | is_deleted=0 | title='تفاصيل الطلب للمزود' | sd='نفّذ الطلب، أضف الملاحظات، وارفع الملف النهائي من هذه الشاشة.'
+  help_guide_id=19 | slug='help-guide-19' | role='support' | screen_key='employee_missing_service_requests' | is_active=1 | is_deleted=0 | title='طلبات الخدمات الجديدة لفريق الدعم' | sd='استخدم هذه الشاشة لمتابعة الطلبات التي لم تجد خدمة مناسبة بعد.'
+  help_guide_id=20 | slug='help-guide-20' | role='support' | screen_key='employee_service_categories' | is_active=1 | is_deleted=0 | title='تصنيفات الخدمات للدعم' | sd='أدر التصنيفات من هذه الشاشة فقط عند الحاجة الفعلية للتنظيم.'
+  help_guide_id=21 | slug='help-guide-21' | role='support' | screen_key='employee_service_relations' | is_active=1 | is_deleted=0 | title='علاقات الخدمات للدعم' | sd='استخدم هذه الشاشة لاقتراح أو إدارة العلاقات بين الخدمات الفعلية.'
+  help_guide_id=22 | slug='help-guide-22' | role='admin' | screen_key='admin_dashboard' | is_active=1 | is_deleted=0 | title='لوحة الإدارة' | sd='شاشة دخول سريعة إلى الأقسام الإدارية المتخصصة.'
+  help_guide_id=23 | slug='help-guide-23' | role='admin' | screen_key='admin_users_roles' | is_active=1 | is_deleted=0 | title='إدارة المستخدمين والأدوار' | sd='أضف المستخدمين التشغيليين، عدّل أدوارهم، ووزّع صلاحياتهم من هذه الشاشة.'
+  help_guide_id=24 | slug='help-guide-24' | role='admin' | screen_key='admin_services' | is_active=1 | is_deleted=0 | title='إدارة الخدمات' | sd='شاشة إدارة تفاصيل الخدمات والأسعار والمستندات المطلوبة والخصائص الأساسية.'
+  help_guide_id=25 | slug='help-guide-25' | role='admin' | screen_key='admin_service_categories' | is_active=1 | is_deleted=0 | title='إدارة تصنيفات الخدمات' | sd='أنشئ هيكل التصنيفات وراجع ترتيبه قبل تعديل ظهور الخدمات.'
+  help_guide_id=26 | slug='help-guide-26' | role='admin' | screen_key='admin_service_relations' | is_active=1 | is_deleted=0 | title='إدارة علاقات الخدمات' | sd='أدر الشروط والبدائل والعلاقات اللاحقة بين الخدمات من هذه الشاشة.'
+  help_guide_id=27 | slug='help-guide-27' | role='admin' | screen_key='admin_providers' | is_active=1 | is_deleted=0 | title='إدارة المزودين' | sd='تابع اعتماد المزودين، تفعيلهم، وبياناتهم التشغيلية.'
+  help_guide_id=28 | slug='help-guide-28' | role='admin' | screen_key='admin_reports' | is_active=1 | is_deleted=0 | title='التقارير الإدارية' | sd='راجع الأداء العام والاتجاهات التشغيلية من شاشة التقارير.'
+  help_guide_id=29 | slug='help-guide-29' | role='admin' | screen_key='admin_public_site' | is_active=1 | is_deleted=0 | title='إدارة الموقع العام' | sd='نقطة الوصول إلى محتوى الواجهة العامة والإعلانات والثيم.'
+  help_guide_id=30 | slug='help-guide-30' | role='admin' | screen_key='admin_advertisements' | is_active=1 | is_deleted=0 | title='إدارة الإعلانات' | sd='أنشئ الإعلانات العامة وحدّث ترتيبها وفترات ظهورها.'
+  help_guide_id=31 | slug='help-guide-31' | role='admin' | screen_key='admin_theme_settings' | is_active=1 | is_deleted=0 | title='إعدادات المظهر العام' | sd='حدّث الألوان والثيم العام ثم راجع المعاينة قبل الاعتماد.'
+  help_guide_id=32 | slug='help-guide-32' | role='admin' | screen_key='admin_notifications' | is_active=1 | is_deleted=0 | title='إدارة قوالب الإشعارات' | sd='حدّث القوالب المعتمدة وراجع النصوص قبل استخدامها تشغيلياً.'
+  help_guide_id=33 | slug='help-guide-33' | role='admin' | screen_key='admin_help_guides' | is_active=1 | is_deleted=0 | title='إدارة دليل المستخدم داخل النظام' | sd='أنشئ محتوى المساعدة حسب الشاشة والدور والحالة التشغيلية.'
+  help_guide_id=34 | slug='how-to-navigate-the-system' | role='all_users' | screen_key='manual_navigation' | is_active=1 | is_deleted=0 | title='How to Navigate the System' | sd='A practical guide to dashboard layout, menus, tables, actions, validation messages, and st'
+  help_guide_id=35 | slug='login-and-account-access' | role='all_users' | screen_key='manual_account_access' | is_active=1 | is_deleted=0 | title='Login and Account Access' | sd='How to sign in, recover access, and update account credentials safely.'
+  help_guide_id=36 | slug='how-to-add-screenshots-to-the-manual' | role='admin' | screen_key='manual_add_screenshots' | is_active=1 | is_deleted=0 | title='How to Add Screenshots to the Manual' | sd='Internal instructions for capturing, naming, storing, and linking manual screenshots.'
+  (36 rows)
+
+## public page content rows
+-- select content_id, version_name, email, whatsapp_number, contact_phone, office_address, length(privacy_policy_ar) pp_ar, length(privacy_policy_en) pp_en, active_content from public_site_publicpagecontent
+  content_id=1 | version_name='Default Homepage Content' | email='info@khalisni.local' | whatsapp_number='+962790000000' | contact_phone='+962790000000' | office_address='Amman, Jordan' | pp_ar=0 | pp_en=0 | active_content=0
+  content_id=2 | version_name='Khalisni Public Demo Homepage' | email='support@khalisni.local' | whatsapp_number='+962 79 000 0000' | contact_phone='+962 6 560 9000' | office_address='عمان - الشميساني، شارع الملكة نور، مبنى خلصني للخدمات' | pp_ar=0 | pp_en=0 | active_content=1
+  (2 rows)
+
+## advertisements
+-- select advertisement_id, title_ar, title_en, button_url, is_active, end_date from public_site_advertisement
+  advertisement_id=1 | title_ar='إعلان ترحيبي' | title_en='Welcome Announcement' | button_url='/services' | is_active=1 | end_date=None
+  advertisement_id=2 | title_ar='خدمة تجديد جواز السفر متاحة الآن' | title_en='Passport renewal is now available' | button_url='/services/passport-renewal' | is_active=1 | end_date=None
+  advertisement_id=3 | title_ar='متابعة فورية للطلبات التجريبية' | title_en='Live tracking for demo requests' | button_url='/track-order' | is_active=1 | end_date=None
+  advertisement_id=4 | title_ar='جرب طلب خدمة غير موجودة' | title_en='Try requesting an unlisted service' | button_url='/services' | is_active=1 | end_date=None
+  advertisement_id=5 | title_ar='تنبيه تجريبي: جهز وثائقك قبل الطلب' | title_en='Demo alert: prepare documents first' | button_url='/services' | is_active=1 | end_date=None
+  (5 rows)
+
+## site themes
+-- select * from public_site_sitetheme
+  created_at='2026-07-26 18:52:58.219126' | updated_at='2026-08-04 16:59:34.617829' | theme_id=1 | name='Default Khalisni Theme' | primary_color='#0b67b2' | secondary_color='#147fd1' | background_color='#f4faff' | text_color='#0f3554' | header_background_color='#ffffff' | footer_background_color='#0f3554' | logo='' | favicon='' | active_theme=0
+  created_at='2026-08-04 17:02:32.323889' | updated_at='2026-08-04 17:02:32.323889' | theme_id=2 | name='Khalisni Public Demo Theme' | primary_color='#0b67b2' | secondary_color='#16a085' | background_color='#f6f8fb' | text_color='#12263a' | header_background_color='#ffffff' | footer_background_color='#12263a' | logo='' | favicon='' | active_theme=1
+  (2 rows)
+
+## missing service requests
+-- select * from public_site_missingservicerequest
+  created_at='2026-08-04 17:03:09.580760' | updated_at='2026-08-04 17:03:09.633852' | request_id=1 | request_number='MSR-000001' | source='homepage_chat' | status='new' | service_name='Demo unlisted service' | request_message='Demo public page request verification' | requester_name='' | requester_phone='0790000099' | requester_email='' | preferred_contact_channel='phone' | internal_notes='' | response_message='' | resolved_at=None | assigned_to_id=None | created_by_user_id=None | matched_service_id=None
+  (1 rows)
+
+## contact inquiries
+-- select * from public_site_contactinquiry
+  (0 rows)
+
+## organizations
+-- select * from organizations_organization
+  organization_id=1 | name='Platform Owner' | slug='platform-owner' | organization_type='platform' | legal_name='Platform Owner' | tax_number='' | commercial_registration_number='' | email='' | phone='' | is_active=1 | created_at='2026-06-08 07:03:56.130201' | updated_at='2026-06-08 07:03:56.130201' | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  (1 rows)
+
+## providers
+-- select * from providers_providerprofile
+  id=1 | provider_type='Government Services Specialist' | company_name='' | commercial_registration_number='' | tax_number='' | phone='0790000003' | address='' | city='Amman' | rating=0 | total_completed_orders=1 | is_available=1 | is_approved=1 | approved_at='2026-05-04 09:28:12.681556' | created_at='2026-05-04 09:21:57.306454' | updated_at='2026-08-04 16:59:34.588421' | approved_by_id=1 | user_id=3 | organization_id=None | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  id=2 | provider_type='Tester' | company_name='' | commercial_registration_number='' | tax_number='' | phone='' | address='' | city='Amman' | rating=0 | total_completed_orders=0 | is_available=1 | is_approved=1 | approved_at='2026-05-05 07:27:54.821654' | created_at='2026-05-05 07:27:54.822656' | updated_at='2026-05-05 07:27:54.822656' | approved_by_id=None | user_id=6 | organization_id=None | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  id=3 | provider_type='Tester' | company_name='' | commercial_registration_number='' | tax_number='' | phone='' | address='' | city='Amman' | rating=0 | total_completed_orders=0 | is_available=1 | is_approved=1 | approved_at='2026-05-05 07:28:21.369347' | created_at='2026-05-05 07:28:21.370367' | updated_at='2026-05-05 07:28:21.370367' | approved_by_id=None | user_id=8 | organization_id=None | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  id=4 | provider_type='Tester' | company_name='' | commercial_registration_number='' | tax_number='' | phone='' | address='' | city='Amman' | rating=0 | total_completed_orders=0 | is_available=1 | is_approved=1 | approved_at='2026-05-05 07:28:40.365601' | created_at='2026-05-05 07:28:40.366620' | updated_at='2026-05-05 07:28:40.366620' | approved_by_id=None | user_id=11 | organization_id=None | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  (4 rows)
+
+## system settings
+-- select * from accounts_systemsetting
+  (0 rows)
+
+## assignment-history notes (latin)
+-- select note, count(*) from orders_orderassignmenthistory group by note
+  note='Order under review' | count(*)=3
+  note='assign' | count(*)=2
+  note='تم تعيين المزود' | count(*)=2
+  (3 rows)
+
+## order status log notes sample
+-- select note, count(*) n from orders_orderstatuslog group by note order by n desc limit 30
+  note='' | n=6
+  note='Order under review' | n=3
+  note='تم تعيين المزود' | n=2
+  note='بدأ التنفيذ' | n=2
+  note='wait' | n=2
+  note='start' | n=2
+  note='review' | n=2
+  note='assign' | n=2
+  note='يرجى رفع صورة أوضح للهوية الشخصية' | n=1
+  note='Provider completed work and uploaded final result' | n=1
+  note='Order completed' | n=1
+  (11 rows)
+
+## order notes sample
+-- select substr(note,1,120) c, visibility, count(*) n from orders_ordernote group by c, visibility order by n desc limit 25
+  c='يرجى رفع صورة أوضح للهوية الشخصية' | visibility='CUSTOMER' | n=1
+  (1 rows)
+
+## documents with test names
+-- select document_id, original_filename, status from documents_document where lower(original_filename) like '%test%' or lower(original_filename) like '%dummy%' or lower(original_filename) like '%sample%' limit 30
+  (0 rows)
+
+## documents count
+-- select status, count(*) from documents_document group by 1
+  status='uploaded' | count(*)=1
+  (1 rows)
+
+## payments/invoices
+-- select status, count(*) from payment_invoice group by 1
+  (0 rows)
+
+## ratings
+-- select id, score, comment from orders_rating
+  (0 rows)
+
+## audit log count
+-- select count(*) from audit_auditlog
+  count(*)=39
+  (1 rows)
+
+## sessions/tokens
+-- select count(*) from authtoken_token
+  count(*)=0
+  (1 rows)
+
+## help guide screenshots placeholders
+-- select * from help_guides_helpguidescreenshot where coalesce(placeholder_label,'')<>'' or coalesce(image,'')='' limit 40
+  screenshot_id=1 | caption='الدليل العام للإدارة screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الدليل العام للإدارة' | alt_text='الدليل العام للإدارة' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.972767' | updated_at='2026-06-08 07:03:57.972767' | help_guide_id=5 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=2 | caption='الدليل العام للدعم screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الدليل العام للدعم' | alt_text='الدليل العام للدعم' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.977770' | updated_at='2026-06-08 07:03:57.977770' | help_guide_id=3 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=3 | caption='الدليل العام للعميل screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الدليل العام للعميل' | alt_text='الدليل العام للعميل' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.984767' | updated_at='2026-06-08 07:03:57.984767' | help_guide_id=1 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=4 | caption='الدليل العام للمزود screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الدليل العام للمزود' | alt_text='الدليل العام للمزود' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.990767' | updated_at='2026-06-08 07:03:57.990767' | help_guide_id=4 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=5 | caption='الدليل العام للموظف screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الدليل العام للموظف' | alt_text='الدليل العام للموظف' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.995773' | updated_at='2026-06-08 07:03:57.995773' | help_guide_id=2 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=6 | caption='How to Navigate the System screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: How to Navigate the System' | alt_text='How to Navigate the System' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:57.999770' | updated_at='2026-06-08 07:03:57.999770' | help_guide_id=34 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=7 | caption='Login and Account Access screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: Login and Account Access' | alt_text='Login and Account Access' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.004770' | updated_at='2026-06-08 07:03:58.004770' | help_guide_id=35 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=8 | caption='How to Add Screenshots to the Manual screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: How to Add Screenshots to the Manual' | alt_text='How to Add Screenshots to the Manual' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.010774' | updated_at='2026-06-08 07:03:58.010774' | help_guide_id=36 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=9 | caption='طلبات الخدمات الجديدة لفريق الدعم screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: طلبات الخدمات الجديدة لفريق الدعم' | alt_text='طلبات الخدمات الجديدة لفريق الدعم' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.015768' | updated_at='2026-06-08 07:03:58.015768' | help_guide_id=19 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=10 | caption='لوحة الإدارة screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: لوحة الإدارة' | alt_text='لوحة الإدارة' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.020771' | updated_at='2026-06-08 07:03:58.020771' | help_guide_id=22 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=11 | caption='لوحة العميل screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: لوحة العميل' | alt_text='لوحة العميل' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.025770' | updated_at='2026-06-08 07:03:58.025770' | help_guide_id=6 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=12 | caption='لوحة المزود screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: لوحة المزود' | alt_text='لوحة المزود' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.030769' | updated_at='2026-06-08 07:03:58.030769' | help_guide_id=16 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=13 | caption='لوحة الموظف screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: لوحة الموظف' | alt_text='لوحة الموظف' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.035769' | updated_at='2026-06-08 07:03:58.035769' | help_guide_id=11 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=14 | caption='إدارة المستخدمين والأدوار screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة المستخدمين والأدوار' | alt_text='إدارة المستخدمين والأدوار' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.040771' | updated_at='2026-06-08 07:03:58.040771' | help_guide_id=23 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=15 | caption='إنشاء طلب جديد screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إنشاء طلب جديد' | alt_text='إنشاء طلب جديد' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.045771' | updated_at='2026-06-08 07:03:58.045771' | help_guide_id=7 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=16 | caption='الطلبات المعيّنة للمزود screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الطلبات المعيّنة للمزود' | alt_text='الطلبات المعيّنة للمزود' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.050769' | updated_at='2026-06-08 07:03:58.050769' | help_guide_id=17 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=17 | caption='تصنيفات الخدمات للدعم screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: تصنيفات الخدمات للدعم' | alt_text='تصنيفات الخدمات للدعم' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.055773' | updated_at='2026-06-08 07:03:58.055773' | help_guide_id=20 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=18 | caption='قائمة مراجعة الطلبات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: قائمة مراجعة الطلبات' | alt_text='قائمة مراجعة الطلبات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.060771' | updated_at='2026-06-08 07:03:58.060771' | help_guide_id=12 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=19 | caption='إدارة الخدمات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة الخدمات' | alt_text='إدارة الخدمات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.065769' | updated_at='2026-06-08 07:03:58.065769' | help_guide_id=24 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=20 | caption='تفاصيل الطلب للمزود screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: تفاصيل الطلب للمزود' | alt_text='تفاصيل الطلب للمزود' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.069767' | updated_at='2026-06-08 07:03:58.069767' | help_guide_id=18 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=21 | caption='علاقات الخدمات للدعم screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: علاقات الخدمات للدعم' | alt_text='علاقات الخدمات للدعم' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.074767' | updated_at='2026-06-08 07:03:58.074767' | help_guide_id=21 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=22 | caption='متابعة الطلبات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: متابعة الطلبات' | alt_text='متابعة الطلبات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.081768' | updated_at='2026-06-08 07:03:58.081768' | help_guide_id=8 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=23 | caption='مراجعة الطلب screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: مراجعة الطلب' | alt_text='مراجعة الطلب' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.086771' | updated_at='2026-06-08 07:03:58.086771' | help_guide_id=13 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=24 | caption='متابعة الطلبات المنتظرة من العميل screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: متابعة الطلبات المنتظرة من العميل' | alt_text='متابعة الطلبات المنتظرة من العميل' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.090769' | updated_at='2026-06-08 07:03:58.090769' | help_guide_id=14 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=25 | caption='إدارة تصنيفات الخدمات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة تصنيفات الخدمات' | alt_text='إدارة تصنيفات الخدمات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.096075' | updated_at='2026-06-08 07:03:58.096075' | help_guide_id=25 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=26 | caption='التحقق من الوثائق screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: التحقق من الوثائق' | alt_text='التحقق من الوثائق' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.099597' | updated_at='2026-06-08 07:03:58.099597' | help_guide_id=15 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=27 | caption='تفاصيل الطلب للعميل screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: تفاصيل الطلب للعميل' | alt_text='تفاصيل الطلب للعميل' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.104493' | updated_at='2026-06-08 07:03:58.104493' | help_guide_id=9 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=28 | caption='إدارة علاقات الخدمات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة علاقات الخدمات' | alt_text='إدارة علاقات الخدمات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.110113' | updated_at='2026-06-08 07:03:58.110113' | help_guide_id=26 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=29 | caption='الرد على طلب المستندات الناقصة screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: الرد على طلب المستندات الناقصة' | alt_text='الرد على طلب المستندات الناقصة' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.114112' | updated_at='2026-06-08 07:03:58.114112' | help_guide_id=10 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=30 | caption='إدارة المزودين screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة المزودين' | alt_text='إدارة المزودين' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.119237' | updated_at='2026-06-08 07:03:58.119237' | help_guide_id=27 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=31 | caption='التقارير الإدارية screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: التقارير الإدارية' | alt_text='التقارير الإدارية' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.123237' | updated_at='2026-06-08 07:03:58.123237' | help_guide_id=28 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=32 | caption='إدارة الموقع العام screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة الموقع العام' | alt_text='إدارة الموقع العام' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.130242' | updated_at='2026-06-08 07:03:58.130242' | help_guide_id=29 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=33 | caption='إدارة الإعلانات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة الإعلانات' | alt_text='إدارة الإعلانات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.134239' | updated_at='2026-06-08 07:03:58.134239' | help_guide_id=30 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=34 | caption='إعدادات المظهر العام screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إعدادات المظهر العام' | alt_text='إعدادات المظهر العام' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.138784' | updated_at='2026-06-08 07:03:58.138784' | help_guide_id=31 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=35 | caption='إدارة قوالب الإشعارات screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة قوالب الإشعارات' | alt_text='إدارة قوالب الإشعارات' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.144659' | updated_at='2026-06-08 07:03:58.144659' | help_guide_id=32 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=36 | caption='إدارة دليل المستخدم داخل النظام screenshot' | image='' | static_path='' | placeholder_label='Screenshot required: إدارة دليل المستخدم داخل النظام' | alt_text='إدارة دليل المستخدم داخل النظام' | step_reference='overview' | display_order=10 | is_active=1 | created_at='2026-06-08 07:03:58.150117' | updated_at='2026-06-08 07:03:58.150117' | help_guide_id=33 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=37 | caption='Dashboard layout overview' | image='' | static_path='' | placeholder_label='Screenshot required: Dashboard layout overview' | alt_text='Dashboard layout overview' | step_reference='dashboard_layout' | display_order=1 | is_active=1 | created_at='2026-06-08 07:03:58.156117' | updated_at='2026-06-08 07:03:58.156117' | help_guide_id=34 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=38 | caption='Sidebar and top navigation' | image='' | static_path='' | placeholder_label='Screenshot required: Sidebar and top navigation' | alt_text='Sidebar and top navigation' | step_reference='navigation_controls' | display_order=2 | is_active=1 | created_at='2026-06-08 07:03:58.161116' | updated_at='2026-06-08 07:03:58.161116' | help_guide_id=34 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=39 | caption='Table actions and status labels' | image='' | static_path='' | placeholder_label='Screenshot required: Table actions and status labels' | alt_text='Table actions and status labels' | step_reference='table_actions' | display_order=3 | is_active=1 | created_at='2026-06-08 07:03:58.166633' | updated_at='2026-06-08 07:03:58.166633' | help_guide_id=34 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  screenshot_id=40 | caption='Login screen' | image='' | static_path='' | placeholder_label='Screenshot required: Login screen' | alt_text='Login screen' | step_reference='login' | display_order=1 | is_active=1 | created_at='2026-06-08 07:03:58.172917' | updated_at='2026-06-08 07:03:58.172917' | help_guide_id=35 | delete_reason='' | deleted_at=None | deleted_by_id=None | is_deleted=0
+  (40 rows)

@@ -1,0 +1,52 @@
+{
+ "steps": [
+  {
+   "step": "R1 register (ar 1440)",
+   "result": "PASS",
+   "detail": "/login?registered=1&email=ar-acceptance-1792227830056%40example.org"
+  },
+  {
+   "step": "R2 login lands in customer portal (ar)",
+   "result": "PASS",
+   "detail": "/customer"
+  },
+  {
+   "step": "R3 browse -> service -> start request (ar)",
+   "result": "PASS",
+   "detail": {
+    "href": "/services/tax-clearance",
+    "startText": "ابدأ الطلب",
+    "url": "/customer/orders/new?service=6"
+   }
+  },
+  {
+   "step": "R4 no console errors (ar)",
+   "result": "PASS",
+   "detail": []
+  },
+  {
+   "step": "R1 register (en 390)",
+   "result": "PASS",
+   "detail": "/login?registered=1&email=en-acceptance-1792227830056%40example.org"
+  },
+  {
+   "step": "R2 login lands in customer portal (en)",
+   "result": "PASS",
+   "detail": "/customer"
+  },
+  {
+   "step": "R3 browse -> service -> start request (en)",
+   "result": "PASS",
+   "detail": {
+    "href": "/services/tax-clearance",
+    "startText": "Start request",
+    "url": "/customer/orders/new?service=6"
+   }
+  },
+  {
+   "step": "R4 no console errors (en)",
+   "result": "PASS",
+   "detail": []
+  }
+ ]
+}

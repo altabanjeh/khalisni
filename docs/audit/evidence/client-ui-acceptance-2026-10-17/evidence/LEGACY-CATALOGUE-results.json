@@ -1,0 +1,147 @@
+{
+ "business_company_registration": {
+  "selects": [
+   {
+    "label": "service_info_company_type",
+    "required": false,
+    "options": [
+     "اختر القيمة"
+    ],
+    "realOptions": 0
+   }
+  ],
+  "emptyRequiredSelects": [],
+  "advancedToDocuments": false,
+  "errors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "اختر القيمة",
+   "الحقل نوع الشركة مطلوب",
+   "الغايات/الأنشطة المطلوبة",
+   "المستندات المطلوبة"
+  ]
+ },
+ "business_trade_name_registration": {
+  "selects": [
+   {
+    "label": "service_info_applicant_type",
+    "required": false,
+    "options": [
+     "اختر القيمة"
+    ],
+    "realOptions": 0
+   },
+   {
+    "label": "service_info_business_activity",
+    "required": false,
+    "options": [
+     "اختر القيمة"
+    ],
+    "realOptions": 0
+   }
+  ],
+  "emptyRequiredSelects": [],
+  "advancedToDocuments": false,
+  "errors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "اختر القيمة",
+   "الحقل صفة مقدم الطلب مطلوب",
+   "اختر القيمة",
+   "الحقل طبيعة النشاط المرتبط بالاسم مطلوب",
+   "المستندات المطلوبة"
+  ]
+ },
+ "request-cadastral-map": {
+  "selects": [
+   {
+    "label": "service_info_field_2fa52c6cfa",
+    "required": false,
+    "options": [
+     "اختر القيمة",
+     "نعم",
+     "لا"
+    ],
+    "realOptions": 2
+   }
+  ],
+  "emptyRequiredSelects": [],
+  "gateOptions": [
+   "اختر القيمة",
+   "نعم",
+   "لا"
+  ],
+  "parcelGate": {
+   "parcelLabelsBefore": 1,
+   "parcelLabelsAfterYes": 2
+  },
+  "advancedToDocuments": false,
+  "errors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "الحقل رقم الهاتف مطلوب",
+   "اختر القيمة",
+   "المستندات المطلوبة"
+  ]
+ },
+ "request-land-survey": {
+  "selects": [],
+  "emptyRequiredSelects": [],
+  "advancedToDocuments": false,
+  "errors": [
+   "اختر الخدمة، أدخل بياناتك وارفع المستندات المطلوبة، ثم راجع وأرسل.",
+   "الحقل الهاتف مطلوب",
+   "الحقل رقم الهاتف مطلوب",
+   "المستندات المطلوبة"
+  ]
+ },
+ "public-passport-renewal": {
+  "notFound": false,
+  "duration": [],
+  "fees": [],
+  "priceNote": 0
+ },
+ "public-business_company_registration": {
+  "notFound": false,
+  "duration": [
+   "المدة المتوقعة: 1 يوم",
+   "المدة المتوقعة: 1 يوم"
+  ],
+  "fees": [],
+  "priceNote": 1
+ },
+ "public-request-cadastral-map": {
+  "notFound": false,
+  "duration": [
+   "المدة المتوقعة: 1 يوم",
+   "المدة المتوقعة: 1 يوم"
+  ],
+  "fees": [],
+  "priceNote": 1
+ },
+ "publicServicesQuestionMarks": false,
+ "adminServices": {
+  "counts": [
+   "عدد العناصر الظاهرة: 13\nنشط",
+   "إجمالي الخدمات\n38",
+   "نشطة\n37",
+   "منشورة للعامة\n32",
+   "نشطة وظاهرة في الموقع العام ضمن فئة نشطة وظاهرة\nظاهرة للعميل",
+   "المنشورة التي يراها عميل المنصة بعد قواعد الجهة\nالخدمات",
+   "عدد العناصر الظاهرة: 20\nنشط",
+   "\tالأحوال المدنية والجوازات\tالمدة المتوقعة: من 1 إلى 3 يوم\t2\tظاهرة\tنشط\t\nتعديل"
+  ],
+  "pagination": [
+   "عرض 1 - 20 من 38"
+  ],
+  "questionMarks": 12
+ },
+ "adminRules": {
+  "mojibake": []
+ },
+ "adminUsersDebugAccounts": [
+  "admin-debug@example.com",
+  "admin-debug-2@example.com",
+  "admin-debug-3@example.com",
+  "provider-debug@example.com",
+  "provider-debug-2@example.com",
+  "provider-debug-3@example.com"
+ ]
+}

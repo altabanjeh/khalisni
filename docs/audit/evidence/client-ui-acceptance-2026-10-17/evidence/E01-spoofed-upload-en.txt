@@ -1,0 +1,51 @@
+URL: http://127.0.0.1:4351/customer/orders/5/missing-docs
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: ["Failed to load resource: the server responded with a status of 400 (Bad Request)"]
+
+WORK PORTAL
+
+Customer portal
+
+My dashboard
+New request
+My requests
+Browse services
+Profile
+Manual
+Customer portal
+Missing documents — request KH-2026-000005
+
+Upload every requested document to send the request back for processing.
+
+Waiting for customer
+
+NOTE FROM THE TEAM
+
+Please upload the QA authorization PDF.
+
+Completion
+1 / 1
+QA authorization
+
+Allowed files: PDF | Maximum size: 10 MB
+
+Ready to submit
+
+Upload the required document
+
+Allowed files: PDF | Maximum size: 10 MB
+
+Choose file
+
+Selected file: qa-html-as.pdf
+
+qa-html-as.pdf
+38 B
+
+File content does not match its extension.
+
+Upload documents & resubmit
+
+File content does not match its extension.

@@ -1,0 +1,1386 @@
+# CATEGORIES
+cat 1 slug=civil-status ar='الأحوال المدنية والجوازات' en='Civil Status' active=1 public=0 deleted=0 parent=None
+cat 2 slug=social-security ar='الضمان الاجتماعي' en='Social Security' active=1 public=1 deleted=0 parent=None
+cat 3 slug=tax ar='ضريبة الدخل والمبيعات' en='Tax' active=1 public=1 deleted=0 parent=None
+cat 4 slug=general ar='الخدمات العامة السريعة' en='General' active=1 public=0 deleted=0 parent=None
+cat 5 slug=category-debug ar='???' en='Category' active=1 public=0 deleted=0 parent=None
+cat 6 slug=category-debug-2 ar='???' en='Category' active=1 public=0 deleted=0 parent=None
+cat 7 slug=category-debug-3 ar='???' en='Category' active=1 public=0 deleted=0 parent=None
+cat 8 slug=civil-status-and-passports ar='الأحوال المدنية والجوازات' en='Civil Status and Passports' active=1 public=1 deleted=0 parent=None
+cat 9 slug=ministry-of-labour ar='وزارة العمل' en='Ministry of Labour' active=1 public=1 deleted=0 parent=None
+cat 10 slug=municipal-services ar='الخدمات البلدية' en='Municipal Services' active=1 public=1 deleted=0 parent=None
+cat 11 slug=land-and-survey ar='العقارات والأراضي' en='Land and Survey' active=1 public=1 deleted=0 parent=None
+cat 12 slug=quick-public-services ar='خدمات عامة سريعة' en='Quick Public Services' active=1 public=1 deleted=0 parent=None
+cat 13 slug=business_services ar='خدمات الأعمال والشركات' en='Business Services' active=1 public=1 deleted=0 parent=None
+
+# SERVICES
+
+## [1] no-criminal-record  no=SRV-000001
+  name_ar='شهادة عدم محكومية' name_en='No Criminal Record' category=civil-status
+  is_active=1 show_on_public_site=0 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=0 gov=5 service_fee=12 total(base+gov+fee)=17 show_total=1 show_gov=0 show_company=0
+  duration mode=duration est=2 min=None max=None unit=days
+  price_note_ar=''
+  price_note_en=''
+  delivery_note_ar=''
+  delivery_note_en=''
+  short_ar='شهادة عدم محكومية'
+  desc_ar='خدمة شهادة عدم محكومية'
+  desc_en='شهادة عدم محكومية'
+  terms_ar='' terms_en=''
+  documents:
+    - req1 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req2 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [2] passport-renewal  no=SRV-000002
+  name_ar='تجديد جواز سفر' name_en='Passport Renewal' category=civil-status
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=32 gov=20 service_fee=12 total(base+gov+fee)=64 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 64 but shown components sum to 32 (hidden base_price 32)
+  duration mode=duration_range est=4 min=2 max=4 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='طلب تجديد جواز السفر مع مراجعة الوثائق ومتابعة حالة الطلب.'
+  desc_ar='طلب تجديد جواز السفر مع مراجعة الوثائق ومتابعة حالة الطلب. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Request passport renewal with document review and status tracking. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req3 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req4 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [3] tax-clearance  no=SRV-000003
+  name_ar='براءة ذمة ضريبية' name_en='Tax Clearance' category=tax
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=18 gov=7 service_fee=11 total(base+gov+fee)=36 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 36 but shown components sum to 18 (hidden base_price 18)
+  duration mode=duration_range est=6 min=4 max=6 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='إصدار أو متابعة براءة ذمة ضريبية للأفراد أو المنشآت.'
+  desc_ar='إصدار أو متابعة براءة ذمة ضريبية للأفراد أو المنشآت. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Issue or follow up a tax clearance for individuals or businesses. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req5 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req6 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [4] service-debug  no=SRV-000004
+  name_ar='????' name_en='Service' category=category-debug
+  is_active=1 show_on_public_site=0 is_deleted=0 featured=0 scope=global org=None
+  price_type=fixed base=10 gov=5 service_fee=5 total(base+gov+fee)=20 show_total=1 show_gov=0 show_company=0
+  duration mode=duration est=3 min=None max=None unit=days
+  price_note_ar=''
+  price_note_en=''
+  delivery_note_ar=''
+  delivery_note_en=''
+  short_ar=''
+  desc_ar='???'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [5] service-debug-2  no=SRV-000005
+  name_ar='????' name_en='Service' category=category-debug-2
+  is_active=1 show_on_public_site=0 is_deleted=0 featured=0 scope=global org=None
+  price_type=fixed base=10 gov=5 service_fee=5 total(base+gov+fee)=20 show_total=1 show_gov=0 show_company=0
+  duration mode=duration est=3 min=None max=None unit=days
+  price_note_ar=''
+  price_note_en=''
+  delivery_note_ar=''
+  delivery_note_en=''
+  short_ar=''
+  desc_ar='???'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [6] service-debug-3  no=SRV-000006
+  name_ar='????' name_en='Service' category=category-debug-3
+  is_active=1 show_on_public_site=0 is_deleted=0 featured=0 scope=global org=None
+  price_type=fixed base=10 gov=5 service_fee=5 total(base+gov+fee)=20 show_total=1 show_gov=0 show_company=0
+  duration mode=duration est=3 min=None max=None unit=days
+  price_note_ar=''
+  price_note_en=''
+  delivery_note_ar=''
+  delivery_note_en=''
+  short_ar=''
+  desc_ar='???'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [8] passport-appointment-booking  no=SRV-000008
+  name_ar='حجز موعد جواز سفر' name_en='Passport Appointment Booking' category=civil-status-and-passports
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=8 gov=3 service_fee=5 total(base+gov+fee)=16 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 16 but shown components sum to 8 (hidden base_price 8)
+  duration mode=duration_range est=3 min=1 max=3 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='احجز موعداً مناسباً قبل زيارة دائرة الأحوال والجوازات.'
+  desc_ar='احجز موعداً مناسباً قبل زيارة دائرة الأحوال والجوازات. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Book a passport appointment before visiting Civil Status and Passports. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req9 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req10 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [7] no-criminal-record-certificate  no=SRV-000007
+  name_ar='شهادة عدم محكومية' name_en='No Criminal Record Certificate' category=ministry-of-labour
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=15 gov=5 service_fee=10 total(base+gov+fee)=30 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 30 but shown components sum to 15 (hidden base_price 15)
+  duration mode=duration_range est=9 min=7 max=9 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='طلب شهادة عدم محكومية ومتابعة المراجعة حتى الجاهزية.'
+  desc_ar='طلب شهادة عدم محكومية ومتابعة المراجعة حتى الجاهزية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Request a no-criminal-record certificate and track it until ready. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req7 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req8 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [11] business-license-renewal  no=SRV-000011
+  name_ar='تجديد رخصة مهن' name_en='Business License Renewal' category=municipal-services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=24 gov=9 service_fee=15 total(base+gov+fee)=48 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 48 but shown components sum to 24 (hidden base_price 24)
+  duration mode=duration_range est=7 min=5 max=7 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='متابعة تجديد رخصة المهن وتجهيز المتطلبات البلدية.'
+  desc_ar='متابعة تجديد رخصة المهن وتجهيز المتطلبات البلدية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Follow up business license renewal and municipal requirements. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req15 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req16 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [21] request-property-registration-certificate  no=SRV-000021
+  name_ar='طلب سند تسجيل' name_en='Request Property Registration Certificate' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لاستخراج سند تسجيل رسمي للعقار من دائرة الأراضي والمساحة.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب لاستخراج سند تسجيل رسمي للعقار، مع قيام فريق خلّصني بمتابعة الطلب لدى دائرة الأراضي والمساحة حتى استلام سند التسجيل وتسليمه للعميل.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• تقديم الوثائق المطلوبة.• تخضع الخدمة لإجراءات ورسوم دائرة الأراضي والمساحة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات م' terms_en=''
+  documents:
+    - req67 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req68 type=document_74a2f98299 ar='أي بيانات تساعد في تحديد العقار' en='' required=1 active=1 deleted=0 def=50:document_74a2f98299 instr_ar=''
+    - req69 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم الكامل' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=field_2fa52c6cfa type=select req=False label_ar='هل تعرف رقم القطعة والحوض؟' label_en=None visible_when=None opts=2
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when={'field': 'field_2fa52c6cfa', 'equals': 'yes'} opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when={'field': 'field_2fa52c6cfa', 'equals': 'yes'} opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_3b752a334c type=checkbox req=False label_ar='هل مالك العقار هو مقدم الطلب؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+  parcel_question=True parcel_fields=['field_2fa52c6cfa', 'parcel_number', 'basin_number']
+
+## [22] request-cadastral-map  no=SRV-000022
+  name_ar='طلب مخطط أراضٍ' name_en='Request Cadastral Map' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب للحصول على مخطط أراضٍ رسمي يوضح بيانات قطعة الأرض.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب للحصول على مخطط أراضٍ رسمي صادر عن دائرة الأراضي والمساحة، ويحتوي على بيانات القطعة والحوض والموقع وحدود الأرض وفق السجلات الرسمية. يتولى فريق خلّصني متابعة الطلب حتى إصدار المخطط وتسليمه للعميل.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة لإجراءات ورسوم دائرة الأراضي والمساحة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات م' terms_en=''
+  documents:
+    - req70 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req71 type=document_74a2f98299 ar='أي بيانات تساعد في تحديد العقار' en='' required=1 active=1 deleted=0 def=50:document_74a2f98299 instr_ar=''
+    - req72 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم الكامل' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=field_2fa52c6cfa type=select req=False label_ar='هل تعرف رقم القطعة والحوض؟' label_en=None visible_when=None opts=2
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when={'field': 'field_2fa52c6cfa', 'equals': 'yes'} opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when={'field': 'field_2fa52c6cfa', 'equals': 'yes'} opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_ccc9901249 type=checkbox req=False label_ar='هل الطلب للمالك أم لمفوض عنه؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+  parcel_question=True parcel_fields=['field_2fa52c6cfa', 'parcel_number', 'basin_number']
+
+## [23] request-property-ownership-transfer  no=SRV-000023
+  name_ar='طلب نقل ملكية عقار' name_en='Request Property Ownership Transfer' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لنقل ملكية عقار وفقًا للإجراءات المعتمدة لدى دائرة الأراضي والمساحة.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب لنقل ملكية عقار بين البائع والمشتري، مع قيام فريق خلّصني بمتابعة جميع الإجراءات لدى دائرة الأراضي والمساحة حتى إتمام عملية نقل الملكية وإصدار سند التسجيل باسم المالك الجديد.'
+  desc_en=''
+  terms_ar='الشروط: • حضور الأطراف أو من يمثلهم قانونيًا عند الحاجة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب ' terms_en=''
+  documents:
+    - req73 type=seller_national_id_copy ar='صورة هوية البائع' en='Seller national ID copy' required=1 active=1 deleted=0 def=51:seller_national_id_copy instr_ar=''
+    - req74 type=buyer_national_id_copy ar='صورة هوية المشتري' en='Buyer national ID copy' required=1 active=1 deleted=0 def=52:buyer_national_id_copy instr_ar=''
+    - req75 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req76 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req77 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=seller_name type=text req=True label_ar='اسم البائع' label_en=None visible_when=None opts=0
+    - key=seller_national_id type=text req=True label_ar='الرقم الوطني للبائع' label_en=None visible_when=None opts=0
+    - key=buyer_name type=text req=True label_ar='اسم المشتري' label_en=None visible_when=None opts=0
+    - key=buyer_national_id type=text req=True label_ar='الرقم الوطني للمشتري' label_en=None visible_when=None opts=0
+    - key=phone_numbers type=text req=True label_ar='أرقام الهواتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_498ac74dd1 type=checkbox req=False label_ar='هل البائع والمشتري داخل الأردن؟' label_en=None visible_when=None opts=0
+    - key=field_23afc22be9 type=checkbox req=False label_ar='هل يوجد وكالة قانونية؟' label_en=None visible_when=None opts=0
+    - key=field_2013716fdf type=checkbox req=False label_ar='هل يوجد أكثر من مالك أو أكثر من مشتري؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [24] request-inheritance-registration  no=SRV-000024
+  name_ar='طلب تسجيل إرث' name_en='Request Inheritance Registration' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لتسجيل الإرث ونقل ملكية العقار من المتوفى إلى الورثة وفقًا لحجة حصر الإرث.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب لتسجيل الإرث ونقل ملكية العقار من المتوفى إلى الورثة الشرعيين أو القانونيين استنادًا إلى حجة حصر الإرث الصادرة عن المحكمة المختصة، مع متابعة جميع الإجراءات لدى دائرة الأراضي والمساحة حتى إصدار سندات التسجيل بأسماء الورثة.'
+  desc_en=''
+  terms_ar='الشروط: • صدور حجة حصر إرث من المحكمة المختصة.• تقديم جميع الوثائق المطلوبة.• حضور الورثة أو من يمثلهم قانونيًا عند الحاجة.• قد تختلف المتطلبات حسب طبيعة العقار وعدد الورثة.\nمعلومات التشغيل: الجهة الم' terms_en=''
+  documents:
+    - req78 type=inheritance_certificate ar='حجة حصر الإرث' en='Inheritance certificate' required=1 active=1 deleted=0 def=55:inheritance_certificate instr_ar=''
+    - req79 type=document_443aae22bf ar='شهادة الوفاة' en='' required=1 active=1 deleted=0 def=56:document_443aae22bf instr_ar=''
+    - req80 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req81 type=document_c3a3aa1c50 ar='صور هويات الورثة' en='' required=1 active=1 deleted=0 def=57:document_c3a3aa1c50 instr_ar=''
+    - req82 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=field_b8a0419109 type=text req=True label_ar='اسم المتوفى' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_a4c0cc56df type=number req=True label_ar='عدد الورثة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_ac120aaeaa type=checkbox req=False label_ar='هل صدرت حجة حصر الإرث؟' label_en=None visible_when=None opts=0
+    - key=field_6dd0ca5286 type=checkbox req=False label_ar='نوع حجة حصر الإرث (شرعية/كنسية)' label_en=None visible_when=None opts=0
+    - key=field_45a27f6310 type=checkbox req=False label_ar='هل يوجد وكيل قانوني يمثل جميع الورثة؟' label_en=None visible_when=None opts=0
+    - key=field_da11e8ca0f type=checkbox req=False label_ar='هل جميع الورثة داخل الأردن؟' label_en=None visible_when=None opts=0
+    - key=field_44b3e07432 type=checkbox req=False label_ar='هل يوجد قاصر ضمن الورثة؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [25] request-property-gift-transfer  no=SRV-000025
+  name_ar='طلب هبة عقار' name_en='Request Property Gift Transfer' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لنقل ملكية عقار عن طريق الهبة وفقًا للإجراءات والأنظمة المعمول بها.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب لنقل ملكية عقار عن طريق الهبة بين الأطراف المستحقة وفقًا للتشريعات المعمول بها، مع متابعة جميع الإجراءات لدى دائرة الأراضي والمساحة حتى استكمال نقل الملكية وإصدار سند التسجيل باسم الموهوب له.'
+  desc_en=''
+  terms_ar='الشروط: • أن يكون الواهب مالكًا للعقار.• حضور الأطراف أو من يمثلهم قانونيًا عند الحاجة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأر' terms_en=''
+  documents:
+    - req83 type=document_564406e175 ar='صورة هوية الواهب' en='' required=1 active=1 deleted=0 def=58:document_564406e175 instr_ar=''
+    - req84 type=document_11667481fd ar='صورة هوية الموهوب له' en='' required=1 active=1 deleted=0 def=59:document_11667481fd instr_ar=''
+    - req85 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req86 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req87 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=field_3cd1e5af3a type=text req=True label_ar='اسم الواهب' label_en=None visible_when=None opts=0
+    - key=field_c67372ee55 type=text req=True label_ar='الرقم الوطني للواهب' label_en=None visible_when=None opts=0
+    - key=field_11eb543426 type=text req=True label_ar='اسم الموهوب له' label_en=None visible_when=None opts=0
+    - key=field_fdba9f39a6 type=text req=True label_ar='الرقم الوطني للموهوب له' label_en=None visible_when=None opts=0
+    - key=phone_numbers type=text req=True label_ar='أرقام الهواتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_e2f57bbb81 type=checkbox req=False label_ar='هل توجد صلة قرابة بين الواهب والموهوب له؟' label_en=None visible_when=None opts=0
+    - key=field_f105f02706 type=checkbox req=False label_ar='هل جميع الأطراف داخل الأردن؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_41624b6665 type=checkbox req=False label_ar='هل العقار مملوك بالكامل للواهب؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [10] property-registration-deed  no=SRV-000010
+  name_ar='إصدار سند تسجيل عقار' name_en='Property Registration Deed' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=28 gov=12 service_fee=16 total(base+gov+fee)=56 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 56 but shown components sum to 28 (hidden base_price 28)
+  duration mode=duration_range est=8 min=6 max=8 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='طلب سند تسجيل أو نسخة حديثة من وثائق الملكية.'
+  desc_ar='طلب سند تسجيل أو نسخة حديثة من وثائق الملكية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Request a property registration deed or updated ownership copy. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req13 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req14 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [26] request-termination-of-co-ownership  no=SRV-000026
+  name_ar='طلب إزالة الشيوع' name_en='Request Termination of Co-ownership' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لإنهاء حالة الشيوع بين المالكين وفقًا للإجراءات المعتمدة.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب إزالة الشيوع للعقارات المملوكة على الشيوع بين أكثر من مالك، مع متابعة جميع الإجراءات لدى الجهات المختصة حتى إنهاء الملكية المشتركة وفقًا للأنظمة والتعليمات المعمول بها.'
+  desc_en=''
+  terms_ar='الشروط: • أن يكون العقار مملوكًا على الشيوع.• تقديم الوثائق المطلوبة.• قد تتطلب المعاملة موافقة جميع الشركاء أو قرارًا من الجهة المختصة.• تخضع المعاملة للأنظمة النافذة.\nمعلومات التشغيل: الجهة المنفذة:' terms_en=''
+  documents:
+    - req88 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req89 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req90 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req91 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_224269de21 type=number req=True label_ar='عدد الشركاء' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_4bca17a629 type=checkbox req=False label_ar='هل جميع الشركاء موافقون على إزالة الشيوع؟' label_en=None visible_when=None opts=0
+    - key=field_5c6164c551 type=checkbox req=False label_ar='إذا لا، هل يوجد حكم قضائي أو دعوى؟' label_en=None visible_when=None opts=0
+    - key=field_3c7283fc39 type=number req=False label_ar='كم عدد الشركاء؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_e9352003cb type=checkbox req=False label_ar='هل جميع الشركاء داخل الأردن؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [27] request-property-subdivision  no=SRV-000027
+  name_ar='طلب إفراز' name_en='Request Property Subdivision' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات الجهات المختصة وطبيعة العقار.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لتقسيم العقار أو قطعة الأرض إلى قطع أو وحدات مستقلة.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب إفراز لعقار أو قطعة أرض بهدف تقسيمها إلى قطع أو وحدات مستقلة وفقًا لمتطلبات الجهات المختصة. يتولى فريق خلّصني متابعة جميع الإجراءات مع الجهات ذات العلاقة حتى استكمال المعاملة وإصدار المستندات اللازمة.'
+  desc_en=''
+  terms_ar='الشروط: • أن يستوفي العقار شروط الإفراز.• تقديم جميع الوثائق المطلوبة.• قد تتطلب المعاملة مخططات أو تقارير فنية.• تخضع لموافقة الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مز' terms_en=''
+  documents:
+    - req92 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req93 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req94 type=cadastral_map ar='مخطط أراضٍ (إن وجد)' en='Cadastral map' required=0 active=1 deleted=0 def=60:cadastral_map instr_ar='حسب الحالة'
+    - req95 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req96 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_2085c3cabf type=number req=True label_ar='عدد القطع أو الوحدات المطلوب إفرازها' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_649c50d973 type=checkbox req=False label_ar='هل العقار أرض أم بناء؟' label_en=None visible_when=None opts=0
+    - key=field_e7d765ce63 type=checkbox req=False label_ar='هل الإفراز لقطعة أرض أم لشقق/وحدات؟' label_en=None visible_when=None opts=0
+    - key=field_5ebd0dedc5 type=number req=False label_ar='كم عدد القطع أو الوحدات المطلوب إفرازها؟' label_en=None visible_when=None opts=0
+    - key=field_b18f129f12 type=checkbox req=False label_ar='هل يوجد مخطط إفراز معتمد؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_9fe181a6e8 type=checkbox req=False label_ar='هل جميع الملاك موافقون؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [28] request-property-consolidation  no=SRV-000028
+  name_ar='طلب توحيد عقار' name_en='Request Property Consolidation' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لتوحيد قطعتين أو أكثر ضمن عقار واحد وفق الأنظمة المعمول بها.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب لتوحيد قطعتين أو أكثر لتصبح قطعة عقارية واحدة، مع متابعة جميع الإجراءات لدى دائرة الأراضي والمساحة والجهات المختصة حتى استكمال عملية التوحيد وإصدار سند التسجيل الجديد.'
+  desc_en=''
+  terms_ar='الشروط: • أن تستوفي القطع شروط التوحيد.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة لموافقة الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة معتمد.يمكن ت' terms_en=''
+  documents:
+    - req97 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req98 type=document_7c6a69c2f4 ar='سندات تسجيل جميع القطع' en='' required=1 active=1 deleted=0 def=61:document_7c6a69c2f4 instr_ar=''
+    - req99 type=cadastral_map ar='مخطط أراضٍ (إن وجد)' en='Cadastral map' required=0 active=1 deleted=0 def=60:cadastral_map instr_ar='حسب الحالة'
+    - req100 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req101 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=field_56b1987951 type=text req=True label_ar='أرقام القطع المطلوب توحيدها' label_en=None visible_when=None opts=0
+    - key=field_7d9efcd6d5 type=text req=True label_ar='أرقام الأحواض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_b8d4677c65 type=number req=False label_ar='كم عدد القطع المطلوب توحيدها؟' label_en=None visible_when=None opts=0
+    - key=field_da334d766f type=checkbox req=False label_ar='هل جميع القطع مملوكة لنفس المالك؟' label_en=None visible_when=None opts=0
+    - key=field_b07ae7100c type=checkbox req=False label_ar='هل القطع متجاورة؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [29] request-boundary-demarcation  no=SRV-000029
+  name_ar='طلب تثبيت حدود' name_en='Request Boundary Demarcation' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لتحديد وتثبيت حدود العقار على أرض الواقع وفق السجلات الرسمية.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب لتثبيت حدود العقار من خلال تحديد حدوده ميدانياً بالاستناد إلى المخططات والسجلات الرسمية، مع متابعة الإجراءات لدى دائرة الأراضي والمساحة والتنسيق مع مكتب المساحة والجهات المختصة حتى استكمال المعاملة.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• قد يتطلب الأمر كشفاً ميدانياً.• تخضع المعاملة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود' terms_en=''
+  documents:
+    - req102 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req103 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req104 type=cadastral_map ar='مخطط أراضٍ' en='Cadastral map' required=1 active=1 deleted=0 def=60:cadastral_map instr_ar=''
+    - req105 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req106 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_bbea5e4459 type=text req=True label_ar='سبب طلب تثبيت الحدود' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_57847bd284 type=checkbox req=False label_ar='هل يوجد نزاع على حدود العقار؟' label_en=None visible_when=None opts=0
+    - key=field_44f22ef962 type=checkbox req=False label_ar='هل سبق تثبيت حدود العقار؟' label_en=None visible_when=None opts=0
+    - key=field_8946eb1107 type=checkbox req=False label_ar='هل يوجد تقرير مساحي سابق؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_2525256bd4 type=checkbox req=False label_ar='هل يمكن الوصول إلى موقع العقار بسهولة؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [30] request-land-survey  no=SRV-000030
+  name_ar='طلب كشف مساحي' name_en='Request Land Survey' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لإجراء كشف مساحي على قطعة أرض بواسطة مسّاح معتمد لتحديد الموقع أو إعداد تقرير مساحي حسب الغاية المطلوبة.'
+  desc_ar='تتيح هذه الخدمة للعميل طلب كشف مساحي لقطعة أرض من خلال مسّاح معتمد، مع متابعة إجراءات التنسيق حتى استلام التقرير أو المخطط المساحي وفق الأنظمة والتعليمات النافذة.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• قد يتطلب الأمر كشفاً ميدانياً.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود ا' terms_en=''
+  documents:
+    - req107 type=document_a4c4fed3af ar='الهوية' en='' required=1 active=1 deleted=0 def=63:document_a4c4fed3af instr_ar=''
+    - req108 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req109 type=property_registration_certificate ar='سند التسجيل' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req110 type=document_0cc19c2317 ar='مخطط أراضٍ إن وجد' en='' required=0 active=1 deleted=0 def=64:document_0cc19c2317 instr_ar='حسب الحالة'
+    - req111 type=cadastral_map ar='مخطط أراضٍ (إن وجد)' en='Cadastral map' required=0 active=1 deleted=0 def=60:cadastral_map instr_ar='حسب الحالة'
+    - req112 type=document_e95445e836 ar='وكالة قانونية إن وجدت' en='' required=0 active=1 deleted=0 def=65:document_e95445e836 instr_ar='حسب الحالة'
+    - req113 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req114 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم' label_en=None visible_when=None opts=0
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=field_760c65a1fa type=tel req=True label_ar='الهاتف' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_d7fc96e29e type=text req=True label_ar='سبب الكشف' label_en=None visible_when=None opts=0
+    - key=survey_reason type=text req=True label_ar='سبب طلب الكشف' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_225e3741b4 type=checkbox req=False label_ar='ما الغاية من الكشف المساحي؟' label_en=None visible_when=None opts=0
+    - key=field_8946eb1107 type=checkbox req=False label_ar='هل يوجد تقرير مساحي سابق؟' label_en=None visible_when=None opts=0
+    - key=field_711abf9b11 type=checkbox req=False label_ar='هل يوجد مخطط أراضٍ حديث؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_2525256bd4 type=checkbox req=False label_ar='هل يمكن الوصول إلى موقع العقار بسهولة؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [31] request-property-readjustment  no=SRV-000031
+  name_ar='طلب إعادة تنظيم' name_en='Request Property Readjustment' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات الجهات المختصة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لمتابعة إجراءات إعادة تنظيم قطعة أرض وفق الأنظمة والتعليمات المعمول بها.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب لإعادة تنظيم قطعة أرض ومتابعة الإجراءات لدى الجهات المختصة حتى استكمال المعاملة، بالتنسيق مع مزود الخدمة والجهات الرسمية.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة للأنظمة والتعليمات النافذة.• قد تتطلب موافقات من الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: الجهات المختصة ودائرة ال' terms_en=''
+  documents:
+    - req115 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req116 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req117 type=cadastral_map ar='مخطط أراضٍ' en='Cadastral map' required=1 active=1 deleted=0 def=60:cadastral_map instr_ar=''
+    - req118 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req119 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=full_name type=text req=True label_ar='الاسم الكامل' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=readjustment_reason type=text req=True label_ar='سبب طلب إعادة التنظيم' label_en=None visible_when=None opts=0
+    - key=field_536eddb5ee type=text req=True label_ar='اسم البلدية' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_b0926cf796 type=checkbox req=False label_ar='ما سبب طلب إعادة التنظيم؟' label_en=None visible_when=None opts=0
+    - key=field_da897ff7ee type=checkbox req=False label_ar='هل المنطقة مشمولة بمشروع إعادة تنظيم؟' label_en=None visible_when=None opts=0
+    - key=field_05c9a7346b type=checkbox req=False label_ar='هل توجد مخططات تنظيم معتمدة؟' label_en=None visible_when=None opts=0
+    - key=field_729ed5c96d type=checkbox req=False label_ar='ما الغاية من الطلب؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_d25b82bf60 type=checkbox req=False label_ar='هل سبق تقديم طلب مشابه؟' label_en=None visible_when=None opts=0
+    - key=field_c7eea7fb68 type=textarea req=False label_ar='هل توجد ملاحظات إضافية؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [32] request-zoning-certificate  no=SRV-000032
+  name_ar='طلب كشف تنظيم' name_en='Request Zoning Certificate' category=land-and-survey
+  is_active=0 show_on_public_site=0 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات البلدية أو الجهة المختصة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب للحصول على كشف يوضح الوضع والتنظيم المعتمد للعقار.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب للحصول على كشف تنظيم يبين المعلومات التنظيمية الأساسية للعقار وفق السجلات والجهة المختصة. تم الإبقاء على هذه الخدمة في النظام لحين المراجعة النهائية والتأكد من عدم تداخلها مع خدمة طلب مخطط موقع تنظيمي.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار.• توفير الوثائق المطلوبة.• تخضع لإجراءات الجهة المختصة.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو الجهة التنظيمية المختصة.مزود الخدمة: معقب معاملات/مكتب هندسي حسب الحالة' terms_en=''
+  documents:
+    - req120 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req121 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req122 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req123 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_2a8f1a87c6 type=checkbox req=False label_ar='ما الغاية من كشف التنظيم؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_c5251821b3 type=checkbox req=False label_ar='هل سبق إصدار كشف تنظيم للعقار؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [33] request-land-use-classification-change  no=SRV-000033
+  name_ar='طلب تغيير صفة التنظيم' name_en='Request Land Use Classification Change' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات الجهات المختصة وطبيعة المعاملة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لمتابعة إجراءات تغيير صفة تنظيم العقار لدى الجهات المختصة.'
+  desc_ar='تتيح هذه الخدمة للعميل تقديم طلب لتغيير صفة تنظيم قطعة أرض أو عقار وفق التشريعات النافذة، مع متابعة المعاملة لدى الجهات المختصة حتى اكتمال الإجراءات.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة لموافقة الجهات المختصة.• قد تتطلب دراسة فنية أو تنظيمية.\nمعلومات التشغيل: الجهة المنفذة: الجهات التنظيمية المختصة.مزود ال' terms_en=''
+  documents:
+    - req124 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req125 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req126 type=cadastral_map ar='مخطط أراضٍ' en='Cadastral map' required=1 active=1 deleted=0 def=60:cadastral_map instr_ar=''
+    - req127 type=document_3775124a52 ar='مخطط موقع تنظيمي (إن وجد)' en='' required=0 active=1 deleted=0 def=66:document_3775124a52 instr_ar='حسب الحالة'
+    - req128 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req129 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=full_name type=text req=True label_ar='الاسم الكامل' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=current_land_use_classification type=text req=True label_ar='صفة التنظيم الحالية' label_en=None visible_when=None opts=0
+    - key=requested_land_use_classification type=text req=True label_ar='صفة التنظيم المطلوبة' label_en=None visible_when=None opts=0
+    - key=request_reason type=text req=True label_ar='سبب الطلب' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_937cc4d5d6 type=checkbox req=False label_ar='ما صفة التنظيم الحالية؟' label_en=None visible_when=None opts=0
+    - key=field_e825ca6266 type=checkbox req=False label_ar='ما صفة التنظيم المطلوبة؟' label_en=None visible_when=None opts=0
+    - key=field_02572f19a1 type=checkbox req=False label_ar='هل سبق تقديم طلب مماثل؟' label_en=None visible_when=None opts=0
+    - key=field_088e60f563 type=checkbox req=False label_ar='ما سبب طلب التغيير؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_c7eea7fb68 type=textarea req=False label_ar='هل توجد ملاحظات إضافية؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [34] request-zoning-plan  no=SRV-000034
+  name_ar='طلب مخطط تنظيمي' name_en='Request Zoning Plan' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب مدة إصدار المخطط من الجهة المختصة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لاستخراج أو الحصول على مخطط تنظيمي للعقار من الجهة المختصة.'
+  desc_ar='تمكن هذه الخدمة العميل من طلب مخطط تنظيمي يوضح صفة التنظيم والارتدادات والطرق والتنظيم المعتمد للعقار، مع متابعة الطلب لدى الجهات المختصة حتى استلام المخطط.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم بيانات العقار بشكل صحيح.• توفر رقم القطعة والحوض.• قد يطلب إثبات ملكية أو وكالة قانونية.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو أمانة عمان ' terms_en=''
+  documents:
+    - req130 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req131 type=property_registration_certificate ar='سند تسجيل العقار (إن وجد)' en='Property registration certificate' required=0 active=1 deleted=0 def=53:property_registration_certificate instr_ar='حسب الحالة'
+    - req132 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req133 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=request_purpose type=text req=True label_ar='الغاية من الطلب' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_5dded7dd47 type=checkbox req=False label_ar='ما الغاية من المخطط؟' label_en=None visible_when=None opts=0
+    - key=field_c3bd9f38ed type=checkbox req=False label_ar='هل يوجد سند تسجيل؟' label_en=None visible_when=None opts=0
+    - key=field_9702f3b4ac type=checkbox req=False label_ar='هل الطلب للمالك أم بموجب وكالة؟' label_en=None visible_when=None opts=0
+    - key=field_54143bc9fe type=checkbox req=False label_ar='هل سبق إصدار مخطط سابق؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['basin_number', 'parcel_number']
+
+## [35] request-change-statement  no=SRV-000035
+  name_ar='طلب بيان تغيير' name_en='Request Change Statement' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات الجهة المختصة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب للحصول على بيان تغيير خاص بالعقار وفق سجلات الجهات المختصة.'
+  desc_ar='تمكن هذه الخدمة العميل من طلب إصدار بيان تغيير يوضح التعديلات أو التغييرات المسجلة على العقار، مع متابعة المعاملة لدى الجهات المختصة حتى استلام الوثيقة.'
+  desc_en=''
+  terms_ar='الشروط: • إدخال بيانات العقار بشكل صحيح.• توفر الوثائق المطلوبة.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة أو الجهة المختصة.مزود الخدمة: معقب معام' terms_en=''
+  documents:
+    - req134 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req135 type=property_registration_certificate ar='سند التسجيل (إن وجد)' en='Property registration certificate' required=0 active=1 deleted=0 def=53:property_registration_certificate instr_ar='حسب الحالة'
+    - req136 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req137 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=request_reason type=text req=True label_ar='سبب الطلب' label_en=None visible_when=None opts=0
+    - key=field_22e7ac2cd2 type=checkbox req=False label_ar='ما الغاية من بيان التغيير؟' label_en=None visible_when=None opts=0
+    - key=field_bc07ea41c3 type=checkbox req=False label_ar='هل الطلب للمالك؟' label_en=None visible_when=None opts=0
+    - key=field_23afc22be9 type=checkbox req=False label_ar='هل يوجد وكالة قانونية؟' label_en=None visible_when=None opts=0
+    - key=field_c7eea7fb68 type=textarea req=False label_ar='هل توجد ملاحظات إضافية؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['basin_number', 'parcel_number']
+
+## [36] request-property-mortgage-registration  no=SRV-000036
+  name_ar='طلب رهن عقار' name_en='Request Property Mortgage Registration' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لتسجيل رهن على عقار لصالح جهة ممولة أو مستفيدة.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب لتسجيل رهن رسمي على عقار لدى دائرة الأراضي والمساحة لصالح بنك أو مؤسسة تمويل أو أي جهة مستفيدة، مع متابعة جميع الإجراءات حتى تسجيل الرهن وإصدار المستندات الرسمية.'
+  desc_en=''
+  terms_ar='الشروط: • أن يكون العقار قابلاً للرهن.• تقديم جميع الوثائق المطلوبة.• حضور الأطراف أو من يمثلهم قانونياً عند الحاجة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأرا' terms_en=''
+  documents:
+    - req138 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req139 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req140 type=document_5c2f8f95d1 ar='عقد التمويل أو اتفاقية الرهن (إن وجدت)' en='' required=0 active=1 deleted=0 def=67:document_5c2f8f95d1 instr_ar='حسب الحالة'
+    - req141 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req142 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_08d94d2888 type=text req=True label_ar='اسم الجهة المستفيدة' label_en=None visible_when=None opts=0
+    - key=field_3ece488644 type=text req=True label_ar='قيمة الرهن (إن وجدت)' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_d6467d46cf type=checkbox req=False label_ar='هل الرهن لصالح بنك أم جهة أخرى؟' label_en=None visible_when=None opts=0
+    - key=field_6ff5e81d0f type=checkbox req=False label_ar='هل يوجد تمويل قائم؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+    - key=field_9209f03252 type=checkbox req=False label_ar='هل جميع الملاك موافقون على الرهن؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [37] request-mortgage-release  no=SRV-000037
+  name_ar='طلب فك رهن عقار' name_en='Request Mortgage Release' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات دائرة الأراضي والمساحة والجهة المرتهنة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب لإلغاء وفك الرهن المسجل على العقار بعد استيفاء المتطلبات.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب لفك الرهن المسجل على العقار بعد سداد الالتزامات أو تحقق شروط فك الرهن، مع متابعة جميع الإجراءات لدى دائرة الأراضي والمساحة والجهة المرتهنة حتى إصدار إشعار فك الرهن وتحديث السجلات.'
+  desc_en=''
+  terms_ar='الشروط: • استكمال متطلبات الجهة المرتهنة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات عقارية.' terms_en=''
+  documents:
+    - req143 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req144 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req145 type=document_d2024a06a1 ar='كتاب أو موافقة فك الرهن من الجهة المرتهنة' en='' required=1 active=1 deleted=0 def=68:document_d2024a06a1 instr_ar=''
+    - req146 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req147 type=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=62:document_b03d952538 instr_ar='حسب الحالة'
+  fields:
+    - key=applicant_name type=text req=True label_ar='اسم مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_8a38c4158a type=text req=True label_ar='اسم الجهة المرتهنة' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_e70300dbb6 type=checkbox req=False label_ar='هل تم سداد كامل الالتزامات؟' label_en=None visible_when=None opts=0
+    - key=field_646f133865 type=checkbox req=False label_ar='ما اسم الجهة المرتهنة؟' label_en=None visible_when=None opts=0
+    - key=field_acf5f0c3dd type=checkbox req=False label_ar='هل يوجد كتاب رسمي بفك الرهن؟' label_en=None visible_when=None opts=0
+    - key=field_307ab61eb9 type=checkbox req=False label_ar='هل يوجد وكيل قانوني؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [38] request-building-permit  no=SRV-000038
+  name_ar='طلب رخصة بناء' name_en='Request Building Permit' category=land-and-survey
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='حسب إجراءات البلدية أو أمانة عمان والجهات المختصة.'
+  delivery_note_en=''
+  short_ar='تقديم طلب للحصول على رخصة بناء جديدة وفق الأنظمة المعمول بها.'
+  desc_ar='تتيح هذه الخدمة تقديم طلب للحصول على رخصة بناء لعقار أو قطعة أرض، مع متابعة الطلب لدى البلدية أو أمانة عمان والجهات المختصة حتى إصدار رخصة البناء بعد استكمال المتطلبات الفنية والتنظيمية.'
+  desc_en=''
+  terms_ar='الشروط: • تقديم المخططات الهندسية المعتمدة.• مطابقة متطلبات التنظيم.• استكمال الوثائق المطلوبة وسداد الرسوم.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو أمانة عمان.مزود الخدمة: مكتب هندسي ومعقب معاملات' terms_en=''
+  documents:
+    - req148 type=national_id_copy ar='صورة الهوية' en='National ID copy' required=1 active=1 deleted=0 def=49:national_id_copy instr_ar=''
+    - req149 type=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' required=1 active=1 deleted=0 def=53:property_registration_certificate instr_ar=''
+    - req150 type=document_3775124a52 ar='مخطط موقع تنظيمي' en='' required=1 active=1 deleted=0 def=66:document_3775124a52 instr_ar=''
+    - req151 type=document_3443627d36 ar='المخططات الهندسية' en='' required=1 active=1 deleted=0 def=69:document_3443627d36 instr_ar=''
+    - req152 type=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='حسب الحالة'
+    - req153 type=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' required=0 active=1 deleted=0 def=54:document_b0f143ad16 instr_ar='حسب الحالة'
+  fields:
+    - key=full_name type=text req=True label_ar='الاسم الكامل' label_en=None visible_when=None opts=0
+    - key=national_id type=text req=True label_ar='الرقم الوطني' label_en=None visible_when=None opts=0
+    - key=phone_number type=tel req=True label_ar='رقم الهاتف' label_en=None visible_when=None opts=0
+    - key=parcel_number type=text req=True label_ar='رقم القطعة' label_en=None visible_when=None opts=0
+    - key=basin_number type=text req=True label_ar='رقم الحوض' label_en=None visible_when=None opts=0
+    - key=region type=text req=True label_ar='المنطقة' label_en=None visible_when=None opts=0
+    - key=governorate type=text req=True label_ar='المحافظة' label_en=None visible_when=None opts=0
+    - key=field_530e3b26a8 type=text req=True label_ar='اسم المكتب الهندسي' label_en=None visible_when=None opts=0
+    - key=additional_notes type=textarea req=False label_ar='ملاحظات إضافية' label_en=None visible_when=None opts=0
+    - key=field_e021559e7a type=checkbox req=False label_ar='هل يوجد مكتب هندسي معتمد؟' label_en=None visible_when=None opts=0
+    - key=field_51b3ed7839 type=checkbox req=False label_ar='هل الرخصة لبناء جديد أم إعادة بناء؟' label_en=None visible_when=None opts=0
+    - key=field_4874b04e76 type=number req=False label_ar='كم عدد الطوابق؟' label_en=None visible_when=None opts=0
+    - key=field_65bdb1ffad type=checkbox req=False label_ar='هل توجد وكالة قانونية؟' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=['parcel_number', 'basin_number']
+
+## [9] traffic-fines-payment  no=SRV-000009
+  name_ar='دفع مخالفات السير' name_en='Traffic Fines Payment' category=quick-public-services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=1 scope=global org=None
+  price_type=fixed base=6 gov=0 service_fee=6 total(base+gov+fee)=12 show_total=1 show_gov=1 show_company=1
+  !! PRICE-SUM: public shows total 12 but shown components sum to 6 (hidden base_price 6)
+  duration mode=duration_range est=5 min=3 max=5 unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='سيتم إشعارك عند كل تحديث مهم على الطلب.'
+  delivery_note_en='You will be notified at every important request update.'
+  short_ar='استعلام ومتابعة دفع مخالفات السير ضمن طلب واحد واضح.'
+  desc_ar='استعلام ومتابعة دفع مخالفات السير ضمن طلب واحد واضح. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+  desc_en='Check and follow up traffic fine payment in one request. The service includes initial document review, status notifications, and final delivery through the platform.'
+  terms_ar='يرجى رفع وثائق واضحة وحديثة لتجنب تأخير المعاملة.' terms_en='Upload clear and recent documents to avoid delays.'
+  documents:
+    - req11 type=national-id ar='هوية شخصية' en='national-id' required=1 active=1 deleted=0 def=1:national-id instr_ar=''
+    - req12 type=authorization-letter ar='تفويض إن وجد' en='authorization-letter' required=1 active=1 deleted=0 def=2:authorization-letter instr_ar=''
+  fields:
+  parcel_question=False parcel_fields=[]
+
+## [12] business_company_registration  no=SRV-000012
+  name_ar='طلب تأسيس شركة' name_en='Request Company Registration' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب تأسيس شركة جديدة ومتابعة إجراءات التسجيل حتى اكتمال المعاملة.'
+  desc_ar='تقديم طلب تأسيس شركة جديدة ومتابعة إجراءات التسجيل حتى اكتمال المعاملة. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req17 type=document_b84500235f ar='صورة هوية/جواز سفر الشركاء' en='' required=1 active=1 deleted=0 def=3:document_b84500235f instr_ar='نسخة واضحة وسارية لكل شريك.'
+    - req18 type=legal_authorization ar='وكالة عدلية أو تفويض' en='Legal authorization' required=0 active=1 deleted=0 def=4:legal_authorization instr_ar='إذا كان مقدم الطلب وكيلاً أو مفوضاً عن أصحاب العلاقة.'
+    - req19 type=document_a7c41b216c ar='موافقات مسبقة على الغايات/الأنشطة' en='' required=0 active=1 deleted=0 def=5:document_a7c41b216c instr_ar='إذا كانت الغاية المختارة تتطلب موافقة جهة مختصة.'
+    - req20 type=document_d6f5694849 ar='وثائق الحصص العينية' en='' required=0 active=1 deleted=0 def=6:document_d6f5694849 instr_ar='إذا كان جزء من رأس المال حصة عينية.'
+    - req21 type=document_6a5fef1088 ar='وثائق الشركة الأجنبية مصدقة ومترجمة' en='' required=0 active=1 deleted=0 def=7:document_6a5fef1088 instr_ar='إذا كان التأسيس/الشريك شركة أجنبية أو حسب نوع الشركة.'
+    - req22 type=document_bf9b841bf1 ar='وثائق المستفيد الحقيقي' en='' required=0 active=1 deleted=0 def=8:document_bf9b841bf1 instr_ar='حسب نوع الشركة والمتطلبات النافذة.'
+  fields:
+    - key=company_type type=select req=True label_ar='نوع الشركة' label_en=None visible_when=None opts=0
+    - key=proposed_company_name_1 type=text req=True label_ar='الاسم المقترح الأول للشركة' label_en=None visible_when=None opts=0
+    - key=proposed_company_name_2 type=text req=True label_ar='الاسم المقترح الثاني للشركة' label_en=None visible_when=None opts=0
+    - key=proposed_company_name_3 type=text req=True label_ar='الاسم المقترح الثالث للشركة' label_en=None visible_when=None opts=0
+    - key=company_objectives type=textarea req=True label_ar='غايات الشركة' label_en=None visible_when=None opts=0
+    - key=company_address type=text req=True label_ar='المركز الرئيسي / العنوان' label_en=None visible_when=None opts=0
+    - key=capital_amount type=number req=True label_ar='رأس مال الشركة' label_en=None visible_when=None opts=0
+    - key=partners_count type=number req=True label_ar='عدد الشركاء' label_en=None visible_when=None opts=0
+    - key=partner_name type=textarea req=True label_ar='اسم كل شريك' label_en=None visible_when=None opts=0
+    - key=partner_id type=textarea req=True label_ar='الرقم الوطني / رقم الجواز للشريك' label_en=None visible_when=None opts=0
+    - key=partner_nationality type=textarea req=True label_ar='جنسية كل شريك' label_en=None visible_when=None opts=0
+    - key=partner_share type=textarea req=True label_ar='حصة كل شريك' label_en=None visible_when=None opts=0
+    - key=authorized_signatories type=textarea req=True label_ar='المفوض/المفوضون بالتوقيع' label_en=None visible_when=None opts=0
+    - key=signing_authority type=textarea req=True label_ar='صلاحيات التوقيع' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [13] business_company_information_amendment  no=SRV-000013
+  name_ar='طلب تعديل بيانات شركة' name_en='Request Company Information Amendment' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب لتعديل بيانات شركة قائمة ومتابعة إجراءات التعديل حتى اكتمالها.'
+  desc_ar='تقديم طلب لتعديل بيانات شركة قائمة ومتابعة إجراءات التعديل حتى اكتمالها. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req23 type=document_cb35245bcf ar='محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة' en='' required=0 active=1 deleted=0 def=9:document_cb35245bcf instr_ar='حسب نوع الشركة ونوع التعديل.'
+    - req24 type=document_39a02bfad7 ar='عقد ونظام الشركة المعدلان أو النماذج المعتمدة' en='' required=0 active=1 deleted=0 def=10:document_39a02bfad7 instr_ar='إذا كان التعديل يستلزم تعديل عقد أو نظام الشركة.'
+    - req25 type=document_e6d6a52927 ar='عقد/وثائق تحويل الحصص' en='' required=0 active=1 deleted=0 def=11:document_e6d6a52927 instr_ar='إذا كان التعديل متعلقاً بالشركاء أو الحصص.'
+    - req26 type=document_bb343bc1a7 ar='هوية الأطراف المعنية بالتعديل' en='' required=0 active=1 deleted=0 def=12:document_bb343bc1a7 instr_ar='عند إضافة/تغيير شريك أو مفوض أو مدير.'
+    - req27 type=legal_authorization ar='وكالة عدلية أو تفويض خطي' en='Legal authorization' required=0 active=1 deleted=0 def=4:legal_authorization instr_ar='إذا كان مقدم الطلب ليس صاحب العلاقة/المفوض.'
+    - req28 type=document_04defb9ccb ar='موافقات الجهات المختصة' en='' required=0 active=1 deleted=0 def=13:document_04defb9ccb instr_ar='إذا كان نوع التعديل يتطلب موافقة مسبقة.'
+  fields:
+    - key=company_registration_number type=number req=True label_ar='رقم تسجيل الشركة' label_en=None visible_when=None opts=0
+    - key=company_name type=text req=True label_ar='اسم الشركة' label_en=None visible_when=None opts=0
+    - key=company_type type=select req=True label_ar='نوع الشركة' label_en=None visible_when=None opts=0
+    - key=amendment_type type=select req=True label_ar='نوع التعديل المطلوب' label_en=None visible_when=None opts=7
+    - key=amendment_details type=textarea req=True label_ar='تفاصيل التعديل المطلوب' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [14] business_company_add_activities  no=SRV-000014
+  name_ar='طلب إضافة غايات لشركة قائمة' name_en='Request to Add Business Activities to an Existing Company' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب لإضافة غايات أو أنشطة جديدة إلى شركة قائمة ومتابعة إجراءات التعديل.'
+  desc_ar='تقديم طلب لإضافة غايات أو أنشطة جديدة إلى شركة قائمة ومتابعة إجراءات التعديل. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req29 type=document_cdd8ce3328 ar='محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات' en='' required=0 active=1 deleted=0 def=14:document_cdd8ce3328 instr_ar='بحسب نوع الشركة ومتطلبات التعديل.'
+    - req30 type=document_ec8d545fbf ar='عقد/نظام معدل أو النموذج المعتمد' en='' required=0 active=1 deleted=0 def=15:document_ec8d545fbf instr_ar='إذا تطلبت المعاملة تعديل عقد أو نظام الشركة.'
+    - req31 type=document_cc8affb2cc ar='موافقات مسبقة على الغاية الجديدة' en='' required=0 active=1 deleted=0 def=16:document_cc8affb2cc instr_ar='للأنشطة التي تحتاج موافقات من جهات مختصة.'
+    - req32 type=legal_authorization ar='وكالة عدلية أو تفويض خطي' en='Legal authorization' required=0 active=1 deleted=0 def=4:legal_authorization instr_ar='إذا كان مقدم الطلب ليس صاحب العلاقة/المفوض.'
+  fields:
+    - key=company_registration_number type=number req=True label_ar='رقم تسجيل الشركة' label_en=None visible_when=None opts=0
+    - key=company_name type=text req=True label_ar='اسم الشركة' label_en=None visible_when=None opts=0
+    - key=company_type type=select req=True label_ar='نوع الشركة' label_en=None visible_when=None opts=0
+    - key=current_business_activities type=textarea req=False label_ar='الغايات الحالية' label_en=None visible_when=None opts=0
+    - key=new_business_activities type=textarea req=True label_ar='الغايات/الأنشطة المطلوب إضافتها' label_en=None visible_when=None opts=0
+    - key=additional_details type=textarea req=False label_ar='تفاصيل إضافية' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [15] business_commercial_registration_certificate  no=SRV-000015
+  name_ar='طلب إصدار سجل تجاري' name_en='Request Commercial Registration Certificate' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='طلب استخراج/إصدار شهادة سجل تجاري ومتابعة الطلب حتى التسليم.'
+  desc_ar='طلب استخراج/إصدار شهادة سجل تجاري ومتابعة الطلب حتى التسليم. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req33 type=document_85697877bb ar='إثبات شخصية مقدم الطلب' en='' required=1 active=1 deleted=0 def=17:document_85697877bb instr_ar='هوية أو جواز سفر ساري.'
+    - req34 type=document_5ca1add6b9 ar='كتاب تفويض من الشركة' en='' required=0 active=1 deleted=0 def=18:document_5ca1add6b9 instr_ar='إذا كان مقدم الطلب مفوضاً عن الشركة.'
+    - req35 type=document_af883d59b3 ar='وكالة عدلية' en='' required=0 active=1 deleted=0 def=19:document_af883d59b3 instr_ar='إذا كان مقدم الطلب وكيلاً وتطلبت المعاملة ذلك.'
+  fields:
+    - key=entity_type type=select req=True label_ar='نوع صاحب السجل' label_en=None visible_when=None opts=0
+    - key=registration_number type=text req=True label_ar='رقم التسجيل / الرقم الوطني للمنشأة' label_en=None visible_when=None opts=0
+    - key=registered_entity_name type=text req=True label_ar='اسم الشركة / المنشأة' label_en=None visible_when=None opts=0
+    - key=certificate_copy_type type=select req=False label_ar='نوع النسخة المطلوبة' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [16] business_trade_name_certificate  no=SRV-000016
+  name_ar='طلب إصدار شهادة اسم تجاري' name_en='Request Trade Name Certificate' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='طلب إصدار شهادة لاسم تجاري مسجل ومتابعة استخراجها حتى التسليم.'
+  desc_ar='طلب إصدار شهادة لاسم تجاري مسجل ومتابعة استخراجها حتى التسليم. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req36 type=document_85697877bb ar='إثبات شخصية مقدم الطلب' en='' required=1 active=1 deleted=0 def=17:document_85697877bb instr_ar='هوية أو جواز سفر ساري.'
+    - req37 type=document_11714fabf5 ar='تفويض خطي' en='' required=0 active=1 deleted=0 def=20:document_11714fabf5 instr_ar='إذا كان مقدم الطلب مفوضاً عن صاحب العلاقة/الشركة.'
+    - req38 type=document_af883d59b3 ar='وكالة عدلية' en='' required=0 active=1 deleted=0 def=19:document_af883d59b3 instr_ar='إذا كان التقديم بواسطة وكيل وتطلبت المعاملة ذلك.'
+  fields:
+    - key=trade_name_number type=number req=True label_ar='رقم الاسم التجاري' label_en=None visible_when=None opts=0
+    - key=trade_name type=text req=True label_ar='اسم الاسم التجاري' label_en=None visible_when=None opts=0
+    - key=trade_name_owner type=text req=True label_ar='اسم صاحب الاسم التجاري / المنشأة' label_en=None visible_when=None opts=0
+    - key=certificate_copy_type type=select req=False label_ar='نوع النسخة المطلوبة' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [17] business_trade_name_registration  no=SRV-000017
+  name_ar='طلب تسجيل اسم تجاري' name_en='Request Trade Name Registration' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب تسجيل اسم تجاري جديد ومتابعة الإجراءات حتى اكتمال التسجيل.'
+  desc_ar='تقديم طلب تسجيل اسم تجاري جديد ومتابعة الإجراءات حتى اكتمال التسجيل. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req39 type=document_197c7d7fc0 ar='إثبات شخصية صاحب الطلب' en='' required=1 active=1 deleted=0 def=21:document_197c7d7fc0 instr_ar='هوية أو جواز سفر ساري.'
+    - req40 type=document_322e004de0 ar='شهادة/بيانات تسجيل الشركة أو المنشأة' en='' required=0 active=1 deleted=0 def=22:document_322e004de0 instr_ar='إذا كان مقدم الطلب شركة أو مؤسسة ولم يمكن التحقق منها إلكترونياً.'
+    - req41 type=document_d038474c7a ar='تفويض خطي أو وكالة' en='' required=0 active=1 deleted=0 def=23:document_d038474c7a instr_ar='إذا كان مقدم الطلب ليس صاحب العلاقة.'
+    - req42 type=document_1b1707d621 ar='مستند يبرر استخدام اسم خاص/أجنبي' en='' required=0 active=1 deleted=0 def=24:document_1b1707d621 instr_ar='إذا طلبته الجهة المختصة بحسب الاسم المقترح.'
+  fields:
+    - key=applicant_type type=select req=True label_ar='صفة مقدم الطلب' label_en=None visible_when=None opts=0
+    - key=applicant_registration_number type=text req=True label_ar='الرقم الوطني / رقم التسجيل' label_en=None visible_when=None opts=0
+    - key=proposed_trade_name_1 type=text req=True label_ar='الاسم التجاري المقترح الأول' label_en=None visible_when=None opts=0
+    - key=proposed_trade_name_2 type=text req=True label_ar='الاسم التجاري المقترح الثاني' label_en=None visible_when=None opts=0
+    - key=proposed_trade_name_3 type=text req=True label_ar='الاسم التجاري المقترح الثالث' label_en=None visible_when=None opts=0
+    - key=business_activity type=select req=True label_ar='طبيعة النشاط المرتبط بالاسم' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [18] business_trademark_services  no=SRV-000018
+  name_ar='طلب خدمات العلامة التجارية' name_en='Request Trademark Services' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب متعلق بعلامة تجارية ومتابعة الإجراء المطلوب حتى اكتمال المعاملة.'
+  desc_ar='تقديم طلب متعلق بعلامة تجارية ومتابعة الإجراء المطلوب حتى اكتمال المعاملة. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req43 type=document_5eb4193ba1 ar='صورة واضحة للعلامة / الشعار' en='' required=1 active=1 deleted=0 def=25:document_5eb4193ba1 instr_ar='مطلوبة عند تسجيل علامة جديدة أو عندما تتطلب المعاملة صورة العلامة.'
+    - req44 type=document_fd135ce03f ar='إثبات شخصية مالك العلامة' en='' required=0 active=1 deleted=0 def=26:document_fd135ce03f instr_ar='إذا كان المالك فرداً.'
+    - req45 type=document_d7d63d7027 ar='شهادة/سجل الشركة أو المؤسسة' en='' required=0 active=1 deleted=0 def=27:document_d7d63d7027 instr_ar='إذا كان مالك العلامة شخصاً اعتبارياً.'
+    - req46 type=legal_power_of_attorney ar='وكالة قانونية' en='Legal power of attorney' required=0 active=1 deleted=0 def=28:legal_power_of_attorney instr_ar='إذا كان التقديم بواسطة وكيل.'
+    - req47 type=document_7672fa9fbe ar='شهادة تسجيل العلامة السابقة' en='' required=0 active=1 deleted=0 def=29:document_7672fa9fbe instr_ar='للتجديد أو التعديل أو المعاملات المتعلقة بعلامة مسجلة، عند الحاجة.'
+    - req48 type=document_fb697280d9 ar='وثائق نقل الملكية ونماذج التنازل/النقل' en='' required=0 active=1 deleted=0 def=30:document_fb697280d9 instr_ar='عند اختيار نقل ملكية.'
+    - req49 type=document_56caf9c71a ar='مستندات داعمة للتعديل' en='' required=0 active=1 deleted=0 def=31:document_56caf9c71a instr_ar='عند تغيير اسم/عنوان/بيانات المالك أو العلامة.'
+  fields:
+    - key=trademark_service_type type=select req=True label_ar='نوع الخدمة' label_en=None visible_when=None opts=0
+    - key=trademark_name type=text req=True label_ar='اسم العلامة التجارية' label_en=None visible_when=None opts=0
+    - key=trademark_owner_type type=select req=True label_ar='نوع مالك العلامة' label_en=None visible_when=None opts=0
+    - key=trademark_owner_name type=text req=True label_ar='اسم مالك العلامة' label_en=None visible_when=None opts=0
+    - key=trademark_class type=select req=False label_ar='فئة السلع/الخدمات' label_en=None visible_when=None opts=0
+    - key=goods_services_description type=textarea req=False label_ar='وصف السلع/الخدمات' label_en=None visible_when=None opts=0
+    - key=trademark_description type=textarea req=False label_ar='وصف العلامة' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [19] business_license_services  no=SRV-000019
+  name_ar='طلب خدمات رخصة المهن' name_en='Request Business License Services' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='طلب إصدار أو تجديد أو تعديل أو إلغاء رخصة مهن حسب نوع النشاط والبلدية.'
+  desc_ar='طلب إصدار أو تجديد أو تعديل أو إلغاء رخصة مهن حسب نوع النشاط والبلدية. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req50 type=document_b7393c5318 ar='إثبات شخصية صاحب العلاقة/مقدم الطلب' en='' required=1 active=1 deleted=0 def=32:document_b7393c5318 instr_ar='هوية أو جواز سفر ساري.'
+    - req51 type=document_1c40b3e58a ar='عقد إيجار ساري أو سند ملكية' en='' required=0 active=1 deleted=0 def=33:document_1c40b3e58a instr_ar='بحسب صفة إشغال العقار ومتطلبات البلدية.'
+    - req52 type=document_602b0a206b ar='إذن إشغال' en='' required=0 active=1 deleted=0 def=34:document_602b0a206b instr_ar='بحسب نوع المبنى والنشاط ومتطلبات البلدية.'
+    - req53 type=document_69e9a26d6e ar='رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي' en='' required=0 active=1 deleted=0 def=35:document_69e9a26d6e instr_ar='إذا تطلب النشاط أو الموقع ذلك.'
+    - req54 type=document_3df268a71b ar='موافقات الجهات المختصة بالنشاط' en='' required=0 active=1 deleted=0 def=36:document_3df268a71b instr_ar='للأنشطة التي تتطلب موافقات مهنية/صحية/بيئية/دفاع مدني أو غيرها.'
+    - req55 type=document_ef81fa254a ar='رخصة المهن الحالية' en='' required=0 active=1 deleted=0 def=37:document_ef81fa254a instr_ar='للتجديد أو التعديل أو الإلغاء عند الحاجة.'
+    - req56 type=document_f56c2e0812 ar='تفويض خطي أو وكالة عدلية' en='' required=0 active=1 deleted=0 def=38:document_f56c2e0812 instr_ar='إذا كان مقدم الطلب ليس صاحب العلاقة.'
+    - req57 type=document_5375b03f66 ar='موافقة مالك العقار' en='' required=0 active=1 deleted=0 def=39:document_5375b03f66 instr_ar='إذا تطلب نوع التعديل أو البلدية ذلك.'
+  fields:
+    - key=business_license_action type=select req=True label_ar='نوع الخدمة' label_en=None visible_when=None opts=0
+    - key=business_name type=text req=True label_ar='اسم المنشأة' label_en=None visible_when=None opts=0
+    - key=business_registration_number type=text req=True label_ar='الرقم الوطني للمنشأة / رقم التسجيل' label_en=None visible_when=None opts=0
+    - key=business_activity_type type=select req=True label_ar='نوع النشاط' label_en=None visible_when=None opts=0
+    - key=municipality type=select req=True label_ar='المحافظة / البلدية' label_en=None visible_when=None opts=0
+    - key=business_location type=text req=True label_ar='عنوان موقع المهنة' label_en=None visible_when=None opts=0
+    - key=occupancy_status type=select req=True label_ar='صفة إشغال العقار' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+## [20] business_company_closure_liquidation  no=SRV-000020
+  name_ar='طلب إغلاق أو تصفية شركة' name_en='Request Company Closure or Liquidation' category=business_services
+  is_active=1 show_on_public_site=1 is_deleted=0 featured=0 scope=global org=None
+  price_type=quotation base=0 gov=0 service_fee=0 total(base+gov+fee)=0 show_total=0 show_gov=0 show_company=0
+  duration mode=duration est=1 min=None max=None unit=days
+  price_note_ar='يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+  price_note_en='Final fees are confirmed after document review.'
+  delivery_note_ar='تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+  delivery_note_en='The completion time is confirmed after your request is reviewed.'
+  short_ar='تقديم طلب شطب أو تصفية شركة قائمة ومتابعة الإجراءات حتى اكتمالها.'
+  desc_ar='تقديم طلب شطب أو تصفية شركة قائمة ومتابعة الإجراءات حتى اكتمالها. يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة.'
+  desc_en=''
+  terms_ar='' terms_en=''
+  documents:
+    - req58 type=document_f0fbb87902 ar='قرار/طلب الشطب أو التصفية موقع حسب الأصول' en='' required=0 active=1 deleted=0 def=40:document_f0fbb87902 instr_ar='بحسب نوع الشركة ومسار الشطب/التصفية.'
+    - req59 type=document_3bee74c311 ar='تفويض أو وكالة للشخص الذي يتابع الإجراءات' en='' required=0 active=1 deleted=0 def=41:document_3bee74c311 instr_ar='إذا لم يكن صاحب العلاقة/المفوض.'
+    - req60 type=document_ddc0c08e82 ar='براءة ذمة من الضمان الاجتماعي' en='' required=0 active=1 deleted=0 def=42:document_ddc0c08e82 instr_ar='في التصفية وحسب الحالة.'
+    - req61 type=document_7713142b41 ar='براءة ذمة من ضريبة الدخل والمبيعات' en='' required=0 active=1 deleted=0 def=43:document_7713142b41 instr_ar='في التصفية وحسب الحالة.'
+    - req62 type=document_8e430fe32b ar='شهادة شطب الاسم التجاري' en='' required=0 active=1 deleted=0 def=44:document_8e430fe32b instr_ar='إذا كان للشركة اسم تجاري مسجل.'
+    - req63 type=document_6192cecaba ar='براءات ذمة/موافقات إضافية من الجهات المختصة' en='' required=0 active=1 deleted=0 def=45:document_6192cecaba instr_ar='قد تشمل جهات أخرى بحسب نوع الشركة وحالتها.'
+    - req64 type=document_37e2d6c45c ar='تقرير المصفي وتقارير التصفية' en='' required=0 active=1 deleted=0 def=46:document_37e2d6c45c instr_ar='عند مسار التصفية.'
+    - req65 type=document_652dd91fc4 ar='موافقات/قرارات الشركاء على التصفية والتقرير النهائي' en='' required=0 active=1 deleted=0 def=47:document_652dd91fc4 instr_ar='بحسب نوع الشركة.'
+    - req66 type=document_c82005f833 ar='إذن المحكمة المختصة' en='' required=0 active=1 deleted=0 def=48:document_c82005f833 instr_ar='إذا وجدت حالة تستلزم ذلك، مثل بعض الموجودات أو حصص القاصرين/المحجور عليهم.'
+  fields:
+    - key=closure_or_liquidation_type type=select req=True label_ar='نوع الإجراء' label_en=None visible_when=None opts=0
+    - key=company_registration_number type=number req=True label_ar='رقم تسجيل الشركة' label_en=None visible_when=None opts=0
+    - key=company_name type=text req=True label_ar='اسم الشركة' label_en=None visible_when=None opts=0
+    - key=company_type type=select req=True label_ar='نوع الشركة' label_en=None visible_when=None opts=0
+    - key=has_operated type=checkbox req=True label_ar='هل مارست الشركة نشاطاً؟' label_en=None visible_when=None opts=0
+    - key=has_assets type=checkbox req=True label_ar='هل لدى الشركة موجودات؟' label_en=None visible_when=None opts=0
+    - key=has_liabilities type=checkbox req=True label_ar='هل على الشركة التزامات أو ديون؟' label_en=None visible_when=None opts=0
+    - key=has_employees type=checkbox req=True label_ar='هل لديها موظفون؟' label_en=None visible_when=None opts=0
+    - key=has_trade_name type=checkbox req=True label_ar='هل لديها اسم تجاري؟' label_en=None visible_when=None opts=0
+    - key=authorized_followup_person type=text req=True label_ar='اسم الشخص المفوض بمتابعة الإجراءات' label_en=None visible_when=None opts=0
+  parcel_question=False parcel_fields=[]
+
+# RELATIONS
+rel1 business-license-renewal -> no-criminal-record-certificate type=recommended_after required=0 active=1 deleted=0 msg='After renewing the business license, you may also need an updated no-criminal-record certificate.'
+rel2 business-license-renewal -> traffic-fines-payment type=optional_bundle required=0 active=1 deleted=0 msg='Many clients also clear related traffic obligations during the same renewal cycle.'
+
+# SUMMARY
+active: 37
+customer_visible: 33
+desc_en_empty: 30
+field_label_en_missing: 311
+field_type:checkbox: 75
+field_type:number: 13
+field_type:select: 20
+field_type:tel: 17
+field_type:text: 153
+field_type:textarea: 33
+hidden: 5
+inactive: 1
+land_category_services: 19
+national_id_type:text: 23
+national_id_type:textarea: 1
+not_customer_visible: 5
+not_deleted: 38
+price_type:fixed: 11
+price_type:quotation: 27
+public: 33
+services_with_parcel_question: 2
+
+# PER CATEGORY
+('???', 'not visible'): 3
+('الأحوال المدنية والجوازات', 'not visible'): 1
+('الأحوال المدنية والجوازات', 'visible'): 2
+('الخدمات البلدية', 'visible'): 1
+('العقارات والأراضي', 'not visible'): 1
+('العقارات والأراضي', 'visible'): 18
+('خدمات الأعمال والشركات', 'visible'): 9
+('خدمات عامة سريعة', 'visible'): 1
+('ضريبة الدخل والمبيعات', 'visible'): 1
+('وزارة العمل', 'visible'): 1
+
+# FLAGS
+[1] no-criminal-record: DOC conditional-in-name: req2 'تفويض إن وجد' required=1
+[2] passport-renewal: PRICE-SUM: public shows total 64 but shown components sum to 32 (hidden base_price 32)
+[2] passport-renewal: DOC conditional-in-name: req4 'تفويض إن وجد' required=1
+[3] tax-clearance: PRICE-SUM: public shows total 36 but shown components sum to 18 (hidden base_price 18)
+[3] tax-clearance: DOC conditional-in-name: req6 'تفويض إن وجد' required=1
+[4] service-debug: QMARKS in name_ar: '????'
+[4] service-debug: QMARKS in description_ar: '???'
+[5] service-debug-2: QMARKS in name_ar: '????'
+[5] service-debug-2: QMARKS in description_ar: '???'
+[6] service-debug-3: QMARKS in name_ar: '????'
+[6] service-debug-3: QMARKS in description_ar: '???'
+[8] passport-appointment-booking: PRICE-SUM: public shows total 16 but shown components sum to 8 (hidden base_price 8)
+[8] passport-appointment-booking: DOC conditional-in-name: req10 'تفويض إن وجد' required=1
+[7] no-criminal-record-certificate: PRICE-SUM: public shows total 30 but shown components sum to 15 (hidden base_price 15)
+[7] no-criminal-record-certificate: DOC conditional-in-name: req8 'تفويض إن وجد' required=1
+[11] business-license-renewal: PRICE-SUM: public shows total 48 but shown components sum to 24 (hidden base_price 24)
+[11] business-license-renewal: DOC conditional-in-name: req16 'تفويض إن وجد' required=1
+[21] request-property-registration-certificate: DOC name_en empty: req68 'أي بيانات تساعد في تحديد العقار'
+[21] request-property-registration-certificate: DOC conditional-in-name: req69 'وكالة قانونية (إن وجدت)' required=0
+[22] request-cadastral-map: DOC name_en empty: req71 'أي بيانات تساعد في تحديد العقار'
+[22] request-cadastral-map: DOC conditional-in-name: req72 'وكالة قانونية (إن وجدت)' required=0
+[23] request-property-ownership-transfer: DOC conditional-in-name: req76 'وكالة قانونية (إن وجدت)' required=0
+[23] request-property-ownership-transfer: DOC name_en empty: req77 'أي وثائق إضافية تطلبها الجهة المختصة'
+[23] request-property-ownership-transfer: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[24] request-inheritance-registration: DOC name_en empty: req79 'شهادة الوفاة'
+[24] request-inheritance-registration: DOC name_en empty: req81 'صور هويات الورثة'
+[24] request-inheritance-registration: DOC conditional-in-name: req82 'وكالة قانونية (إن وجدت)' required=0
+[24] request-inheritance-registration: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[25] request-property-gift-transfer: DOC name_en empty: req83 'صورة هوية الواهب'
+[25] request-property-gift-transfer: DOC name_en empty: req84 'صورة هوية الموهوب له'
+[25] request-property-gift-transfer: DOC conditional-in-name: req86 'وكالة قانونية (إن وجدت)' required=0
+[25] request-property-gift-transfer: DOC name_en empty: req87 'أي وثائق إضافية تطلبها الجهة المختصة'
+[25] request-property-gift-transfer: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[10] property-registration-deed: PRICE-SUM: public shows total 56 but shown components sum to 28 (hidden base_price 28)
+[10] property-registration-deed: DOC conditional-in-name: req14 'تفويض إن وجد' required=1
+[26] request-termination-of-co-ownership: DOC conditional-in-name: req90 'وكالة قانونية (إن وجدت)' required=0
+[26] request-termination-of-co-ownership: DOC name_en empty: req91 'أي وثائق إضافية تطلبها الجهة المختصة'
+[26] request-termination-of-co-ownership: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[27] request-property-subdivision: DOC conditional-in-name: req94 'مخطط أراضٍ (إن وجد)' required=0
+[27] request-property-subdivision: DOC conditional-in-name: req95 'وكالة قانونية (إن وجدت)' required=0
+[27] request-property-subdivision: DOC name_en empty: req96 'أي وثائق إضافية تطلبها الجهة المختصة'
+[27] request-property-subdivision: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[28] request-property-consolidation: DOC name_en empty: req98 'سندات تسجيل جميع القطع'
+[28] request-property-consolidation: DOC conditional-in-name: req99 'مخطط أراضٍ (إن وجد)' required=0
+[28] request-property-consolidation: DOC conditional-in-name: req100 'وكالة قانونية (إن وجدت)' required=0
+[28] request-property-consolidation: DOC name_en empty: req101 'أي وثائق إضافية تطلبها الجهة المختصة'
+[29] request-boundary-demarcation: DOC conditional-in-name: req105 'وكالة قانونية (إن وجدت)' required=0
+[29] request-boundary-demarcation: DOC name_en empty: req106 'أي مستندات إضافية تطلبها الجهة المختصة'
+[29] request-boundary-demarcation: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[30] request-land-survey: DOC name_en empty: req107 'الهوية'
+[30] request-land-survey: DOC name_en empty: req110 'مخطط أراضٍ إن وجد'
+[30] request-land-survey: DOC conditional-in-name: req110 'مخطط أراضٍ إن وجد' required=0
+[30] request-land-survey: DOC conditional-in-name: req111 'مخطط أراضٍ (إن وجد)' required=0
+[30] request-land-survey: DOC name_en empty: req112 'وكالة قانونية إن وجدت'
+[30] request-land-survey: DOC conditional-in-name: req112 'وكالة قانونية إن وجدت' required=0
+[30] request-land-survey: DOC conditional-in-name: req113 'وكالة قانونية (إن وجدت)' required=0
+[30] request-land-survey: DOC name_en empty: req114 'أي مستندات إضافية تطلبها الجهة المختصة'
+[30] request-land-survey: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[31] request-property-readjustment: DOC conditional-in-name: req118 'وكالة قانونية (إن وجدت)' required=0
+[31] request-property-readjustment: DOC name_en empty: req119 'أي مستندات إضافية تطلبها الجهة المختصة'
+[31] request-property-readjustment: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[32] request-zoning-certificate: DOC conditional-in-name: req122 'وكالة قانونية (إن وجدت)' required=0
+[32] request-zoning-certificate: DOC name_en empty: req123 'أي مستندات إضافية تطلبها الجهة المختصة'
+[32] request-zoning-certificate: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[33] request-land-use-classification-change: DOC name_en empty: req127 'مخطط موقع تنظيمي (إن وجد)'
+[33] request-land-use-classification-change: DOC conditional-in-name: req127 'مخطط موقع تنظيمي (إن وجد)' required=0
+[33] request-land-use-classification-change: DOC conditional-in-name: req128 'وكالة قانونية (إن وجدت)' required=0
+[33] request-land-use-classification-change: DOC name_en empty: req129 'أي مستندات إضافية تطلبها الجهة المختصة'
+[33] request-land-use-classification-change: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[34] request-zoning-plan: DOC conditional-in-name: req131 'سند تسجيل العقار (إن وجد)' required=0
+[34] request-zoning-plan: DOC conditional-in-name: req132 'وكالة قانونية (إن وجدت)' required=0
+[34] request-zoning-plan: DOC name_en empty: req133 'أي وثائق إضافية تطلبها الجهة المختصة'
+[34] request-zoning-plan: PARCEL fields without yes/no question: ['basin_number', 'parcel_number']
+[35] request-change-statement: DOC conditional-in-name: req135 'سند التسجيل (إن وجد)' required=0
+[35] request-change-statement: DOC conditional-in-name: req136 'وكالة قانونية (إن وجدت)' required=0
+[35] request-change-statement: DOC name_en empty: req137 'أي وثائق إضافية تطلبها الجهة المختصة'
+[35] request-change-statement: PARCEL fields without yes/no question: ['basin_number', 'parcel_number']
+[36] request-property-mortgage-registration: DOC name_en empty: req140 'عقد التمويل أو اتفاقية الرهن (إن وجدت)'
+[36] request-property-mortgage-registration: DOC conditional-in-name: req140 'عقد التمويل أو اتفاقية الرهن (إن وجدت)' required=0
+[36] request-property-mortgage-registration: DOC conditional-in-name: req141 'وكالة قانونية (إن وجدت)' required=0
+[36] request-property-mortgage-registration: DOC name_en empty: req142 'أي مستندات إضافية تطلبها الجهة المختصة'
+[36] request-property-mortgage-registration: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[37] request-mortgage-release: DOC name_en empty: req145 'كتاب أو موافقة فك الرهن من الجهة المرتهنة'
+[37] request-mortgage-release: DOC conditional-in-name: req146 'وكالة قانونية (إن وجدت)' required=0
+[37] request-mortgage-release: DOC name_en empty: req147 'أي مستندات إضافية تطلبها الجهة المختصة'
+[37] request-mortgage-release: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[38] request-building-permit: DOC name_en empty: req150 'مخطط موقع تنظيمي'
+[38] request-building-permit: DOC name_en empty: req151 'المخططات الهندسية'
+[38] request-building-permit: DOC conditional-in-name: req152 'وكالة قانونية (إن وجدت)' required=0
+[38] request-building-permit: DOC name_en empty: req153 'أي وثائق إضافية تطلبها الجهة المختصة'
+[38] request-building-permit: PARCEL fields without yes/no question: ['parcel_number', 'basin_number']
+[9] traffic-fines-payment: PRICE-SUM: public shows total 12 but shown components sum to 6 (hidden base_price 6)
+[9] traffic-fines-payment: DOC conditional-in-name: req12 'تفويض إن وجد' required=1
+[12] business_company_registration: DOC name_en empty: req17 'صورة هوية/جواز سفر الشركاء'
+[12] business_company_registration: DOC name_en empty: req19 'موافقات مسبقة على الغايات/الأنشطة'
+[12] business_company_registration: DOC name_en empty: req20 'وثائق الحصص العينية'
+[12] business_company_registration: DOC name_en empty: req21 'وثائق الشركة الأجنبية مصدقة ومترجمة'
+[12] business_company_registration: DOC name_en empty: req22 'وثائق المستفيد الحقيقي'
+[13] business_company_information_amendment: DOC name_en empty: req23 'محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة'
+[13] business_company_information_amendment: DOC name_en empty: req24 'عقد ونظام الشركة المعدلان أو النماذج المعتمدة'
+[13] business_company_information_amendment: DOC name_en empty: req25 'عقد/وثائق تحويل الحصص'
+[13] business_company_information_amendment: DOC name_en empty: req26 'هوية الأطراف المعنية بالتعديل'
+[13] business_company_information_amendment: DOC name_en empty: req28 'موافقات الجهات المختصة'
+[14] business_company_add_activities: DOC name_en empty: req29 'محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات'
+[14] business_company_add_activities: DOC name_en empty: req30 'عقد/نظام معدل أو النموذج المعتمد'
+[14] business_company_add_activities: DOC name_en empty: req31 'موافقات مسبقة على الغاية الجديدة'
+[15] business_commercial_registration_certificate: DOC name_en empty: req33 'إثبات شخصية مقدم الطلب'
+[15] business_commercial_registration_certificate: DOC name_en empty: req34 'كتاب تفويض من الشركة'
+[15] business_commercial_registration_certificate: DOC name_en empty: req35 'وكالة عدلية'
+[16] business_trade_name_certificate: DOC name_en empty: req36 'إثبات شخصية مقدم الطلب'
+[16] business_trade_name_certificate: DOC name_en empty: req37 'تفويض خطي'
+[16] business_trade_name_certificate: DOC name_en empty: req38 'وكالة عدلية'
+[17] business_trade_name_registration: DOC name_en empty: req39 'إثبات شخصية صاحب الطلب'
+[17] business_trade_name_registration: DOC name_en empty: req40 'شهادة/بيانات تسجيل الشركة أو المنشأة'
+[17] business_trade_name_registration: DOC name_en empty: req41 'تفويض خطي أو وكالة'
+[17] business_trade_name_registration: DOC name_en empty: req42 'مستند يبرر استخدام اسم خاص/أجنبي'
+[18] business_trademark_services: DOC name_en empty: req43 'صورة واضحة للعلامة / الشعار'
+[18] business_trademark_services: DOC name_en empty: req44 'إثبات شخصية مالك العلامة'
+[18] business_trademark_services: DOC name_en empty: req45 'شهادة/سجل الشركة أو المؤسسة'
+[18] business_trademark_services: DOC name_en empty: req47 'شهادة تسجيل العلامة السابقة'
+[18] business_trademark_services: DOC name_en empty: req48 'وثائق نقل الملكية ونماذج التنازل/النقل'
+[18] business_trademark_services: DOC name_en empty: req49 'مستندات داعمة للتعديل'
+[19] business_license_services: DOC name_en empty: req50 'إثبات شخصية صاحب العلاقة/مقدم الطلب'
+[19] business_license_services: DOC name_en empty: req51 'عقد إيجار ساري أو سند ملكية'
+[19] business_license_services: DOC name_en empty: req52 'إذن إشغال'
+[19] business_license_services: DOC name_en empty: req53 'رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي'
+[19] business_license_services: DOC name_en empty: req54 'موافقات الجهات المختصة بالنشاط'
+[19] business_license_services: DOC name_en empty: req55 'رخصة المهن الحالية'
+[19] business_license_services: DOC name_en empty: req56 'تفويض خطي أو وكالة عدلية'
+[19] business_license_services: DOC name_en empty: req57 'موافقة مالك العقار'
+[20] business_company_closure_liquidation: DOC name_en empty: req58 'قرار/طلب الشطب أو التصفية موقع حسب الأصول'
+[20] business_company_closure_liquidation: DOC name_en empty: req59 'تفويض أو وكالة للشخص الذي يتابع الإجراءات'
+[20] business_company_closure_liquidation: DOC name_en empty: req60 'براءة ذمة من الضمان الاجتماعي'
+[20] business_company_closure_liquidation: DOC name_en empty: req61 'براءة ذمة من ضريبة الدخل والمبيعات'
+[20] business_company_closure_liquidation: DOC name_en empty: req62 'شهادة شطب الاسم التجاري'
+[20] business_company_closure_liquidation: DOC name_en empty: req63 'براءات ذمة/موافقات إضافية من الجهات المختصة'
+[20] business_company_closure_liquidation: DOC name_en empty: req64 'تقرير المصفي وتقارير التصفية'
+[20] business_company_closure_liquidation: DOC name_en empty: req65 'موافقات/قرارات الشركاء على التصفية والتقرير النهائي'
+[20] business_company_closure_liquidation: DOC name_en empty: req66 'إذن المحكمة المختصة'
+[11] business-license-renewal: RELATION rel1 message not Arabic: 'After renewing the business license, you may also need an updated no-criminal-record certificate.'
+[11] business-license-renewal: RELATION rel2 message not Arabic: 'Many clients also clear related traffic obligations during the same renewal cycle.'
+
+# DEFINITIONS
+def1 code=national-id ar='هوية شخصية' en='national-id' active=1 deleted=0
+def2 code=authorization-letter ar='تفويض إن وجد' en='authorization-letter' active=1 deleted=0
+def3 code=document_b84500235f ar='صورة هوية/جواز سفر الشركاء' en='' active=1 deleted=0
+def4 code=legal_authorization ar='وكالة عدلية أو تفويض خطي' en='Legal authorization' active=1 deleted=0
+def5 code=document_a7c41b216c ar='موافقات مسبقة على الغايات/الأنشطة' en='' active=1 deleted=0
+def6 code=document_d6f5694849 ar='وثائق الحصص العينية' en='' active=1 deleted=0
+def7 code=document_6a5fef1088 ar='وثائق الشركة الأجنبية مصدقة ومترجمة' en='' active=1 deleted=0
+def8 code=document_bf9b841bf1 ar='وثائق المستفيد الحقيقي' en='' active=1 deleted=0
+def9 code=document_cb35245bcf ar='محضر/قرار الهيئة العامة أو هيئة المديرين أو مجلس الإدارة' en='' active=1 deleted=0
+def10 code=document_39a02bfad7 ar='عقد ونظام الشركة المعدلان أو النماذج المعتمدة' en='' active=1 deleted=0
+def11 code=document_e6d6a52927 ar='عقد/وثائق تحويل الحصص' en='' active=1 deleted=0
+def12 code=document_bb343bc1a7 ar='هوية الأطراف المعنية بالتعديل' en='' active=1 deleted=0
+def13 code=document_04defb9ccb ar='موافقات الجهات المختصة' en='' active=1 deleted=0
+def14 code=document_cdd8ce3328 ar='محضر/قرار الجهة المختصة في الشركة بالموافقة على تعديل الغايات' en='' active=1 deleted=0
+def15 code=document_ec8d545fbf ar='عقد/نظام معدل أو النموذج المعتمد' en='' active=1 deleted=0
+def16 code=document_cc8affb2cc ar='موافقات مسبقة على الغاية الجديدة' en='' active=1 deleted=0
+def17 code=document_85697877bb ar='إثبات شخصية مقدم الطلب' en='' active=1 deleted=0
+def18 code=document_5ca1add6b9 ar='كتاب تفويض من الشركة' en='' active=1 deleted=0
+def19 code=document_af883d59b3 ar='وكالة عدلية' en='' active=1 deleted=0
+def20 code=document_11714fabf5 ar='تفويض خطي' en='' active=1 deleted=0
+def21 code=document_197c7d7fc0 ar='إثبات شخصية صاحب الطلب' en='' active=1 deleted=0
+def22 code=document_322e004de0 ar='شهادة/بيانات تسجيل الشركة أو المنشأة' en='' active=1 deleted=0
+def23 code=document_d038474c7a ar='تفويض خطي أو وكالة' en='' active=1 deleted=0
+def24 code=document_1b1707d621 ar='مستند يبرر استخدام اسم خاص/أجنبي' en='' active=1 deleted=0
+def25 code=document_5eb4193ba1 ar='صورة واضحة للعلامة / الشعار' en='' active=1 deleted=0
+def26 code=document_fd135ce03f ar='إثبات شخصية مالك العلامة' en='' active=1 deleted=0
+def27 code=document_d7d63d7027 ar='شهادة/سجل الشركة أو المؤسسة' en='' active=1 deleted=0
+def28 code=legal_power_of_attorney ar='وكالة قانونية (إن وجدت)' en='Legal power of attorney' active=1 deleted=0
+def29 code=document_7672fa9fbe ar='شهادة تسجيل العلامة السابقة' en='' active=1 deleted=0
+def30 code=document_fb697280d9 ar='وثائق نقل الملكية ونماذج التنازل/النقل' en='' active=1 deleted=0
+def31 code=document_56caf9c71a ar='مستندات داعمة للتعديل' en='' active=1 deleted=0
+def32 code=document_b7393c5318 ar='إثبات شخصية صاحب العلاقة/مقدم الطلب' en='' active=1 deleted=0
+def33 code=document_1c40b3e58a ar='عقد إيجار ساري أو سند ملكية' en='' active=1 deleted=0
+def34 code=document_602b0a206b ar='إذن إشغال' en='' active=1 deleted=0
+def35 code=document_69e9a26d6e ar='رخصة/مخططات إنشائية أو شهادة ترخيص إنشائي' en='' active=1 deleted=0
+def36 code=document_3df268a71b ar='موافقات الجهات المختصة بالنشاط' en='' active=1 deleted=0
+def37 code=document_ef81fa254a ar='رخصة المهن الحالية' en='' active=1 deleted=0
+def38 code=document_f56c2e0812 ar='تفويض خطي أو وكالة عدلية' en='' active=1 deleted=0
+def39 code=document_5375b03f66 ar='موافقة مالك العقار' en='' active=1 deleted=0
+def40 code=document_f0fbb87902 ar='قرار/طلب الشطب أو التصفية موقع حسب الأصول' en='' active=1 deleted=0
+def41 code=document_3bee74c311 ar='تفويض أو وكالة للشخص الذي يتابع الإجراءات' en='' active=1 deleted=0
+def42 code=document_ddc0c08e82 ar='براءة ذمة من الضمان الاجتماعي' en='' active=1 deleted=0
+def43 code=document_7713142b41 ar='براءة ذمة من ضريبة الدخل والمبيعات' en='' active=1 deleted=0
+def44 code=document_8e430fe32b ar='شهادة شطب الاسم التجاري' en='' active=1 deleted=0
+def45 code=document_6192cecaba ar='براءات ذمة/موافقات إضافية من الجهات المختصة' en='' active=1 deleted=0
+def46 code=document_37e2d6c45c ar='تقرير المصفي وتقارير التصفية' en='' active=1 deleted=0
+def47 code=document_652dd91fc4 ar='موافقات/قرارات الشركاء على التصفية والتقرير النهائي' en='' active=1 deleted=0
+def48 code=document_c82005f833 ar='إذن المحكمة المختصة' en='' active=1 deleted=0
+def49 code=national_id_copy ar='صورة الهوية' en='National ID copy' active=1 deleted=0
+def50 code=document_74a2f98299 ar='أي بيانات تساعد في تحديد العقار' en='' active=1 deleted=0
+def51 code=seller_national_id_copy ar='صورة هوية البائع' en='Seller national ID copy' active=1 deleted=0
+def52 code=buyer_national_id_copy ar='صورة هوية المشتري' en='Buyer national ID copy' active=1 deleted=0
+def53 code=property_registration_certificate ar='سند تسجيل العقار' en='Property registration certificate' active=1 deleted=0
+def54 code=document_b0f143ad16 ar='أي وثائق إضافية تطلبها الجهة المختصة' en='' active=1 deleted=0
+def55 code=inheritance_certificate ar='حجة حصر الإرث' en='Inheritance certificate' active=1 deleted=0
+def56 code=document_443aae22bf ar='شهادة الوفاة' en='' active=1 deleted=0
+def57 code=document_c3a3aa1c50 ar='صور هويات الورثة' en='' active=1 deleted=0
+def58 code=document_564406e175 ar='صورة هوية الواهب' en='' active=1 deleted=0
+def59 code=document_11667481fd ar='صورة هوية الموهوب له' en='' active=1 deleted=0
+def60 code=cadastral_map ar='مخطط أراضٍ' en='Cadastral map' active=1 deleted=0
+def61 code=document_7c6a69c2f4 ar='سندات تسجيل جميع القطع' en='' active=1 deleted=0
+def62 code=document_b03d952538 ar='أي مستندات إضافية تطلبها الجهة المختصة' en='' active=1 deleted=0
+def63 code=document_a4c4fed3af ar='الهوية' en='' active=1 deleted=0
+def64 code=document_0cc19c2317 ar='مخطط أراضٍ إن وجد' en='' active=1 deleted=0
+def65 code=document_e95445e836 ar='وكالة قانونية إن وجدت' en='' active=1 deleted=0
+def66 code=document_3775124a52 ar='مخطط موقع تنظيمي' en='' active=1 deleted=0
+def67 code=document_5c2f8f95d1 ar='عقد التمويل أو اتفاقية الرهن (إن وجدت)' en='' active=1 deleted=0
+def68 code=document_d2024a06a1 ar='كتاب أو موافقة فك الرهن من الجهة المرتهنة' en='' active=1 deleted=0
+def69 code=document_3443627d36 ar='المخططات الهندسية' en='' active=1 deleted=0

@@ -1,0 +1,8 @@
+== D:/ghassan/frontend/e2e-results/client_audit_snapshot_copy.sqlite3
+ users (13,) [('audit-login@example.com',)]
+ orders (6,)
+ services [('service-debug', '????'), ('service-debug-2', '????'), ('service-debug-3', '????')]
+== D:/ghassan/frontend/e2e-results/final_closure_20261004.sqlite3
+ users (6,) [('client-audit-qa-202610-admin@example.test',), ('client-audit-qa-202610-customer_a@example.test',), ('client-audit-qa-202610-customer_b@example.test',), ('client-audit-qa-202610-employee@example.test',), ('client-audit-qa-202610-provider_a@example.test',), ('client-audit-qa-202610-provider_b@example.test',)]
+ orders (12,)
+ services [('client-audit-qa-202610-service', 'خدمة اختبار رحلة الطلب')]

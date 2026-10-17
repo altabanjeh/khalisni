@@ -1,0 +1,114 @@
+# Brand spelling occurrences by surface (case-sensitive display forms; tests, node_modules, dist, evidence excluded)
+| Surface | Khalsni | Khalisni | Khalasni | Khalesni | KHALSNI | خلّصني | خلصني | خلاصني | files |
+|---|---|---|---|---|---|---|---|---|---|
+| Public web UI (frontend/src/pages/public, layouts, components, index.html, public/) | 53 | 0 | 0 | 0 | 4 | 0 | 23 | 0 | 17 |
+| Portal web UI (frontend/src/pages non-public, routes, locales, utils) | 11 | 0 | 0 | 0 | 0 | 0 | 5 | 0 | 8 |
+| Emails (backend/accounts templates + password_reset subjects) | 6 | 0 | 0 | 0 | 0 | 6 | 0 | 0 | 5 |
+| Backend defaults / notifications / other non-test code | 10 | 2 | 0 | 0 | 2 | 0 | 1 | 0 | 10 |
+| Mobile app (mobile/src, app.json, App.tsx) | 5 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 5 |
+| Docs (docs/, excluding evidence/) | 165 | 16 | 2 | 0 | 200 | 6 | 65 | 0 | 85 |
+| Root manuals and prompts (*.md in repo root) | 48 | 8 | 0 | 0 | 2 | 8 | 1 | 0 | 7 |
+| Customer-visible DB data (migrated legacy copy, all text columns) | 0 | 8 | 0 | 0 | 0 | 13 | 2 | 0 | - |
+
+# Per-file detail (non-docs surfaces)
+
+## Public web UI (frontend/src/pages/public, layouts, components, index.html, public/)
+  frontend\index.html | Khalsni | 3
+  frontend\index.html | خلصني | 4
+  frontend\public\brand\README.md | Khalsni | 3
+  frontend\public\brand\README.md | خلصني | 1
+  frontend\src\components\RequestCard.jsx | Khalsni | 1
+  frontend\src\components\RequestCard.jsx | خلصني | 1
+  frontend\src\components\Sidebar.jsx | Khalsni | 5
+  frontend\src\components\Topbar.jsx | Khalsni | 3
+  frontend\src\components\brand\KhalsniLogo.jsx | KHALSNI | 4
+  frontend\src\components\brand\KhalsniLogo.jsx | Khalsni | 11
+  frontend\src\components\brand\KhalsniLogo.jsx | خلصني | 2
+  frontend\src\components\public\PublicPage.jsx | Khalsni | 2
+  frontend\src\layouts\PublicLayout.jsx | Khalsni | 6
+  frontend\src\layouts\PublicLayout.jsx | خلصني | 2
+  frontend\src\pages\public\AboutPage.jsx | Khalsni | 2
+  frontend\src\pages\public\AboutPage.jsx | خلصني | 2
+  frontend\src\pages\public\ContactPage.jsx | Khalsni | 1
+  frontend\src\pages\public\ContactPage.jsx | خلصني | 1
+  frontend\src\pages\public\FaqPage.jsx | Khalsni | 2
+  frontend\src\pages\public\FaqPage.jsx | خلصني | 2
+  frontend\src\pages\public\HomePage.jsx | Khalsni | 3
+  frontend\src\pages\public\HomePage.jsx | خلصني | 3
+  frontend\src\pages\public\LoginPage.jsx | Khalsni | 4
+  frontend\src\pages\public\LoginPage.jsx | خلصني | 1
+  frontend\src\pages\public\PrivacyPolicyPage.jsx | Khalsni | 2
+  frontend\src\pages\public\PrivacyPolicyPage.jsx | خلصني | 2
+  frontend\src\pages\public\RegisterPage.jsx | Khalsni | 3
+  frontend\src\pages\public\ServiceDetailsPage.jsx | Khalsni | 1
+  frontend\src\pages\public\ServiceDetailsPage.jsx | خلصني | 1
+  frontend\src\pages\public\ServicesPage.jsx | Khalsni | 1
+  frontend\src\pages\public\ServicesPage.jsx | خلصني | 1
+
+## Portal web UI (frontend/src/pages non-public, routes, locales, utils)
+  frontend\src\pages\admin\ServicesManagementPage.jsx | Khalsni | 1
+  frontend\src\pages\admin\ServicesManagementPage.jsx | خلصني | 1
+  frontend\src\pages\customer\CustomerCreateOrderPage.jsx | Khalsni | 1
+  frontend\src\pages\customer\CustomerCreateOrderPage.jsx | خلصني | 1
+  frontend\src\pages\customer\CustomerOrderDetailsPage.jsx | Khalsni | 1
+  frontend\src\pages\customer\CustomerOrderDetailsPage.jsx | خلصني | 1
+  frontend\src\pages\customer\MissingDocumentsResponsePage.jsx | Khalsni | 1
+  frontend\src\pages\customer\MissingDocumentsResponsePage.jsx | خلصني | 1
+  frontend\src\utils\catalogImagery.js | Khalsni | 1
+  frontend\src\utils\cover.js | Khalsni | 2
+  frontend\src\utils\mockData.js | Khalsni | 2
+  frontend\src\utils\publicSiteDefaults.js | Khalsni | 2
+  frontend\src\utils\publicSiteDefaults.js | خلصني | 1
+
+## Emails (backend/accounts templates + password_reset subjects)
+  backend\accounts\password_reset.py | Khalsni | 2
+  backend\accounts\password_reset.py | خلّصني | 2
+  backend\accounts\templates\accounts\email\password_changed_ar.txt | خلّصني | 2
+  backend\accounts\templates\accounts\email\password_changed_en.txt | Khalsni | 2
+  backend\accounts\templates\accounts\email\password_reset_ar.txt | خلّصني | 2
+  backend\accounts\templates\accounts\email\password_reset_en.txt | Khalsni | 2
+
+## Backend defaults / notifications / other non-test code
+  backend\documents\file_validation.py | Khalisni | 1
+  backend\help_guides\migrations\0004_manual_guide_library.py | Khalisni | 1
+  backend\orders\migrations\0016_backfill_order_requirements_snapshot.py | KHALSNI | 1
+  backend\orders\migrations\0019_order_consent_append_only.py | KHALSNI | 1
+  backend\public_site\defaults.py | Khalsni | 2
+  backend\public_site\defaults.py | خلصني | 1
+  backend\services\management\commands\import_production_services.py | Khalsni | 1
+  backend\services\management\commands\seed_catalog_images.py | Khalsni | 3
+  backend\services\management\commands\seed_service_images.py | Khalsni | 2
+  backend\services\seed_assets\service_images\CREDITS.json | Khalsni | 1
+  backend\services\service_import.py | Khalsni | 1
+
+## Mobile app (mobile/src, app.json, App.tsx)
+  mobile\app.json | Khalsni | 2
+  mobile\src\config\env.ts | Khalsni | 1
+  mobile\src\features\client\screens\ClientDashboardScreen.tsx | Khalisni | 1
+  mobile\src\features\client\screens\ClientDashboardScreen.tsx | خلصني | 1
+  mobile\src\screens\auth\LoginScreen.tsx | Khalsni | 1
+  mobile\src\screens\auth\LoginScreen.tsx | خلّصني | 1
+  mobile\src\screens\shared\SplashScreen.tsx | Khalsni | 1
+
+## Root manuals and prompts (*.md in repo root)
+  Khalisni_User_Manual_AR.md | خلّصني | 8
+  README.md | Khalisni | 2
+  README.md | خلصني | 1
+  khalisni_service_catalog_enhancement_codex_prompt.md | Khalisni | 3
+  khalisni_soft_delete_ui_fix_prompt.md | Khalisni | 3
+  khalsni_full_system_audit_test_enhancement_prompt.md | KHALSNI | 1
+  khalsni_full_system_audit_test_enhancement_prompt.md | Khalsni | 23
+  khalsni_full_system_test_enhancement_prompt.md | Khalsni | 14
+  khalsni_services_platform_full_test_enhancement_prompt.md | KHALSNI | 1
+  khalsni_services_platform_full_test_enhancement_prompt.md | Khalsni | 11
+
+## DB
+  help_guides_helpguide.purpose | Khalisni | 1
+  public_site_publicpagecontent.footer_text | Khalisni | 1
+  public_site_publicpagecontent.footer_text | خلصني | 1
+  public_site_publicpagecontent.footer_text_en | Khalisni | 2
+  public_site_publicpagecontent.office_address | خلصني | 1
+  public_site_publicpagecontent.office_address_en | Khalisni | 1
+  public_site_publicpagecontent.version_name | Khalisni | 1
+  public_site_sitetheme.name | Khalisni | 2
+  services_service.description_ar | خلّصني | 13

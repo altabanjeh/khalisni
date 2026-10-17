@@ -1,0 +1,197 @@
+# A. checkbox fields whose label is a question (open/either-or questions rendered as a single checkbox)
+  [20] business_company_closure_liquidation key=has_operated kind=yes/no label='هل مارست الشركة نشاطاً؟' opts=0
+  [20] business_company_closure_liquidation key=has_assets kind=yes/no label='هل لدى الشركة موجودات؟' opts=0
+  [20] business_company_closure_liquidation key=has_liabilities kind=yes/no label='هل على الشركة التزامات أو ديون؟' opts=0
+  [20] business_company_closure_liquidation key=has_employees kind=yes/no label='هل لديها موظفون؟' opts=0
+  [20] business_company_closure_liquidation key=has_trade_name kind=yes/no label='هل لديها اسم تجاري؟' opts=0
+  [21] request-property-registration-certificate key=field_3b752a334c kind=yes/no label='هل مالك العقار هو مقدم الطلب؟' opts=0
+  [21] request-property-registration-certificate key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [22] request-cadastral-map key=field_ccc9901249 kind=EITHER-OR label='هل الطلب للمالك أم لمفوض عنه؟' opts=0
+  [22] request-cadastral-map key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [23] request-property-ownership-transfer key=field_498ac74dd1 kind=yes/no label='هل البائع والمشتري داخل الأردن؟' opts=0
+  [23] request-property-ownership-transfer key=field_23afc22be9 kind=yes/no label='هل يوجد وكالة قانونية؟' opts=0
+  [23] request-property-ownership-transfer key=field_2013716fdf kind=yes/no label='هل يوجد أكثر من مالك أو أكثر من مشتري؟' opts=0
+  [24] request-inheritance-registration key=field_ac120aaeaa kind=yes/no label='هل صدرت حجة حصر الإرث؟' opts=0
+  [24] request-inheritance-registration key=field_45a27f6310 kind=yes/no label='هل يوجد وكيل قانوني يمثل جميع الورثة؟' opts=0
+  [24] request-inheritance-registration key=field_da11e8ca0f kind=yes/no label='هل جميع الورثة داخل الأردن؟' opts=0
+  [24] request-inheritance-registration key=field_44b3e07432 kind=yes/no label='هل يوجد قاصر ضمن الورثة؟' opts=0
+  [25] request-property-gift-transfer key=field_e2f57bbb81 kind=yes/no label='هل توجد صلة قرابة بين الواهب والموهوب له؟' opts=0
+  [25] request-property-gift-transfer key=field_f105f02706 kind=yes/no label='هل جميع الأطراف داخل الأردن؟' opts=0
+  [25] request-property-gift-transfer key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [25] request-property-gift-transfer key=field_41624b6665 kind=yes/no label='هل العقار مملوك بالكامل للواهب؟' opts=0
+  [26] request-termination-of-co-ownership key=field_4bca17a629 kind=yes/no label='هل جميع الشركاء موافقون على إزالة الشيوع؟' opts=0
+  [26] request-termination-of-co-ownership key=field_5c6164c551 kind=yes/no label='إذا لا، هل يوجد حكم قضائي أو دعوى؟' opts=0
+  [26] request-termination-of-co-ownership key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [26] request-termination-of-co-ownership key=field_e9352003cb kind=yes/no label='هل جميع الشركاء داخل الأردن؟' opts=0
+  [27] request-property-subdivision key=field_649c50d973 kind=EITHER-OR label='هل العقار أرض أم بناء؟' opts=0
+  [27] request-property-subdivision key=field_e7d765ce63 kind=EITHER-OR label='هل الإفراز لقطعة أرض أم لشقق/وحدات؟' opts=0
+  [27] request-property-subdivision key=field_b18f129f12 kind=yes/no label='هل يوجد مخطط إفراز معتمد؟' opts=0
+  [27] request-property-subdivision key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [27] request-property-subdivision key=field_9fe181a6e8 kind=yes/no label='هل جميع الملاك موافقون؟' opts=0
+  [28] request-property-consolidation key=field_da334d766f kind=yes/no label='هل جميع القطع مملوكة لنفس المالك؟' opts=0
+  [28] request-property-consolidation key=field_b07ae7100c kind=yes/no label='هل القطع متجاورة؟' opts=0
+  [28] request-property-consolidation key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [29] request-boundary-demarcation key=field_57847bd284 kind=yes/no label='هل يوجد نزاع على حدود العقار؟' opts=0
+  [29] request-boundary-demarcation key=field_44f22ef962 kind=yes/no label='هل سبق تثبيت حدود العقار؟' opts=0
+  [29] request-boundary-demarcation key=field_8946eb1107 kind=yes/no label='هل يوجد تقرير مساحي سابق؟' opts=0
+  [29] request-boundary-demarcation key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [29] request-boundary-demarcation key=field_2525256bd4 kind=yes/no label='هل يمكن الوصول إلى موقع العقار بسهولة؟' opts=0
+  [30] request-land-survey key=field_225e3741b4 kind=OPEN (ما/كم/متى/ماذا) label='ما الغاية من الكشف المساحي؟' opts=0
+  [30] request-land-survey key=field_8946eb1107 kind=yes/no label='هل يوجد تقرير مساحي سابق؟' opts=0
+  [30] request-land-survey key=field_711abf9b11 kind=yes/no label='هل يوجد مخطط أراضٍ حديث؟' opts=0
+  [30] request-land-survey key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [30] request-land-survey key=field_2525256bd4 kind=yes/no label='هل يمكن الوصول إلى موقع العقار بسهولة؟' opts=0
+  [31] request-property-readjustment key=field_b0926cf796 kind=OPEN (ما/كم/متى/ماذا) label='ما سبب طلب إعادة التنظيم؟' opts=0
+  [31] request-property-readjustment key=field_da897ff7ee kind=yes/no label='هل المنطقة مشمولة بمشروع إعادة تنظيم؟' opts=0
+  [31] request-property-readjustment key=field_05c9a7346b kind=yes/no label='هل توجد مخططات تنظيم معتمدة؟' opts=0
+  [31] request-property-readjustment key=field_729ed5c96d kind=OPEN (ما/كم/متى/ماذا) label='ما الغاية من الطلب؟' opts=0
+  [31] request-property-readjustment key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [31] request-property-readjustment key=field_d25b82bf60 kind=yes/no label='هل سبق تقديم طلب مشابه؟' opts=0
+  [32] request-zoning-certificate key=field_2a8f1a87c6 kind=OPEN (ما/كم/متى/ماذا) label='ما الغاية من كشف التنظيم؟' opts=0
+  [32] request-zoning-certificate key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [32] request-zoning-certificate key=field_c5251821b3 kind=yes/no label='هل سبق إصدار كشف تنظيم للعقار؟' opts=0
+  [33] request-land-use-classification-change key=field_937cc4d5d6 kind=OPEN (ما/كم/متى/ماذا) label='ما صفة التنظيم الحالية؟' opts=0
+  [33] request-land-use-classification-change key=field_e825ca6266 kind=OPEN (ما/كم/متى/ماذا) label='ما صفة التنظيم المطلوبة؟' opts=0
+  [33] request-land-use-classification-change key=field_02572f19a1 kind=yes/no label='هل سبق تقديم طلب مماثل؟' opts=0
+  [33] request-land-use-classification-change key=field_088e60f563 kind=OPEN (ما/كم/متى/ماذا) label='ما سبب طلب التغيير؟' opts=0
+  [33] request-land-use-classification-change key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [34] request-zoning-plan key=field_5dded7dd47 kind=OPEN (ما/كم/متى/ماذا) label='ما الغاية من المخطط؟' opts=0
+  [34] request-zoning-plan key=field_c3bd9f38ed kind=yes/no label='هل يوجد سند تسجيل؟' opts=0
+  [34] request-zoning-plan key=field_9702f3b4ac kind=EITHER-OR label='هل الطلب للمالك أم بموجب وكالة؟' opts=0
+  [34] request-zoning-plan key=field_54143bc9fe kind=yes/no label='هل سبق إصدار مخطط سابق؟' opts=0
+  [35] request-change-statement key=field_22e7ac2cd2 kind=OPEN (ما/كم/متى/ماذا) label='ما الغاية من بيان التغيير؟' opts=0
+  [35] request-change-statement key=field_bc07ea41c3 kind=yes/no label='هل الطلب للمالك؟' opts=0
+  [35] request-change-statement key=field_23afc22be9 kind=yes/no label='هل يوجد وكالة قانونية؟' opts=0
+  [36] request-property-mortgage-registration key=field_d6467d46cf kind=EITHER-OR label='هل الرهن لصالح بنك أم جهة أخرى؟' opts=0
+  [36] request-property-mortgage-registration key=field_6ff5e81d0f kind=yes/no label='هل يوجد تمويل قائم؟' opts=0
+  [36] request-property-mortgage-registration key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [36] request-property-mortgage-registration key=field_9209f03252 kind=yes/no label='هل جميع الملاك موافقون على الرهن؟' opts=0
+  [37] request-mortgage-release key=field_e70300dbb6 kind=yes/no label='هل تم سداد كامل الالتزامات؟' opts=0
+  [37] request-mortgage-release key=field_646f133865 kind=OPEN (ما/كم/متى/ماذا) label='ما اسم الجهة المرتهنة؟' opts=0
+  [37] request-mortgage-release key=field_acf5f0c3dd kind=yes/no label='هل يوجد كتاب رسمي بفك الرهن؟' opts=0
+  [37] request-mortgage-release key=field_307ab61eb9 kind=yes/no label='هل يوجد وكيل قانوني؟' opts=0
+  [38] request-building-permit key=field_e021559e7a kind=yes/no label='هل يوجد مكتب هندسي معتمد؟' opts=0
+  [38] request-building-permit key=field_51b3ed7839 kind=EITHER-OR label='هل الرخصة لبناء جديد أم إعادة بناء؟' opts=0
+  [38] request-building-permit key=field_65bdb1ffad kind=yes/no label='هل توجد وكالة قانونية؟' opts=0
+  counts: {'yes/no': 58, 'EITHER-OR': 6, 'OPEN (ما/كم/متى/ماذا)': 10}
+
+# B. likely duplicate fields within a service (same normalised label, or known synonyms)
+  [30] request-land-survey SYNONYMS [('full_name', 'الاسم', True), ('applicant_name', 'اسم مقدم الطلب', True)]
+  [30] request-land-survey SYNONYMS [('field_760c65a1fa', 'الهاتف', True), ('phone_number', 'رقم الهاتف', True)]
+  [30] request-land-survey REASON-DUP [('field_d7fc96e29e', 'سبب الكشف'), ('survey_reason', 'سبب طلب الكشف')]
+  [31] request-property-readjustment SYNONYMS [('applicant_name', 'اسم مقدم الطلب', True), ('full_name', 'الاسم الكامل', True)]
+  [33] request-land-use-classification-change SYNONYMS [('applicant_name', 'اسم مقدم الطلب', True), ('full_name', 'الاسم الكامل', True)]
+
+# C. near-duplicate required documents within a service (normalised name)
+  [30] request-land-survey visible=True [(107, 'الهوية', '', 1), (108, 'صورة الهوية', 'National ID copy', 1)]
+  [30] request-land-survey visible=True [(110, 'مخطط أراضٍ إن وجد', '', 0), (111, 'مخطط أراضٍ (إن وجد)', 'Cadastral map', 0)]
+  [30] request-land-survey visible=True [(112, 'وكالة قانونية إن وجدت', '', 0), (113, 'وكالة قانونية (إن وجدت)', 'Legal power of attorney', 0)]
+
+# D. documents whose name says 'if any' but is_required=1
+  req2 no-criminal-record 'تفويض إن وجد' required=1
+  req4 passport-renewal 'تفويض إن وجد' required=1
+  req6 tax-clearance 'تفويض إن وجد' required=1
+  req8 no-criminal-record-certificate 'تفويض إن وجد' required=1
+  req10 passport-appointment-booking 'تفويض إن وجد' required=1
+  req12 traffic-fines-payment 'تفويض إن وجد' required=1
+  req14 property-registration-deed 'تفويض إن وجد' required=1
+  req16 business-license-renewal 'تفويض إن وجد' required=1
+
+# E. document English names that are machine codes (contain '-' or '_' and no space)
+  req1 no-criminal-record ar='هوية شخصية' en='national-id'
+  req2 no-criminal-record ar='تفويض إن وجد' en='authorization-letter'
+  req3 passport-renewal ar='هوية شخصية' en='national-id'
+  req4 passport-renewal ar='تفويض إن وجد' en='authorization-letter'
+  req5 tax-clearance ar='هوية شخصية' en='national-id'
+  req6 tax-clearance ar='تفويض إن وجد' en='authorization-letter'
+  req7 no-criminal-record-certificate ar='هوية شخصية' en='national-id'
+  req8 no-criminal-record-certificate ar='تفويض إن وجد' en='authorization-letter'
+  req9 passport-appointment-booking ar='هوية شخصية' en='national-id'
+  req10 passport-appointment-booking ar='تفويض إن وجد' en='authorization-letter'
+  req11 traffic-fines-payment ar='هوية شخصية' en='national-id'
+  req12 traffic-fines-payment ar='تفويض إن وجد' en='authorization-letter'
+  req13 property-registration-deed ar='هوية شخصية' en='national-id'
+  req14 property-registration-deed ar='تفويض إن وجد' en='authorization-letter'
+  req15 business-license-renewal ar='هوية شخصية' en='national-id'
+  req16 business-license-renewal ar='تفويض إن وجد' en='authorization-letter'
+
+# F. number-type fields
+  [12] business_company_registration key=capital_amount label='رأس مال الشركة'
+  [12] business_company_registration key=partners_count label='عدد الشركاء'
+  [13] business_company_information_amendment key=company_registration_number label='رقم تسجيل الشركة'
+  [14] business_company_add_activities key=company_registration_number label='رقم تسجيل الشركة'
+  [16] business_trade_name_certificate key=trade_name_number label='رقم الاسم التجاري'
+  [20] business_company_closure_liquidation key=company_registration_number label='رقم تسجيل الشركة'
+  [24] request-inheritance-registration key=field_a4c0cc56df label='عدد الورثة'
+  [26] request-termination-of-co-ownership key=field_224269de21 label='عدد الشركاء'
+  [26] request-termination-of-co-ownership key=field_3c7283fc39 label='كم عدد الشركاء؟'
+  [27] request-property-subdivision key=field_2085c3cabf label='عدد القطع أو الوحدات المطلوب إفرازها'
+  [27] request-property-subdivision key=field_5ebd0dedc5 label='كم عدد القطع أو الوحدات المطلوب إفرازها؟'
+  [28] request-property-consolidation key=field_b8d4677c65 label='كم عدد القطع المطلوب توحيدها؟'
+  [38] request-building-permit key=field_4874b04e76 label='كم عدد الطوابق؟'
+
+# G. national-id fields
+  [12] business_company_registration key=partner_id type=textarea label='الرقم الوطني / رقم الجواز للشريك'
+  [15] business_commercial_registration_certificate key=registration_number type=text label='رقم التسجيل / الرقم الوطني للمنشأة'
+  [17] business_trade_name_registration key=applicant_registration_number type=text label='الرقم الوطني / رقم التسجيل'
+  [19] business_license_services key=business_registration_number type=text label='الرقم الوطني للمنشأة / رقم التسجيل'
+  [21] request-property-registration-certificate key=national_id type=text label='الرقم الوطني'
+  [22] request-cadastral-map key=national_id type=text label='الرقم الوطني'
+  [23] request-property-ownership-transfer key=seller_national_id type=text label='الرقم الوطني للبائع'
+  [23] request-property-ownership-transfer key=buyer_national_id type=text label='الرقم الوطني للمشتري'
+  [24] request-inheritance-registration key=national_id type=text label='الرقم الوطني'
+  [25] request-property-gift-transfer key=field_c67372ee55 type=text label='الرقم الوطني للواهب'
+  [25] request-property-gift-transfer key=field_fdba9f39a6 type=text label='الرقم الوطني للموهوب له'
+  [26] request-termination-of-co-ownership key=national_id type=text label='الرقم الوطني'
+  [27] request-property-subdivision key=national_id type=text label='الرقم الوطني'
+  [28] request-property-consolidation key=national_id type=text label='الرقم الوطني'
+  [29] request-boundary-demarcation key=national_id type=text label='الرقم الوطني'
+  [30] request-land-survey key=national_id type=text label='الرقم الوطني'
+  [31] request-property-readjustment key=national_id type=text label='الرقم الوطني'
+  [32] request-zoning-certificate key=national_id type=text label='الرقم الوطني'
+  [33] request-land-use-classification-change key=national_id type=text label='الرقم الوطني'
+  [34] request-zoning-plan key=national_id type=text label='الرقم الوطني'
+  [35] request-change-statement key=national_id type=text label='الرقم الوطني'
+  [36] request-property-mortgage-registration key=national_id type=text label='الرقم الوطني'
+  [37] request-mortgage-release key=national_id type=text label='الرقم الوطني'
+  [38] request-building-permit key=national_id type=text label='الرقم الوطني'
+
+# H. fields with no label_en: 311 of 311
+
+# I. services with empty schema
+  [1] no-criminal-record active=1 public=0
+  [2] passport-renewal active=1 public=1
+  [3] tax-clearance active=1 public=1
+  [4] service-debug active=1 public=0
+  [5] service-debug-2 active=1 public=0
+  [6] service-debug-3 active=1 public=0
+  [7] no-criminal-record-certificate active=1 public=1
+  [8] passport-appointment-booking active=1 public=1
+  [9] traffic-fines-payment active=1 public=1
+  [10] property-registration-deed active=1 public=1
+  [11] business-license-renewal active=1 public=1
+
+# J. generated field keys (field_<hex>) count
+   97
+
+# K. select fields with no options
+  [12] business_company_registration key=company_type label='نوع الشركة'
+  [13] business_company_information_amendment key=company_type label='نوع الشركة'
+  [14] business_company_add_activities key=company_type label='نوع الشركة'
+  [15] business_commercial_registration_certificate key=entity_type label='نوع صاحب السجل'
+  [15] business_commercial_registration_certificate key=certificate_copy_type label='نوع النسخة المطلوبة'
+  [16] business_trade_name_certificate key=certificate_copy_type label='نوع النسخة المطلوبة'
+  [17] business_trade_name_registration key=applicant_type label='صفة مقدم الطلب'
+  [17] business_trade_name_registration key=business_activity label='طبيعة النشاط المرتبط بالاسم'
+  [18] business_trademark_services key=trademark_service_type label='نوع الخدمة'
+  [18] business_trademark_services key=trademark_owner_type label='نوع مالك العلامة'
+  [18] business_trademark_services key=trademark_class label='فئة السلع/الخدمات'
+  [19] business_license_services key=business_license_action label='نوع الخدمة'
+  [19] business_license_services key=business_activity_type label='نوع النشاط'
+  [19] business_license_services key=municipality label='المحافظة / البلدية'
+  [19] business_license_services key=occupancy_status label='صفة إشغال العقار'
+  [20] business_company_closure_liquidation key=closure_or_liquidation_type label='نوع الإجراء'
+  [20] business_company_closure_liquidation key=company_type label='نوع الشركة'
+docs (153, 76)
+defs (69, 59)
+catch-all optional (15,)

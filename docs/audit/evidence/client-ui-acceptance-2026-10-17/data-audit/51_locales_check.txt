@@ -1,0 +1,7 @@
+ar keys 177 en keys 177
+missing in ar []
+missing in en []
+ar values without Arabic letters:
+   language.en 'English'
+en values containing Arabic:
+Khalsni/خلصني in locales: []

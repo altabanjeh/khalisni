@@ -1,0 +1,94 @@
+# slug | category | cat_public | name_ar | name_en
+1 no-criminal-record civil-status 0 شهادة عدم محكومية | No Criminal Record
+2 passport-renewal civil-status 0 تجديد جواز سفر | Passport Renewal
+3 tax-clearance tax 1 براءة ذمة ضريبية | Tax Clearance
+4 service-debug category-debug 0 ???? | Service
+5 service-debug-2 category-debug-2 0 ???? | Service
+6 service-debug-3 category-debug-3 0 ???? | Service
+7 no-criminal-record-certificate ministry-of-labour 1 شهادة عدم محكومية | No Criminal Record Certificate
+8 passport-appointment-booking civil-status-and-passports 1 حجز موعد جواز سفر | Passport Appointment Booking
+9 traffic-fines-payment quick-public-services 1 دفع مخالفات السير | Traffic Fines Payment
+10 property-registration-deed land-and-survey 1 إصدار سند تسجيل عقار | Property Registration Deed
+11 business-license-renewal municipal-services 1 تجديد رخصة مهن | Business License Renewal
+12 business_company_registration business_services 1 طلب تأسيس شركة | Request Company Registration
+13 business_company_information_amendment business_services 1 طلب تعديل بيانات شركة | Request Company Information Amendment
+14 business_company_add_activities business_services 1 طلب إضافة غايات لشركة قائمة | Request to Add Business Activities to an Existing Company
+15 business_commercial_registration_certificate business_services 1 طلب إصدار سجل تجاري | Request Commercial Registration Certificate
+16 business_trade_name_certificate business_services 1 طلب إصدار شهادة اسم تجاري | Request Trade Name Certificate
+17 business_trade_name_registration business_services 1 طلب تسجيل اسم تجاري | Request Trade Name Registration
+18 business_trademark_services business_services 1 طلب خدمات العلامة التجارية | Request Trademark Services
+19 business_license_services business_services 1 طلب خدمات رخصة المهن | Request Business License Services
+20 business_company_closure_liquidation business_services 1 طلب إغلاق أو تصفية شركة | Request Company Closure or Liquidation
+21 request-property-registration-certificate land-and-survey 1 طلب سند تسجيل | Request Property Registration Certificate
+22 request-cadastral-map land-and-survey 1 طلب مخطط أراضٍ | Request Cadastral Map
+23 request-property-ownership-transfer land-and-survey 1 طلب نقل ملكية عقار | Request Property Ownership Transfer
+24 request-inheritance-registration land-and-survey 1 طلب تسجيل إرث | Request Inheritance Registration
+25 request-property-gift-transfer land-and-survey 1 طلب هبة عقار | Request Property Gift Transfer
+26 request-termination-of-co-ownership land-and-survey 1 طلب إزالة الشيوع | Request Termination of Co-ownership
+27 request-property-subdivision land-and-survey 1 طلب إفراز | Request Property Subdivision
+28 request-property-consolidation land-and-survey 1 طلب توحيد عقار | Request Property Consolidation
+29 request-boundary-demarcation land-and-survey 1 طلب تثبيت حدود | Request Boundary Demarcation
+30 request-land-survey land-and-survey 1 طلب كشف مساحي | Request Land Survey
+31 request-property-readjustment land-and-survey 1 طلب إعادة تنظيم | Request Property Readjustment
+32 request-zoning-certificate land-and-survey 1 طلب كشف تنظيم | Request Zoning Certificate
+33 request-land-use-classification-change land-and-survey 1 طلب تغيير صفة التنظيم | Request Land Use Classification Change
+34 request-zoning-plan land-and-survey 1 طلب مخطط تنظيمي | Request Zoning Plan
+35 request-change-statement land-and-survey 1 طلب بيان تغيير | Request Change Statement
+36 request-property-mortgage-registration land-and-survey 1 طلب رهن عقار | Request Property Mortgage Registration
+37 request-mortgage-release land-and-survey 1 طلب فك رهن عقار | Request Mortgage Release
+38 request-building-permit land-and-survey 1 طلب رخصة بناء | Request Building Permit
+
+# empty-field counts over 38 services
+short_description_ar 3
+short_description_en 30
+description_en 30
+terms_ar 13
+terms_en 31
+delivery_note_en 22
+public_price_note_en 4
+image 0
+
+# duplicate name_ar
+'شهادة عدم محكومية' ['no-criminal-record', 'no-criminal-record-certificate']
+'????' ['service-debug', 'service-debug-2', 'service-debug-3']
+
+# repeated sentences in description_ar (>=3 services)
+9 'يقوم فريق خلّصني بمراجعة البيانات والوثائق ومتابعة الإجراءات لدى الجهات المختصة، مع طلب أي مستند إضافي عند الحاجة حسب حالة المعاملة'
+7 'تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام'
+
+# delivery notes distinct (ar)
+9 'تُحدَّد مدة الإنجاز بعد مراجعة الطلب.'
+7 'سيتم إشعارك عند كل تحديث مهم على الطلب.'
+4 ''
+4 'حسب إجراءات دائرة الأراضي والمساحة واستكمال الوثائق.'
+4 'حسب إجراءات دائرة الأراضي والمساحة وطبيعة المعاملة.'
+2 'حسب إجراءات دائرة الأراضي والمساحة.'
+2 'حسب إجراءات الجهات المختصة وطبيعة المعاملة.'
+1 'حسب إجراءات الجهات المختصة وطبيعة العقار.'
+1 'حسب إجراءات البلدية أو الجهة المختصة.'
+1 'حسب مدة إصدار المخطط من الجهة المختصة.'
+1 'حسب إجراءات الجهة المختصة.'
+1 'حسب إجراءات دائرة الأراضي والمساحة والجهة المرتهنة.'
+1 'حسب إجراءات البلدية أو أمانة عمان والجهات المختصة.'
+# price notes distinct (ar)
+34 'يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.'
+4 ''
+# delivery_note_en distinct
+22 ''
+9 'The completion time is confirmed after your request is reviewed.'
+7 'You will be notified at every important request update.'
+
+# brand spellings inside catalogue text
+خلّصني 13
+خلصني 0
+Khalisni 0
+Khalsni 0
+# descriptions mentioning admin/settings wording
+passport-renewal description_ar 'طلب تجديد جواز السفر مع مراجعة الوثائق ومتابعة حالة الطلب. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+tax-clearance description_ar 'إصدار أو متابعة براءة ذمة ضريبية للأفراد أو المنشآت. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+no-criminal-record-certificate description_ar 'طلب شهادة عدم محكومية ومتابعة المراجعة حتى الجاهزية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+passport-appointment-booking description_ar 'احجز موعداً مناسباً قبل زيارة دائرة الأحوال والجوازات. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+traffic-fines-payment description_ar 'استعلام ومتابعة دفع مخالفات السير ضمن طلب واحد واضح. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+property-registration-deed description_ar 'طلب سند تسجيل أو نسخة حديثة من وثائق الملكية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+business-license-renewal description_ar 'متابعة تجديد رخصة المهن وتجهيز المتطلبات البلدية. تشمل الخدمة مراجعة أولية للوثائق، إشعارات حالة الطلب، وتسليم النتيجة النهائية عبر النظام.'
+request-zoning-certificate description_ar 'تتيح هذه الخدمة تقديم طلب للحصول على كشف تنظيم يبين المعلومات التنظيمية الأساسية للعقار وفق السجلات والجهة المختصة. تم الإبقاء على هذه الخدمة في النظا'

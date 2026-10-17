@@ -1,0 +1,3 @@
+related_services []
+recommended_services [{"relation_type": "optional_bundle", "message_to_customer": "Many clients also clear related traffic obligations during the same renewal cycle."}, {"relation_type": "recommended_after", "message_to_customer": "After renewing the business license, you may also need an updated no-criminal-record certificate."}]
+prerequisite_services []

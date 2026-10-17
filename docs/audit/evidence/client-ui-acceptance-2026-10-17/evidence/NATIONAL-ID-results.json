@@ -1,0 +1,17 @@
+{
+ "profilePatch": 200,
+ "before": "9901234567",
+ "blankSubmit": [
+  201,
+  "{\"id\":11,\"order_number\":\"KH-2026-000011\",\"status\":\"NEW\",\"warnings\":[]}"
+ ],
+ "after": "",
+ "duplicateSubmitByB": [
+  201,
+  "{\"id\":12,\"order_number\":\"KH-2026-000012\",\"status\":\"NEW\",\"warnings\":[]}"
+ ],
+ "phoneOfOtherUserByB": [
+  400,
+  "{\"__all__\":[\"Constraint “unique_non_empty_user_phone” is violated.\"]}"
+ ]
+}

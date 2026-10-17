@@ -1,0 +1,19 @@
+Operations to perform:
+  Apply all migrations: accounts, admin, audit, auth, authtoken, contenttypes, documents, help_guides, notifications, orders, organizations, payment, providers, public_site, services, sessions, token_blacklist
+Running migrations:
+  Applying accounts.0007_customuser_token_version... OK
+  Applying services.0010_alter_serviceproviderassignment_provider_and_more... OK
+  Applying services.0011_backfill_required_document_definitions... OK
+  Applying services.0012_repair_known_public_arabic_catalog_values... OK
+  Applying services.0013_normalize_legacy_schema_locale_fields... OK
+  Applying orders.0014_order_submission_fingerprint_order_submission_key_and_more... OK
+  Applying orders.0015_order_requirements_snapshot... OK
+  Applying orders.0016_backfill_order_requirements_snapshot... OK
+  Applying orders.0017_orderstatuslog_system_event... OK
+  Applying orders.0018_order_consent... OK
+  Applying orders.0019_order_consent_append_only... OK
+  Applying public_site.0005_contactinquiry... OK
+  Applying public_site.0006_alter_publicpagecontent_contact_phone_and_more... OK
+  Applying public_site.0007_publicpagecontent_privacy_policy_ar_and_more... OK
+  Applying services.0014_apply_owner_catalogue_decisions... OK
+  Applying services.0015_national_id_fields_as_text... OK

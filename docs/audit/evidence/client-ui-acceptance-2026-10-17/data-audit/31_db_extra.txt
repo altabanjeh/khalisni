@@ -1,0 +1,46 @@
+## service provider assignments
+-- select a.assignment_id, s.slug, u.email, a.is_active, a.is_deleted from services_serviceproviderassignment a join services_service s using(service_id) join providers_providerprofile p on p.id=a.provider_id join accounts_customuser u on u.user_id=p.user_id
+   (1, 'no-criminal-record', 'provider@khalisni.local', 1, 0)
+   (2, 'passport-renewal', 'provider@khalisni.local', 1, 0)
+   (3, 'tax-clearance', 'provider@khalisni.local', 1, 0)
+## provider categories
+-- select p.id, u.email, p.provider_type, pc.servicecategory_id from providers_providerprofile p join accounts_customuser u on u.user_id=p.user_id left join providers_providerprofile_service_categories pc on pc.providerprofile_id=p.id
+   (1, 'provider@khalisni.local', 'Government Services Specialist', 5)
+   (1, 'provider@khalisni.local', 'Government Services Specialist', 6)
+   (1, 'provider@khalisni.local', 'Government Services Specialist', 7)
+   (2, 'provider-debug@example.com', 'Tester', 5)
+   (3, 'provider-debug-2@example.com', 'Tester', 6)
+   (4, 'provider-debug-3@example.com', 'Tester', 7)
+## orders detail
+-- select o.id,o.order_number,o.status,u.email,s.slug,o.service_name_snapshot,o.created_at from orders_order o join accounts_customuser u on u.user_id=o.customer_id join services_service s on s.service_id=o.service_id
+   (1, 'KH-2026-000001', 'WAITING_CUSTOMER', 'customer@khalisni.local', 'no-criminal-record', 'شهادة عدم محكومية', '2026-05-04 09:28:12.758715')
+   (2, 'KH-2026-000002', 'IN_PROGRESS', 'customer@khalisni.local', 'passport-renewal', 'تجديد جواز سفر', '2026-05-04 09:28:12.789501')
+   (3, 'KH-2026-000003', 'COMPLETED', 'customer@khalisni.local', 'tax-clearance', 'براءة ذمة ضريبية', '2026-05-04 09:28:12.815502')
+   (4, 'KH-2026-000004', 'NEW', 'customer@khalisni.local', 'no-criminal-record', 'شهادة عدم محكومية', '2026-05-04 09:28:12.854723')
+   (5, 'KH-2026-000005', 'WAITING_GOVERNMENT', '0799100003@guest.khalisni.local', 'service-debug-2', '????', '2026-05-05 07:28:21.492347')
+   (6, 'KH-2026-000006', 'WAITING_GOVERNMENT', '0799200003@guest.khalisni.local', 'service-debug-3', '????', '2026-05-05 07:28:40.495616')
+## django admin log recent
+-- select count(*) from django_admin_log
+   (0,)
+## missing service notifications
+-- select notification_id,title,recipient_id,status from notifications_notification where title like "%Demo%"
+   (14, 'طلب خدمة غير موجودة: Demo unlisted service', 5, 'sent')
+   (15, 'طلب خدمة غير موجودة: Demo unlisted service', 7, 'sent')
+   (16, 'طلب خدمة غير موجودة: Demo unlisted service', 10, 'sent')
+   (17, 'طلب خدمة غير موجودة: Demo unlisted service', 1, 'sent')
+## notifications latin titles count
+-- select count(*) from notifications_notification where title glob "[A-Za-z]*"
+   (13,)
+## notifications total
+-- select count(*) from notifications_notification
+   (17,)
+## ads count active public
+-- select count(*) from public_site_advertisement where is_active=1 and is_deleted=0
+   (5,)
+## help guide internal_notes non-empty
+-- select help_guide_id, substr(internal_notes,1,100) from help_guides_helpguide where coalesce(internal_notes,"")<>""
+## help guide 36 role/active
+-- select help_guide_id, role, is_active, is_quick_link from help_guides_helpguide where help_guide_id in (34,35,36)
+   (34, 'all_users', 1, 1)
+   (35, 'all_users', 1, 1)
+   (36, 'admin', 1, 1)
