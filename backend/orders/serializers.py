@@ -22,6 +22,7 @@ from orders.readiness import order_requirement_rows, order_requirements
 from orders.services import create_customer_order
 from providers.models import ProviderProfile
 from services.models import Service
+from services.pricing import public_pricing
 from services.schema_rules import answers_notes_section, order_blockers, parse_answers, validate_answers
 from services.selectors import visible_services_queryset
 from workflow.rules import get_transition_rule
@@ -39,11 +40,13 @@ class ServiceBriefSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSer
         user = getattr(self.context.get("request"), "user", None)
         role = (getattr(user, "role", "") or "").lower()
         if role not in {CustomUser.Role.ADMIN, CustomUser.Role.EMPLOYEE, CustomUser.Role.SUPPORT}:
-            # Fee components follow the service's public-visibility settings for
-            # everyone outside the operations team.
-            if not instance.show_company_fee_public:
+            # Outside the operations team, fee components follow the public
+            # pricing rule (owner decision B10-10): shown only when the public
+            # breakdown is shown, i.e. the components sum exactly to the total.
+            pricing = public_pricing(instance)
+            if pricing.get("company_fee") is None:
                 data.pop("service_fee", None)
-            if not instance.show_government_fee_public:
+            if pricing.get("government_fee") is None:
                 data.pop("government_fee", None)
         return data
 
@@ -314,6 +317,9 @@ class OrderDetailSerializer(OrderListSerializer):
             "language": record.language,
             "source": record.source,
             "accepted_at": record.created_at,
+            "consent_type": record.consent_type,
+            "privacy_version": record.privacy_version,
+            "terms_version": record.terms_version,
         }
 
     def get_notes(self, obj):

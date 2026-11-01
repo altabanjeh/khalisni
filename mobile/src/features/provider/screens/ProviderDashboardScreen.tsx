@@ -16,11 +16,11 @@ export function ProviderDashboardScreen({ navigation }: { navigation: any }) {
   const ordersQuery = useQuery({ queryKey: ['provider-orders'], queryFn: () => ordersApi.getProviderOrders() });
 
   if (dashboardQuery.isLoading || ordersQuery.isLoading) {
-    return <LoadingState />;
+    return <AppScreen title="لوحة المزوّد"><LoadingState /></AppScreen>;
   }
 
   if (dashboardQuery.isError || ordersQuery.isError) {
-    return <ErrorState message={getDisplayError(dashboardQuery.error ?? ordersQuery.error)} onRetry={() => { dashboardQuery.refetch(); ordersQuery.refetch(); }} />;
+    return <AppScreen title="لوحة المزوّد"><ErrorState message={getDisplayError(dashboardQuery.error ?? ordersQuery.error)} onRetry={() => { dashboardQuery.refetch(); ordersQuery.refetch(); }} /></AppScreen>;
   }
 
   return (

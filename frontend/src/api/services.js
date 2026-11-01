@@ -476,6 +476,10 @@ export const api = {
   uploadCustomerDocument: documentsApi.uploadCustomerDocument,
   cancelCustomerOrder: ordersApi.cancelCustomerOrder,
   submitRating: ordersApi.submitRating,
+  getCustomerOrderMessages: async (id) => withTestValue(() => ordersApi.getCustomerOrderMessages(id), []),
+  sendCustomerOrderMessage: ordersApi.sendCustomerOrderMessage,
+  getCustomerOrderComplaints: async (id) => withTestValue(() => ordersApi.getCustomerOrderComplaints(id), []),
+  createCustomerOrderComplaint: ordersApi.createCustomerOrderComplaint,
 
   getEmployeeOrders: async (params = {}) => withTestValue(() => ordersApi.getEmployeeOrders(params), mockReviewOrders),
   getEmployeeOrder: ordersApi.getEmployeeOrder,
@@ -506,6 +510,12 @@ export const api = {
   rejectOrder: ordersApi.rejectOrder,
   cancelAdminOrder: ordersApi.cancelAdminOrder,
   recoverMissingDocumentRequest: ordersApi.recoverMissingDocumentRequest,
+  getStaffOrderComplaints: async (id) => withTestValue(() => ordersApi.getStaffOrderComplaints(id), []),
+  resolveStaffOrderComplaint: ordersApi.resolveStaffOrderComplaint,
+  reassignOrderProvider: ordersApi.reassignOrderProvider,
+  getCustomerOrderDelivery: async (id) => withTestValue(() => ordersApi.getCustomerOrderDelivery(id), null),
+  getStaffOrderDelivery: async (id) => withTestValue(() => ordersApi.getStaffOrderDelivery(id), null),
+  updateStaffOrderDelivery: ordersApi.updateStaffOrderDelivery,
 
   getAdminServices: async (params = {}) => withTestValue(() => servicesApi.getAdminServices(params), filterSoftDeleted(mockServices, params)),
   getAdminServiceCounts: async () => {
@@ -706,6 +716,8 @@ export const api = {
   getNotifications: async () => withTestValue(() => notificationsApi.getNotifications(), mockNotifications),
   getNotificationsPage: async (params = {}) => withTestValue(() => notificationsApi.getNotificationsPage(params), mockPage(mockNotifications)),
   getNotificationCenter: async () => withTestValue(() => notificationsApi.getNotificationCenter(), mockNotificationCenter),
+  getNotificationCenterPage: async (params = {}) =>
+    withTestValue(() => notificationsApi.getNotificationCenterPage(params), mockPage(mockNotificationCenter)),
   getNotificationUnreadCount: async () =>
     withTestValue(
       () => notificationsApi.getNotificationUnreadCount(),

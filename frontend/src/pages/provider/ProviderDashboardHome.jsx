@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowUpRight, Building2, CheckCircle2, Clock3, FolderCheck } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Building2, CheckCircle2, Clock3, FolderCheck, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import StatusBadge from '../../components/StatusBadge'
@@ -41,6 +41,16 @@ function ProviderDashboardHome() {
     { icon: CheckCircle2, label: isArabic ? 'مكتملة' : 'Completed', value: data.completed ?? 0 },
     { icon: AlertTriangle, label: isArabic ? 'متأخرة' : 'Delayed', value: data.delayed ?? 0, warn: true },
   ]
+
+  // CN-MAP-04: the provider's own rating and completed-order count, read from
+  // the dashboard payload (ProviderProfile). Earnings are out of the MVP.
+  const profile = data.provider || null
+  const ratingValue = profile?.rating != null && profile.rating !== '' ? Number(profile.rating) : null
+  const hasRating = ratingValue != null && Number.isFinite(ratingValue) && ratingValue > 0
+  const ratingText = hasRating
+    ? ratingValue.toFixed(1)
+    : null
+  const completedTotal = profile?.total_completed_orders ?? data.completed ?? 0
 
   function Row({ order }) {
     return (
@@ -88,6 +98,31 @@ function ProviderDashboardHome() {
                 <p className="text-[0.7rem] font-bold text-slate-500">{label}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section aria-label={isArabic ? 'أدائي' : 'My performance'} className="grid gap-3 sm:grid-cols-2" data-testid="provider-performance">
+        <div className="flex items-center gap-4 rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-amber-50 text-amber-600"><Star aria-hidden="true" className="h-6 w-6" /></span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-600">{isArabic ? 'تقييمك' : 'Your rating'}</p>
+            {hasRating ? (
+              <p className="mt-0.5 text-2xl font-black text-ink" data-testid="provider-rating">
+                <bdi>{ratingText}</bdi> <span className="text-sm font-bold text-slate-600">/ <bdi>5</bdi></span>
+              </p>
+            ) : (
+              <p className="mt-0.5 text-sm font-bold text-slate-600" data-testid="provider-rating">
+                {profile ? (isArabic ? 'لا توجد تقييمات بعد' : 'No ratings yet') : (isArabic ? 'غير متاح لحسابك' : 'Not available for your account')}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-4 rounded-[var(--radius-xl)] border border-border bg-card p-5 shadow-soft">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-green-50 text-green-700"><CheckCircle2 aria-hidden="true" className="h-6 w-6" /></span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-600">{isArabic ? 'الطلبات المكتملة' : 'Completed requests'}</p>
+            <p className="mt-0.5 text-2xl font-black text-ink" data-testid="provider-completed">{completedTotal}</p>
           </div>
         </div>
       </section>

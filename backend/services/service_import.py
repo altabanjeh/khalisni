@@ -25,7 +25,11 @@ from services.catalogue_rules import (
     approved_delivery_note,
     approved_price_note,
     drop_merged_aliases,
+    normalize_brand,
 )
+from services.catalogue_translations import SERVICE_TEXT_EN, document_name_en, translate_schema
+from services.client_categories import PUBLIC_CATEGORY_WORLDS
+from services.document_merges import canonical_document
 from services.models import RequiredDocumentDefinition, Service, ServiceCategory, ServiceRequiredDocument
 from services.schema_rules import schema_problems
 
@@ -597,7 +601,7 @@ def catalogue_form_problems(services):
     """The admin editor's form rules (services/schema_rules.py) applied to the import."""
     problems = []
     for service in services:
-        schema = apply_identifier_rules(apply_schema_rules(service.get("fields", [])))
+        schema = apply_identifier_rules(apply_schema_rules(service.get("fields", []), gate_all_parcel_fields=True))
         for _number, key, message in schema_problems(schema):
             problems.append({"service": service["slug"], "field": key, "message": message})
     return problems
@@ -721,17 +725,19 @@ def apply_import(result):
                 "show_on_public_site": True,
             },
         )
-        changed = _update_if_changed(
-            category,
-            {
-                "name_ar": category_data["name_ar"],
-                "name_en": category_data["name_en"],
-                "display_order": category_data["display_order"],
-                "sort_order": category_data["display_order"],
-                "is_active": True,
-                "show_on_public_site": True,
-            },
-        )
+        values = {
+            "name_ar": category_data["name_ar"],
+            "name_en": category_data["name_en"],
+            "display_order": category_data["display_order"],
+            "sort_order": category_data["display_order"],
+            "is_active": True,
+            "show_on_public_site": True,
+        }
+        # The client's category names and order (CN-ACT-04) win over the sheet's.
+        world = next((item for item in PUBLIC_CATEGORY_WORLDS if item["slug"] == category.slug), None)
+        if world is not None:
+            values.update(name_ar=world["name_ar"], name_en=world["name_en"], display_order=world["sort_order"], sort_order=world["sort_order"])
+        changed = _update_if_changed(category, values)
         _count(result, "categories", created, changed)
 
     for service_data in result.normalized["services"]:
@@ -752,15 +758,29 @@ def _service_defaults(service_data, category):
         APPROVED_PRICE_NOTE["en"] if service_data.get("public_price_note_ar") else "",
     )
     delivery_note_ar, delivery_note_en = approved_delivery_note(service_data.get("delivery_note_ar", ""), "")
+    short_description_ar = service_data.get("short_description_ar", "")[:300]
+    description_ar = service_data.get("description_ar") or service_data.get("short_description_ar") or service_data["name_ar"]
+    # English text: the faithful translations table (services/catalogue_translations.py).
+    english = {
+        name: english_text
+        for name, (arabic, english_text) in SERVICE_TEXT_EN.get(service_data.get("slug", ""), {}).items()
+        if {"short_description": short_description_ar, "description": description_ar, "delivery_note": delivery_note_ar}.get(name) == arabic
+    }
+    schema, _filled = translate_schema(
+        apply_identifier_rules(apply_schema_rules(service_data.get("fields", []), gate_all_parcel_fields=True))
+    )
+    # Brand spelling is normalized after the translation lookup (which compares the source text).
+    short_description_ar = normalize_brand(short_description_ar)
+    description_ar = normalize_brand(description_ar)
     return {
         "category": category,
         "name_ar": service_data["name_ar"],
         "name_en": service_data["name_en"] or service_data["name_ar"],
-        "short_description_ar": service_data.get("short_description_ar", "")[:300],
-        "short_description_en": "",
-        "description_ar": service_data.get("description_ar") or service_data.get("short_description_ar") or service_data["name_ar"],
-        "description_en": "",
-        "required_information_schema": apply_identifier_rules(apply_schema_rules(service_data.get("fields", []))),
+        "short_description_ar": short_description_ar,
+        "short_description_en": english.get("short_description", ""),
+        "description_ar": description_ar,
+        "description_en": english.get("description", ""),
+        "required_information_schema": schema,
         "price_type": service_data.get("price_type") or Service.PriceType.QUOTATION,
         "base_price": Decimal(service_data.get("base_price", "0.00")),
         "government_fee": Decimal(service_data.get("government_fee", "0.00")),
@@ -776,8 +796,8 @@ def _service_defaults(service_data, category):
         "estimated_duration_unit": Service.DurationUnit.DAYS,
         "delivery_time_mode": Service.DeliveryTimeMode.AFTER_REVIEW,
         "delivery_note_ar": delivery_note_ar,
-        "delivery_note_en": delivery_note_en,
-        "terms_ar": service_data.get("terms_ar", ""),
+        "delivery_note_en": delivery_note_en or english.get("delivery_note", ""),
+        "terms_ar": normalize_brand(service_data.get("terms_ar", "")),
         "terms_en": "",
         "is_online": True,
         "requires_appointment": False,
@@ -793,6 +813,18 @@ def _service_defaults(service_data, category):
 def _sync_documents(result, service, documents):
     active_codes = set()
     for document in documents:
+        # Approved merges (B10-9): a duplicate wording maps onto its canonical definition.
+        code, name_ar = canonical_document(document["code"], document["name_ar"])
+        if code in active_codes:
+            if document.get("is_required"):
+                service.document_requirements.filter(document_type=code, is_deleted=False).update(is_required=True)
+            continue
+        document = {
+            **document,
+            "code": code,
+            "name_ar": name_ar,
+            "name_en": document.get("name_en") or document_name_en(code, name_ar) or "",
+        }
         definition_defaults = {
             "name_ar": document["name_ar"],
             "name_en": document.get("name_en", ""),

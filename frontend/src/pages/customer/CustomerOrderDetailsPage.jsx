@@ -1,4 +1,4 @@
-import { AlertTriangle, FileText, MessageSquare, Star, UploadCloud } from 'lucide-react'
+import { AlertTriangle, FileText, MessageSquare, MessageSquareWarning, MessagesSquare, Star, UploadCloud } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
@@ -8,6 +8,9 @@ import EmptyState from '../../components/EmptyState'
 import FileUploader from '../../components/FileUploader'
 import InlineHelp, { HelpLabel } from '../../components/InlineHelp'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import OrderComplaints from '../../components/OrderComplaints'
+import { CustomerDeliveryCard } from '../../components/OrderDelivery'
+import OrderMessages from '../../components/OrderMessages'
 import OrderTimeline from '../../components/OrderTimeline'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
@@ -230,6 +233,8 @@ function CustomerOrderDetailsPage() {
             <DocumentList documents={order.documents || []} requiredDocuments={requiredDocuments} />
           </SectionCard>
 
+          <CustomerDeliveryCard orderId={order.id} />
+
           <SectionCard
             icon={MessageSquare}
             title={tr('الخط الزمني', 'Timeline')}
@@ -248,6 +253,22 @@ function CustomerOrderDetailsPage() {
             <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-sm leading-7 text-slate-600">
               {order.customer_notes ? <bdi>{order.customer_notes}</bdi> : tr('لا توجد ملاحظات مسجلة على هذا الطلب.', 'No notes are recorded on this request.')}
             </div>
+          </SectionCard>
+
+          <SectionCard
+            icon={MessagesSquare}
+            title={tr('الرسائل', 'Messages')}
+            description={tr('راسل فريق الدعم بخصوص هذا الطلب، وستجد ردود الفريق هنا.', 'Message the support team about this request; the team’s replies appear here.')}
+          >
+            <OrderMessages canSend={String(order.status || '').toUpperCase() !== 'ARCHIVED'} orderId={order.id} />
+          </SectionCard>
+
+          <SectionCard
+            icon={MessageSquareWarning}
+            title={tr('تقديم شكوى', 'Report a problem')}
+            description={tr('واجهت مشكلة في هذا الطلب؟ صفها وسيتابعها الفريق، ويصلك الرد في قسم الرسائل.', 'Had a problem with this request? Describe it and the team will follow up; the reply arrives in the messages section.')}
+          >
+            <OrderComplaints orderId={order.id} />
           </SectionCard>
 
           {allowedActions.can_view_missing_documents_form && allowedActions.can_upload_customer_document ? (

@@ -1,6 +1,8 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
+from core.management.production_guard import refuse_in_production
+
 
 class Command(BaseCommand):
     help = "Seed explicit demo roles, users, services, public-site content, and example orders."
@@ -18,6 +20,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Published demo passwords (and a demo superuser) never reach production.
+        refuse_in_production("seed_demo", allow_non_debug=options["allow_non_debug"])
         call_command("setup_roles")
         call_command(
             "seed_initial_data",

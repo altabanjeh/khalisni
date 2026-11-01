@@ -1,0 +1,52 @@
+URL: http://127.0.0.1:4361/contact
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+Contact us
+
+Send your inquiry
+
+The Khalsni team can help you choose a service, follow up on a request, or clarify requirements.
+
+Name(Required)
+Phone(Required)
+
+Example: 0791234567 or +962791234567. For a number outside Jordan, add the country code after +.
+
+Email(Optional)
+Message(Required)
+Send
+
+Contact details
+
+Contact details are not published yet.
+
+Direct support
+
+Use the floating support action or the tracking page for an existing request.
+
+Service inquiries
+
+Mention the service and any details that help us route your inquiry quickly.
+
+Khalsni is a Jordanian platform for managing and tracking public and administrative service requests digitally.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Terms of use
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

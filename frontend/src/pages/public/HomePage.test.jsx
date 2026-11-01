@@ -41,3 +41,19 @@ test('homepage search shows live service suggestions', async () => {
     expect(screen.getByRole('option', { name: /تجديد جواز سفر/ })).toBeInTheDocument()
   })
 })
+
+// DEF-P02 / CN-ACT-03: one category representation only, with no competing
+// "main categories" rail + "services by category" rows.
+test('homepage shows a single category-worlds section with a special-request path', async () => {
+  renderHomePage()
+  await waitFor(() => {
+    expect(screen.getAllByTestId('category-world').length).toBeGreaterThan(0)
+  })
+  expect(screen.queryByText('خدمات حسب التصنيف')).not.toBeInTheDocument()
+  expect(screen.queryByText('التصنيفات الرئيسية')).not.toBeInTheDocument()
+  expect(screen.queryAllByText('عرض التصنيف')).toHaveLength(0)
+  expect(document.querySelectorAll('#home-categories')).toHaveLength(1)
+  // a category with no published services offers the special request instead of an empty rail
+  expect(screen.getAllByTestId('world-empty').length).toBeGreaterThan(0)
+  expect(document.getElementById('special-request')).toBeInTheDocument()
+})

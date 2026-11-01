@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getAuditActionLabel, getAuditEntityLabel, getAuditRoleLabel, getAuditSourceLabel, getAuditStatusLabel } from '../../utils/auditPresentation'
 import { formatDateTime } from '../../utils/format'
 
 const PAGE_SIZE = 25
@@ -21,6 +22,7 @@ function AuditLogPage() {
     return (
       l.user_name?.toLowerCase().includes(q) ||
       l.action?.toLowerCase().includes(q) ||
+      getAuditActionLabel(l.action, language).toLowerCase().includes(q) ||
       l.entity_type?.toLowerCase().includes(q) ||
       l.ip_address?.toLowerCase().includes(q)
     )
@@ -31,12 +33,12 @@ function AuditLogPage() {
 
   const columns = [
     { key: 'user_name', label: isArabic ? 'المستخدم' : 'User' },
-    { key: 'user_role', label: isArabic ? 'الدور' : 'Role' },
-    { key: 'action', label: isArabic ? 'الإجراء' : 'Action' },
-    { key: 'entity_type', label: isArabic ? 'نوع الكيان' : 'Entity type' },
+    { key: 'user_role', label: isArabic ? 'الدور' : 'Role', render: (row) => getAuditRoleLabel(row.user_role, language) },
+    { key: 'action', label: isArabic ? 'الإجراء' : 'Action', render: (row) => <span title={row.action || ''}>{getAuditActionLabel(row.action, language)}</span> },
+    { key: 'entity_type', label: isArabic ? 'نوع الكيان' : 'Entity type', render: (row) => getAuditEntityLabel(row.entity_type) },
     { key: 'entity_id', label: isArabic ? 'المعرّف' : 'Entity ID' },
-    { key: 'source', label: isArabic ? 'المصدر' : 'Source' },
-    { key: 'status', label: isArabic ? 'الحالة' : 'Result' },
+    { key: 'source', label: isArabic ? 'المصدر' : 'Source', render: (row) => getAuditSourceLabel(row.source, language) },
+    { key: 'status', label: isArabic ? 'الحالة' : 'Result', render: (row) => getAuditStatusLabel(row.status, language) },
     { key: 'ip_address', label: 'IP' },
     { key: 'created_at', label: isArabic ? 'التوقيت' : 'Time', render: (row) => formatDateTime(row.created_at, language) },
   ]

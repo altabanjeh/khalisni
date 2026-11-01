@@ -11,6 +11,7 @@ import { ProviderTaskUpdateScreen } from '../features/provider/screens/ProviderT
 import { ProfileScreen } from '../screens/shared/ProfileScreen';
 import { SettingsScreen } from '../screens/shared/SettingsScreen';
 import { OrderDetailResolverScreen } from '../screens/shared/OrderDetailResolverScreen';
+import { LegalDocumentScreen } from '../screens/public/LegalDocumentScreen';
 import { theme } from '../theme';
 
 const Tab = createBottomTabNavigator();
@@ -37,6 +38,7 @@ export function ProviderNavigator() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="OrderDetailResolver" component={OrderDetailResolverScreen} />
+      <Stack.Screen name="LegalDocument" component={LegalDocumentScreen} />
     </Stack.Navigator>
   );
 }

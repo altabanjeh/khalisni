@@ -35,7 +35,7 @@ export function ToastContainer() {
             <p className="flex-1 text-sm font-medium leading-relaxed">{toast.message}</p>
             <button
               aria-label={isArabic ? 'إغلاق الإشعار' : 'Dismiss notification'}
-              className="shrink-0 rounded-xl p-1 opacity-60 transition hover:opacity-100"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl opacity-60 transition hover:opacity-100"
               onClick={() => dismiss(toast.id)}
               type="button"
             >

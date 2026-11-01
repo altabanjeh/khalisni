@@ -1,0 +1,5 @@
+smtp sink listening on 0.0.0.0:1025, writing to /mail
+stored message 1 from FROM:<no-reply@khalisni.com> size=904 to ['TO:<client-audit-qa-202610-customer_a@example.test>']
+stored message 2 from FROM:<no-reply@khalisni.com> size=643 to ['TO:<client-audit-qa-202610-customer_a@example.test>']
+stored message 3 from FROM:<no-reply@khalisni.com> size=671 to ['TO:<client-audit-qa-202610-customer_a@example.test>']
+stored message 4 from FROM:<no-reply@khalisni.com> size=485 to ['TO:<client-audit-qa-202610-customer_a@example.test>']

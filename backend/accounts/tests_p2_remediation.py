@@ -227,7 +227,7 @@ class PasswordEmailLanguageTests(UnthrottledAuthMixin, APITestCase):
     # 17. password reset email Arabic
     def test_reset_email_in_arabic(self):
         message = self.forgot("ar")
-        self.assertEqual(message.subject, "إعادة تعيين كلمة المرور في خلّصني")
+        self.assertEqual(message.subject, "إعادة تعيين كلمة المرور في خلصني")
         self.assertIn("إعادة تعيين كلمة المرور", message.body)
         self.assertIn("https://app.example.test/reset-password/", message.body)
         self.assertIn("سارة", message.body)
@@ -248,7 +248,7 @@ class PasswordEmailLanguageTests(UnthrottledAuthMixin, APITestCase):
 
     def test_password_changed_email_follows_the_reset_request_language(self):
         for language, subject, phrase in (
-            ("ar", "تم تغيير كلمة المرور في خلّصني", "تم تغيير كلمة المرور"),
+            ("ar", "تم تغيير كلمة المرور في خلصني", "تم تغيير كلمة المرور"),
             ("en", "Khalsni password changed", "Your Khalsni password was changed successfully."),
         ):
             with self.subTest(language=language):

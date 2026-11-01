@@ -55,6 +55,51 @@ export const ordersApi = {
     return http.post(`/customer/orders/${id}/rating/`, payload)
   },
 
+  // Customer <-> support messages on one order (oldest first).
+  async getCustomerOrderMessages(id) {
+    return unwrapList(await http.get(`/customer/orders/${id}/messages/`))
+  },
+
+  sendCustomerOrderMessage(id, message) {
+    return http.post(`/customer/orders/${id}/messages/`, { message })
+  },
+
+  // Customer complaints on one order.
+  async getCustomerOrderComplaints(id) {
+    return unwrapList(await http.get(`/customer/orders/${id}/complaints/`))
+  },
+
+  createCustomerOrderComplaint(id, description) {
+    return http.post(`/customer/orders/${id}/complaints/`, { description })
+  },
+
+  // Staff side of the complaints follow-up.
+  async getStaffOrderComplaints(id) {
+    return unwrapList(await http.get(`/admin/orders/${id}/complaints/`))
+  },
+
+  resolveStaffOrderComplaint(id, complaintId, resolutionNote) {
+    return http.post(`/admin/orders/${id}/complaints/${complaintId}/resolve/`, { resolution_note: resolutionNote })
+  },
+
+  // How the result reaches the customer (electronic / paper pickup / courier).
+  getCustomerOrderDelivery(id) {
+    return http.get(`/customer/orders/${id}/delivery/`)
+  },
+
+  getStaffOrderDelivery(id) {
+    return http.get(`/admin/orders/${id}/delivery/`)
+  },
+
+  updateStaffOrderDelivery(id, payload) {
+    return http.put(`/admin/orders/${id}/delivery/`, payload)
+  },
+
+  // Move an assigned / in-progress order to another eligible provider.
+  reassignOrderProvider(id, payload) {
+    return http.post(`/admin/orders/${id}/reassign-provider/`, payload)
+  },
+
   async getEmployeeOrders(params = {}) {
     return unwrapList(await http.get(`/admin/orders/${buildQuery(params)}`))
   },

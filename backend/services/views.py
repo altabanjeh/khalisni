@@ -136,13 +136,18 @@ class ServiceCategoryListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         organization = resolve_service_organization_from_request(self.request)
-        queryset = visible_service_categories_queryset(organization=organization).annotate(
+        visible_service_ids = visible_services_queryset(organization=organization).values("pk")
+        queryset = visible_service_categories_queryset(
+            organization=organization,
+            include_empty_client_worlds=True,
+        ).annotate(
             service_count=Count(
                 "services",
                 filter=Q(
                     services__is_active=True,
                     services__is_deleted=False,
                     services__show_on_public_site=True,
+                    services__pk__in=visible_service_ids,
                 ),
                 distinct=True,
             )

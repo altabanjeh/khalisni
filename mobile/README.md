@@ -6,7 +6,8 @@ React Native / Expo mobile extension for the existing Khalsni service-order mana
 
 - JWT authentication with secure session storage
 - Role-based navigation for client, employee, provider, and admin
-- Client service browsing, order creation, order tracking, and document response
+- Customer self-registration, public order tracking (order number + phone), and in-app privacy policy / terms
+- Client service browsing, order creation, order tracking, rating, messages with support, and document response
 - Employee order review, document verification, missing-document requests, and provider assignment
 - Provider assigned-order flow, work-status updates, and final-document upload
 - Admin dashboards, orders, users, permissions, services, prices, advertisements, public content, reports, and audit log access
@@ -232,6 +233,38 @@ See:
 - `docs/mobile/mobile_screen_map.md`
 - `docs/mobile/mobile_permission_matrix.md`
 - `docs/mobile/mobile_qa_checklist.md`
+
+## RTL policy
+
+The app is Arabic only (owner decision; there is no English mode). Arabic is
+laid out **explicitly** inside a native **LTR** layout:
+
+- text uses `textAlign: 'right'`; rows that must read right-to-left use
+  `flexDirection: 'row-reverse'` (the first child is on the right);
+- `KeyValueRow` places the label last so it renders on the right;
+- the back button sits at the top right with a right-pointing arrow (`AppScreen`).
+
+Native RTL mirroring is switched **off** so these styles are never flipped a
+second time on an Arabic-locale phone:
+
+- Android: `plugins/withLtrLayoutLock.js` (added by `app.config.js`) writes
+  `android:supportsRtl="false"` into the generated manifest. React Native only
+  mirrors when the application supports RTL, so the lock holds from the first
+  launch. (Expo Go uses its own manifest; check RTL on a development or EAS build.)
+- Both platforms: `index.ts` calls `I18nManager.allowRTL(false)` and
+  `I18nManager.forceRTL(false)` before the app registers.
+
+New code must follow the same rule: never rely on `I18nManager.isRTL`, `start`/`end`
+or automatic mirroring; write right-aligned text and `row-reverse` rows.
+
+## Safe areas
+
+Every navigator hides the native header and Android runs edge-to-edge
+(`android.edgeToEdgeEnabled`). `AppScreen` applies `useSafeAreaInsets()` (top,
+sides, and bottom on stacked screens) and shows a «رجوع» back button on every
+stacked screen that can go back; the customer tab bar adds the bottom inset to
+its height. Screens should render through `AppScreen`, including their loading
+and error states.
 
 ## Known Limitations
 

@@ -1,6 +1,6 @@
 # Khalsni recovery runbook
 
-Written 2026-10-13. For the operator of the Docker Compose deployment (Coolify or a plain server).
+Written 2026-10-13, backup/restore sections updated 2026-11-01 (backup set format 2). For the operator of the Docker Compose deployment (Coolify or a plain server).
 
 **Status of what is described here**
 
@@ -9,7 +9,8 @@ Written 2026-10-13. For the operator of the Docker Compose deployment (Coolify o
 | `scripts/backup.sh`, `scripts/restore.sh` | Run on a local Compose stack built from this release (PostgreSQL 16, production settings). **Not run against the deployed stack.** |
 | Backup failure handling | Tested locally: with the database container stopped, and separately with the backend container stopped, the script exits 1 and leaves only a `.partial` directory. |
 | Restore drill, database and media | Done locally on 2026-10-13 into a separate Compose project: 12 s, row counts identical, the test document readable, `check_system_consistency` clean. Repeated on 2026-10-17 with the database-role layout (`db-init`): backup, `verify_backup.sh`, then `restore.sh` over a modified stack in 52 s; row counts back to the backup, all objects owned by the owner role, the consent trigger enabled, the backend connected as the app role. Local seeded data, not a production copy. |
-| Scheduled backups, off-server copy | `scripts/backup_scheduled.sh` and `scripts/verify_backup.sh` exist (section 3, Schedule). **Nothing is scheduled on any server yet**: until the cron entry and the off-server copy are set up on production, losing the server disk loses every order and every customer document. |
+| Backup set format 2 (2026-11-01) | Dump + media archive + per-file media inventory + `manifest.json` + checksums in one set; verification with `pg_restore --list`; machine-readable status file; off-server copy command; rotation. Drill on 2026-11-01 (section 4): scheduled backup 25 s, full restore into an emptied stack 61 s; counts, media sha256 and API downloads identical. Local seeded data, not a production copy. |
+| Scheduled backups, off-server copy | `scripts/backup_scheduled.sh`, `scripts/verify_backup.sh`, `scripts/backup_status_check.sh` (section 3, Schedule). **Nothing is scheduled on any server yet**: until the cron entry and the off-server copy are set up on production, losing the server disk loses every order and every customer document. |
 
 ## 1. Where the data lives
 
@@ -43,119 +44,137 @@ If `AWS_STORAGE_BUCKET_NAME` is set, uploads go to object storage instead of `ba
 
 Run from the repository root on the server. The scripts lack the executable bit when checked out on Windows, so call them with `sh`.
 
-### What a backup contains
+### What a backup set contains
 
-`sh scripts/backup.sh <directory>` writes `<directory>/khalsni-<UTC time>/`:
+`sh scripts/backup.sh <directory>` writes one set, `<directory>/khalsni-<UTC time>/`:
 
 | File | Content |
 |---|---|
-| `database.dump` | `pg_dump` custom format of the whole database |
-| `database.toc` | The dump's table of contents, produced by reading the dump back |
-| `media.tar.gz` | The whole media volume: customer documents, final results, payment receipts, catalog and CMS images |
-| `manifest.txt` | UTC time, release commit, media file counts, object-storage bucket (or `none`), PostgreSQL version, row counts for orders, documents, users, payments, audit log, migrations |
-| `SHA256SUMS` | Checksums of the dump, the archive and the manifest |
+| `database.dump` | `pg_dump` custom format of the whole database (taken as the cluster admin inside the db container) |
+| `database.toc` | `pg_restore --list` of that dump, produced by reading the dump back |
+| `media.tar.gz` | Every file of the media volume (`media/...`): customer documents, final results, payment receipts, catalog and CMS images |
+| `media.inventory.tsv` | One line per archived file: sha256, size in bytes, path. The archive holds exactly these files (checked). |
+| `manifest.json` | `created_at` (UTC), `release_sha` (the running backend image's `BUILD_SHA`), `repository_commit` (the scripts checkout), database name and PostgreSQL version, `row_counts` of users, services, orders, documents, order consents, payments, audit log and migrations (counted before and after the dump; `row_counts_stable` says whether they changed meanwhile), media `file_count` and `bytes`, object-storage bucket (or `none`), size and sha256 of every artifact |
+| `SHA256SUMS` | Checksums of all of the above |
 
-The script exits non-zero, and the directory keeps the suffix `.partial`, when any of these fails: the dump, reading the dump back, the orders table missing from the dump, the media archive, the archive integrity test, an empty archive while the volume has files, the row counts, the checksums. **A directory without `.partial` is a complete backup; anything else is not.**
+The script exits non-zero, logs `BACKUP FAILED: <reason>` and leaves the directory with the suffix `.partial` when any step fails: database unreachable, the dump, reading it back, a key table missing from the dump, the media inventory, the archive, the archive list differing from the inventory, the manifest, the checksums. **A directory without `.partial` is a complete backup set; anything else is not.** Every line is logged with a UTC timestamp.
 
 ### Production commands
 
 ```bash
-cd /srv/khalsni                      # the repository root on the server
+cd /srv/khalsni                      # the repository checkout on the server (scripts only)
+export COMPOSE="docker compose -p <project> -f <config file>"   # both from: docker compose ls
 
-# 1. back up
-sh scripts/backup.sh /srv/khalsni-backups
-echo "exit status: $?"               # must be 0
-
-# 2. confirm
-ls /srv/khalsni-backups              # newest entry has no .partial suffix
-cat /srv/khalsni-backups/khalsni-*/manifest.txt | tail -13
-
-# 3. copy off the server (example; use the storage the client approves)
-rsync -a /srv/khalsni-backups/ backup-host:/backups/khalsni/
+sh scripts/backup.sh /srv/khalsni-backups      # one set
+sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
 ```
 
-Under Coolify the Compose project has its own name. Find it with `docker compose ls`, then:
-
-```bash
-COMPOSE="docker compose -p <project name> -f docker-compose.yml" sh scripts/backup.sh /srv/khalsni-backups
-```
-
-If `manifest.txt` shows a bucket name instead of `object_storage_bucket=none`, uploads live in object storage: the archive holds only what is on the volume, and the bucket needs its own backup. That path was not exercised.
+If `manifest.json` shows a bucket name instead of `"object_storage_bucket": "none"`, uploads live in object storage: the archive holds only what is on the volume, and the bucket needs its own backup. That path was not exercised.
 
 ### Schedule
 
-Nightly is the minimum for a service that holds customer identity documents:
-
-`scripts/backup_scheduled.sh` runs one scheduled cycle: `backup.sh`, then `verify_backup.sh` on the new backup, then an optional off-server copy, then optional rotation. It exits non-zero if any step fails.
+Nightly is the minimum for a service that holds customer identity documents. `scripts/backup_scheduled.sh` runs one cycle: `backup.sh`, `verify_backup.sh` on the new set, the off-server copy, rotation, then writes the status file. It takes a lock (one run at a time) and exits non-zero if any step fails.
 
 ```cron
-15 2 * * * cd /srv/khalsni && KHALSNI_BACKUP_COPY_COMMAND="<copy command>" sh scripts/backup_scheduled.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
+# /etc/cron.d/khalsni-backup   (server clock in UTC: 02:15 UTC = 05:15 Amman)
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+COMPOSE="docker compose -p <project> -f <config file>"
+KHALSNI_BACKUP_OFFSITE_CMD=rclone copy "$KHALSNI_BACKUP_DIR" offsite:khalsni/"$KHALSNI_BACKUP_NAME"
+KHALSNI_BACKUP_KEEP=<number of sets, per retention policy D06>
+15 2 * * * root cd /srv/khalsni && sh scripts/backup_scheduled.sh /srv/khalsni-backups >> /var/log/khalsni-backup.log 2>&1 || echo "Khalsni backup FAILED $(date -u)" | mail -s "Khalsni backup failed" ops@<domain>
+# monitoring: alert when the last good backup is older than 26 h or the last run failed
+30 * * * * root sh /srv/khalsni/scripts/backup_status_check.sh /srv/khalsni-backups/backup-status.json > /dev/null || echo "Khalsni backup status FAILED" | mail -s "Khalsni backup status" ops@<domain>
 ```
+
+(cron passes variable values literally; the quotes in `KHALSNI_BACKUP_OFFSITE_CMD` reach the shell that runs the command.)
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `KHALSNI_BACKUP_COPY_COMMAND` | Command that copies one finished backup off the server; the backup directory is appended as the last argument (for example an `rclone copy` or `rsync` invocation). | Unset: a warning is logged and the backup stays only on this server. |
-| `KHALSNI_BACKUP_KEEP` | Number of newest complete local backups to keep. Older complete backups are deleted; `.partial` directories are never deleted. | Unset: nothing is deleted. |
+| `KHALSNI_BACKUP_OFFSITE_CMD` | Shell command that copies **one** finished set off the server. It runs with `KHALSNI_BACKUP_DIR` (full path) and `KHALSNI_BACKUP_NAME` (folder name) exported and the path as `$1`; if it mentions neither, the path is appended. Examples: `rclone copy "$KHALSNI_BACKUP_DIR" offsite:khalsni/"$KHALSNI_BACKUP_NAME"`, `rsync -a "$1" backup@vault.example:/srv/khalsni/`. Its exit code is checked; non-zero fails the run. **Credentials live in the tool's own configuration (`rclone.conf`, `~/.ssh/`), never in this variable or in the repository.** | Unset: a warning is logged, `"offsite": "not_configured"`, the set stays only on this server. |
+| `KHALSNI_BACKUP_COPY_COMMAND` | Older name (path always appended). Still honoured. | |
+| `KHALSNI_BACKUP_KEEP` | Number of newest complete local sets to keep. Older complete sets are deleted; `.partial` directories are never deleted (a warning lists them). | Unset: nothing is deleted. |
+| `KHALSNI_BACKUP_STATUS_FILE` | Status file path | `<backup root>/backup-status.json` |
+
+Status file (rewritten on every run, also on failure):
+
+```json
+{
+  "last_run_at": "2026-11-01T08:26:11Z",
+  "last_result": "success",
+  "last_success_at": "2026-11-01T08:26:35Z",
+  "last_failure_at": "2026-11-01T08:25:46Z",
+  "last_error": "",
+  "backup_dir": "/srv/khalsni-backups/khalsni-20261101T082611Z",
+  "offsite": "copied",
+  "artifacts": [
+    {"name": "database.dump", "bytes": 475512, "sha256": "4bac0ae3..."},
+    {"name": "media.tar.gz", "bytes": 694425, "sha256": "30719584..."}
+  ]
+}
+```
+
+On failure `last_result` is `"failure"`, `last_error` names the step (`settings`, `backup`, `verify`, `offsite`, `rotate`) and `last_success_at` keeps the previous good run. `scripts/backup_status_check.sh` exits 1 when the last run failed or the last success is older than `KHALSNI_BACKUP_MAX_AGE_HOURS` (default 26): use it from cron (above) or any monitoring agent.
 
 There is deliberately no default retention. How long backups of identity documents may be kept is a client policy decision (D06), not an engineering one; set `KHALSNI_BACKUP_KEEP` (and the retention of the off-server copy) once that policy exists. Production schedule confirmation remains a release gate.
 
-### Verify a backup
+### Verify a backup set
 
 ```sh
 sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
 ```
 
-Needs no running stack, so it can be run on the off-server copy as well. It checks the checksums, that the media archive is readable, that the database file is a PostgreSQL custom-format dump, and that the manifest records the time, commit and row counts. It does not prove the backup restores; only the restore drill (section 4) does.
+Needs no running stack, so it also runs on the off-server copy. Checks: `SHA256SUMS` and the sha256 recorded in `manifest.json` match every artifact; `pg_restore --list` reads the dump and finds the key tables and the consent append-only trigger (host `pg_restore`, otherwise the `postgres:16-alpine` image through Docker); the media archive is valid and its file list equals `media.inventory.tsv`; the manifest has every field. Sets written before format 2 (`manifest.txt`) get the older checks. Exit 0 means every check passed; only the restore drill (section 4) proves a restore.
 
 ### Restore
 
 ```bash
-# DESTRUCTIVE for the stack it runs against
+# DESTRUCTIVE for the stack COMPOSE names
 sh scripts/restore.sh /srv/khalsni-backups/khalsni-<UTC time> --yes-overwrite
-docker compose -f docker-compose.yml exec backend python manage.py check_system_consistency
-docker compose -f docker-compose.yml exec backend python manage.py audit_requirements_snapshot --strict
+$COMPOSE exec backend python manage.py check_system_consistency
 ```
 
-The restore verifies the checksums, stops the application, replaces the database contents and the media folder, runs `db-init` (which gives the restored objects back to the owner role, applies any migrations newer than the backup as the owner and re-grants the app role), then starts the application as the app role. Restore database and media from the **same** backup: a newer database with older media has document rows whose files are missing.
+`restore.sh`, each step fatal on failure:
+
+1. `verify_backup.sh` on the set (nothing changes if it fails);
+2. stops backend and frontend;
+3. database: converts the dump to SQL, then in **one transaction** drops and re-creates the `public` schema and loads it. Any error rolls the database back to its state before the restore (seen in the drill: a failed attempt left the target untouched);
+4. media: extracts into a temporary folder on the media volume, checks every file against `media.inventory.tsv` (sha256), then swaps it in; a failure leaves the current media untouched;
+5. `db-init`: restored objects go to the owner role, migrations newer than the backup are applied as the owner, the app role is re-granted;
+6. starts backend and frontend and waits until they are healthy;
+7. checks: key-table row counts equal `manifest.json` (migrations may grow), every backed-up media file present and byte-identical (files added by the backend start, such as a default service image, are listed), backend connected as the app role (not superuser, owns nothing), consent trigger enabled.
+
+Restore database and media from the **same** set. A newer database with older media has document rows whose files are missing.
 
 ## 4. Restore drill
 
-A backup that has never been restored is not proven. Do this once before go-live and after every change to the backup setup, on a **separate** stack, never on production. A second machine is best; a second Compose project on the same machine also works because the base Compose file publishes no ports.
+A backup that has never been restored is not proven. Do this once before go-live and after every change to the backup setup, on a **separate** stack, never on production. A second Compose project on the same machine works because the base Compose file publishes no ports; `scripts/drill/docker-compose.drill.yml` adds a loopback port and an SMTP sink, for drills only.
 
 ```bash
-# on the drill machine, same commit as production
-git clone <repository> khalsni-drill && cd khalsni-drill && git checkout <production commit>
-cp /path/to/drill.env .env           # same variable names as production, different secrets
+# same commit as production; a throwaway env file with the production variable names and NEW secrets
+export COMPOSE="docker compose -p khalsni-drill --env-file /path/drill.env -f docker-compose.yml -f scripts/drill/docker-compose.drill.yml"
+BUILD_SHA=$(git rev-parse --short HEAD) BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) $COMPOSE up -d --build --wait
 
-# 1. empty stack under its own project name
-export COMPOSE="docker compose -p khalsni-drill -f docker-compose.yml"
-$COMPOSE up -d --build
-$COMPOSE ps                          # wait until backend is healthy
+# 1. restore the copied production set into the empty drill stack
+time sh scripts/restore.sh /backups/khalsni/khalsni-<UTC time> --yes-overwrite     # ends with "RESTORE OK"
 
-# 2. restore the copied backup
-START=$(date +%s)
-sh scripts/restore.sh /backups/khalsni/khalsni-<UTC time> --yes-overwrite
-echo "restore took $(( $(date +%s) - START )) s"
-
-# 3. compare with manifest.txt
-$COMPOSE exec db sh -c 'psql -At -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
-  select count(*) from orders_order; select count(*) from documents_document;
-  select count(*) from accounts_customuser; select count(*) from payment_payment"'
-$COMPOSE exec backend sh -c 'find /app/media -type f | wc -l'
-
-# 4. consistency
+# 2. consistency
 $COMPOSE exec backend python manage.py check_system_consistency
-$COMPOSE exec backend python manage.py audit_requirements_snapshot --strict
 
-# 5. sign in as a staff user and download one customer document and one final result
+# 3. sign in as a staff user and download one customer document and one final result
+#    (on a seeded drill stack: python scripts/drill/drill_api.py journey|check, see the script header)
 
-# 6. remove the drill stack and its volumes
+# 4. remove the drill stack and its volumes
 $COMPOSE down -v
 ```
 
-Record the restore time (the observed recovery time) and the age of the backup (the data-loss window).
+Record the restore time (observed recovery time) and the age of the backup (data-loss window).
 
-Local result on 2026-10-13: backup of 21 users, 33 audit rows and 1 media file; restore into project `kta-drill` in 12 s; counts identical; the document readable; consistency check clean. This proves the scripts, not the production data volume or timing.
+### Drill results
+
+- 2026-10-13: backup of 21 users, 33 audit rows, 1 media file; restore into project `kta-drill` in 12 s; counts identical.
+- 2026-10-17: with the database-role layout; `restore.sh` over a modified stack in 52 s.
+- **2026-11-01 (format 2)**, project `khalsni-tc`, images built from the release tree with `BUILD_SHA=fa5a19b`, production settings, roles split (admin / owner / app). Seeded `seed_demo` and `seed_client_audit_qa`; through the API a QA customer submitted an order with a document and consent, staff verified it and assigned the provider, the provider uploaded the final result, staff verified it and completed the order, and the customer downloaded it. Then: `backup_scheduled.sh` (backup, verify, off-server copy, rotation) 25 s for 11 users, 8 services, 11 orders, 15 documents, 3 consents and 22 media files (699 141 bytes); `docker compose down -v` (all data destroyed) 11 s; fresh empty stack 52 s; `restore.sh` 61 s. Afterwards: row counts equal the manifest; all 22 media files byte-identical; the customer upload and the final result downloaded through the API with the recorded sha256; backend as the app role (not superuser, owns nothing); consent trigger enabled, and as the app role `UPDATE` and `DELETE` of consent rows, `DISABLE TRIGGER`, `TRUNCATE` and `session_replication_role` were all refused; `check_system_consistency` clean. Two defects found and fixed during the drill: the first restore attempt failed on the `public` schema (and rolled back cleanly), the second flagged a service image the backend start adds. Evidence: `docs/audit/evidence/khalsni-total-closure-2026-11-01/ops/`. This proves the scripts on seeded data, not the production data volume or timing.
 
 ## 5. Rolling back a release
 

@@ -3,6 +3,9 @@ import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import StaffDeliveryPanel from '../../components/OrderDelivery'
+import ReassignProviderPanel from '../../components/ReassignProviderPanel'
+import StaffComplaintsPanel from '../../components/StaffComplaintsPanel'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import MissingRequestRecovery from '../../components/MissingRequestRecovery'
@@ -18,7 +21,7 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getOrderAllowedActions, hasPermission } from '../../utils/authz'
 import { formatDate, formatDateTime } from '../../utils/format'
-import { getServiceName } from '../../utils/servicePresentation'
+import { getAdminName, getServiceName } from '../../utils/servicePresentation'
 import { findRequiredDocument,
   getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
 import OrderNumber from '../../components/OrderNumber'
@@ -80,7 +83,7 @@ function EmployeeOrderReviewPage() {
   const { data: templates = [] } = useAsyncData(() => api.getEmployeeNotificationTemplates(), [], [])
   const assignForm = useForm()
   const docsRequestForm = useForm()
-  const noteForm = useForm()
+  const noteForm = useForm({ defaultValues: { visibility: 'INTERNAL' } })
   const returnProviderForm = useForm()
   const returnInternalForm = useForm()
   const manualNotificationForm = useForm()
@@ -148,9 +151,11 @@ function EmployeeOrderReviewPage() {
   }
   async function handleNote(values) {
     try {
-      await api.addEmployeeNote(id, { note: values.note, visibility: 'INTERNAL' })
-      noteForm.reset(); reload()
-      toast(tr('تم حفظ الملاحظة الداخلية.', 'Internal note saved.'), 'success')
+      // A customer-visible note is the staff reply in the customer's messages thread.
+      const visibility = (values.visibility === 'CUSTOMER' || !allowedActions.can_add_internal_note) && allowedActions.can_add_customer_note ? 'CUSTOMER' : 'INTERNAL'
+      await api.addEmployeeNote(id, { note: values.note, visibility })
+      noteForm.reset({ note: '', visibility }); reload()
+      toast(visibility === 'CUSTOMER' ? tr('تم إرسال الرسالة إلى العميل.', 'Message sent to the customer.') : tr('تم حفظ الملاحظة الداخلية.', 'Internal note saved.'), 'success')
     } catch (e) { toast(getDisplayError(e), 'error'); if (isStaleActionError(e)) reload() }
   }
   async function handleReject() {
@@ -219,7 +224,7 @@ function EmployeeOrderReviewPage() {
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard label={tr('العميل', 'Customer')} value={order.customer?.full_name || T.unavailable} hint={order.customer?.phone || tr('لا يوجد هاتف', 'No phone')} />
           <MetricCard label={tr('البريد والهوية', 'Email & ID')} value={order.customer?.email || tr('غير متوفر', 'Not available')} hint={order.customer?.national_id || tr('لا يوجد رقم وطني', 'No national ID')} />
-          <MetricCard label={tr('الخدمة', 'Service')} value={order.service ? getServiceName(order.service, language) : T.notSet} hint={order.service?.category_name || ''} />
+          <MetricCard label={tr('الخدمة', 'Service')} value={order.service ? getServiceName(order.service, language) : T.notSet} hint={order.service?.category && typeof order.service.category === 'object' ? getAdminName(order.service.category, language, order.service?.category_name || '') : order.service?.category_name || ''} />
           <MetricCard label={tr('التسليم المتوقع', 'Expected delivery')} value={formatDate(order.expected_delivery_date, language)} hint={order.city || T.notSet} />
         </div>
       </section>
@@ -414,6 +419,16 @@ function EmployeeOrderReviewPage() {
             </SectionCard>
           ) : null}
 
+          <ReassignProviderPanel
+            onReassigned={() => { reload(); toast(tr('تم تغيير مزوّد الخدمة.', 'Provider changed.'), 'success') }}
+            order={order}
+            providers={providers}
+          />
+
+          <StaffComplaintsPanel onChanged={reload} orderId={id} />
+
+          <StaffDeliveryPanel orderId={id} orderStatus={order.status} />
+
           {finalDocuments.length ? (
             <SectionCard icon={FileText} title={tr('مراجعة نتيجة المزوّد', 'Review the provider result')} description={tr('اعتمد النتيجة بعد التحقق، أو أعدها للمزوّد أو للمراجعة الداخلية بسبب واضح.', 'Approve the result after verifying it, or return it to the provider or internal review with a clear reason.')}>
               <DocumentList documents={finalDocuments} />
@@ -437,11 +452,26 @@ function EmployeeOrderReviewPage() {
             </SectionCard>
           ) : null}
 
-          {allowedActions.can_add_internal_note ? (
-            <SectionCard icon={FileText} title={tr('ملاحظة داخلية', 'Internal note')} description={tr('هذه الملاحظات مخصصة للفريق الداخلي فقط.', 'These notes are for the internal team only.')}>
+          {allowedActions.can_add_internal_note || allowedActions.can_add_customer_note ? (
+            <SectionCard
+              icon={FileText}
+              title={allowedActions.can_add_customer_note ? tr('ملاحظة أو رسالة للعميل', 'Note or message to the customer') : tr('ملاحظة داخلية', 'Internal note')}
+              description={allowedActions.can_add_customer_note
+                ? tr('الملاحظة الداخلية للفريق فقط؛ الملاحظة المرئية للعميل تُرسل إليه كرسالة في قسم الرسائل.', 'An internal note is for the team only; a customer-visible note is sent to the customer as a message.')
+                : tr('هذه الملاحظات مخصصة للفريق الداخلي فقط.', 'These notes are for the internal team only.')}
+            >
               <form className="space-y-4" onSubmit={noteForm.handleSubmit(exclusive('note', handleNote))}>
-                <textarea aria-label={tr('نص الملاحظة', 'Note text')} className="field min-h-20" placeholder={tr('ملاحظة للعمل الداخلي فقط', 'A note for internal work only')} {...noteForm.register('note', { required: tr('الملاحظة مطلوبة', 'A note is required') })} />
+                <textarea aria-label={tr('نص الملاحظة', 'Note text')} className="field min-h-20" placeholder={allowedActions.can_add_customer_note ? tr('اكتب الملاحظة أو الرسالة هنا', 'Write the note or message here') : tr('ملاحظة للعمل الداخلي فقط', 'A note for internal work only')} {...noteForm.register('note', { required: tr('الملاحظة مطلوبة', 'A note is required') })} />
                 {noteForm.formState.errors.note ? <p className="text-sm font-bold text-danger">{noteForm.formState.errors.note.message}</p> : null}
+                {allowedActions.can_add_customer_note ? (
+                  <>
+                    <label className="block text-sm font-bold text-ink" htmlFor="employee-note-visibility">{tr('مستوى الظهور', 'Visibility')}</label>
+                    <select className="field" id="employee-note-visibility" {...noteForm.register('visibility')}>
+                      {allowedActions.can_add_internal_note ? <option value="INTERNAL">{tr('داخلية', 'Internal')}</option> : null}
+                      <option value="CUSTOMER">{tr('مرئية للعميل — تُرسل كرسالة للعميل', 'Visible to customer — sent to the customer as a message')}</option>
+                    </select>
+                  </>
+                ) : null}
                 <button className="btn-secondary w-full" disabled={Boolean(busy)} type="submit">{busy === 'note' ? tr('جارٍ الحفظ...', 'Saving...') : tr('حفظ الملاحظة', 'Save note')}</button>
               </form>
             </SectionCard>

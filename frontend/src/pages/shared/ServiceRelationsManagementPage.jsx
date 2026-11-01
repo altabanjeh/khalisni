@@ -10,6 +10,7 @@ import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
+import { getAdminCategoryPath, getAdminName, resolveCatalogName } from '../../utils/servicePresentation'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
 const relationTypeOptions = [
@@ -79,7 +80,7 @@ function CheckboxField({ label, registration, hint }) {
 }
 
 function ServiceRelationsManagementPage() {
-  const { isArabic } = useLanguage()
+  const { isArabic, language } = useLanguage()
   const { toast } = useToast()
   const form = useForm({ defaultValues })
   const [selectedRelationId, setSelectedRelationId] = useState(null)
@@ -97,6 +98,14 @@ function ServiceRelationsManagementPage() {
 
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
   const { data: categories = [] } = useAsyncData(() => api.getAdminCategories(), [], [])
+  // The relation serializer only carries Arabic flat names; resolve them
+  // through the loaded catalogue so English mode shows English names (DEF-A03).
+  const relationServiceName = (row, side) => {
+    if (!row) return ''
+    const nested = row[`${side}_service`]
+    if (nested && typeof nested === 'object' && (nested.name_ar || nested.name_en)) return getAdminName(nested, language)
+    return resolveCatalogName(nested || row[`${side}_service_id`], services, row[`${side}_service_name`], language)
+  }
   const { data: relations = [], loading: relationsLoading, reload } = useAsyncData(
     () => api.getAdminServiceRelations(filters),
     [filters.source_service, filters.target_service, filters.relation_type, filters.is_active, filters.status],
@@ -217,7 +226,7 @@ function ServiceRelationsManagementPage() {
       label: isArabic ? 'الخدمة المصدر' : 'Source Service',
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span>{row.source_service_name || row.source_service?.name_ar || (isArabic ? 'غير معروف' : 'Unknown')}</span>
+          <span>{relationServiceName(row, 'source') || (isArabic ? 'غير معروف' : 'Unknown')}</span>
           {row.is_deleted ? (
             <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
               {isArabic ? 'محذوفة' : 'Deleted'}
@@ -229,7 +238,7 @@ function ServiceRelationsManagementPage() {
     {
       key: 'target_service_name',
       label: isArabic ? 'الخدمة الهدف' : 'Target Service',
-      render: (row) => row.target_service_name || row.target_service?.name_ar || (isArabic ? 'غير معروف' : 'Unknown'),
+      render: (row) => relationServiceName(row, 'target') || (isArabic ? 'غير معروف' : 'Unknown'),
     },
     { key: 'relation_type_label', label: isArabic ? 'نوع القاعدة' : 'Rule Type' },
     {
@@ -328,7 +337,7 @@ function ServiceRelationsManagementPage() {
               <option value="">{isArabic ? 'جميع الخدمات المصدر' : 'All source services'}</option>
               {activeServices.map((service) => (
                 <option key={service.id} value={service.id}>
-                  {service.name_ar}
+                  {getAdminName(service, language)}
                 </option>
               ))}
             </select>
@@ -341,7 +350,7 @@ function ServiceRelationsManagementPage() {
               <option value="">{isArabic ? 'جميع الخدمات الهدف' : 'All target services'}</option>
               {activeServices.map((service) => (
                 <option key={service.id} value={service.id}>
-                  {service.name_ar}
+                  {getAdminName(service, language)}
                 </option>
               ))}
             </select>
@@ -373,12 +382,12 @@ function ServiceRelationsManagementPage() {
         mobileCard={(row) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-ink">{row.source_service_name || row.source_service?.name_ar}</p>
+              <p className="font-bold text-ink">{relationServiceName(row, 'source')}</p>
               <span className="text-sm text-slate-500">
                 {row.is_deleted ? (isArabic ? 'محذوفة' : 'Deleted') : row.is_active ? (isArabic ? 'مفعّلة' : 'Active') : (isArabic ? 'موقفة' : 'Inactive')}
               </span>
             </div>
-            <p className="text-sm text-slate-600">{isArabic ? 'الهدف: ' : 'Target: '}{row.target_service_name || row.target_service?.name_ar}</p>
+            <p className="text-sm text-slate-600">{isArabic ? 'الهدف: ' : 'Target: '}{relationServiceName(row, 'target')}</p>
             <p className="text-sm text-slate-500">{row.relation_type_label}</p>
           </div>
         )}
@@ -416,7 +425,7 @@ function ServiceRelationsManagementPage() {
                 <option value="">{isArabic ? 'اختر الخدمة المصدر' : 'Select source service'}</option>
                 {sourceServices.map((service) => (
                   <option key={service.id} value={service.id}>
-                    {service.name_ar}
+                    {getAdminName(service, language)}
                   </option>
                 ))}
               </select>
@@ -430,7 +439,7 @@ function ServiceRelationsManagementPage() {
                 <option value="">{isArabic ? 'اختر الخدمة الهدف' : 'Select target service'}</option>
                 {targetServices.map((service) => (
                   <option key={service.id} value={service.id}>
-                    {service.name_ar}
+                    {getAdminName(service, language)}
                   </option>
                 ))}
               </select>
@@ -446,7 +455,7 @@ function ServiceRelationsManagementPage() {
                 <option value="">{isArabic ? 'جميع التصنيفات' : 'All categories'}</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || category.name_ar}
+                    {getAdminCategoryPath(category, language)}
                   </option>
                 ))}
               </select>
@@ -460,7 +469,7 @@ function ServiceRelationsManagementPage() {
                 <option value="">{isArabic ? 'جميع التصنيفات' : 'All categories'}</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || category.name_ar}
+                    {getAdminCategoryPath(category, language)}
                   </option>
                 ))}
               </select>
@@ -524,8 +533,8 @@ function ServiceRelationsManagementPage() {
         confirmLabel={isArabic ? 'تأكيد الحذف' : 'Confirm delete'}
         description={
           isArabic
-            ? `سيتم إخفاء العلاقة بين "${pendingDelete?.source_service_name || pendingDelete?.source_service?.name_ar || ''}" و "${pendingDelete?.target_service_name || pendingDelete?.target_service?.name_ar || ''}" من النظام.`
-            : `This will hide the relation between "${pendingDelete?.source_service_name || pendingDelete?.source_service?.name_ar || ''}" and "${pendingDelete?.target_service_name || pendingDelete?.target_service?.name_ar || ''}" from the system.`
+            ? `سيتم إخفاء العلاقة بين "${relationServiceName(pendingDelete, 'source')}" و "${relationServiceName(pendingDelete, 'target')}" من النظام.`
+            : `This will hide the relation between "${relationServiceName(pendingDelete, 'source')}" and "${relationServiceName(pendingDelete, 'target')}" from the system.`
         }
         impact={
           isArabic

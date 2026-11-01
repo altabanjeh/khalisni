@@ -7,7 +7,7 @@ import { AppCard } from '../../components/AppCard';
 import { AppInput } from '../../components/AppInput';
 import type { UploadableDocument } from '../../types/document';
 import { theme } from '../../theme';
-import { validateUploadDocument } from '../../utils/file';
+import { resolveFileSize, validateUploadDocument } from '../../utils/file';
 
 interface DocumentUploadWidgetProps {
   title?: string;
@@ -36,12 +36,12 @@ export function DocumentUploadWidget({
     });
     if (result.canceled) return;
     const asset = result.assets[0];
-    const selectedFile: UploadableDocument = {
+    const selectedFile: UploadableDocument = await resolveFileSize({
       uri: asset.uri,
       name: asset.name,
       mimeType: asset.mimeType,
       size: asset.size,
-    };
+    });
     const error = validateUploadDocument(selectedFile);
     if (error) {
       Alert.alert('ملف غير صالح', error);

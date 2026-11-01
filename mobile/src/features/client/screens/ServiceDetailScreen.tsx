@@ -10,7 +10,7 @@ import { PublicServiceCard } from '../../../components/public/PublicServiceCard'
 import { servicesApi } from '../../../api/services.api';
 import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
-import { formatCurrency } from '../../../utils/format';
+import { formatCurrency, formatStepNumber } from '../../../utils/format';
 import { getRequiredDocumentLabel } from '../../../utils/serviceForms';
 
 export function ServiceDetailScreen({ route, navigation }: { route: any; navigation: any }) {
@@ -51,7 +51,7 @@ export function ServiceDetailScreen({ route, navigation }: { route: any; navigat
                         pricing.government_fee != null ? `حكومي: ${formatCurrency(Number(pricing.government_fee))}` : null,
                         pricing.company_fee != null ? `خدمة: ${formatCurrency(Number(pricing.company_fee))}` : null,
                       ].filter(Boolean).join(' | ')
-                    : 'الرسوم التفصيلية مخفية'}
+                    : 'تُوضَّح تفاصيل الرسوم عند مراجعة الطلب'}
                 </Text>
               </AppCard>
             </View>
@@ -83,7 +83,7 @@ export function ServiceDetailScreen({ route, navigation }: { route: any; navigat
             <View style={styles.stack}>
               {(query.data.steps ?? []).map((step, index) => (
                 <AppCard key={`${step}-${index}`} variant="muted" style={styles.stepCard}>
-                  <Text style={styles.stepIndex}>0{index + 1}</Text>
+                  <Text style={styles.stepIndex}>{formatStepNumber(index)}</Text>
                   <Text style={styles.stepText}>{step}</Text>
                 </AppCard>
               ))}

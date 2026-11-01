@@ -1,0 +1,1 @@
+destroy=11s fresh_up=52s restore=61s restore_exit=0

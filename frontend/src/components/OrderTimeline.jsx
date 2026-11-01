@@ -50,6 +50,8 @@ function OrderTimeline({ items = [], variant = 'default' }) {
               ? isArabic ? 'المرحلة الحالية' : 'Current stage'
               : isArabic ? 'مرحلة مكتملة' : 'Completed'
 
+        const note = describeTimelineNote(item, language)
+
         return (
           <li key={item.id || index} className="relative grid grid-cols-[44px_minmax(0,1fr)] gap-4 pb-6 last:pb-0">
             <div className="relative flex justify-center">
@@ -72,9 +74,7 @@ function OrderTimeline({ items = [], variant = 'default' }) {
                 </div>
                 <span className="text-xs font-semibold text-slate-600">{formatDateTime(item.created_at, language)}</span>
               </div>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                {describeTimelineNote(item, language) || (isArabic ? 'لا توجد ملاحظات إضافية لهذا التحديث.' : 'No additional notes for this update.')}
-              </p>
+              {note ? <p className="mt-3 text-sm leading-7 text-slate-600">{note}</p> : null}
             </article>
           </li>
         )

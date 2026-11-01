@@ -1,6 +1,6 @@
 import { apiClient, buildQuery, fetchAllPages, unwrapListData } from './client';
-import type { ApiListParams } from '../types/common';
-import type { Order } from '../types/order';
+import type { ApiListParams, PaginatedResponse } from '../types/common';
+import type { Order, OrderComplaint, OrderDelivery, OrderMessage, TrackOrderResult } from '../types/order';
 
 export const ordersApi = {
   // The backend answers 201 for a new order and 200 when the same Idempotency-Key
@@ -16,7 +16,7 @@ export const ordersApi = {
   },
   // The backend exposes tracking as GET and requires both values.
   trackOrder(payload: { order_number: string; phone: string }) {
-    return apiClient.get<Order>('/orders/track/', { params: buildQuery(payload) }).then((res) => res.data);
+    return apiClient.get<TrackOrderResult>('/orders/track/', { params: buildQuery(payload) }).then((res) => res.data);
   },
   // Every page: the list is paginated server-side (PAGE_SIZE 20) and the
   // dashboard counts and the missing-documents list need all of it.
@@ -30,7 +30,31 @@ export const ordersApi = {
     return apiClient.post(`/customer/orders/${orderId}/cancel/`, payload).then((res) => res.data);
   },
   submitRating(orderId: number | string, payload: { score: number; comment?: string }) {
-    return apiClient.post(`/customer/orders/${orderId}/rating/`, payload).then((res) => res.data);
+    return apiClient
+      .post<{ score: number; comment?: string }>(`/customer/orders/${orderId}/rating/`, payload)
+      .then((res) => res.data);
+  },
+  // Customer <-> support thread on an order (utils/orderMessages.ts).
+  getOrderMessages(orderId: number | string) {
+    return apiClient
+      .get<OrderMessage[] | PaginatedResponse<OrderMessage>>(`/customer/orders/${orderId}/messages/`)
+      .then((res) => unwrapListData(res.data));
+  },
+  sendOrderMessage(orderId: number | string, payload: { message: string }) {
+    return apiClient.post<OrderMessage>(`/customer/orders/${orderId}/messages/`, payload).then((res) => res.data);
+  },
+  // How the result reaches the customer (utils/orderDelivery.ts describeResultDelivery).
+  getOrderDelivery(orderId: number | string) {
+    return apiClient.get<OrderDelivery>(`/customer/orders/${orderId}/delivery/`).then((res) => res.data);
+  },
+  // Customer complaints on an order (utils/complaints.ts).
+  getOrderComplaints(orderId: number | string) {
+    return apiClient
+      .get<OrderComplaint[] | PaginatedResponse<OrderComplaint>>(`/customer/orders/${orderId}/complaints/`)
+      .then((res) => unwrapListData(res.data));
+  },
+  createOrderComplaint(orderId: number | string, payload: { description: string }) {
+    return apiClient.post<OrderComplaint>(`/customer/orders/${orderId}/complaints/`, payload).then((res) => res.data);
   },
   getEmployeeOrders(params: ApiListParams = {}) {
     return apiClient.get<Order[]>('/admin/orders/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));

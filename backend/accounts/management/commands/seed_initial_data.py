@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
 
 from accounts.models import CustomUser
+from core.management.production_guard import refuse_in_production
 from documents.services import create_order_document
 from orders.models import Order, OrderStatusLog
 from orders.services import (
@@ -461,6 +462,9 @@ class Command(BaseCommand):
                 "Demo users and orders are refused when DJANGO_DEBUG is False. "
                 "Catalog-only seeding works without these flags; pass --allow-non-debug only on a disposable demo site."
             )
+        if include_demo_users:
+            # KHALSNI_ENVIRONMENT=production refuses demo users even with --allow-non-debug.
+            refuse_in_production("seed_initial_data --include-demo-users", allow_non_debug=True)
 
         self._seed_catalog()
         seed_actor = self._get_seed_actor()

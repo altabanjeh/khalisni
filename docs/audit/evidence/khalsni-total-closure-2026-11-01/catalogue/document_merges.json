@@ -1,0 +1,313 @@
+{
+ "applied": false,
+ "rows": [
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-boundary-demarcation",
+   "requirement_id": 106,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-land-survey",
+   "requirement_id": 114,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-property-readjustment",
+   "requirement_id": 119,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-zoning-certificate",
+   "requirement_id": 123,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-land-use-classification-change",
+   "requirement_id": 129,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-property-mortgage-registration",
+   "requirement_id": 142,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "repoint",
+   "service": "request-mortgage-release",
+   "requirement_id": 147,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "additional-authority-documents",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_b03d952538",
+   "from_name": "أي مستندات إضافية تطلبها الجهة المختصة",
+   "to_code": "document_b0f143ad16",
+   "to_name": "أي وثائق إضافية تطلبها الجهة المختصة",
+   "detail": "«وثائق» and «مستندات» are synonyms; same catch-all request from the competent authority."
+  },
+  {
+   "group": "legal-power-of-attorney",
+   "action": "dedupe",
+   "service": "request-land-survey",
+   "requirement_id": 112,
+   "from_code": "document_e95445e836",
+   "from_name": "وكالة قانونية إن وجدت",
+   "to_code": "legal_power_of_attorney",
+   "to_name": "وكالة قانونية (إن وجدت)",
+   "detail": "service already lists the canonical document (requirement 113); duplicate requirement soft-deleted"
+  },
+  {
+   "group": "legal-power-of-attorney",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_e95445e836",
+   "from_name": "وكالة قانونية إن وجدت",
+   "to_code": "legal_power_of_attorney",
+   "to_name": "وكالة قانونية (إن وجدت)",
+   "detail": "Same document; the wording differs only by parentheses."
+  },
+  {
+   "group": "company-registration-certificate",
+   "action": "repoint",
+   "service": "business_trademark_services",
+   "requirement_id": 45,
+   "from_code": "document_d7d63d7027",
+   "from_name": "شهادة/سجل الشركة أو المؤسسة",
+   "to_code": "document_322e004de0",
+   "to_name": "شهادة/بيانات تسجيل الشركة أو المنشأة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "company-registration-certificate",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_d7d63d7027",
+   "from_name": "شهادة/سجل الشركة أو المؤسسة",
+   "to_code": "document_322e004de0",
+   "to_name": "شهادة/بيانات تسجيل الشركة أو المنشأة",
+   "detail": "Company/establishment registration certificate or record; «بيانات تسجيل» and «سجل» name the same extract."
+  },
+  {
+   "group": "amended-company-contract",
+   "action": "repoint",
+   "service": "business_company_add_activities",
+   "requirement_id": 30,
+   "from_code": "document_ec8d545fbf",
+   "from_name": "عقد/نظام معدل أو النموذج المعتمد",
+   "to_code": "document_39a02bfad7",
+   "to_name": "عقد ونظام الشركة المعدلان أو النماذج المعتمدة",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "amended-company-contract",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_ec8d545fbf",
+   "from_name": "عقد/نظام معدل أو النموذج المعتمد",
+   "to_code": "document_39a02bfad7",
+   "to_name": "عقد ونظام الشركة المعدلان أو النماذج المعتمدة",
+   "detail": "Amended company contract and articles or the approved forms; singular/plural wording only."
+  },
+  {
+   "group": "cadastral-map",
+   "action": "dedupe",
+   "service": "request-land-survey",
+   "requirement_id": 110,
+   "from_code": "document_0cc19c2317",
+   "from_name": "مخطط أراضٍ إن وجد",
+   "to_code": "cadastral_map",
+   "to_name": "مخطط أراضٍ",
+   "detail": "service already lists the canonical document (requirement 111); duplicate requirement soft-deleted"
+  },
+  {
+   "group": "cadastral-map",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_0cc19c2317",
+   "from_name": "مخطط أراضٍ إن وجد",
+   "to_code": "cadastral_map",
+   "to_name": "مخطط أراضٍ",
+   "detail": "Same cadastral map; «إن وجد» is a condition already carried by the requirement being optional."
+  },
+  {
+   "group": "notarized-poa-or-written-authorization",
+   "action": "repoint",
+   "service": "business_license_services",
+   "requirement_id": 56,
+   "from_code": "document_f56c2e0812",
+   "from_name": "تفويض خطي أو وكالة عدلية",
+   "to_code": "legal_authorization",
+   "to_name": "وكالة عدلية أو تفويض خطي",
+   "detail": "repointed to the canonical definition"
+  },
+  {
+   "group": "notarized-poa-or-written-authorization",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_f56c2e0812",
+   "from_name": "تفويض خطي أو وكالة عدلية",
+   "to_code": "legal_authorization",
+   "to_name": "وكالة عدلية أو تفويض خطي",
+   "detail": "Same two alternatives in reversed order."
+  },
+  {
+   "group": "applicant-id-copy",
+   "action": "dedupe",
+   "service": "request-land-survey",
+   "requirement_id": 107,
+   "from_code": "document_a4c4fed3af",
+   "from_name": "الهوية",
+   "to_code": "national_id_copy",
+   "to_name": "صورة الهوية",
+   "detail": "service already lists the canonical document (requirement 108); duplicate requirement soft-deleted"
+  },
+  {
+   "group": "applicant-id-copy",
+   "action": "deactivate-definition",
+   "service": "",
+   "requirement_id": null,
+   "from_code": "document_a4c4fed3af",
+   "from_name": "الهوية",
+   "to_code": "national_id_copy",
+   "to_name": "صورة الهوية",
+   "detail": "«الهوية» is the applicant's ID copy; already classified as a duplicate of «صورة الهوية» by services.0016 (request-land-survey second sheet)."
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "no-criminal-record",
+   "requirement_id": 2,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "passport-renewal",
+   "requirement_id": 4,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "tax-clearance",
+   "requirement_id": 6,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "no-criminal-record-certificate",
+   "requirement_id": 8,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "passport-appointment-booking",
+   "requirement_id": 10,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "traffic-fines-payment",
+   "requirement_id": 12,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "property-registration-deed",
+   "requirement_id": 14,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  },
+  {
+   "group": "authorization-if-any",
+   "action": "make-optional",
+   "service": "business-license-renewal",
+   "requirement_id": 16,
+   "from_code": "authorization-letter",
+   "from_name": "تفويض إن وجد",
+   "to_code": "",
+   "to_name": "",
+   "detail": "«إن وجد» (if any) cannot be a required upload"
+  }
+ ]
+}

@@ -6,3 +6,5 @@ class PublicSiteConfig(AppConfig):
     name = "public_site"
     verbose_name = "Public Site"
 
+    def ready(self):
+        from public_site import checks  # noqa: F401  (registers the deployment checks)

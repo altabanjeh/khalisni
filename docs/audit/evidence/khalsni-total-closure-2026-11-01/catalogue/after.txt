@@ -1,0 +1,17 @@
+WARNING 7 no-criminal-record-certificate | document national-id | No allowed file types (the global list applies).
+WARNING 7 no-criminal-record-certificate | document authorization-letter | No allowed file types (the global list applies).
+WARNING 8 passport-appointment-booking | document national-id | No allowed file types (the global list applies).
+WARNING 8 passport-appointment-booking | document authorization-letter | No allowed file types (the global list applies).
+WARNING 9 traffic-fines-payment | document national-id | No allowed file types (the global list applies).
+WARNING 9 traffic-fines-payment | document authorization-letter | No allowed file types (the global list applies).
+WARNING 10 property-registration-deed | document national-id | No allowed file types (the global list applies).
+WARNING 10 property-registration-deed | document authorization-letter | No allowed file types (the global list applies).
+WARNING 11 business-license-renewal | document national-id | No allowed file types (the global list applies).
+WARNING 11 business-license-renewal | document authorization-letter | No allowed file types (the global list applies).
+ERROR   12 business_company_registration | field company_type | A select field needs at least one option.
+ERROR   13 business_company_information_amendment | field company_type | A select field needs at least one option.
+ERROR   14 business_company_add_activities | field company_type | A select field needs at least one option.
+WARNING 18 business_trademark_services | field trademark_class | Optional select field has no options.
+ERROR   19 business_license_services | field municipality | A select field needs at least one option.
+ERROR   20 business_company_closure_liquidation | field company_type | A select field needs at least one option.
+Services: 35 (33 customer-visible). Errors: 5. Warnings: 11.

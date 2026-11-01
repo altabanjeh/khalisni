@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import { useAuthStore } from '../state/authStore';
 import { SplashScreen } from '../screens/shared/SplashScreen';
+import { UnknownRoleScreen } from '../screens/shared/UnknownRoleScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { ClientNavigator } from './ClientNavigator';
 import { EmployeeNavigator } from './EmployeeNavigator';
@@ -16,7 +17,7 @@ export function RootNavigator() {
     <NavigationContainer>
       {status === 'bootstrapping' ? (
         <SplashScreen />
-      ) : status !== 'authenticated' || !role ? (
+      ) : status !== 'authenticated' ? (
         <AuthNavigator />
       ) : role === 'client' ? (
         <ClientNavigator />
@@ -24,8 +25,12 @@ export function RootNavigator() {
         <EmployeeNavigator />
       ) : role === 'provider' ? (
         <ProviderNavigator />
-      ) : (
+      ) : role === 'admin' ? (
         <AdminNavigator />
+      ) : (
+        // A missing or unrecognised account role never falls back to the
+        // customer screens (audit M-29); the backend still enforces permissions.
+        <UnknownRoleScreen />
       )}
     </NavigationContainer>
   );

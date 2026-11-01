@@ -19,6 +19,7 @@ import { servicesApi } from '../../../api/services.api';
 import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
 import type { PublicSiteTheme } from '../../../types/publicSite';
+import { BRAND_AR, BRAND_LOCKUP } from '../../../utils/brand';
 
 function getPalette(publicTheme?: PublicSiteTheme) {
   return {
@@ -36,25 +37,32 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
   // Server-side unread count: the notification list is paginated.
   const notificationsQuery = useQuery({ queryKey: ['notifications-unread', 'client'], queryFn: () => notificationsApi.getUnreadCount() });
 
-  const isLoading = homepageQuery.isLoading || servicesQuery.isLoading || ordersQuery.isLoading;
-  const hasError = homepageQuery.isError || servicesQuery.isError || ordersQuery.isError;
+  // The homepage content (hero texts, alert, ads, contact details) is optional
+  // decoration: its failure never blocks the dashboard (audit M-30). Services
+  // and orders fail inside their own sections; only when both fail is the
+  // whole screen an error.
+  const isLoading = servicesQuery.isLoading && ordersQuery.isLoading;
+  const retryAll = () => {
+    homepageQuery.refetch();
+    publicThemeQuery.refetch();
+    servicesQuery.refetch();
+    ordersQuery.refetch();
+    notificationsQuery.refetch();
+  };
 
   if (isLoading) {
-    return <LoadingState />;
+    return (
+      <AppScreen>
+        <LoadingState />
+      </AppScreen>
+    );
   }
 
-  if (hasError) {
+  if (servicesQuery.isError && ordersQuery.isError) {
     return (
-      <ErrorState
-        message={getDisplayError(homepageQuery.error ?? servicesQuery.error ?? ordersQuery.error)}
-        onRetry={() => {
-          homepageQuery.refetch();
-          publicThemeQuery.refetch();
-          servicesQuery.refetch();
-          ordersQuery.refetch();
-          notificationsQuery.refetch();
-        }}
-      />
+      <AppScreen>
+        <ErrorState message={getDisplayError(ordersQuery.error ?? servicesQuery.error)} onRetry={retryAll} />
+      </AppScreen>
     );
   }
 
@@ -88,8 +96,14 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
       return;
     }
 
+    // Public tracking (order number + phone), not the customer's order list.
     if (url.startsWith('/track-order')) {
-      navigation.navigate('MyOrders');
+      navigation.navigate('TrackOrder');
+      return;
+    }
+
+    if (url.startsWith('/privacy') || url.startsWith('/terms')) {
+      navigation.navigate('LegalDocument', { kind: url.startsWith('/privacy') ? 'privacy' : 'terms' });
       return;
     }
 
@@ -123,7 +137,7 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
           <View style={styles.heroContent}>
             <View style={styles.heroHeader}>
               {publicThemeQuery.data?.logo_url ? <Image source={{ uri: publicThemeQuery.data.logo_url }} style={styles.logo} /> : null}
-              <Text style={styles.heroBrand}>Khalisni / خلصني</Text>
+              <Text style={styles.heroBrand}>{BRAND_LOCKUP}</Text>
             </View>
             <Text style={styles.heroTitle}>{content?.hero_title_ar || content?.hero_title_en || 'منصة خدمات حكومية بأسلوب واضح وسريع'}</Text>
             <Text style={styles.heroSubtitle}>
@@ -154,6 +168,10 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
           <MetricCard label="نواقص بانتظارك" value={waitingDocuments} />
           <MetricCard label="إشعارات غير مقروءة" value={unreadNotifications} />
         </View>
+        {waitingDocuments ? (
+          <AppButton label="عرض الطلبات التي تنتظر مستندات منك" onPress={() => navigation.navigate('MissingDocumentRequests')} />
+        ) : null}
+        <AppButton label="تتبع طلب برقم الطلب والهاتف" variant="secondary" onPress={() => navigation.navigate('TrackOrder')} />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -163,6 +181,7 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
             </View>
             <AppButton label="كل الخدمات" onPress={() => navigation.navigate('ServiceList')} variant="ghost" />
           </View>
+          {servicesQuery.isError ? <ErrorState message={getDisplayError(servicesQuery.error)} onRetry={() => void servicesQuery.refetch()} /> : null}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
             {serviceShowcase.map((service) => (
               <View key={service.id} style={styles.horizontalCard}>
@@ -204,15 +223,15 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
           <View style={styles.featureGrid}>
             <AppCard>
               <Text style={styles.featureTitle}>سريع وواضح</Text>
-              <Text style={styles.featureText}>نفس منطق الموقع، لكن بترتيب مبسط يناسب الجوال ويختصر خطواتك اليومية.</Text>
+              <Text style={styles.featureText}>اختر الخدمة، أرسل طلبك وارفع مستنداتك من الجوال في خطوات قليلة.</Text>
             </AppCard>
             <AppCard>
               <Text style={styles.featureTitle}>وثائقك محمية</Text>
-              <Text style={styles.featureText}>إدارة المستندات والطلبات مرتبطة بنفس النظام الحالي وصلاحياته بدون تغيير في القواعد.</Text>
+              <Text style={styles.featureText}>تُستخدم بياناتك ومستنداتك لإنجاز طلبك فقط، وفق سياسة الخصوصية.</Text>
             </AppCard>
             <AppCard>
-              <Text style={styles.featureTitle}>تشغيل احترافي</Text>
-              <Text style={styles.featureText}>الطلبات، الإشعارات، والخطوات التشغيلية تظهر لك مباشرة من نفس البيانات المعتمدة على الويب.</Text>
+              <Text style={styles.featureTitle}>متابعة لحظة بلحظة</Text>
+              <Text style={styles.featureText}>تصلك الإشعارات عند كل تحديث على طلبك، ويمكنك مراسلة فريق {BRAND_AR} من صفحة الطلب.</Text>
             </AppCard>
           </View>
         </View>
@@ -254,7 +273,9 @@ export function ClientDashboardScreen({ navigation }: { navigation: any }) {
               <AppButton label="عرض الكل" onPress={() => navigation.navigate('MyOrders')} variant="ghost" />
             ) : null}
           </View>
-          {orders.length ? (
+          {ordersQuery.isError ? (
+            <ErrorState message={getDisplayError(ordersQuery.error)} onRetry={() => void ordersQuery.refetch()} />
+          ) : orders.length ? (
             <View style={styles.stack}>
               {orders.slice(0, 3).map((order) => (
                 <OrderCard key={order.id} order={order} onPress={() => navigation.navigate('ClientOrderDetail', { orderId: order.id })} />

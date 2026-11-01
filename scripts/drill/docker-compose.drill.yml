@@ -1,0 +1,23 @@
+# Drill-only additions to docker-compose.yml. NEVER use on a server.
+#
+#   docker compose -p <unique-drill-name> --env-file <throwaway.env> \
+#     -f docker-compose.yml -f scripts/drill/docker-compose.drill.yml up -d --build
+#
+# - publishes the frontend on 127.0.0.1:${KHALSNI_DRILL_HTTP_PORT:-18080} only;
+# - adds an SMTP sink (scripts/drill/smtp_sink.py) that stores every message
+#   in the container folder /mail and delivers nothing. Point the backend at it
+#   with DJANGO_EMAIL_HOST=smtp-sink, DJANGO_EMAIL_PORT=1025, TLS/SSL False.
+# Paths are relative to the repository root (the first -f file's folder).
+services:
+  frontend:
+    ports:
+      - "127.0.0.1:${KHALSNI_DRILL_HTTP_PORT:-18080}:80"
+
+  smtp-sink:
+    image: python:3.12-alpine
+    restart: "no"
+    command: ["python", "-u", "/sink/smtp_sink.py", "--port", "1025", "--out", "/mail"]
+    volumes:
+      - ./scripts/drill/smtp_sink.py:/sink/smtp_sink.py:ro
+    expose:
+      - "1025"

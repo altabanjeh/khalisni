@@ -10,8 +10,9 @@ import EmptyState from './EmptyState'
 
 function NotificationPanel({ user, onNavigate, titleId }) {
   const { t, isArabic } = useLanguage()
-  const { notifications, markRead, markAllRead, loading, error } = useNotifications()
-  const unreadCount = notifications.filter((item) => !item.is_read).length
+  const { notifications, markRead, markAllRead, loading, error, hasMore, loadMore, loadingMore, unreadCount: serverUnreadCount } = useNotifications()
+  // The server count covers every unread row, not only the loaded page (DEF-C05).
+  const unreadCount = serverUnreadCount ?? notifications.filter((item) => !item.is_read).length
   const notificationPath = hasPermission(user, 'accounts.manage_user_roles') ? '/admin/notifications' : null
 
   const { toast } = useToast()
@@ -22,6 +23,14 @@ function NotificationPanel({ user, onNavigate, titleId }) {
       await markAllRead()
     } catch {
       toast(t('notifications.markReadError', isArabic ? 'تعذر تعليم الإشعارات كمقروءة. حاول مرة أخرى.' : 'Could not mark notifications as read. Please try again.'), 'error')
+    }
+  })
+
+  const handleLoadMore = exclusive('more', async () => {
+    try {
+      await loadMore?.()
+    } catch {
+      toast(t('notifications.loadError', isArabic ? 'تعذر تحميل الإشعارات.' : 'Could not load notifications.'), 'error')
     }
   })
 
@@ -94,8 +103,8 @@ function NotificationPanel({ user, onNavigate, titleId }) {
         </div>
       </div>
 
-      <div className="mt-4 space-y-3">
-        {notifications.slice(0, 5).map((notification) => (
+      <div className="mt-4 max-h-[min(60vh,28rem)] space-y-3 overflow-y-auto pe-1" data-testid="notification-list">
+        {notifications.map((notification) => (
           <button
             key={notification.id}
             className="w-full rounded-2xl border border-border px-4 py-3 text-start transition hover:bg-brand-50 disabled:opacity-60"
@@ -113,6 +122,18 @@ function NotificationPanel({ user, onNavigate, titleId }) {
             <p className="mt-2 text-xs text-slate-500">{formatDateTime(notification.created_at)}</p>
           </button>
         ))}
+        {hasMore ? (
+          <button
+            className="btn-ghost w-full text-xs"
+            disabled={Boolean(busy) || loadingMore}
+            onClick={handleLoadMore}
+            type="button"
+          >
+            {loadingMore
+              ? t('common.loading', isArabic ? 'جارٍ التحميل...' : 'Loading...')
+              : isArabic ? 'عرض المزيد من الإشعارات' : 'Load more notifications'}
+          </button>
+        ) : null}
       </div>
 
       {notificationPath ? (

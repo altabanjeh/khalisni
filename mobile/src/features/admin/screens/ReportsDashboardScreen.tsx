@@ -13,9 +13,9 @@ export function ReportsDashboardScreen() {
   const weeklyQuery = useQuery({ queryKey: ['weekly-report'], queryFn: () => reportsApi.getWeeklyReport() });
   const summaryQuery = useQuery({ queryKey: ['ops-summary'], queryFn: () => reportsApi.getOperationalSummary() });
 
-  if (dailyQuery.isLoading || weeklyQuery.isLoading || summaryQuery.isLoading) return <LoadingState />;
+  if (dailyQuery.isLoading || weeklyQuery.isLoading || summaryQuery.isLoading) return <AppScreen title="التقارير"><LoadingState /></AppScreen>;
   if (dailyQuery.isError || weeklyQuery.isError || summaryQuery.isError) {
-    return <ErrorState message={getDisplayError(dailyQuery.error ?? weeklyQuery.error ?? summaryQuery.error)} onRetry={() => { dailyQuery.refetch(); weeklyQuery.refetch(); summaryQuery.refetch(); }} />;
+    return <AppScreen title="التقارير"><ErrorState message={getDisplayError(dailyQuery.error ?? weeklyQuery.error ?? summaryQuery.error)} onRetry={() => { dailyQuery.refetch(); weeklyQuery.refetch(); summaryQuery.refetch(); }} /></AppScreen>;
   }
 
   return (

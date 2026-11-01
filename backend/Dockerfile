@@ -13,6 +13,14 @@ COPY . .
 
 RUN chmod +x /app/entrypoint.sh
 
+# Build identity, reported by GET /api/health/version/ (core/version.py).
+# Declared after the dependency layers so a new commit does not reinstall them.
+# docker-compose.yml passes BUILD_SHA / BUILD_TIME; without them: "unknown".
+ARG BUILD_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV BUILD_SHA=${BUILD_SHA} \
+    BUILD_TIME=${BUILD_TIME}
+
 EXPOSE 8000
 
 CMD ["/app/entrypoint.sh"]

@@ -1,0 +1,87 @@
+{
+ "messages": [
+  {
+   "kind": "password_reset",
+   "language": "ar",
+   "subject": "إعادة تعيين كلمة المرور في خلّصني",
+   "from": "Khalsni <no-reply@khalisni.com>",
+   "to": "client-audit-qa-202610-customer_a@example.test",
+   "checks": {
+    "subject_matches": true,
+    "body_language_matches": true,
+    "from_is_configured_sender": true,
+    "to_is_account": true,
+    "has_reset_link": true,
+    "link_host_is_public_domain": true,
+    "link_is_https": true,
+    "link_works_once": true,
+    "link_rejected_on_reuse": true,
+    "new_password_signs_in": true
+   },
+   "link_redacted": "https://khalisni.com/reset-password/<REDACTED-TOKEN len=64 sha256=030874b481f9>",
+   "ok": true,
+   "first_use_http": 200,
+   "reuse_http": 400,
+   "reuse_detail": "This password reset link is invalid or has expired.",
+   "saved_as": "smtp_ar_password_reset.eml.txt"
+  },
+  {
+   "kind": "password_changed",
+   "language": "ar",
+   "subject": "تم تغيير كلمة المرور في خلّصني",
+   "from": "Khalsni <no-reply@khalisni.com>",
+   "to": "client-audit-qa-202610-customer_a@example.test",
+   "checks": {
+    "subject_matches": true,
+    "body_language_matches": true,
+    "from_is_configured_sender": true,
+    "to_is_account": true,
+    "no_reset_link": true
+   },
+   "ok": true,
+   "saved_as": "smtp_ar_password_changed.eml.txt"
+  },
+  {
+   "kind": "password_reset",
+   "language": "en",
+   "subject": "Khalsni password reset",
+   "from": "Khalsni <no-reply@khalisni.com>",
+   "to": "client-audit-qa-202610-customer_a@example.test",
+   "checks": {
+    "subject_matches": true,
+    "body_language_matches": true,
+    "from_is_configured_sender": true,
+    "to_is_account": true,
+    "has_reset_link": true,
+    "link_host_is_public_domain": true,
+    "link_is_https": true,
+    "link_works_once": true,
+    "link_rejected_on_reuse": true,
+    "new_password_signs_in": true
+   },
+   "link_redacted": "https://khalisni.com/reset-password/<REDACTED-TOKEN len=64 sha256=65a84e30d7e5>",
+   "ok": true,
+   "first_use_http": 200,
+   "reuse_http": 400,
+   "reuse_detail": "This password reset link is invalid or has expired.",
+   "saved_as": "smtp_en_password_reset.eml.txt"
+  },
+  {
+   "kind": "password_changed",
+   "language": "en",
+   "subject": "Khalsni password changed",
+   "from": "Khalsni <no-reply@khalisni.com>",
+   "to": "client-audit-qa-202610-customer_a@example.test",
+   "checks": {
+    "subject_matches": true,
+    "body_language_matches": true,
+    "from_is_configured_sender": true,
+    "to_is_account": true,
+    "no_reset_link": true
+   },
+   "ok": true,
+   "saved_as": "smtp_en_password_changed.eml.txt"
+  }
+ ],
+ "failures": 0
+}

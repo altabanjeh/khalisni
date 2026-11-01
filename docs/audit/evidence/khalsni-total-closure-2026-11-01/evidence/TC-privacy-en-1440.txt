@@ -1,0 +1,102 @@
+URL: http://127.0.0.1:4361/privacy
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+Services
+About
+For business
+FAQ
+Contact
+Arabic
+English
+Sign in
+Create account
+
+Privacy policy
+
+Privacy Policy
+
+How the Khalsni platform handles your data and documents.
+
+Draft — requires owner/legal approval before production
+
+Version: 2026-11-01-draft · Effective: 2026-11-01
+
+This is a draft. It describes how the Khalsni platform handles personal data as the system works in this release. It must be reviewed and approved by the owner and a legal advisor before it is relied on in production.
+
+1. Who operates the platform
+
+Khalsni is run by the platform operator. The operator's published contact details are on the Contact page. The owner adds the operator's legal name and registered address before approval.
+
+2. Data the platform collects
+
+• When you create an account: your full name, email address, mobile phone number and password. A national ID number is optional. Your password is stored only as a one-way hash.
+• When you submit a service request: the service, your name, phone number and city, an optional national ID number, your notes, your answers to the service's form questions, and the documents you upload.
+• Your acceptance of the consent statement on the request form: which statement you accepted (its version and exact text), the language, whether it came from the website or the mobile app, the time, and the versions of this Privacy Policy and of the Terms of Use published at that time.
+• Messages you send from the public site (the contact form or a request for a service that is not listed): your name, phone number, optional email address and message.
+• Security records: the time and IP address of sign-ins, password-reset requests, and an audit log of sensitive actions (for example status changes, document reviews and administrative changes), which may include the IP address and the browser or app identifier.
+
+3. How the data is used
+
+• To review, process and complete the service you request.
+• To inform you about the progress of your request and about any missing documents through notifications inside your account.
+• To send account emails: a password-reset link when you ask for one, and a confirmation when your password is changed. The platform does not send text (SMS) or WhatsApp messages in this release.
+• To protect accounts and keep a record of sensitive actions.
+
+4. Who can see your data
+
+• You: your account, your requests, the documents you uploaded and the results delivered to you.
+• Platform staff (administrators, employees and support) see the requests and documents their role needs; access is controlled by role-based permissions.
+• The service provider assigned to your request sees only what is needed to carry it out: the request number, the service, the city, the status, the request notes and form answers, the instructions given by staff, and the documents made available for that request. The provider's screens do not show your name, phone number, email address or national ID number.
+• Anyone who has both the request number and the phone number of the request can see its status on the public tracking page.
+• To complete a government or administrative service, staff or the assigned provider may need to present your details and documents to the authority responsible for that service.
+• The platform has no other built-in feature that shares your data with third parties.
+
+5. Storage and security
+
+• Uploaded documents are kept in the platform's file storage on the servers chosen by the operator. They can be downloaded only by authorised accounts or through a signed, short-lived link.
+• A document deleted in the platform is hidden from everyone; the stored file is kept until a retention period configured by the operator removes it.
+• Consent records cannot be changed or deleted by the system.
+
+6. Retention
+
+The operator sets in the system configuration how long each category of data is kept (documents, completed requests, accounts, notifications, audit records and backups). A category without a configured period is not removed automatically. The system does not delete requests and does not delete consent records.
+
+7. Payments
+
+This release does not take online payments, and the platform does not ask for card details.
+
+8. Your choices
+
+You can view and update your profile details in your account. For any other request about your data, such as access, correction or deletion, contact the operator through the channels published on the Contact page. This release does not offer self-service account deletion.
+
+9. Versions
+
+Each version of this policy has a version label and an effective date. A new version is published as a new record, previous versions are kept, and the version in force when you submit a request is recorded with your consent.
+
+10. To be completed before approval
+
+The owner and the legal advisor confirm the operator's legal identity, the contact for data-protection requests, the legal basis for processing, and where the servers and backups are located. This draft does not decide them.
+
+Terms of Use
+
+Khalsni is a Jordanian platform for managing and tracking public and administrative service requests digitally.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Terms of use
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

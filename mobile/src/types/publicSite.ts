@@ -59,3 +59,16 @@ export interface PublicHomepagePayload {
   advertisements: PublicAdvertisement[];
   important_alert?: PublicAdvertisement | null;
 }
+
+export type LegalKind = 'privacy' | 'terms';
+
+// GET /api/public-site/legal/<kind>/.
+export interface LegalDocument {
+  kind: LegalKind;
+  version?: string;
+  effective_date?: string | null;
+  title_ar?: string;
+  body_ar?: string;
+  approval_status?: string;
+  [key: string]: unknown;
+}

@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getNotificationStatusLabel } from '../../utils/auditPresentation'
 import { formatDateTime } from '../../utils/format'
 
 const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
@@ -30,7 +31,7 @@ function NotificationsPage() {
     { key: 'title', label: isArabic ? 'العنوان' : 'Title' },
     { key: 'recipient_name', label: isArabic ? 'المستخدم' : 'Recipient' },
     { key: 'order_number', label: isArabic ? 'رقم الطلب' : 'Request' },
-    { key: 'status', label: isArabic ? 'الحالة' : 'Status' },
+    { key: 'status', label: isArabic ? 'الحالة' : 'Status', render: (row) => getNotificationStatusLabel(row.status, language) },
     { key: 'created_at', label: isArabic ? 'الوقت' : 'Time', render: (row) => formatDateTime(row.created_at, language) },
   ]
 

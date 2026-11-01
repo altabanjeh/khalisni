@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowUpRight, Bell, CheckCircle2, Clock3, Compass, FilePlus2, LifeBuoy } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import LoadError from '../../components/LoadError'
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -33,7 +33,19 @@ function CustomerDashboardHome() {
   const { user } = useAuth()
   const { isArabic, language } = useLanguage()
   const { data: orders = [], loading, error, reload } = useAsyncData(() => api.getCustomerOrders(), [], [])
-  const { notifications } = useNotifications()
+  const { notifications, hasMore, loadMore, loadingMore, unreadCount } = useNotifications()
+  // Customer notifications list: show 4, then reveal more (and fetch further
+  // server pages) on demand instead of stopping at the first page (DEF-C05).
+  const [visibleNotifications, setVisibleNotifications] = useState(4)
+  const shownNotifications = notifications.slice(0, visibleNotifications)
+  const canShowMore = notifications.length > visibleNotifications || hasMore
+  async function showMoreNotifications() {
+    const next = visibleNotifications + 10
+    if (next > notifications.length && hasMore) {
+      try { await loadMore?.() } catch { /* the button stays available for a retry */ }
+    }
+    setVisibleNotifications(next)
+  }
 
   const buckets = useMemo(() => {
     const list = Array.isArray(orders) ? orders : []
@@ -224,10 +236,15 @@ function CustomerDashboardHome() {
             <div className="mb-3 flex items-center gap-2">
               <Bell className="h-4 w-4 text-brand-600" />
               <h2 className="text-sm font-extrabold text-ink">{isArabic ? 'آخر الإشعارات' : 'Latest notifications'}</h2>
+              {unreadCount > 0 ? (
+                <span className="ms-auto rounded-full bg-brand-50 px-2 py-0.5 text-[0.7rem] font-extrabold text-brand-700" data-testid="dashboard-unread-count">
+                  {isArabic ? `${unreadCount} غير مقروءة` : `${unreadCount} unread`}
+                </span>
+              ) : null}
             </div>
             <div className="space-y-3">
-              {notifications.slice(0, 4).length ? (
-                notifications.slice(0, 4).map((notification) => (
+              {shownNotifications.length ? (
+                shownNotifications.map((notification) => (
                   <div key={notification.id} className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 px-4 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-bold text-ink">{notification.title}</p>
@@ -239,6 +256,11 @@ function CustomerDashboardHome() {
               ) : (
                 <p className="text-sm font-semibold text-slate-500">{isArabic ? 'لا توجد إشعارات حديثة.' : 'No recent notifications.'}</p>
               )}
+              {canShowMore ? (
+                <button className="btn-ghost w-full text-xs" disabled={loadingMore} onClick={showMoreNotifications} type="button">
+                  {loadingMore ? (isArabic ? 'جارٍ التحميل...' : 'Loading...') : (isArabic ? 'عرض المزيد' : 'Show more')}
+                </button>
+              ) : null}
             </div>
           </section>
 

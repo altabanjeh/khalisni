@@ -1,0 +1,2486 @@
+{
+ "services": 38,
+ "customer_visible": 32,
+ "errors": 5,
+ "warnings": 408,
+ "findings": [
+  {
+   "level": "warning",
+   "service": "1 no-criminal-record",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "1 no-criminal-record",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "2 passport-renewal",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "2 passport-renewal",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "3 tax-clearance",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "3 tax-clearance",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document national-id",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document authorization-letter",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "error",
+   "service": "12 business_company_registration",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field company_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field proposed_company_name_1",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field proposed_company_name_2",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field proposed_company_name_3",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field company_objectives",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field company_address",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field capital_amount",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field partners_count",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field partner_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field partner_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field partner_nationality",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field partner_share",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field authorized_signatories",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "field signing_authority",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "document document_b84500235f",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "document document_a7c41b216c",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "document document_d6f5694849",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "document document_6a5fef1088",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "12 business_company_registration",
+   "where": "document document_bf9b841bf1",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "error",
+   "service": "13 business_company_information_amendment",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "field company_registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "field company_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "field company_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "field amendment_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "field amendment_details",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "document document_cb35245bcf",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "document document_39a02bfad7",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "document document_e6d6a52927",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "document document_bb343bc1a7",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "13 business_company_information_amendment",
+   "where": "document document_04defb9ccb",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "error",
+   "service": "14 business_company_add_activities",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field company_registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field company_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field company_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field current_business_activities",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field new_business_activities",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "field additional_details",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "document document_cdd8ce3328",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "document document_ec8d545fbf",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "14 business_company_add_activities",
+   "where": "document document_cc8affb2cc",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "field entity_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "field registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "field registered_entity_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "field certificate_copy_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "document document_85697877bb",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "document document_5ca1add6b9",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "15 business_commercial_registration_certificate",
+   "where": "document document_af883d59b3",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "field trade_name_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "field trade_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "field trade_name_owner",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "field certificate_copy_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "document document_85697877bb",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "document document_11714fabf5",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "16 business_trade_name_certificate",
+   "where": "document document_af883d59b3",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field applicant_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field applicant_registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field proposed_trade_name_1",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field proposed_trade_name_2",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field proposed_trade_name_3",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "field business_activity",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "document document_197c7d7fc0",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "document document_322e004de0",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "document document_d038474c7a",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "17 business_trade_name_registration",
+   "where": "document document_1b1707d621",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_class",
+   "message": "Optional select field has no options."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_service_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_owner_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_owner_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_class",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field goods_services_description",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_description",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_5eb4193ba1",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_fd135ce03f",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_d7d63d7027",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_7672fa9fbe",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_fb697280d9",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "document document_56caf9c71a",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "error",
+   "service": "19 business_license_services",
+   "where": "field municipality",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field business_license_action",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field business_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field business_registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field business_activity_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field municipality",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field business_location",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "field occupancy_status",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_b7393c5318",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_1c40b3e58a",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_602b0a206b",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_69e9a26d6e",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_3df268a71b",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_ef81fa254a",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_f56c2e0812",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "19 business_license_services",
+   "where": "document document_5375b03f66",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "error",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field closure_or_liquidation_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field company_registration_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field company_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field company_type",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field has_operated",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field has_assets",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field has_liabilities",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field has_employees",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field has_trade_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field authorized_followup_person",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_f0fbb87902",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_3bee74c311",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_ddc0c08e82",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_7713142b41",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_8e430fe32b",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_6192cecaba",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_37e2d6c45c",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_652dd91fc4",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "20 business_company_closure_liquidation",
+   "where": "document document_c82005f833",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field field_2fa52c6cfa",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field field_3b752a334c",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "21 request-property-registration-certificate",
+   "where": "document document_74a2f98299",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field field_2fa52c6cfa",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field field_ccc9901249",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "22 request-cadastral-map",
+   "where": "document document_74a2f98299",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field seller_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field seller_national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field buyer_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field buyer_national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field phone_numbers",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field field_498ac74dd1",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field field_23afc22be9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "field field_2013716fdf",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "23 request-property-ownership-transfer",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_b8a0419109",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_a4c0cc56df",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_ac120aaeaa",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_6dd0ca5286",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_45a27f6310",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_da11e8ca0f",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "field field_44b3e07432",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "document document_443aae22bf",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "24 request-inheritance-registration",
+   "where": "document document_c3a3aa1c50",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_3cd1e5af3a",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_c67372ee55",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_11eb543426",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_fdba9f39a6",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field phone_numbers",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_e2f57bbb81",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_f105f02706",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "field field_41624b6665",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "document document_564406e175",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "document document_11667481fd",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "25 request-property-gift-transfer",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_224269de21",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_4bca17a629",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_5c6164c551",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_3c7283fc39",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "field field_e9352003cb",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "26 request-termination-of-co-ownership",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_2085c3cabf",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_649c50d973",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_e7d765ce63",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_5ebd0dedc5",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_b18f129f12",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "field field_9fe181a6e8",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "27 request-property-subdivision",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_56b1987951",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_7d9efcd6d5",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_b8d4677c65",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_da334d766f",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_b07ae7100c",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "document document_7c6a69c2f4",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "28 request-property-consolidation",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_bbea5e4459",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_57847bd284",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_44f22ef962",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_8946eb1107",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "field field_2525256bd4",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "29 request-boundary-demarcation",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field survey_reason",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field field_225e3741b4",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field field_8946eb1107",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field field_711abf9b11",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "field field_2525256bd4",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "30 request-land-survey",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field readjustment_reason",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_536eddb5ee",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_b0926cf796",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_da897ff7ee",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_05c9a7346b",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_729ed5c96d",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_d25b82bf60",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "field field_c7eea7fb68",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "31 request-property-readjustment",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field field_2a8f1a87c6",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "field field_c5251821b3",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "32 request-zoning-certificate",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field current_land_use_classification",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field requested_land_use_classification",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field request_reason",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_937cc4d5d6",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_e825ca6266",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_02572f19a1",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_088e60f563",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "field field_c7eea7fb68",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "document document_3775124a52",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "33 request-land-use-classification-change",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field request_purpose",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field field_5dded7dd47",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field field_c3bd9f38ed",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field field_9702f3b4ac",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "field field_54143bc9fe",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "34 request-zoning-plan",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field request_reason",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field field_22e7ac2cd2",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field field_bc07ea41c3",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field field_23afc22be9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "field field_c7eea7fb68",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "35 request-change-statement",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_08d94d2888",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_3ece488644",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_d6467d46cf",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_6ff5e81d0f",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "field field_9209f03252",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "document document_5c2f8f95d1",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "36 request-property-mortgage-registration",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field applicant_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field field_8a38c4158a",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field field_e70300dbb6",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field field_646f133865",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field field_acf5f0c3dd",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "field field_307ab61eb9",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "document document_d2024a06a1",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "37 request-mortgage-release",
+   "where": "document document_b03d952538",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field full_name",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field national_id",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field phone_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field parcel_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field basin_number",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field region",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field governorate",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field field_530e3b26a8",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field additional_notes",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field field_e021559e7a",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field field_51b3ed7839",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field field_4874b04e76",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "field field_65bdb1ffad",
+   "message": "No English label (English screens show a generic name)."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "document document_3775124a52",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "document document_3443627d36",
+   "message": "Document has no readable English name."
+  },
+  {
+   "level": "warning",
+   "service": "38 request-building-permit",
+   "where": "document document_b0f143ad16",
+   "message": "Document has no readable English name."
+  }
+ ]
+}

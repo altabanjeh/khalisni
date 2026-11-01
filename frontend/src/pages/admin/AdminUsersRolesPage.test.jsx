@@ -69,7 +69,6 @@ test('admin users page can create a new user from the admin flow', async () => {
       role: 'employee',
       national_id: '',
       is_active: true,
-      is_verified: false,
     })
   })
 })

@@ -16,12 +16,13 @@ import {
 } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import CategoryCard from '../../components/CategoryCard'
+import CategoryWorlds from '../../components/CategoryWorlds'
+import { buildCategoryWorlds, categoryPath, SPECIAL_REQUEST_SLUG } from '../../utils/categoryWorlds'
 import ServiceCard from '../../components/ServiceCard'
 import { ServiceRail, ServiceRailItem } from '../../components/ServiceRail'
-import { ImageFallback } from '../../components/public/PublicPage'
+
 import { getCover } from '../../utils/cover'
-import { CUSTOM_REQUEST_ILLUSTRATION, HERO_ILLUSTRATION } from '../../utils/catalogImagery'
+import { HERO_ILLUSTRATION } from '../../utils/catalogImagery'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
@@ -36,7 +37,6 @@ import {
   getServiceName,
   getServicePublicPrice,
 } from '../../utils/servicePresentation'
-
 
 const copy = {
   ar: {
@@ -64,12 +64,9 @@ const copy = {
     ],
     latestTitle: 'أحدث الخدمات',
     latestText: 'خدمات فعلية من كتالوج خلصني، مرتبة حسب البيانات المتاحة.',
-    categoriesTitle: 'التصنيفات الرئيسية',
-    categoriesText: 'تصفح التصنيفات المنشورة واكتشف الخدمات المرتبطة بها.',
+    categoriesTitle: 'أقسام الخدمات',
+    categoriesText: 'كل قسم يجمع خدماته في مكان واحد؛ اختر القسم وتصفح خدماته مباشرة.',
     viewAll: 'عرض الكل',
-    categoryRowsTitle: 'خدمات حسب التصنيف',
-    categoryRowsText: 'مجموعات مختصرة من التصنيفات التي تحتوي على خدمات منشورة.',
-    serviceCount: 'خدمة متاحة',
     emptyCategories: 'لا توجد تصنيفات منشورة حالياً.',
     emptyServices: 'لا توجد خدمات منشورة حالياً.',
     howTitle: 'كيف تعمل خلصني؟',
@@ -115,12 +112,9 @@ const copy = {
     ],
     latestTitle: 'Latest services',
     latestText: 'Real services from the Khalsni catalog, ordered by available backend data.',
-    categoriesTitle: 'Main categories',
-    categoriesText: 'Browse published categories and discover the services inside them.',
+    categoriesTitle: 'Service categories',
+    categoriesText: 'Each category gathers its services in one place. Pick one and browse its services directly.',
     viewAll: 'View all',
-    categoryRowsTitle: 'Services by category',
-    categoryRowsText: 'Short rows from categories that contain published services.',
-    serviceCount: 'available services',
     emptyCategories: 'No public categories are published yet.',
     emptyServices: 'No public services are published yet.',
     howTitle: 'How Khalsni Works',
@@ -156,12 +150,6 @@ function serviceDetailsPath(service) {
   return slug ? `/services/${encodeURIComponent(slug)}` : '/services'
 }
 
-function categoryPath(category) {
-  if (category?.slug) return `/services/category/${encodeURIComponent(category.slug)}`
-  if (category?.id) return `/services?category=${encodeURIComponent(category.id)}`
-  return '/services'
-}
-
 function getRecordTime(record) {
   return Date.parse(record?.created_at || record?.updated_at || '') || 0
 }
@@ -173,32 +161,6 @@ function uniqueByServiceId(services) {
     if (!key || seen.has(key)) return false
     seen.add(key)
     return true
-  })
-}
-
-function buildCategorySections(categories, services, language, isArabic) {
-  const publicServices = services.filter(isPublicRecord)
-  const servicesByCategory = publicServices.reduce((accumulator, service) => {
-    const category = service.category || {}
-    const keys = [category.slug, category.id, service.category_id].filter(Boolean)
-    keys.forEach((key) => {
-      if (!accumulator[key]) accumulator[key] = []
-      accumulator[key].push(service)
-    })
-    return accumulator
-  }, {})
-
-  return categories.filter(isPublicRecord).map((category, index) => {
-    const key = category.slug || category.id
-    const categoryServices = (servicesByCategory[key] || []).filter(isPublicRecord)
-    return {
-      id: key || `category-${index}`,
-      category,
-      title: getCategoryName(category, language, isArabic ? 'تصنيف خدمات' : 'Service category'),
-      description: getCategoryDescription(category, language, isArabic ? 'خدمات مرتبطة بهذا التصنيف.' : 'Services grouped under this category.'),
-      count: category.service_count ?? categoryServices.length,
-      services: categoryServices,
-    }
   })
 }
 
@@ -362,7 +324,6 @@ function ServiceSearch({ services, categories, loading, onSpecialRequest }) {
   )
 }
 
-
 function HeroPreviewCard({ service, dictionary, isArabic, language, className = '' }) {
   const name = service ? getServiceName(service, language, isArabic ? 'خدمة' : 'Service') : dictionary.heroCardTitle
   const category = service?.category ? getCategoryName(service.category, language, '') : ''
@@ -476,14 +437,15 @@ function HomePage() {
   const [submitting, setSubmitting] = useState(false)
 
   const publicServices = useMemo(() => services.filter(isPublicRecord), [services])
-  const publicCategories = useMemo(() => categories.filter(isPublicRecord), [categories])
-  const categorySections = useMemo(() => buildCategorySections(categories, services, language, isArabic), [categories, isArabic, language, services])
+  // One category representation (DEF-P02 / CN-ACT-03): the client's category
+  // "worlds", each with its own service slider (CN-ACT-04).
+  const categoryWorlds = useMemo(() => buildCategoryWorlds(categories, services), [categories, services])
+  const browsableWorlds = useMemo(() => categoryWorlds.filter((world) => world.category?.slug !== SPECIAL_REQUEST_SLUG), [categoryWorlds])
   const latestServices = useMemo(() => {
     const featured = publicServices.filter((service) => service.is_featured)
     const ordered = [...publicServices].sort((a, b) => getRecordTime(b) - getRecordTime(a))
     return uniqueByServiceId([...featured, ...ordered]).slice(0, 8)
   }, [publicServices])
-  const categoryRows = useMemo(() => categorySections.filter((section) => section.services.length).slice(0, 2), [categorySections])
   const loadingCatalog = loadingServices || loadingCategories
 
   function openSpecialRequest(initialValue = '') {
@@ -562,7 +524,7 @@ function HomePage() {
             </div>
           </div>
 
-          <HeroVisual categories={publicCategories} dictionary={dictionary} heroImageUrl={content.hero_image_url} isArabic={isArabic} language={language} services={latestServices} />
+          <HeroVisual categories={browsableWorlds} dictionary={dictionary} heroImageUrl={content.hero_image_url} isArabic={isArabic} language={language} services={latestServices} />
         </div>
       </section>
 
@@ -606,62 +568,16 @@ function HomePage() {
         )}
       </ServiceRail>
 
-      <ServiceRail
-        action={<Link className="kh-focusable inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)]" to="/services">{dictionary.viewAll}</Link>}
+      <CategoryWorlds
+        action={<Link className="kh-focusable inline-flex h-11 shrink-0 items-center justify-center self-start rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] shadow-sm hover:border-[var(--khalsni-public-primary)] hover:text-[var(--khalsni-public-accent-text)] sm:self-auto" to="/services">{dictionary.viewAll}</Link>}
         description={dictionary.categoriesText}
+        emptyText={dictionary.emptyCategories}
         eyebrow={isArabic ? 'تصفح' : 'Browse'}
-        id="home-categories"
-        itemCount={categorySections.length}
+        loading={loadingCatalog}
+        onSpecialRequest={openSpecialRequest}
         title={dictionary.categoriesTitle}
-      >
-        {loadingCatalog && !categorySections.length ? (
-          Array.from({ length: 5 }).map((_, index) => <ServiceRailItem key={index}><div className="h-80 animate-pulse rounded-[var(--radius-lg)] bg-[var(--khalsni-public-surface)] shadow-soft" /></ServiceRailItem>)
-        ) : categorySections.length ? (
-          categorySections.slice(0, 10).map((section) => (
-            <ServiceRailItem key={section.id}>
-              <CategoryCard category={section.category} count={section.count} />
-            </ServiceRailItem>
-          ))
-        ) : (
-          <div className="w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-surface)] p-8 text-center text-sm font-bold text-[var(--khalsni-public-text-secondary)]">
-            {dictionary.emptyCategories}
-          </div>
-        )}
-      </ServiceRail>
-
-      {categoryRows.length ? (
-        <section className="kh-public-container py-8 sm:py-11">
-          <div className="mb-6 max-w-3xl text-start">
-            <span className="kh-eyebrow mb-3">{isArabic ? 'مجموعات' : 'Collections'}</span>
-            <h2 className="text-[1.75rem] font-black leading-tight tracking-tight text-[var(--khalsni-public-navy)] sm:text-4xl">{dictionary.categoryRowsTitle}</h2>
-            <p className="mt-2.5 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)] sm:text-base">{dictionary.categoryRowsText}</p>
-          </div>
-          <div className="grid gap-5">
-            {categoryRows.map((section) => (
-              <article className="rounded-[var(--radius-xl)] bg-white p-4 shadow-soft ring-1 ring-[var(--khalsni-public-border)] sm:p-5" key={section.id}>
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-3 text-start">
-                  <div>
-                    <h3 className="text-xl font-black text-[var(--khalsni-public-navy)]">{section.title}</h3>
-                    <p className="mt-1 text-sm font-semibold text-[var(--khalsni-public-text-secondary)]">
-                      {section.count} {dictionary.serviceCount}
-                    </p>
-                  </div>
-                  <Link className="text-sm font-extrabold text-[var(--khalsni-public-accent-text)] hover:text-[var(--khalsni-public-primary-hover)]" to={categoryPath(section.category)}>
-                    {dictionary.viewAll}
-                  </Link>
-                </div>
-                <div className="kh-rail-scroll -mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
-                  {section.services.slice(0, 6).map((service) => (
-                    <div className="w-[74vw] shrink-0 snap-start xs:w-[15rem] sm:w-[16rem]" key={service.id || service.slug}>
-                      <ServiceCard service={service} variant="compact" />
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+        worlds={categoryWorlds}
+      />
 
       <section className="relative overflow-hidden py-10 sm:py-14">
         <div
@@ -695,10 +611,13 @@ function HomePage() {
       </section>
 
       <section className="kh-public-container pb-10 pt-6" id="special-request">
+        {/* Compact card: no decorative image column (it left an empty half; CN-VIS-15). */}
         <article className="overflow-hidden rounded-[var(--radius-xl)] bg-white shadow-soft ring-1 ring-[var(--khalsni-public-border)]">
-          <div className="grid gap-0 md:grid-cols-[0.62fr_1fr]">
-            <ImageFallback alt="" className="aspect-[16/10] min-h-48 md:h-full" imgClassName="object-cover" src={CUSTOM_REQUEST_ILLUSTRATION} />
-            <div className="p-5 text-start sm:p-6">
+          <div className="flex flex-col gap-4 p-5 text-start sm:flex-row sm:items-start sm:p-6">
+            <span aria-hidden="true" className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--khalsni-public-primary-soft)] text-[var(--khalsni-public-accent-text)]">
+              <SendHorizontal className="h-5 w-5 rtl:-scale-x-100" />
+            </span>
+            <div className="min-w-0 flex-1">
               <h2 className="text-2xl font-black text-[var(--khalsni-public-navy)]">{dictionary.specialTitle}</h2>
               <p className="mt-2 max-w-2xl text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.specialText}</p>
               <button className="kh-focusable mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--khalsni-public-border)] bg-white px-4 text-sm font-extrabold text-[var(--khalsni-public-navy)] transition hover:bg-[var(--khalsni-public-primary-soft)] hover:text-[var(--khalsni-public-accent-text)]" onClick={() => setCustomOpen((current) => !current)} type="button">

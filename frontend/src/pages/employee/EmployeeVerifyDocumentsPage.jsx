@@ -124,7 +124,7 @@ function EmployeeVerifyDocumentsPage() {
 
   const meta = [
     { label: isArabic ? 'الطلب' : 'Request', value: selectedDocument.order?.order_number },
-    { label: isArabic ? 'الخدمة' : 'Service', value: selectedDocument.order?.service_name || (isArabic ? 'غير محدد' : 'Not set') },
+    { label: isArabic ? 'الخدمة' : 'Service', value: (isArabic ? selectedDocument.order?.service_name : selectedDocument.order?.service_name_en || selectedDocument.order?.service_name) || (isArabic ? 'غير محدد' : 'Not set') },
     { label: isArabic ? 'العميل' : 'Customer', value: selectedDocument.order?.customer_name || selectedDocument.uploaded_by_name || '—' },
     { label: isArabic ? 'نوع المستند' : 'Document type', value: getDocumentTypeLabel(selectedDocument, language) },
     { label: isArabic ? 'اسم الملف' : 'File name', value: selectedDocument.original_filename },

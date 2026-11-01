@@ -39,7 +39,8 @@ function InlineHelp({ actionKey = '', fieldKey = '', fallbackText = '', title = 
     <span className={`relative inline-flex ${className}`}>
       <button
         aria-label={title || (isArabic ? 'مساعدة إضافية' : 'More help')}
-        className="inline-flex h-5 w-5 items-center justify-center rounded-full text-brand-600 transition hover:bg-brand-50"
+        className="-m-1.5 inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center rounded-full text-brand-600 transition hover:bg-brand-50"
+        data-touch-target="inline-help"
         onBlur={() => setOpen(false)}
         onClick={() => setOpen((current) => !current)}
         onMouseEnter={() => setOpen(true)}

@@ -1,46 +1,57 @@
 import { ShieldCheck } from 'lucide-react'
 import { api } from '../../api/services'
+import { legalApi } from '../../api/legalApi'
+import LoadingSpinner from '../../components/LoadingSpinner'
+import { LegalDocumentBody } from '../../components/public/LegalDocumentContent'
 import { PublicHero, PublicPageShell, PublicPanel } from '../../components/public/PublicPage'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
+// The privacy policy is the published legal document (versioned, D06). Only when
+// no version is published does the page fall back to the approved CMS text.
+async function loadPrivacyPolicy() {
+  try {
+    return { document: await legalApi.getPublicLegalDocument('privacy'), homepage: null }
+  } catch {
+    const homepage = await api.getPublicHomepage().catch(() => null)
+    return { document: null, homepage }
+  }
+}
+
 function PrivacyPolicyPage() {
   const { isArabic } = useLanguage()
-  const { data: homepage } = useAsyncData(() => api.getPublicHomepage(), [], null)
-  const approvedPolicy = String(isArabic ? homepage?.content?.privacy_policy_ar || '' : homepage?.content?.privacy_policy_en || '').trim()
-  const paragraphs = approvedPolicy ? approvedPolicy.split(/\n\s*\n/).filter(Boolean) : isArabic
-    ? [
-        'تستخدم خلصني بيانات العميل ووثائقه فقط لغرض تنفيذ الخدمة المطلوبة والتواصل التشغيلي المرتبط بها.',
-        'الوصول إلى الوثائق محمي بصلاحيات حسب الدور، ولا يتم توفير روابط تنزيل عامة غير مصرح بها.',
-        'يتم تسجيل العمليات الحساسة إداريا لأغراض التدقيق والجودة والمتابعة التشغيلية.',
-        'يمكن للعميل تحديث بياناته الأساسية وطلب المساعدة عبر قنوات الدعم المعتمدة.',
-      ]
-    : [
-        'Khalsni uses customer data and documents only to deliver the requested service and the related operational communication.',
-        'Access to documents is protected by role-based permissions, and unauthorized public download links are not provided.',
-        'Sensitive actions are logged for audit, quality assurance, and operational follow-up purposes.',
-        'Customers can update their core details and request assistance through the approved support channels.',
-      ]
+  const { data, loading } = useAsyncData(loadPrivacyPolicy, [], null)
+  const document = data?.document || null
+  const cmsPolicy = String(
+    isArabic ? data?.homepage?.content?.privacy_policy_ar || '' : data?.homepage?.content?.privacy_policy_en || '',
+  ).trim()
+  const title = document ? (isArabic ? document.title_ar : document.title_en) : isArabic ? 'سياسة الخصوصية' : 'Privacy policy'
 
   return (
     <PublicPageShell>
       <PublicHero
         eyebrow={isArabic ? 'سياسة الخصوصية' : 'Privacy policy'}
         icon={ShieldCheck}
-        title={isArabic ? 'كيف نتعامل مع بياناتك ووثائقك' : 'How we handle your data and documents'}
-        description={isArabic ? 'توضح هذه الصفحة المبادئ العامة لحماية بيانات الطلبات والمستندات داخل خلصني.' : 'This page outlines the general principles for protecting request data and documents inside Khalsni.'}
+        title={title}
+        description={isArabic ? 'كيف تتعامل منصة خلصني مع بياناتك ومستنداتك.' : 'How the Khalsni platform handles your data and documents.'}
       />
 
-      <PublicPanel>
-        <div className="space-y-4 text-sm font-semibold leading-8 text-slate-600">
-          {paragraphs.map((paragraph, index) => (
-            <div key={paragraph} className="flex gap-4 rounded-[var(--radius-lg)] border border-[var(--khalsni-public-border)] bg-[var(--khalsni-public-primary-soft)]/45 p-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--khalsni-public-primary)] text-sm font-extrabold text-white">{index + 1}</span>
-              <p>{paragraph}</p>
-            </div>
-          ))}
-        </div>
-      </PublicPanel>
+      {loading && !data ? (
+        <LoadingSpinner />
+      ) : document || cmsPolicy ? (
+        <LegalDocumentBody
+          document={document}
+          fallbackText={cmsPolicy}
+          isArabic={isArabic}
+          otherLink={{ to: '/terms', label: isArabic ? 'شروط الاستخدام' : 'Terms of Use' }}
+        />
+      ) : (
+        <PublicPanel>
+          <p className="text-sm font-semibold leading-7 text-slate-600">
+            {isArabic ? 'سياسة الخصوصية غير منشورة حالياً.' : 'The privacy policy is not published yet.'}
+          </p>
+        </PublicPanel>
+      )}
     </PublicPageShell>
   )
 }

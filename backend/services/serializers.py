@@ -18,6 +18,7 @@ from services.models import (
 )
 from services.catalog_defaults import fallback_slug, suggest_category_icon
 from services.order_validation import get_completed_service_ids_for_customer
+from services.pricing import public_pricing
 from services.schema_rules import SEMANTIC_MESSAGES, order_blockers, schema_problems
 from services.service_relations import RELATION_TYPE_HELP_TEXT
 from services.selectors import resolve_service_organization_from_request, visible_services_queryset
@@ -41,22 +42,10 @@ SAFE_ADMIN_DOCUMENT_EXTENSIONS = {
 }
 
 
-def _public_total_price(service):
-    config = _matched_partner_config(service)
-    if config and config.custom_price is not None:
-        return config.custom_price
-    return service.total_fee
-
-
 def _public_pricing_payload(service):
-    total_price = _public_total_price(service)
-    return {
-        "total_price": total_price if service.show_total_price_public else None,
-        "government_fee": service.government_fee if service.show_government_fee_public else None,
-        "company_fee": service.service_fee if service.show_company_fee_public else None,
-        "public_note_ar": service.public_price_note_ar,
-        "public_note_en": service.public_price_note_en,
-    }
+    # Owner decision B10-10: total only unless the shown parts add up to it;
+    # quotation services show no number (services/pricing.py).
+    return public_pricing(service)
 
 
 def _media_url(request, file_field, *, version=None):
@@ -454,20 +443,22 @@ class ServiceListSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeri
         config = _matched_partner_config(obj)
         return config.custom_name or obj.name_ar if config else obj.name_ar
 
+    # The flat price fields mirror ``pricing`` (B10-10), so no public field
+    # shows a fee component that does not add up to the shown total.
     def get_effective_total_fee(self, obj):
-        return _public_total_price(obj) if obj.show_total_price_public else None
+        return _public_pricing_payload(obj)["total_price"]
 
     def get_base_price(self, obj):
         return None
 
     def get_government_fee(self, obj):
-        return obj.government_fee if obj.show_government_fee_public else None
+        return _public_pricing_payload(obj)["government_fee"]
 
     def get_service_fee(self, obj):
-        return obj.service_fee if obj.show_company_fee_public else None
+        return _public_pricing_payload(obj)["company_fee"]
 
     def get_total_fee(self, obj):
-        return _public_total_price(obj) if obj.show_total_price_public else None
+        return _public_pricing_payload(obj)["total_price"]
 
     def get_pricing(self, obj):
         return _public_pricing_payload(obj)

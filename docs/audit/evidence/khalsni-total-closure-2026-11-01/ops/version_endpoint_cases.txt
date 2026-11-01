@@ -1,0 +1,11 @@
+
+# (the next case is 41 characters, longer than a SHA-1, hence unknown)
+'fa5a19b'                200 {'sha': 'fa5a19b', 'built_at': '2026-11-01T08:16:19Z'} no-store
+'FA5A19BCDEF0123456789   200 {'sha': 'unknown', 'built_at': '2026-11-01T08:16:19.123+03:00'} no-store
+''                       200 {'sha': 'unknown', 'built_at': 'unknown'} no-store
+'unknown'                200 {'sha': 'unknown', 'built_at': 'unknown'} no-store
+'fa5a19b; rm -rf'        200 {'sha': 'unknown', 'built_at': 'unknown'} no-store
+'abc'                    200 {'sha': 'unknown', 'built_at': 'unknown'} no-store
+POST -> 405
+
+40-char upper-case full SHA 40 {'sha': 'fa5a19bccccc', 'built_at': '2026-11-01T08:16:19Z'}

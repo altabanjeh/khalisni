@@ -28,7 +28,9 @@ import {
   validateSchemaAnswerFormat,
   isSchemaFieldVisible,
 } from '../../../utils/serviceForms';
-import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../../utils/orderConsent';
+import { ORDER_CONSENT_SOURCE, ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../../utils/orderConsent';
+import { resolveFileSize } from '../../../utils/file';
+import { LegalLinks } from '../../../components/LegalLinks';
 import { uuidv4 } from '../../../utils/uuid';
 
 function getKeyboardType(type: string) {
@@ -70,14 +72,12 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
 
   const servicesQuery = useQuery({ queryKey: ['services'], queryFn: () => servicesApi.getServices() });
 
+  // A service named by slug is selected; otherwise nothing is preselected and
+  // the customer chooses explicitly (audit M-20: never the first service silently).
   useEffect(() => {
-    if (selectedServiceId || !servicesQuery.data?.length) return;
-
-    const matchedService = initialSlug
-      ? servicesQuery.data.find((service) => service.slug === initialSlug)
-      : null;
-
-    setSelectedServiceId(matchedService?.id ?? servicesQuery.data[0].id);
+    if (selectedServiceId || !initialSlug || !servicesQuery.data?.length) return;
+    const matchedService = servicesQuery.data.find((service) => service.slug === initialSlug);
+    if (matchedService) setSelectedServiceId(matchedService.id);
   }, [initialSlug, selectedServiceId, servicesQuery.data]);
 
   const selectedService = useMemo(
@@ -174,7 +174,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       formData.append('consent', consent ? 'true' : 'false');
       // Names the consent statement shown on this screen (backend/orders/consent.py).
       formData.append('consent_version', ORDER_CONSENT_VERSION);
-      formData.append('consent_source', 'mobile');
+      formData.append('consent_source', ORDER_CONSENT_SOURCE);
 
       if (requiredDocuments.length) {
         requiredDocuments.forEach((document, index) => {
@@ -289,12 +289,12 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
     if (result.canceled) return;
 
     const asset = result.assets[0];
-    const file: UploadableDocument = {
+    const file: UploadableDocument = await resolveFileSize({
       uri: asset.uri,
       name: asset.name,
       mimeType: asset.mimeType,
       size: asset.size,
-    };
+    });
     const error = validateUploadableFile(file, document);
     if (error) {
       Alert.alert('ملف غير صالح', error);
@@ -316,18 +316,24 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
   };
 
   if (servicesQuery.isLoading || (selectedService && serviceDetailQuery.isLoading)) {
-    return <LoadingState />;
+    return (
+      <AppScreen title="طلب خدمة">
+        <LoadingState />
+      </AppScreen>
+    );
   }
 
   if (servicesQuery.isError || serviceDetailQuery.isError) {
     return (
-      <ErrorState
-        message={getDisplayError(servicesQuery.error ?? serviceDetailQuery.error)}
-        onRetry={() => {
-          servicesQuery.refetch();
-          serviceDetailQuery.refetch();
-        }}
-      />
+      <AppScreen title="طلب خدمة">
+        <ErrorState
+          message={getDisplayError(servicesQuery.error ?? serviceDetailQuery.error)}
+          onRetry={() => {
+            servicesQuery.refetch();
+            serviceDetailQuery.refetch();
+          }}
+        />
+      </AppScreen>
     );
   }
 
@@ -338,7 +344,9 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
           <Text style={styles.sectionTitle}>الخدمة المختارة</Text>
           {selectedService ? (
             <PublicServiceCard service={selectedService} />
-          ) : null}
+          ) : (
+            <Text style={styles.infoText}>اختر الخدمة التي تريد طلبها من القائمة التالية.</Text>
+          )}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicePicker}>
             {(servicesQuery.data ?? []).map((service) => (
               <AppButton
@@ -469,6 +477,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
               <Text style={styles.toggleTitle}>{ORDER_CONSENT_TEXT}</Text>
             </View>
           </View>
+          <LegalLinks navigation={navigation} prefix="اقرأ قبل الموافقة:" />
           {errors.consent ? <Text style={styles.errorText}>{errors.consent}</Text> : null}
         </AppCard>
 

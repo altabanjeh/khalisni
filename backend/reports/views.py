@@ -154,6 +154,13 @@ def _resolved_category_name(order):
     return "Uncategorized"
 
 
+def _category_name_en(order, arabic_name):
+    category = getattr(getattr(order, "service", None), "category", None)
+    if category is not None and category.name_ar == arabic_name and category.name_en:
+        return category.name_en
+    return arabic_name
+
+
 def _category_summary(queryset):
     rows = {}
     for order in queryset.select_related("service", "service__category"):
@@ -162,6 +169,8 @@ def _category_summary(queryset):
             category_name,
             {
                 "category_name": category_name,
+                # English screens read this; the snapshot name stays the key.
+                "category_name_en": _category_name_en(order, category_name),
                 "orders_count": 0,
                 "revenue": Decimal("0.00"),
                 "completed_orders": 0,
@@ -271,7 +280,7 @@ class AdminDashboardAPIView(APIView):
             },
             "orders_by_status": list(orders.values("status").annotate(total=Count("id")).order_by("status")),
             "top_services": list(
-                orders.values("service__name_ar").annotate(total=Count("id")).order_by("-total")[:5]
+                orders.values("service__name_ar", "service__name_en").annotate(total=Count("id")).order_by("-total")[:5]
             ),
             "provider_performance": list(
                 orders.exclude(assigned_provider=None)
@@ -307,7 +316,7 @@ class DailyReportAPIView(APIView):
             "created_orders": queryset.count(),
             "completed_orders": queryset.filter(status=Order.Status.COMPLETED).count(),
             "revenue": queryset.filter(status=Order.Status.COMPLETED).aggregate(total=Sum("final_price"))["total"] or 0,
-            "top_services": list(queryset.values("service__name_ar").annotate(total=Count("id")).order_by("-total")[:5]),
+            "top_services": list(queryset.values("service__name_ar", "service__name_en").annotate(total=Count("id")).order_by("-total")[:5]),
             "orders_by_category": _category_summary(queryset),
             "orders_by_organization": _organization_summary(queryset),
             "orders_by_branch": _branch_summary(queryset),

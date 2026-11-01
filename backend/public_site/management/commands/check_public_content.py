@@ -4,21 +4,26 @@
     python manage.py check_public_content --strict   # exit 1 while anything needs owner input
 
 It never changes data and never suggests contact values or policy text: it
-lists what the published content row holds and what still needs an approved
-value from the owner or legal team.
+lists what the published content row and the published legal documents hold,
+and what still needs an approved value from the owner or legal team.
+
+The published content row (PublicPageContent) is the one source of the public
+contact details (footer and /contact page).
 """
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from core.reserved_domains import is_reserved_email
-from public_site.selectors import get_active_public_page_content
+from public_site.contact_checks import CONTACT_FIELDS, contact_placeholder_findings
+from public_site.models import LegalDocument
+from public_site.selectors import get_active_public_page_content, get_published_legal_document
 
-CONTACT_FIELDS = ("contact_phone", "whatsapp_number", "email", "office_address", "office_address_en")
+LEGAL_LABELS = {"privacy": "privacy policy", "terms": "terms of use"}
 
 
 class Command(BaseCommand):
-    help = "Report public contact data and privacy policy readiness. Read-only."
+    help = "Report public contact data and legal document readiness. Read-only."
 
     def add_arguments(self, parser):
         parser.add_argument("--strict", action="store_true", help="Exit 1 when any item needs owner input.")
@@ -27,7 +32,7 @@ class Command(BaseCommand):
         findings = []
         content = get_active_public_page_content()
         if content is None:
-            findings.append("No published content row: the site shows built-in defaults (no contact data, generic privacy text).")
+            findings.append("No published content row: the site shows built-in defaults (no contact data).")
         else:
             self.stdout.write(f"Published content row: {content.pk} ({content.version_name}), updated {content.updated_at:%Y-%m-%d %H:%M}")
             for field in CONTACT_FIELDS:
@@ -39,12 +44,28 @@ class Command(BaseCommand):
                 findings.append(f"D05 email {content.email} is on a reserved domain: it cannot receive mail and is hidden from the public site.")
             elif content.email:
                 self.stdout.write("  email domain: deliverable form (ownership of the mailbox is not checked here)")
-            self.stdout.write("  phone, WhatsApp and address cannot be verified automatically; the owner confirms them.")
-            has_ar = bool((content.privacy_policy_ar or "").strip())
-            has_en = bool((content.privacy_policy_en or "").strip())
-            self.stdout.write(f"  privacy_policy_ar: {'present' if has_ar else '(blank)'}; privacy_policy_en: {'present' if has_en else '(blank)'}")
-            if not (has_ar and has_en):
-                findings.append("D06 approved privacy policy text is missing (the page shows the generic built-in principles).")
+            for field, value, reason in contact_placeholder_findings(content):
+                if field == "email" and is_reserved_email(value):
+                    continue  # reported above
+                findings.append(f"D05 {field} holds a placeholder value ({reason}): {value}")
+            self.stdout.write("  phone, WhatsApp, address and hours cannot be verified automatically; the owner confirms them.")
+
+        for kind in LegalDocument.Kind.values:
+            label = LEGAL_LABELS[kind]
+            document = get_published_legal_document(kind)
+            if document is None:
+                self.stdout.write(f"  legal {kind}: (none published)")
+                findings.append(f"D06 approved {label} text is missing: no {label} version is published.")
+                continue
+            self.stdout.write(
+                f"  legal {kind}: version {document.version}, effective {document.effective_date}, {document.approval_status}"
+            )
+            if document.is_draft:
+                findings.append(
+                    f"D06 approved {label} text is missing: the published version {document.version} is a draft "
+                    "that requires owner/legal approval."
+                )
+
         sender = getattr(settings, "DEFAULT_FROM_EMAIL", "")
         self.stdout.write(f"Sender (DEFAULT_FROM_EMAIL): {sender}")
         if is_reserved_email(sender):

@@ -160,6 +160,14 @@ class Order(models.Model):
     expected_delivery_start_date = models.DateField(null=True, blank=True)
     expected_delivery_end_date = models.DateField(null=True, blank=True)
     expected_delivery_note_snapshot = models.TextField(blank=True)
+    # How the result reaches the customer (daily operations: electronic, or paper
+    # by pickup or courier). Staff record it; the instructions are customer-visible.
+    delivery_method = models.CharField(
+        max_length=20,
+        choices=[("electronic", "Electronic"), ("paper_pickup", "Paper - pickup"), ("paper_courier", "Paper - courier")],
+        default="electronic",
+    )
+    delivery_instructions = models.TextField(blank=True)
 
     final_price = models.DecimalField(
         max_digits=10,
@@ -535,34 +543,7 @@ class Order(models.Model):
                 f"Order cannot be assigned while its status is {self.status}."
             )
 
-        if provider is None:
-            raise ValidationError("Provider is required.")
-
-        if provider.is_deleted or provider.user.is_deleted or not provider.user.is_active:
-            raise ValidationError("Provider account is not active.")
-
-        if not provider.is_available:
-            raise ValidationError("Provider is not currently available.")
-
-        if not provider.is_approved:
-            raise ValidationError("Provider must be approved before assignment.")
-
-        if not self.service.provider_required:
-            raise ValidationError("This service does not require a provider.")
-
-        has_service_assignment = self.service.provider_assignments.filter(
-            provider=provider,
-            is_active=True,
-            is_deleted=False,
-        ).exists()
-        has_category_assignment = provider.service_categories.filter(
-            pk=self.service.category_id
-        ).exists()
-        if not (has_service_assignment or has_category_assignment):
-            raise ValidationError(
-                "Provider is not linked to this service or its category."
-            )
-
+        self.validate_provider_eligibility(provider)
         old_status = self.status
 
         self.assigned_provider = provider
@@ -590,6 +571,36 @@ class Order(models.Model):
             )
 
         return self
+
+    def validate_provider_eligibility(self, provider):
+        """The provider checks shared by assignment and reassignment."""
+        if provider is None:
+            raise ValidationError("Provider is required.")
+
+        if provider.is_deleted or provider.user.is_deleted or not provider.user.is_active:
+            raise ValidationError("Provider account is not active.")
+
+        if not provider.is_available:
+            raise ValidationError("Provider is not currently available.")
+
+        if not provider.is_approved:
+            raise ValidationError("Provider must be approved before assignment.")
+
+        if not self.service.provider_required:
+            raise ValidationError("This service does not require a provider.")
+
+        has_service_assignment = self.service.provider_assignments.filter(
+            provider=provider,
+            is_active=True,
+            is_deleted=False,
+        ).exists()
+        has_category_assignment = provider.service_categories.filter(
+            pk=self.service.category_id
+        ).exists()
+        if not (has_service_assignment or has_category_assignment):
+            raise ValidationError(
+                "Provider is not linked to this service or its category."
+            )
 
 
 class OrderStatusLog(models.Model):
@@ -989,6 +1000,13 @@ class OrderConsent(models.Model):
     consent_text = models.TextField(blank=True)
     language = models.CharField(max_length=8, blank=True)
     source = models.CharField(max_length=16)
+    # What was accepted, beyond the statement itself (audit D06): the kind of
+    # consent and the versions of the legal documents published at that moment
+    # ("" when none was published). Rows written before these fields existed
+    # keep "" for the versions.
+    consent_type = models.CharField(max_length=32, default="order_submission")
+    privacy_version = models.CharField(max_length=64, blank=True, default="")
+    terms_version = models.CharField(max_length=64, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = OrderConsentQuerySet.as_manager()

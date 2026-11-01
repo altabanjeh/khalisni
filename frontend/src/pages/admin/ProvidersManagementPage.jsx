@@ -12,6 +12,7 @@ import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getAdminName, resolveCatalogName } from '../../utils/servicePresentation'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 
 const defaultProviderValues = {
@@ -56,7 +57,7 @@ const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
 
 function ProvidersManagementPage() {
   const { toast } = useToast()
-  const { isArabic } = useLanguage()
+  const { isArabic, language } = useLanguage()
   const tr = (ar, en) => (isArabic ? ar : en)
   const [statusFilter, setStatusFilter] = useState('active')
   // The table pages on the server: every provider is reachable and the status
@@ -80,6 +81,9 @@ function ProvidersManagementPage() {
   }, [error, page])
   const { data: assignments = [], loading: assignmentsLoading } = useAsyncData(() => api.getAdminServiceAssignments(), [], [])
   const { data: categories = [], loading: categoriesLoading } = useAsyncData(() => api.getAdminCategories(), [], [])
+  // Names on these rows are Arabic-only on the API; resolve them through the
+  // loaded catalogue so English mode shows English names (DEF-A03).
+  const { data: catalogServices = [] } = useAsyncData(() => api.getAdminServices(), [], [])
   const [selectedProviderId, setSelectedProviderId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(null)
@@ -247,11 +251,16 @@ function ProvidersManagementPage() {
     const providerId = String(assignment.provider_id || '')
     if (!providerId || !assignment.service_name) return accumulator
     accumulator[providerId] = accumulator[providerId] || []
-    accumulator[providerId].push(assignment.service_name)
+    accumulator[providerId].push(resolveCatalogName(assignment.service_id ?? assignment.service, catalogServices, assignment.service_name, language))
     return accumulator
   }, {})
 
   const noCategories = tr('بدون فئات', 'No categories')
+  const providerCategoryNames = (row) => {
+    const ids = row.service_category_ids || []
+    if (!ids.length) return row.service_categories || []
+    return ids.map((id, index) => resolveCatalogName(id, categories, row.service_categories?.[index], language)).filter(Boolean)
+  }
   const listSep = isArabic ? '، ' : ', '
 
   const tableColumns = [
@@ -273,7 +282,7 @@ function ProvidersManagementPage() {
     {
       key: 'service_categories',
       label: tr('الفئات', 'Categories'),
-      render: (row) => row.service_categories?.join(listSep) || noCategories,
+      render: (row) => providerCategoryNames(row).join(listSep) || noCategories,
     },
     {
       key: 'assigned_services',
@@ -398,7 +407,7 @@ function ProvidersManagementPage() {
               <StatusBadge status={row.is_deleted ? 'REJECTED' : row.account_active ? 'VERIFIED' : 'PENDING_REVIEW'} />
             </div>
             <p className="text-sm text-slate-600">{row.provider_type || tr('مزود خدمة', 'Service provider')}</p>
-            <p className="text-sm text-slate-500">{row.service_categories?.join(listSep) || noCategories}</p>
+            <p className="text-sm text-slate-500">{providerCategoryNames(row).join(listSep) || noCategories}</p>
           </div>
         )}
         mobileCardClassName={(row) => (row.is_deleted ? 'opacity-60 ring-1 ring-danger/20' : '')}
@@ -491,7 +500,7 @@ function ProvidersManagementPage() {
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {isArabic ? category.name_ar : (category.name_en || category.name_ar)}
+                  {getAdminName(category, language)}
                 </option>
               ))}
             </select>

@@ -6,7 +6,10 @@ import ConfirmModal from '../../components/ConfirmModal'
 import DocumentList from '../../components/DocumentList'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import MissingRequestRecovery from '../../components/MissingRequestRecovery'
+import StaffDeliveryPanel from '../../components/OrderDelivery'
 import OrderTimeline from '../../components/OrderTimeline'
+import ReassignProviderPanel from '../../components/ReassignProviderPanel'
+import StaffComplaintsPanel from '../../components/StaffComplaintsPanel'
 import StatusBadge from '../../components/StatusBadge'
 import { api } from '../../api/services'
 import { getDisplayError, isStaleActionError } from '../../api/client'
@@ -90,7 +93,7 @@ function AdminOrderDetailsPage() {
   const indirectOptions = workflow.filter((option) => option.available && INDIRECT_ACTION_NOTES[option.action])
   const noteVisibilityOptions = [
     ...(allowedActions.can_add_internal_note ? [{ value: 'INTERNAL', label: isArabic ? 'داخلية' : 'Internal' }] : []),
-    ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: isArabic ? 'مرئية للعميل' : 'Visible to customer' }] : []),
+    ...(allowedActions.can_add_customer_note ? [{ value: 'CUSTOMER', label: isArabic ? 'مرئية للعميل — تُرسل كرسالة للعميل' : 'Visible to customer — sent to the customer as a message' }] : []),
   ]
 
   // Returns true on success. One action at a time: the ref closes the gap
@@ -282,6 +285,16 @@ function AdminOrderDetailsPage() {
               </form>
             </Panel>
           ) : null}
+
+          <ReassignProviderPanel
+            onReassigned={() => { reload(); toast(isArabic ? 'تم تغيير مزوّد الخدمة.' : 'Provider changed.', 'success') }}
+            order={order}
+            providers={providers}
+          />
+
+          <StaffComplaintsPanel onChanged={reload} orderId={id} />
+
+          <StaffDeliveryPanel orderId={id} orderStatus={order.status} />
 
           {noteVisibilityOptions.length ? (
             <Panel icon={MessageSquare} title={isArabic ? 'إضافة ملاحظة' : 'Add a note'} description={isArabic ? 'ملاحظة داخلية للتنسيق، أو ملاحظة مرئية لإيضاح ما يحتاجه العميل.' : 'An internal note for coordination, or a visible note to tell the customer what is needed.'}>

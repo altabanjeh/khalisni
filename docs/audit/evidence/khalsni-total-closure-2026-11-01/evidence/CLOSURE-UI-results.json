@@ -1,0 +1,174 @@
+{
+ "home ar-1440": {
+  "h1": "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
+  "worldsFound": 8,
+  "specialRequestLink": 3,
+  "brandVariants": 0,
+  "overflowX": 0,
+  "consoleErrors": 0
+ },
+ "fixed price ar-1440": {
+  "amounts": [
+   "٣٦٫٠٠ د.أ"
+  ],
+  "overflowX": 0
+ },
+ "privacy ar-1440": {
+  "draftBanner": true,
+  "textLength": 4313,
+  "overflowX": 0
+ },
+ "terms ar-1440": {
+  "draftBanner": true,
+  "textLength": 2338,
+  "overflowX": 0
+ },
+ "contact ar-1440": {
+  "notPublished": true,
+  "localEmail": false,
+  "formPresent": 1
+ },
+ "home ar-390": {
+  "h1": "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
+  "worldsFound": 8,
+  "specialRequestLink": 3,
+  "brandVariants": 0,
+  "overflowX": 0,
+  "consoleErrors": 0
+ },
+ "fixed price ar-390": {
+  "amounts": [
+   "٣٦٫٠٠ د.أ"
+  ],
+  "overflowX": 0
+ },
+ "privacy ar-390": {
+  "draftBanner": true,
+  "textLength": 4221,
+  "overflowX": 0
+ },
+ "terms ar-390": {
+  "draftBanner": true,
+  "textLength": 2246,
+  "overflowX": 0
+ },
+ "contact ar-390": {
+  "notPublished": true,
+  "localEmail": false,
+  "formPresent": 1
+ },
+ "home en-1440": {
+  "h1": "Focus on what matters… and we will handle the rest.",
+  "worldsFound": null,
+  "specialRequestLink": 4,
+  "brandVariants": 0,
+  "overflowX": 0,
+  "consoleErrors": 0
+ },
+ "fixed price en-1440": {
+  "amounts": [
+   "JOD 36.00"
+  ],
+  "overflowX": 0
+ },
+ "privacy en-1440": {
+  "draftBanner": true,
+  "textLength": 5338,
+  "overflowX": 0
+ },
+ "terms en-1440": {
+  "draftBanner": true,
+  "textLength": 3008,
+  "overflowX": 0
+ },
+ "contact en-1440": {
+  "notPublished": true,
+  "localEmail": false,
+  "formPresent": 1
+ },
+ "home en-390": {
+  "h1": "Focus on what matters… and we will handle the rest.",
+  "worldsFound": null,
+  "specialRequestLink": 4,
+  "brandVariants": 0,
+  "overflowX": 0,
+  "consoleErrors": 0
+ },
+ "fixed price en-390": {
+  "amounts": [
+   "JOD 36.00"
+  ],
+  "overflowX": 0
+ },
+ "privacy en-390": {
+  "draftBanner": true,
+  "textLength": 5260,
+  "overflowX": 0
+ },
+ "terms en-390": {
+  "draftBanner": true,
+  "textLength": 2930,
+  "overflowX": 0
+ },
+ "contact en-390": {
+  "notPublished": true,
+  "localEmail": false,
+  "formPresent": 1
+ },
+ "parcelGateSchema": {
+  "gate": {
+   "type": "select",
+   "options": [
+    "yes",
+    "no"
+   ]
+  },
+  "parcelVisibleWhen": {
+   "field": "field_2fa52c6cfa",
+   "equals": "yes"
+  }
+ },
+ "pricingInvariantViolations": [],
+ "publicCategories": [
+  [
+   "land-and-survey",
+   "العقارات والأراضي",
+   18
+  ],
+  [
+   "business_services",
+   "خدمات الأعمال",
+   10
+  ],
+  [
+   "tax",
+   "الضرائب والرسوم",
+   1
+  ],
+  [
+   "quick-public-services",
+   "المركبات والنقل",
+   1
+  ],
+  [
+   "ministry-of-labour",
+   "العمالة والإقامة",
+   0
+  ],
+  [
+   "civil-status-and-passports",
+   "الوثائق والتصديقات",
+   3
+  ],
+  [
+   "international-services",
+   "الخدمات الدولية",
+   0
+  ],
+  [
+   "special-request",
+   "طلب خاص",
+   0
+  ]
+ ]
+}

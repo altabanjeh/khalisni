@@ -1,6 +1,10 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from orders.complaints import CustomerOrderComplaintsAPIView, StaffOrderComplaintsAPIView, StaffResolveComplaintAPIView
+from orders.delivery import CustomerOrderDeliveryAPIView, StaffOrderDeliveryAPIView
+from orders.messages import CustomerOrderMessagesAPIView
+from orders.reassignment import AdminOrderReassignAPIView
 from orders.views import (
     AdminDashboardOrderListAPIView,
     AdminOrderAssignAPIView,
@@ -42,10 +46,17 @@ urlpatterns = [
     path("customer/orders/<int:pk>/documents/", CustomerOrderDocumentUploadAPIView.as_view()),
     path("customer/orders/<int:pk>/cancel/", CustomerOrderCancelAPIView.as_view()),
     path("customer/orders/<int:pk>/rating/", CustomerOrderRatingAPIView.as_view()),
+    path("customer/orders/<int:pk>/messages/", CustomerOrderMessagesAPIView.as_view()),
+    path("customer/orders/<int:pk>/complaints/", CustomerOrderComplaintsAPIView.as_view()),
+    path("customer/orders/<int:pk>/delivery/", CustomerOrderDeliveryAPIView.as_view()),
     path("admin/orders/", AdminDashboardOrderListAPIView.as_view()),
     path("admin/orders/<int:pk>/", AdminOrderDetailAPIView.as_view()),
     path("admin/orders/<int:pk>/status/", AdminOrderStatusUpdateAPIView.as_view()),
     path("admin/orders/<int:pk>/assign/", AdminOrderAssignAPIView.as_view()),
+    path("admin/orders/<int:pk>/reassign-provider/", AdminOrderReassignAPIView.as_view()),
+    path("admin/orders/<int:pk>/complaints/", StaffOrderComplaintsAPIView.as_view()),
+    path("admin/orders/<int:pk>/delivery/", StaffOrderDeliveryAPIView.as_view()),
+    path("admin/orders/<int:pk>/complaints/<int:issue_pk>/resolve/", StaffResolveComplaintAPIView.as_view()),
     path("admin/orders/<int:pk>/request-documents/", AdminRequestDocumentsAPIView.as_view()),
     path("admin/orders/<int:pk>/recover-missing-documents/", AdminRecoverMissingDocumentRequestAPIView.as_view()),
     path("admin/orders/<int:pk>/notes/", AdminOrderNotesAPIView.as_view()),

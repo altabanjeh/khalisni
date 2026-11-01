@@ -1,5 +1,5 @@
 import { formatCurrency } from './format'
-import { normalizeLanguage } from './i18n'
+import { getLocalizedField, normalizeLanguage } from './i18n'
 
 function hasArabicScript(value) {
   return /[\u0600-\u06FF]/.test(String(value || ''))
@@ -40,6 +40,32 @@ export function getCategoryName(category, language, fallback = '') {
 
 export function getCategoryDescription(category, language, fallback = '') {
   return getPresentationField(category, { ar: 'description_ar', en: 'description_en' }, language, fallback || (normalizeLanguage(language) === 'en' ? 'Services grouped under this category.' : 'خدمات ضمن هذا التصنيف.'))
+}
+
+// Staff/admin tables (DEF-A03): the catalogue name in the screen language,
+// falling back to the other language when that one is empty.
+export function getAdminName(record, language, fallback = '') {
+  return getLocalizedField(record, { ar: 'name_ar', en: 'name_en' }, language, fallback)
+}
+
+// A category with its parents ("A / B") in the screen language.
+export function getAdminCategoryPath(category, language, fallback = '') {
+  if (!category) return fallback
+  const order = normalizeLanguage(language) === 'en'
+    ? ['full_path_name_en', 'name_en', 'full_path_name', 'name_ar']
+    : ['full_path_name', 'name_ar', 'full_path_name_en', 'name_en']
+  const field = order.find((key) => typeof category[key] === 'string' && category[key].trim())
+  return field ? category[field] : fallback
+}
+
+// Several serializers expose only an Arabic flat name (e.g. `service_name`).
+// Resolve the record from a catalogue the page already loaded so English mode
+// shows the English name; keep the flat value when the record is unknown.
+export function resolveCatalogName(id, records, flatName, language, fallback = '') {
+  const key = id && typeof id === 'object' ? id.id ?? id.service_id ?? id.category_id : id
+  const record = key != null && key !== '' ? (records || []).find((item) => String(item?.id) === String(key)) : null
+  if (record) return getAdminName(record, language, flatName || fallback)
+  return flatName || fallback
 }
 
 export function getServicePublicPrice(service, language) {

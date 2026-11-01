@@ -248,7 +248,7 @@ function FileUploader({
               {previewUrls[index] ? (
                 <a
                   aria-label={t('upload.previewFile', isArabic ? 'معاينة الملف {name}' : 'Preview file {name}', { name: file.name })}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
+                  className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
                   href={previewUrls[index]}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -259,7 +259,7 @@ function FileUploader({
               ) : null}
               <button
                 aria-label={t('upload.replaceFile', isArabic ? 'استبدال الملف {name}' : 'Replace file {name}', { name: file.name })}
-                className="inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
+                className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-xl px-2 py-1 text-xs font-bold text-brand-600 hover:bg-brand-50"
                 onClick={() => {
                   replaceIndexRef.current = index
                   if (inputRef.current) {
@@ -274,7 +274,7 @@ function FileUploader({
               </button>
               <button
                 aria-label={t('upload.removeFile', isArabic ? 'حذف الملف {name}' : 'Remove file {name}', { name: file.name })}
-                className="shrink-0 rounded-xl p-1 hover:bg-red-50"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl hover:bg-red-50"
                 onClick={() => removeFile(index)}
                 type="button"
               >

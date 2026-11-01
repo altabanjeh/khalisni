@@ -17,7 +17,26 @@ export function validateUploadDocument(file: UploadableDocument) {
   return validateUploadableFile(file, null);
 }
 
-const DOWNLOAD_DIRECTORY = `${FileSystem.cacheDirectory}downloads/`;
+/**
+ * The picker does not always report a size (some content providers omit it).
+ * Ask the file system for the copied file's size before validating, so an
+ * oversized file is refused on the device and an unknown size is not waved
+ * through (validateUploadableFile refuses a file whose size is still unknown).
+ */
+export async function resolveFileSize(file: UploadableDocument): Promise<UploadableDocument> {
+  if (typeof file.size === 'number' && Number.isFinite(file.size) && file.size > 0) return file;
+  try {
+    const info = await FileSystem.getInfoAsync(file.uri);
+    if (info.exists && typeof info.size === 'number' && Number.isFinite(info.size)) {
+      return { ...file, size: info.size };
+    }
+  } catch {
+    // Unknown size stays unknown; validation refuses it.
+  }
+  return file;
+}
+
+const DOWNLOAD_DIRECTORY =`${FileSystem.cacheDirectory}downloads/`;
 
 /**
  * Downloads a document with a short-lived token and opens the share sheet.

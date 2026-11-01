@@ -101,6 +101,9 @@ class PublicPageContent(TimeStampedModel):
     email = models.EmailField(blank=True, validators=[EmailValidator()])
     office_address = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
     office_address_en = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
+    # D05: office hours are a business fact supplied by the owner; blank means "not published".
+    office_hours_ar = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
+    office_hours_en = models.CharField(max_length=255, blank=True, validators=[validate_no_script_content])
     footer_text = models.TextField(validators=[validate_no_script_content])
     footer_text_en = models.TextField(blank=True, validators=[validate_no_script_content])
     privacy_policy_ar = models.TextField(blank=True, validators=[validate_no_script_content])
@@ -369,3 +372,126 @@ class ContactInquiry(TimeStampedModel):
 
     def __str__(self):
         return f"Contact inquiry #{self.pk} from {self.name}"
+
+
+class LegalDocumentQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(is_published=True)
+
+
+class LegalDocument(TimeStampedModel):
+    """A versioned legal text (privacy policy or terms of use), audit D06.
+
+    Each kind has at most one published version (database constraint). A version
+    that has ever been published is read-only: changing the text means creating
+    and publishing a new version, so the wording a customer accepted on a given
+    date can always be shown again. ``approval_status`` records whether the
+    owner/legal advisor approved the wording; the system never sets it to
+    approved on its own.
+    """
+
+    class Kind(models.TextChoices):
+        PRIVACY = "privacy", "Privacy policy"
+        TERMS = "terms", "Terms of use"
+
+    class ApprovalStatus(models.TextChoices):
+        DRAFT_REQUIRES_APPROVAL = "draft_requires_approval", "Draft - requires owner/legal approval"
+        APPROVED = "approved", "Approved"
+
+    legal_document_id = models.BigAutoField(primary_key=True)
+    kind = models.CharField(max_length=16, choices=Kind.choices, db_index=True)
+    version = models.CharField(max_length=64, validators=[validate_no_script_content])
+    effective_date = models.DateField()
+    title_ar = models.CharField(max_length=255, validators=[validate_no_script_content])
+    title_en = models.CharField(max_length=255, validators=[validate_no_script_content])
+    body_ar = models.TextField(validators=[validate_no_script_content])
+    body_en = models.TextField(validators=[validate_no_script_content])
+    approval_status = models.CharField(
+        max_length=32,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.DRAFT_REQUIRES_APPROVAL,
+        db_index=True,
+    )
+    approval_note = models.CharField(
+        max_length=500,
+        blank=True,
+        validators=[validate_no_script_content],
+        help_text="Who approved the wording and how (e.g. reference of the owner's or legal advisor's written approval).",
+    )
+    is_published = models.BooleanField(default=False, db_index=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_legal_documents",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_legal_documents",
+    )
+
+    objects = LegalDocumentQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["kind", "-created_at", "-legal_document_id"]
+        verbose_name = "Legal document"
+        verbose_name_plural = "Legal documents"
+        constraints = [
+            models.UniqueConstraint(fields=["kind", "version"], name="unique_legal_document_kind_version"),
+            models.UniqueConstraint(
+                fields=["kind"],
+                condition=models.Q(is_published=True),
+                name="unique_published_legal_document_per_kind",
+            ),
+            models.CheckConstraint(
+                check=~models.Q(approval_status="approved") | models.Q(approved_at__isnull=False),
+                name="legal_document_approved_has_timestamp",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.kind} {self.version}"
+
+    @property
+    def id(self):
+        return self.pk
+
+    @property
+    def is_draft(self):
+        return self.approval_status != self.ApprovalStatus.APPROVED
+
+    @property
+    def was_published(self):
+        return self.published_at is not None
+
+    def clean(self):
+        errors = {}
+        if self.approval_status == self.ApprovalStatus.APPROVED and not self.approved_at:
+            errors["approval_status"] = "An approved version needs the approval time."
+        if self.is_published and not self.published_at:
+            errors["is_published"] = "Publish a version through the publish action."
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    @transaction.atomic
+    def publish(self):
+        """Make this version the published one of its kind; the previous one stays stored, unpublished."""
+        now = timezone.now()
+        self.__class__.objects.filter(kind=self.kind, is_published=True).exclude(pk=self.pk).update(
+            is_published=False, updated_at=now
+        )
+        self.is_published = True
+        if not self.published_at:
+            self.published_at = now
+        self.save()
+        return self

@@ -1,11 +1,12 @@
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
 
 import { theme } from '../../theme';
+import { BRAND_LOCKUP } from '../../utils/brand';
 
 export function SplashScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>Khalsni</Text>
+      <Text style={styles.logo}>{BRAND_LOCKUP}</Text>
       <Text style={styles.subtitle}>بوابة الخدمات والطلبات</Text>
       <ActivityIndicator size="large" color={theme.colors.primary} />
     </View>

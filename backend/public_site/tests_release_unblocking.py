@@ -9,6 +9,7 @@ from django.core.checks import run_checks
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser
@@ -19,7 +20,7 @@ from documents.services import create_order_document
 from notifications.models import Notification
 from orders.models import Order, OrderStatusLog
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT
-from public_site.models import PublicPageContent
+from public_site.models import LegalDocument, PublicPageContent
 from services.models import Service, ServiceCategory, ServiceRequiredDocument
 
 PDF = b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n"
@@ -112,8 +113,18 @@ class PublicContentReportTests(TestCase):
 
     @override_settings(DEFAULT_FROM_EMAIL="no-reply@khalsni.jo")
     def test_strict_mode_passes_once_owner_values_are_present(self):
-        content_row(email="support@khalsni.jo", whatsapp_number="+962790000001", office_address_en="Amman",
+        # Total closure: office hours are part of the contact block, filler numbers
+        # (six identical digits) and earlier sample values count as placeholders, and
+        # D06 needs approved published privacy policy and terms of use versions.
+        content_row(contact_phone="+962 6 552 7381", email="support@khalsni.jo", whatsapp_number="+962795527381",
+                    office_address_en="Amman", office_hours_ar="الأحد - الخميس", office_hours_en="Sunday - Thursday",
                     privacy_policy_ar="نص معتمد للاختبار.", privacy_policy_en="Approved test text.")
+        for kind in ("privacy", "terms"):
+            LegalDocument.objects.create(
+                kind=kind, version="approved-test", effective_date="2026-11-01", title_ar="نص", title_en="Text",
+                body_ar="نص معتمد للاختبار.", body_en="Approved test text.", approval_status="approved",
+                approval_note="Test fixture", approved_at=timezone.now(),
+            ).publish()
         self.assertIn("No open items", self.run_report("--strict"))
 
 

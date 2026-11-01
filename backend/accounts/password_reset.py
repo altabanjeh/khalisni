@@ -86,8 +86,8 @@ def _build_reset_link(raw_token: str) -> str:
 
 
 EMAIL_SUBJECTS = {
-    "password_reset": {"ar": "إعادة تعيين كلمة المرور في خلّصني", "en": "Khalsni password reset"},
-    "password_changed": {"ar": "تم تغيير كلمة المرور في خلّصني", "en": "Khalsni password changed"},
+    "password_reset": {"ar": "إعادة تعيين كلمة المرور في خلصني", "en": "Khalsni password reset"},
+    "password_changed": {"ar": "تم تغيير كلمة المرور في خلصني", "en": "Khalsni password changed"},
 }
 
 

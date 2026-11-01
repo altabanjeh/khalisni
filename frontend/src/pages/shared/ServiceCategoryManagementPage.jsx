@@ -16,6 +16,7 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { hasPermission } from '../../utils/authz'
 import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
+import { getAdminCategoryPath, getAdminName, resolveCatalogName } from '../../utils/servicePresentation'
 
 const defaultValues = {
   name_ar: '',
@@ -60,7 +61,7 @@ function isClearImageValue(value) {
 
 function ServiceCategoryManagementPage() {
   const { user } = useAuth()
-  const { isArabic } = useLanguage()
+  const { isArabic, language } = useLanguage()
   const { toast } = useToast()
   const form = useForm({ defaultValues })
   const [filters, setFilters] = useState({
@@ -241,7 +242,7 @@ function ServiceCategoryManagementPage() {
       label: isArabic ? 'التصنيف' : 'Category',
       render: (row) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span>{row.name_ar}</span>
+          <span>{getAdminName(row, language)}</span>
           {row.is_deleted ? (
             <span className="rounded-full border border-danger/20 bg-danger/10 px-2 py-1 text-[11px] font-semibold text-danger">
               {isArabic ? 'محذوف' : 'Deleted'}
@@ -253,7 +254,7 @@ function ServiceCategoryManagementPage() {
     {
       key: 'parent_name',
       label: isArabic ? 'التصنيف الأصلي' : 'Parent',
-      render: (row) => row.parent_name || (isArabic ? 'رئيسي' : 'Root'),
+      render: (row) => (row.parent ? resolveCatalogName(row.parent, categories, row.parent_name, language) : '') || (isArabic ? 'رئيسي' : 'Root'),
     },
     { key: 'sort_order', label: isArabic ? 'الترتيب' : 'Order' },
     {
@@ -275,7 +276,7 @@ function ServiceCategoryManagementPage() {
       label: isArabic ? 'معاينة الخدمات' : 'Service Preview',
       render: (row) =>
         row.services_preview?.length
-          ? row.services_preview.map((service) => service.name_ar).join(', ')
+          ? row.services_preview.map((service) => getAdminName(service, language)).join(isArabic ? '، ' : ', ')
           : (isArabic ? 'لا توجد خدمات فعّالة' : 'No active services'),
     },
     {
@@ -383,7 +384,7 @@ function ServiceCategoryManagementPage() {
                 .filter((category) => !category.is_deleted)
                 .map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || category.name_ar}
+                    {getAdminCategoryPath(category, language)}
                   </option>
                 ))}
             </select>
@@ -456,7 +457,7 @@ function ServiceCategoryManagementPage() {
                 <option value="">{isArabic ? 'بدون تصنيف أصلي' : 'Root category'}</option>
                 {parentOptions.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || category.name_ar}
+                    {getAdminCategoryPath(category, language)}
                   </option>
                 ))}
               </select>
@@ -509,8 +510,8 @@ function ServiceCategoryManagementPage() {
         confirmLabel={isArabic ? 'تأكيد الحذف' : 'Confirm delete'}
         description={
           isArabic
-            ? `سيتم إخفاء التصنيف "${pendingDelete?.name_ar || ''}" من النظام مع الإبقاء عليه للتدقيق والاسترجاع.`
-            : `This will hide "${pendingDelete?.name_ar || ''}" from the system while keeping it for audit and recovery.`
+            ? `سيتم إخفاء التصنيف "${getAdminName(pendingDelete, language)}" من النظام مع الإبقاء عليه للتدقيق والاسترجاع.`
+            : `This will hide "${getAdminName(pendingDelete, language)}" from the system while keeping it for audit and recovery.`
         }
         impact={
           isArabic
@@ -528,8 +529,8 @@ function ServiceCategoryManagementPage() {
         confirmLabel={isArabic ? 'استعادة' : 'Restore'}
         description={
           isArabic
-            ? `سيعود التصنيف "${pendingRestore?.name_ar || ''}" إلى الشاشات الإدارية ويمكن استخدامه مجدداً.`
-            : `This will restore "${pendingRestore?.name_ar || ''}" back to admin screens and make it available again.`
+            ? `سيعود التصنيف "${getAdminName(pendingRestore, language)}" إلى الشاشات الإدارية ويمكن استخدامه مجدداً.`
+            : `This will restore "${getAdminName(pendingRestore, language)}" back to admin screens and make it available again.`
         }
         onClose={() => setPendingRestore(null)}
         onConfirm={handleRestoreConfirm}

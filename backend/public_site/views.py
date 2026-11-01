@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import generics, permissions, status, viewsets
 from django.db import transaction
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -9,7 +10,7 @@ from audit.utils import create_audit_log
 from config.permissions import IsAdminRole, IsInternalStaffRole, PlatformRecordWriteMixin
 from core.delete_guard import AdminDeleteGuardMixin
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT, DEFAULT_SITE_THEME
-from public_site.models import Advertisement, MissingServiceRequest, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, LegalDocument, MissingServiceRequest, PublicPageContent, SiteTheme
 from public_site.services import notify_missing_service_request_assigned, notify_missing_service_request_created
 from public_site.selectors import (
     get_active_public_page_content,
@@ -17,12 +18,16 @@ from public_site.selectors import (
     get_current_important_alert,
     get_current_public_advertisements,
     get_latest_public_page_content,
+    get_published_legal_document,
+    get_published_legal_documents,
 )
 from public_site.serializers import (
     AdvertisementAdminSerializer,
     AdvertisementPublicSerializer,
     ContactInquiryCreateSerializer,
     HomepagePayloadSerializer,
+    LegalDocumentAdminSerializer,
+    LegalDocumentPublicSerializer,
     MissingServiceRequestAdminSerializer,
     MissingServiceRequestPublicSerializer,
     PublicPageContentAdminSerializer,
@@ -218,6 +223,8 @@ class AdminPublicPageContentAPIView(AdminSingletonMixin, APIView):
         "email",
         "office_address",
         "office_address_en",
+        "office_hours_ar",
+        "office_hours_en",
         "footer_text",
         "footer_text_en",
         "active_content",
@@ -421,3 +428,101 @@ class MissingServiceRequestViewSet(PlatformRecordWriteMixin, viewsets.ModelViewS
                 "response_message": missing_request.response_message,
             },
         )
+
+
+LEGAL_AUDIT_FIELDS = ("kind", "version", "effective_date", "approval_status", "approval_note", "is_published", "published_at")
+
+
+class PublicLegalDocumentsAPIView(APIView):
+    """GET /api/public-site/legal/ -> {"privacy": {...} | null, "terms": {...} | null}."""
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        documents = get_published_legal_documents()
+        return Response(
+            {kind: (LegalDocumentPublicSerializer(document).data if document else None) for kind, document in documents.items()}
+        )
+
+
+class PublicLegalDocumentDetailAPIView(APIView):
+    """GET /api/public-site/legal/<kind>/ -> the published version, 404 when none is published."""
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, kind):
+        if kind not in LegalDocument.Kind.values:
+            raise Http404
+        document = get_published_legal_document(kind)
+        if document is None:
+            raise Http404
+        return Response(LegalDocumentPublicSerializer(document).data)
+
+
+class LegalDocumentAdminViewSet(viewsets.ModelViewSet):
+    """Admin management of legal document versions.
+
+    Versions are never deleted. A version that has been published is read-only;
+    a new wording is a new version, created as a draft and then published.
+    """
+
+    serializer_class = LegalDocumentAdminSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminRole]
+    http_method_names = ["get", "post", "put", "patch", "head", "options"]
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = LegalDocument.objects.select_related("approved_by", "created_by")
+        kind = self.request.query_params.get("kind")
+        if kind:
+            queryset = queryset.filter(kind=kind)
+        return queryset.order_by("kind", "-created_at", "-legal_document_id")
+
+    def perform_create(self, serializer):
+        document = serializer.save()
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action="create_legal_document_version",
+            entity_type="LegalDocument",
+            entity_id=document.pk,
+            entity_name=f"{document.kind} {document.version}",
+            new_value=_snapshot(document, LEGAL_AUDIT_FIELDS),
+        )
+
+    def perform_update(self, serializer):
+        old_value = _snapshot(serializer.instance, LEGAL_AUDIT_FIELDS)
+        document = serializer.save()
+        create_audit_log(
+            request=self.request,
+            user=self.request.user,
+            action="update_legal_document_version",
+            entity_type="LegalDocument",
+            entity_id=document.pk,
+            entity_name=f"{document.kind} {document.version}",
+            old_value=old_value,
+            new_value=_snapshot(document, LEGAL_AUDIT_FIELDS),
+        )
+
+    @action(detail=True, methods=["post"])
+    def publish(self, request, pk=None):
+        document = self.get_object()
+        if document.was_published:
+            return Response(
+                {"detail": "This version was already published. Create a new version to publish a change."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        previous = get_published_legal_document(document.kind)
+        with transaction.atomic():
+            document.publish()
+            create_audit_log(
+                request=request,
+                user=request.user,
+                action="publish_legal_document_version",
+                entity_type="LegalDocument",
+                entity_id=document.pk,
+                entity_name=f"{document.kind} {document.version}",
+                old_value={"previous_published_version": previous.version if previous else ""},
+                new_value=_snapshot(document, LEGAL_AUDIT_FIELDS),
+            )
+        return Response(self.get_serializer(document).data)

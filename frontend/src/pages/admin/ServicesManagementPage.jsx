@@ -1,6 +1,7 @@
 import { Files, FolderTree, Settings } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
 import AdminSoftDeleteModal from '../../components/AdminSoftDeleteModal'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
@@ -13,6 +14,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
+import { getAdminCategoryPath } from '../../utils/servicePresentation'
 import { resolveServiceImage } from '../../utils/catalogImagery'
 
 const defaultCategoryValues = {
@@ -460,8 +462,12 @@ function ServicesManagementPage() {
   // The services table pages on the server: every service is reachable and
   // status, category and search apply to the whole catalogue (audit B10-6).
   const [servicePage, setServicePage] = useState(1)
-  const [serviceSearchInput, setServiceSearchInput] = useState('')
-  const [serviceSearch, setServiceSearch] = useState('')
+  // Deep link from the rules overview: /admin/services?edit=<id>&search=<name>
+  // narrows the table to that service and opens its editor (one canonical editor).
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [pendingEditId, setPendingEditId] = useState(() => searchParams.get('edit') || '')
+  const [serviceSearchInput, setServiceSearchInput] = useState(() => searchParams.get('search') || '')
+  const [serviceSearch, setServiceSearch] = useState(() => searchParams.get('search') || '')
   const [servicePageSize, setServicePageSize] = useState(20)
   useEffect(() => {
     const next = serviceSearchInput.trim()
@@ -688,6 +694,20 @@ function ServicesManagementPage() {
     setServiceSlugEdited(Boolean(id))
     setActiveModal('service')
   }
+
+  useEffect(() => {
+    if (!pendingEditId || servicesLoading) return
+    const target = services.find((item) => String(item.id) === String(pendingEditId))
+    setPendingEditId('')
+    if (searchParams.has('edit')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('edit')
+      setSearchParams(next, { replace: true })
+    }
+    if (target) openServiceForm(target.id)
+    // openServiceForm only sets state; the effect runs when the page of services arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingEditId, services, servicesLoading])
 
   function openDefinitionForm(id = null) {
     setSelectedDefinitionId(id)
@@ -1230,7 +1250,7 @@ function ServicesManagementPage() {
                 <option value="">{tr('كل الفئات', 'All categories')}</option>
                 {categories.filter((category) => !category.is_deleted).map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.full_path_name || (isArabic ? category.name_ar : (category.name_en || category.name_ar))}
+                    {getAdminCategoryPath(category, isArabic ? 'ar' : 'en')}
                   </option>
                 ))}
               </select>

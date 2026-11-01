@@ -6,7 +6,8 @@ import { AppCard } from '../../components/AppCard';
 import { AppScreen } from '../../components/AppScreen';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { useAuth } from '../../auth/AuthProvider';
-import { roleLabels } from '../../constants/roles';
+import { getRoleLabel } from '../../constants/roles';
+import { LegalLinks } from '../../components/LegalLinks';
 import { useAuthStore } from '../../state/authStore';
 import { theme } from '../../theme';
 
@@ -36,8 +37,12 @@ export function SettingsScreen({ navigation }: { navigation: any }) {
       <AppCard>
         <Text style={styles.name}>{user?.full_name || 'مستخدم'}</Text>
         {user?.email ? <Text style={styles.meta}>{user.email}</Text> : null}
-        {role ? <Text style={styles.meta}>نوع الحساب: {roleLabels[role]}</Text> : null}
+        <Text style={styles.meta}>نوع الحساب: {getRoleLabel(role)}</Text>
         <AppButton label="الملف الشخصي" variant="secondary" onPress={() => navigation.navigate('Profile')} />
+      </AppCard>
+      <AppCard>
+        <Text style={styles.name}>الشروط والخصوصية</Text>
+        <LegalLinks navigation={navigation} />
       </AppCard>
       <AppCard>
         <Text style={styles.meta}>عند تسجيل الخروج تُحذف بيانات الدخول المحفوظة على هذا الجهاز.</Text>

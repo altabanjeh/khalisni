@@ -110,7 +110,7 @@ Local development: `docker-compose.override.yml` builds on the same file, so a l
 - The public entrypoint is the `frontend` container. The base Compose file publishes no ports; the platform proxy (Coolify/Traefik) routes to it. On a plain server put a TLS reverse proxy in front and forward to the frontend container.
 - Set `API_THROTTLE_NUM_PROXIES` to the number of proxies in front of Django (see `docs/hardening/KHALSNI_PRODUCTION_ENV_REQUIREMENTS.md`). Without it rate limits can be bypassed.
 - Errors are written to the backend container log (stderr). `docker compose logs backend | grep ERROR` shows unhandled exceptions with tracebacks.
-- Backups are not automatic until scheduled on the server. Schedule `scripts/backup_scheduled.sh` (backup, verification, optional off-server copy and rotation) before go-live: `docs/total-audit/RECOVERY_RUNBOOK.md`. Retention has no default; it follows the client's data-retention policy.
+- Backups are not automatic until scheduled on the server. Schedule `scripts/backup_scheduled.sh` (backup set of database + media + manifest, verification, off-server copy via `KHALSNI_BACKUP_OFFSITE_CMD`, rotation via `KHALSNI_BACKUP_KEEP`, status file for monitoring) before go-live: `docs/total-audit/RECOVERY_RUNBOOK.md`. Retention has no default; it follows the client's data-retention policy.
 - `create_admin` creates the admin from `DJANGO_ADMIN_*` on first start. On later starts it changes nothing unless `DJANGO_ADMIN_RESET_PASSWORD=True`, and it refuses to promote an existing non-admin account.
 - Django migrations run in `db-init` as the owner role. `collectstatic`, role setup, admin creation, and seed initialization run on backend startup as the app role.
 - Uploaded files and collected static assets are persisted through Docker named volumes.
@@ -120,7 +120,27 @@ Local development: `docker-compose.override.yml` builds on the same file, so a l
 ## Health checks
 
 - Backend health endpoint: `/api/health/`
+- Build identity: `/api/health/version/` (backend) and `/version.json` (frontend); see "Build identity"
 - Frontend container health: `/`
+
+## Build identity
+
+Each image records the commit it was built from, so an operator can prove which release is live.
+
+- `docker-compose.yml` passes the build arguments `BUILD_SHA` and `BUILD_TIME` to the backend, `db-init` and frontend builds. `BUILD_SHA` falls back to `SOURCE_COMMIT` (Coolify can provide it at build time) and then to `unknown`.
+- Backend (`backend/Dockerfile`): `ENV BUILD_SHA/BUILD_TIME`; settings expose them as `KHALSNI_BUILD_SHA/KHALSNI_BUILD_TIME`; `GET /api/health/version/` (`backend/core/version.py`, no authentication, `Cache-Control: no-store`) returns only `{"sha": "<up to 12 hex characters>", "built_at": "<ISO time>"}`. Anything that is not a hex commit id or an ISO timestamp is reported as `"unknown"`; no other setting or version string is exposed.
+- Frontend (`frontend/Dockerfile`): `VITE_BUILD_SHA` is available to the app at build time, `index.html` gets `<meta name="khalsni-build" content="<sha>">` and `/version.json` holds the same `{"sha", "built_at"}` (served by nginx with `Cache-Control: no-store`).
+
+Build with the commit you deploy:
+
+```bash
+BUILD_SHA=$(git rev-parse --short HEAD) BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  docker compose -f docker-compose.yml up -d --build
+curl -fsS https://<domain>/api/health/version/
+curl -fsS https://<domain>/version.json
+```
+
+Under Coolify set `BUILD_SHA` (and `BUILD_TIME`) in the resource's environment before deploying, or enable the option that passes the source commit to the build. The release steps are in `docs/operations/PRODUCTION_RELEASE_RUNBOOK.md`.
 
 ## Useful commands
 
@@ -131,4 +151,9 @@ docker compose -f docker-compose.yml logs -f frontend
 docker compose -f docker-compose.yml exec backend python manage.py check --deploy
 sh scripts/backup.sh /srv/khalsni-backups
 sh scripts/verify_backup.sh /srv/khalsni-backups/khalsni-<UTC time>
+sh scripts/backup_scheduled.sh /srv/khalsni-backups          # backup + verify + off-server copy + rotation + status file
+sh scripts/backup_status_check.sh /srv/khalsni-backups/backup-status.json
+KHALSNI_GATE_EXPECTED_SHA=<sha> KHALSNI_GATE_URL=https://<domain> sh scripts/release_gate.sh
 ```
+
+Scripts that act on a Compose stack read `COMPOSE` (default `docker compose -f docker-compose.yml`); under Coolify use `COMPOSE="docker compose -p <project> -f <config file>"` with both values from `docker compose ls`.

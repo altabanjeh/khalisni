@@ -404,3 +404,52 @@ PASSWORD_RESET_RATE_LIMIT_IP = int(os.getenv("PASSWORD_RESET_RATE_LIMIT_IP", "10
 # Send reset emails on a background thread so the response time does not reveal
 # whether an address is registered. Disable only where the send must be inline.
 PASSWORD_RESET_EMAIL_ASYNC = _get_bool_env("PASSWORD_RESET_EMAIL_ASYNC", True)
+
+# --- Build / ops (Stream E) ---
+# Commit and build time baked into the image as Docker build arguments
+# (backend/Dockerfile ARG BUILD_SHA / BUILD_TIME, passed by docker-compose.yml).
+# Exposed only through GET /api/health/version/ (core/version.py), which
+# reports "unknown" for anything that is not a hex commit id or a timestamp.
+KHALSNI_BUILD_SHA = (os.getenv("BUILD_SHA") or "").strip()
+KHALSNI_BUILD_TIME = (os.getenv("BUILD_TIME") or "").strip()
+# --- end Build / ops (Stream E) ---
+
+# --- Retention (Stream B) ---
+# Data-retention periods (audit D06). Each value is a whole number of days (or,
+# for backups, a number of newest backups to keep) set by the operator once the
+# owner/legal team has approved a period. Unset or blank = "not configured":
+# nothing in that category is ever purged. No default period is assumed.
+# Report / apply: `python manage.py retention_report [--show-policy] [--apply]`
+# (core/retention.py). Backups reuse KHALSNI_BACKUP_KEEP, the variable that
+# scripts/backup_scheduled.sh already reads.
+def _retention_env(name, *, minimum=1):
+    from django.core.exceptions import ImproperlyConfigured
+
+    raw = (os.getenv(name) or "").strip()
+    if not raw:
+        return None
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise ImproperlyConfigured(f"{name} must be a whole number (got {raw!r}); leave it unset for no retention.") from exc
+    if value < minimum:
+        raise ImproperlyConfigured(f"{name} must be at least {minimum} (got {value}); leave it unset for no retention.")
+    return value
+
+
+KHALSNI_RETENTION = {
+    "documents_days": _retention_env("KHALSNI_RETENTION_DOCUMENTS_DAYS"),
+    "completed_orders_days": _retention_env("KHALSNI_RETENTION_COMPLETED_ORDERS_DAYS"),
+    "accounts_days": _retention_env("KHALSNI_RETENTION_ACCOUNTS_DAYS"),
+    "notifications_days": _retention_env("KHALSNI_RETENTION_NOTIFICATIONS_DAYS"),
+    "audit_logs_days": _retention_env("KHALSNI_RETENTION_AUDIT_LOGS_DAYS"),
+    "backups_keep": _retention_env("KHALSNI_BACKUP_KEEP"),
+}
+if (os.getenv("KHALSNI_RETENTION_BACKUPS_KEEP") or "").strip() and (
+    (os.getenv("KHALSNI_RETENTION_BACKUPS_KEEP") or "").strip() != (os.getenv("KHALSNI_BACKUP_KEEP") or "").strip()
+):
+    from django.core.exceptions import ImproperlyConfigured
+
+    # One variable for backup rotation: the backup script reads KHALSNI_BACKUP_KEEP.
+    raise ImproperlyConfigured("Set backup retention with KHALSNI_BACKUP_KEEP (read by scripts/backup_scheduled.sh), not KHALSNI_RETENTION_BACKUPS_KEEP.")
+# --- end Retention (Stream B) ---

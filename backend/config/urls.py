@@ -37,6 +37,7 @@ def public_media_serve(request, path):
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("api/health/", healthcheck),
+    path("api/health/version/", include("core.version")),
     path("api/", include("accounts.urls")),
     path("api/", include("organizations.urls")),
     path("api/", include("services.urls")),

@@ -50,6 +50,12 @@ export const notificationsApi = {
     return unwrapList(await http.get('/notifications/'))
   },
 
+  // One page of the signed-in user's notifications (newest first) plus the
+  // pager facts, so the bell and lists can load more than the first page.
+  async getNotificationCenterPage({ page = 1 } = {}) {
+    return fetchPage('/notifications/', { page })
+  },
+
   async getNotificationUnreadCount() {
     const { data } = await http.get('/notifications/unread-count/')
     return Number(data?.unread ?? 0)

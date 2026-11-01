@@ -21,7 +21,22 @@ CONSENT_TEXTS = {
     "order-consent-mobile-v1": {
         "ar": "أوافق على استخدام بياناتي ووثائقي لأغراض تنفيذ الخدمة فقط.",
     },
+    # v2 (D06): web and mobile show the same statement, which names the Terms of
+    # Use and the Privacy Policy. Only the version id tells the clients apart.
+    # frontend/src/utils/orderConsent.js
+    "order-consent-web-v2": {
+        "ar": "أوافق على شروط الاستخدام وسياسة الخصوصية، وعلى استخدام بياناتي ومستنداتي لإنجاز هذه الخدمة فقط وإشعاري بأي نواقص.",
+        "en": "I agree to the Terms of Use and the Privacy Policy, and that my details and documents are used only to complete this service and to notify me of anything missing.",
+    },
+    # mobile app (same meaning and wording as the web v2 statement)
+    "order-consent-mobile-v2": {
+        "ar": "أوافق على شروط الاستخدام وسياسة الخصوصية، وعلى استخدام بياناتي ومستنداتي لإنجاز هذه الخدمة فقط وإشعاري بأي نواقص.",
+        "en": "I agree to the Terms of Use and the Privacy Policy, and that my details and documents are used only to complete this service and to notify me of anything missing.",
+    },
 }
+
+# Every consent recorded so far is given when an order is submitted.
+ORDER_SUBMISSION = "order_submission"
 
 # A client that does not say which statement it showed. The acceptance is
 # still recorded, but no text is claimed for it.
@@ -31,10 +46,23 @@ SOURCES = ("web", "mobile")
 UNKNOWN_SOURCE = "unknown"
 
 
+def published_legal_versions():
+    """Versions of the privacy policy and terms of use published right now ("" if none)."""
+    from public_site.selectors import get_published_legal_versions
+
+    versions = get_published_legal_versions()
+    return {"privacy_version": versions.get("privacy", ""), "terms_version": versions.get("terms", "")}
+
+
 def consent_evidence(*, version, source, request_language):
-    """Return the fields of an ``OrderConsent`` row for an accepted submission."""
+    """Return the fields of an ``OrderConsent`` row for an accepted submission.
+
+    Besides the statement, the row records the consent type and the versions of
+    the legal documents published at the moment of submission.
+    """
+    legal = {"consent_type": ORDER_SUBMISSION, **published_legal_versions()}
     texts = CONSENT_TEXTS.get(version)
     if not texts:
-        return {"consent_version": UNVERSIONED, "consent_text": "", "language": request_language, "source": source or UNKNOWN_SOURCE}
+        return {"consent_version": UNVERSIONED, "consent_text": "", "language": request_language, "source": source or UNKNOWN_SOURCE, **legal}
     language = request_language if request_language in texts else next(iter(texts))
-    return {"consent_version": version, "consent_text": texts[language], "language": language, "source": source or UNKNOWN_SOURCE}
+    return {"consent_version": version, "consent_text": texts[language], "language": language, "source": source or UNKNOWN_SOURCE, **legal}

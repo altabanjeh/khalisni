@@ -1,0 +1,30 @@
+Document definition normalization (DRY RUN: nothing changed)
+- additional-authority-documents: repoint [request-boundary-demarcation req 106] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-land-survey req 114] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-property-readjustment req 119] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-zoning-certificate req 123] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-land-use-classification-change req 129] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-property-mortgage-registration req 142] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: repoint [request-mortgage-release req 147] document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». repointed to the canonical definition
+- additional-authority-documents: deactivate-definition document_b03d952538 «أي مستندات إضافية تطلبها الجهة المختصة» -> document_b0f143ad16 «أي وثائق إضافية تطلبها الجهة المختصة». «وثائق» and «مستندات» are synonyms; same catch-all request from the competent authority.
+- legal-power-of-attorney: dedupe [request-land-survey req 112] document_e95445e836 «وكالة قانونية إن وجدت» -> legal_power_of_attorney «وكالة قانونية (إن وجدت)». service already lists the canonical document (requirement 113); duplicate requirement soft-deleted
+- legal-power-of-attorney: deactivate-definition document_e95445e836 «وكالة قانونية إن وجدت» -> legal_power_of_attorney «وكالة قانونية (إن وجدت)». Same document; the wording differs only by parentheses.
+- company-registration-certificate: repoint [business_trademark_services req 45] document_d7d63d7027 «شهادة/سجل الشركة أو المؤسسة» -> document_322e004de0 «شهادة/بيانات تسجيل الشركة أو المنشأة». repointed to the canonical definition
+- company-registration-certificate: deactivate-definition document_d7d63d7027 «شهادة/سجل الشركة أو المؤسسة» -> document_322e004de0 «شهادة/بيانات تسجيل الشركة أو المنشأة». Company/establishment registration certificate or record; «بيانات تسجيل» and «سجل» name the same extract.
+- amended-company-contract: repoint [business_company_add_activities req 30] document_ec8d545fbf «عقد/نظام معدل أو النموذج المعتمد» -> document_39a02bfad7 «عقد ونظام الشركة المعدلان أو النماذج المعتمدة». repointed to the canonical definition
+- amended-company-contract: deactivate-definition document_ec8d545fbf «عقد/نظام معدل أو النموذج المعتمد» -> document_39a02bfad7 «عقد ونظام الشركة المعدلان أو النماذج المعتمدة». Amended company contract and articles or the approved forms; singular/plural wording only.
+- cadastral-map: dedupe [request-land-survey req 110] document_0cc19c2317 «مخطط أراضٍ إن وجد» -> cadastral_map «مخطط أراضٍ». service already lists the canonical document (requirement 111); duplicate requirement soft-deleted
+- cadastral-map: deactivate-definition document_0cc19c2317 «مخطط أراضٍ إن وجد» -> cadastral_map «مخطط أراضٍ». Same cadastral map; «إن وجد» is a condition already carried by the requirement being optional.
+- notarized-poa-or-written-authorization: repoint [business_license_services req 56] document_f56c2e0812 «تفويض خطي أو وكالة عدلية» -> legal_authorization «وكالة عدلية أو تفويض خطي». repointed to the canonical definition
+- notarized-poa-or-written-authorization: deactivate-definition document_f56c2e0812 «تفويض خطي أو وكالة عدلية» -> legal_authorization «وكالة عدلية أو تفويض خطي». Same two alternatives in reversed order.
+- applicant-id-copy: dedupe [request-land-survey req 107] document_a4c4fed3af «الهوية» -> national_id_copy «صورة الهوية». service already lists the canonical document (requirement 108); duplicate requirement soft-deleted
+- applicant-id-copy: deactivate-definition document_a4c4fed3af «الهوية» -> national_id_copy «صورة الهوية». «الهوية» is the applicant's ID copy; already classified as a duplicate of «صورة الهوية» by services.0016 (request-land-survey second sheet).
+- authorization-if-any: make-optional [no-criminal-record req 2] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [passport-renewal req 4] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [tax-clearance req 6] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [no-criminal-record-certificate req 8] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [passport-appointment-booking req 10] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [traffic-fines-payment req 12] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [property-registration-deed req 14] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+- authorization-if-any: make-optional [business-license-renewal req 16] authorization-letter «تفويض إن وجد». «إن وجد» (if any) cannot be a required upload
+28 change(s) would be made.

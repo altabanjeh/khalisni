@@ -1,0 +1,15 @@
+{
+  "format": "khalsni-backup/2",
+  "created_at": "2026-11-01T08:26:11Z",
+  "release_sha": "fa5a19b",
+  "repository_commit": "unknown",
+  "database": {"name": "khalsni_drill", "server_version": "16.15", "row_counts_stable": true},
+  "row_counts": {"users" : 11, "services" : 8, "orders" : 11, "documents" : 15, "order_consents" : 3, "payments" : 0, "audit_logs" : 130, "migrations" : 117},
+  "media": {"file_count": 22, "bytes": 699141, "object_storage_bucket": "none"},
+  "artifacts": {
+    "database.dump": {"bytes": 475512, "sha256": "4bac0ae3aedf3dac4e090604fcd46c79b51b0403e9cdea77b2a553dffe6cc5df"},
+    "database.toc": {"bytes": 93530, "sha256": "72329a18156839cdba71c30e9b6ff127e698da09cc2c850d7ecf22a57eda2ba9"},
+    "media.tar.gz": {"bytes": 694425, "sha256": "307195841c4064584c191e389ac5e310736a0aeb0a0390afcd33d5876bca7404"},
+    "media.inventory.tsv": {"bytes": 3096, "sha256": "eeb2c0a75dae3d20772c3582c119f139c0a6a6b32084beb6f9b292bfbb9e1ab8"}
+  }
+}

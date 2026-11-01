@@ -1,6 +1,7 @@
 import { FileText, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import PageHeader from '../../components/PageHeader'
 import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
@@ -48,6 +49,8 @@ function HomepageContentEditorPage() {
       email: data.email || '',
       office_address: data.office_address || '',
       office_address_en: data.office_address_en || '',
+      office_hours_ar: data.office_hours_ar || '',
+      office_hours_en: data.office_hours_en || '',
       footer_text: data.footer_text || '',
       footer_text_en: data.footer_text_en || '',
       privacy_policy_ar: data.privacy_policy_ar || '',
@@ -152,6 +155,12 @@ function HomepageContentEditorPage() {
 
           <div className="glass-panel space-y-5 p-6">
             <h2 className="text-xl font-extrabold text-ink">{isArabic ? 'التواصل والتذييل' : 'Contact and footer'}</h2>
+            <p className="text-sm text-slate-600">
+              {tr(
+                'هذه البيانات هي المصدر الوحيد لمعلومات التواصل في تذييل الموقع وصفحة «تواصل معنا». أدخل القيم التي أكدها المالك فقط، واترك الحقل فارغاً إن لم تتوفر قيمة معتمدة.',
+                'These fields are the only source of the contact details shown in the site footer and on the Contact page. Enter only owner-confirmed values; leave a field blank when no confirmed value exists.',
+              )}
+            </p>
             <FieldGroup error={form.formState.errors.contact_phone} label={tr('رقم الهاتف', 'Phone')}>
               <input className="field" {...form.register('contact_phone')} />
             </FieldGroup>
@@ -166,6 +175,12 @@ function HomepageContentEditorPage() {
             </FieldGroup>
             <FieldGroup error={form.formState.errors.office_address_en} label={tr('عنوان المكتب (إنجليزي)', 'Office address (English)')}>
               <input className="field" {...form.register('office_address_en')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.office_hours_ar} hint={tr('مثال: الأحد – الخميس', 'e.g. Sunday – Thursday')} label={tr('ساعات العمل (عربي)', 'Office hours (Arabic)')}>
+              <input className="field" {...form.register('office_hours_ar')} />
+            </FieldGroup>
+            <FieldGroup error={form.formState.errors.office_hours_en} label={tr('ساعات العمل (إنجليزي)', 'Office hours (English)')}>
+              <input className="field" {...form.register('office_hours_en')} />
             </FieldGroup>
             <FieldGroup error={form.formState.errors.footer_text} label={tr('نص التذييل (عربي)', 'Footer text (Arabic)')}>
               <textarea className="field min-h-28" {...form.register('footer_text', { required: tr('نص التذييل مطلوب', 'Footer text is required') })} />
@@ -183,6 +198,11 @@ function HomepageContentEditorPage() {
           <div className="glass-panel space-y-5 p-6">
             <h2 className="text-xl font-extrabold text-ink">{tr('سياسة الخصوصية', 'Privacy policy')}</h2>
             <p className="text-sm text-slate-600">{tr('أدخل النص المعتمد من العميل فقط. اترك الحقلين فارغين حتى تتم الموافقة.', 'Enter only client-approved text. Leave both fields blank until it is approved.')}</p>
+            <p className="text-sm text-slate-600">
+              {tr('تُدار سياسة الخصوصية وشروط الاستخدام بنسخ مرقّمة في ', 'The privacy policy and terms of use are managed as versioned documents in ')}
+              <Link className="font-bold text-brand-700 underline" to="/admin/public-site/legal">{tr('الوثائق القانونية', 'Legal documents')}</Link>
+              {tr('. يظهر هذا النص فقط إذا لم تُنشر أي نسخة من سياسة الخصوصية.', '. This text is shown only when no privacy policy version is published.')}
+            </p>
             <FieldGroup error={form.formState.errors.privacy_policy_ar} label={tr('النص المعتمد (عربي)', 'Approved text (Arabic)')}>
               <textarea className="field min-h-48" {...form.register('privacy_policy_ar')} />
             </FieldGroup>

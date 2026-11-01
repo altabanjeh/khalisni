@@ -10,6 +10,7 @@ import re
 from dataclasses import dataclass, field
 
 from services.catalogue_rules import APPROVED_DELIVERY_NOTE
+from services.pricing import is_quotation, pricing_invariant_problem, public_pricing
 from services.schema_rules import (
     field_key,
     field_label,
@@ -22,6 +23,7 @@ from services.schema_rules import (
 ERROR = "error"
 WARNING = "warning"
 NO_FIXED_DURATION = re.compile(r"^\s*(حسب|تُحدَّد|تحدد|يُحدد|يحدد)")
+IF_ANY = re.compile(r"إن\s+وجد")
 
 
 @dataclass
@@ -98,11 +100,31 @@ def validate_service(service, report, *, visible):
         if not requirement.allowed_extensions:
             add(WARNING, where, "No allowed file types (the global list applies).")
 
+        if requirement.is_required and IF_ANY.search(requirement.name_ar or ""):
+            add(level, where, "A document described as 'if any' (إن وجد) is marked required.")
+
     note = (service.delivery_note_ar or "").strip()
     if service.delivery_time_mode == "duration" and (
         note == APPROVED_DELIVERY_NOTE["ar"] or NO_FIXED_DURATION.match(note)
     ):
         add(level, "delivery", f"Shows a fixed duration ({service.estimated_duration} {service.estimated_duration_unit}) while the note says it depends: '{note}'.")
+    elif (
+        service.delivery_time_mode == "duration"
+        and service.estimated_duration == 1
+        and service.estimated_duration_unit == "days"
+        and not note
+    ):
+        add(WARNING, "delivery", "Shows the default duration (1 day) with no note; confirm it is a real duration (placeholder?).")
+    if service.delivery_time_mode == "after_review" and not note:
+        add(WARNING, "delivery", "Completion time is 'after review' but no sentence is set (customers see the generic wording).")
+
+    # Owner decision B10-10: a public price breakdown must add up to the shown total.
+    pricing = public_pricing(service)
+    problem = pricing_invariant_problem(pricing)
+    if problem:
+        add(level, "pricing", problem)
+    if is_quotation(service) and any(pricing.get(name) is not None for name in ("total_price", "government_fee", "company_fee")):
+        add(level, "pricing", "A quotation service shows a numeric fee.")
 
 
 def validate_catalogue():

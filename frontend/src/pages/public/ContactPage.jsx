@@ -12,11 +12,15 @@ import {
   PublicPanel,
   PublicTextarea,
 } from '../../components/public/PublicPage'
+import PublishedContactDetails from '../../components/public/PublishedContactDetails'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAsyncData } from '../../hooks/useAsyncData'
 import { getPhoneFormatHint, PHONE_INPUT_PROPS } from '../../utils/phoneInput'
 
 function ContactPage() {
   const { isArabic } = useLanguage()
+  // D05: the published contact details come from the one CMS source (homepage content).
+  const { data: homepage } = useAsyncData(() => api.getPublicHomepage(), [], null)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const {
@@ -103,6 +107,12 @@ function ContactPage() {
         </PublicPanel>
 
         <div className="space-y-4">
+          <PublicCard>
+            <p className="text-lg font-extrabold text-ink">{isArabic ? 'معلومات التواصل' : 'Contact details'}</p>
+            <div className="mt-3 text-sm font-semibold text-slate-600" data-testid="contact-page-details">
+              <PublishedContactDetails content={homepage?.content} isArabic={isArabic} />
+            </div>
+          </PublicCard>
           <PublicCard>
             <Phone className="h-7 w-7 text-[var(--khalsni-public-primary)]" />
             <p className="mt-3 text-lg font-extrabold text-ink">{isArabic ? 'الدعم المباشر' : 'Direct support'}</p>

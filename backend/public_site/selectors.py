@@ -1,6 +1,6 @@
 from django.utils import timezone
 
-from public_site.models import Advertisement, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, LegalDocument, PublicPageContent, SiteTheme
 
 
 def get_active_theme():
@@ -29,3 +29,18 @@ def get_current_important_alert(now=None):
     return get_current_public_advertisements(now).filter(
         advertisement_type=Advertisement.Type.IMPORTANT_ALERT
     ).order_by("display_order", "-start_date", "-advertisement_id").first()
+
+
+def get_published_legal_document(kind):
+    """The published version of a legal document kind (privacy/terms), or None."""
+    return LegalDocument.objects.published().filter(kind=kind).order_by("-published_at", "-legal_document_id").first()
+
+
+def get_published_legal_documents():
+    """``{kind: LegalDocument or None}`` for every legal document kind."""
+    return {kind: get_published_legal_document(kind) for kind in LegalDocument.Kind.values}
+
+
+def get_published_legal_versions():
+    """``{"privacy": version, "terms": version}``; ``""`` where nothing is published."""
+    return {kind: (document.version if document else "") for kind, document in get_published_legal_documents().items()}

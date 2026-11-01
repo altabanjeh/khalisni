@@ -15,6 +15,7 @@ import { ordersApi } from '../../../api/orders.api';
 import { getDisplayError, normalizeApiError } from '../../../api/client';
 import { findRequirement, getRequirementLabel } from '../../../utils/documentPresentation';
 import { buildUploadHint, getUploadRules, validateUploadableFile } from '../../../utils/serviceForms';
+import { resolveFileSize } from '../../../utils/file';
 import type { UploadableDocument } from '../../../types/document';
 import type { ServiceRequirement } from '../../../types/service';
 import { theme } from '../../../theme';
@@ -61,7 +62,7 @@ export function RespondToMissingDocumentScreen({ route, navigation }: { route: a
   const uploadedTypesRef = useRef(new Set<string>());
 
   if (query.isLoading) {
-    return <LoadingState />;
+    return <AppScreen title="الرد على النواقص"><LoadingState /></AppScreen>;
   }
 
   if (query.isError || !query.data) {
@@ -136,12 +137,12 @@ export function RespondToMissingDocumentScreen({ route, navigation }: { route: a
     });
     if (result.canceled) return;
     const asset = result.assets[0];
-    const file: UploadableDocument = {
+    const file: UploadableDocument = await resolveFileSize({
       uri: asset.uri,
       name: asset.name,
       mimeType: asset.mimeType,
       size: asset.size,
-    };
+    });
     const error = validateUploadableFile(file, requirement);
     if (error) {
       setErrors((current) => ({ ...current, [documentType]: error }));

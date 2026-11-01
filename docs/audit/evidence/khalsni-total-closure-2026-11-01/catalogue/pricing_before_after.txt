@@ -1,0 +1,42 @@
+
+Public pricing on the real catalogue (stored values unchanged).
+Legacy payload = pre-B10-10 rule (each component shown when its own flag is on); new payload = services/pricing.py.
+  1 no-criminal-record                            fixed     stored base=0.00 gov=5.00 svc=12.00 | legacy total=17.00 gov=None co=None | new total=17.00 gov=None co=None
+  2 passport-renewal                              fixed     stored base=32.00 gov=20.00 svc=12.00 | legacy total=64.00 gov=20.00 co=12.00 | new total=64.00 gov=None co=None
+  3 tax-clearance                                 fixed     stored base=18.00 gov=7.00 svc=11.00 | legacy total=36.00 gov=7.00 co=11.00 | new total=36.00 gov=None co=None  (visible)
+  4 service-debug                                 fixed     stored base=10.00 gov=5.00 svc=5.00 | legacy total=20.00 gov=None co=None | new total=20.00 gov=None co=None
+  5 service-debug-2                               fixed     stored base=10.00 gov=5.00 svc=5.00 | legacy total=20.00 gov=None co=None | new total=20.00 gov=None co=None
+  6 service-debug-3                               fixed     stored base=10.00 gov=5.00 svc=5.00 | legacy total=20.00 gov=None co=None | new total=20.00 gov=None co=None
+  7 no-criminal-record-certificate                fixed     stored base=15.00 gov=5.00 svc=10.00 | legacy total=30.00 gov=5.00 co=10.00 | new total=30.00 gov=None co=None  (visible)
+  8 passport-appointment-booking                  fixed     stored base=8.00 gov=3.00 svc=5.00 | legacy total=16.00 gov=3.00 co=5.00 | new total=16.00 gov=None co=None  (visible)
+  9 traffic-fines-payment                         fixed     stored base=6.00 gov=0.00 svc=6.00 | legacy total=12.00 gov=0.00 co=6.00 | new total=12.00 gov=None co=None  (visible)
+ 10 property-registration-deed                    fixed     stored base=28.00 gov=12.00 svc=16.00 | legacy total=56.00 gov=12.00 co=16.00 | new total=56.00 gov=None co=None  (visible)
+ 11 business-license-renewal                      fixed     stored base=24.00 gov=9.00 svc=15.00 | legacy total=48.00 gov=9.00 co=15.00 | new total=48.00 gov=None co=None  (visible)
+ 12 business_company_registration                 quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 13 business_company_information_amendment        quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 14 business_company_add_activities               quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 15 business_commercial_registration_certificate  quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 16 business_trade_name_certificate               quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 17 business_trade_name_registration              quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 18 business_trademark_services                   quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 19 business_license_services                     quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 20 business_company_closure_liquidation          quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 21 request-property-registration-certificate     quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 22 request-cadastral-map                         quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 23 request-property-ownership-transfer           quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 24 request-inheritance-registration              quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 25 request-property-gift-transfer                quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 26 request-termination-of-co-ownership           quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 27 request-property-subdivision                  quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 28 request-property-consolidation                quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 29 request-boundary-demarcation                  quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 30 request-land-survey                           quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 31 request-property-readjustment                 quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 32 request-zoning-certificate                    quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None
+ 33 request-land-use-classification-change        quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 34 request-zoning-plan                           quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 35 request-change-statement                      quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 36 request-property-mortgage-registration        quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 37 request-mortgage-release                      quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+ 38 request-building-permit                       quotation stored base=0.00 gov=0.00 svc=0.00 | legacy total=None gov=None co=None | new total=None gov=None co=None  (visible)
+Customer-visible services whose legacy breakdown did not add up: 6

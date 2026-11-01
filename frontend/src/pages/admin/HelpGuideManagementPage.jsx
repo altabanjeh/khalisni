@@ -12,7 +12,7 @@ import { useToast } from '../../context/ToastContext'
 import { getHelpScreenLabel } from '../../help/screenRegistry'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
-import { getServiceName } from '../../utils/servicePresentation'
+import { getAdminName, resolveCatalogName } from '../../utils/servicePresentation'
 
 // UI labels for backend choice codes (help_guides.models). Guide body content
 // (titles, steps, descriptions) is stored in the database and is shown as-is.
@@ -290,10 +290,17 @@ function HelpGuideManagementPage() {
     [metadata.categories, language],
   )
   const serviceOptions = useMemo(
-    () => (services || []).map((service) => ({ ...service, display_name: getServiceName(service, language) || service.name_ar })),
+    () => (services || []).map((service) => ({ ...service, display_name: getAdminName(service, language) })),
     [services, language],
   )
   const workflowOptions = useMemo(() => metadata.workflow_statuses || [], [metadata.workflow_statuses])
+  // service_name / category_name are Arabic-only on the API (DEF-A03).
+  const helpService = (row) => (services || []).find((service) => String(service.id) === String(row?.service ?? row?.service_id))
+  const helpServiceName = (row) => resolveCatalogName(row?.service ?? row?.service_id, services, row?.service_name, language)
+  const helpCategoryName = (row) => {
+    const category = helpService(row)?.category
+    return category && typeof category === 'object' ? getAdminName(category, language, row?.category_name || '') : row?.category_name || ''
+  }
 
   const entityConfig = useMemo(
     () => ({
@@ -465,10 +472,10 @@ function HelpGuideManagementPage() {
         update: api.updateAdminHelpService,
         remove: api.deleteAdminHelpService,
         restore: api.restoreAdminHelpService,
-        summary: (row) => row.service_name || row.service,
+        summary: (row) => helpServiceName(row) || row.service,
         columns: [
-          { key: 'service_name', label: tx('الخدمة', 'Service') },
-          { key: 'category_name', label: tx('الفئة', 'Category') },
+          { key: 'service_name', label: tx('الخدمة', 'Service'), render: (row) => helpServiceName(row) },
+          { key: 'category_name', label: tx('الفئة', 'Category'), render: (row) => helpCategoryName(row) },
           { key: 'role_label', label: tx('الدور', 'Role'), render: (row) => roleLabel(row.role, row.role_label) },
           { key: 'display_order', label: tx('الترتيب', 'Order') },
         ],

@@ -94,5 +94,56 @@ HELP_SCREEN_REGISTRY = [
 HELP_SCREEN_MAP = {item["screen_key"]: item for item in HELP_SCREEN_REGISTRY}
 
 
+# Arabic screen names: the help panel shows the label in the screen language
+# (CN-ACT-13). The request language is activated by core.middleware.
+ARABIC_SCREEN_LABELS = {
+    "manual_navigation": "طريقة التنقل في النظام",
+    "manual_account_access": "تسجيل الدخول والوصول إلى الحساب",
+    "manual_add_screenshots": "إضافة لقطات الشاشة إلى الدليل",
+    "customer_dashboard": "لوحة العميل",
+    "customer_create_order": "طلب جديد",
+    "customer_orders": "طلباتي",
+    "customer_order_details": "تفاصيل الطلب",
+    "customer_missing_documents": "رفع المستندات الناقصة",
+    "customer_profile": "الملف الشخصي",
+    "employee_dashboard": "لوحة الموظف",
+    "employee_review_queue": "قائمة المراجعة",
+    "employee_order_review": "مراجعة الطلب",
+    "employee_verify_documents": "التحقق من الوثائق",
+    "employee_reports": "تقارير الموظف",
+    "employee_missing_service_requests": "طلبات الخدمات الجديدة",
+    "employee_service_categories": "تصنيفات الخدمات",
+    "employee_service_relations": "علاقات الخدمات",
+    "admin_dashboard": "لوحة الإدارة",
+    "admin_orders": "إدارة الطلبات",
+    "admin_order_details": "تفاصيل الطلب (الإدارة)",
+    "admin_rules": "قواعد التشغيل",
+    "admin_system_settings": "إعدادات النظام",
+    "admin_service_categories": "تصنيفات الخدمات",
+    "admin_services": "الخدمات",
+    "admin_service_relations": "علاقات الخدمات",
+    "admin_public_site": "الموقع العام",
+    "admin_homepage_content": "محتوى الصفحة الرئيسية",
+    "admin_advertisements": "الإعلانات",
+    "admin_theme_settings": "إعدادات المظهر",
+    "admin_missing_service_requests": "طلبات الخدمات الجديدة",
+    "admin_users_roles": "المستخدمون والأدوار",
+    "admin_providers": "مزودو الخدمة",
+    "admin_provider_services": "خدمات مزودي الخدمة",
+    "admin_reports": "التقارير",
+    "admin_notifications": "الإشعارات",
+    "admin_payments": "المدفوعات",
+    "admin_audit_log": "سجل التدقيق",
+    "admin_help_guides": "إدارة دليل المستخدم",
+    "provider_dashboard": "لوحة مزود الخدمة",
+    "provider_orders": "الطلبات المسندة",
+    "provider_order_details": "تفاصيل الطلب المسند",
+}
+
+
 def get_help_screen_label(screen_key: str) -> str:
+    from django.utils import translation
+
+    if (translation.get_language() or "ar").startswith("ar"):
+        return ARABIC_SCREEN_LABELS.get(screen_key) or HELP_SCREEN_MAP.get(screen_key, {}).get("label", screen_key or "عام")
     return HELP_SCREEN_MAP.get(screen_key, {}).get("label", screen_key or "General")

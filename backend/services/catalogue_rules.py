@@ -19,6 +19,7 @@ format rule is added: the official format is an owner/domain decision.
 """
 
 import copy
+import hashlib
 
 APPROVED_PRICE_NOTE = {
     "ar": "يتم تأكيد الرسوم النهائية بعد مراجعة الوثائق.",
@@ -32,6 +33,11 @@ ADMIN_PANEL_PHRASE = "لوحة الإدارة"
 
 PARCEL_KEYS = ("parcel_number", "basin_number")
 PARCEL_QUESTION_LABEL = "هل تعرف رقم القطعة والحوض؟"
+PARCEL_QUESTION_LABEL_EN = "Do you know the parcel and basin numbers?"
+# The importer's stable key for this label (``service_import._stable_slug``):
+# the two services whose sheets ask the question already use it.
+PARCEL_QUESTION_KEY = "field_" + hashlib.sha1(PARCEL_QUESTION_LABEL.encode("utf-8")).hexdigest()[:10]
+PARCEL_FIELD_LABELS = ("رقم القطعة", "رقم الحوض")
 YES_NO_OPTIONS = [
     {"value": "yes", "label_ar": "نعم", "label_en": "Yes"},
     {"value": "no", "label_ar": "لا", "label_en": "No"},
@@ -70,12 +76,50 @@ def _is_additional_notes(field):
     return field.get("key") in ADDITIONAL_NOTES_KEYS or (field.get("label_ar") or "").strip() in ADDITIONAL_NOTES_LABELS
 
 
-def apply_schema_rules(schema):
-    """Return a new schema with the approved field rules applied. The input is not modified."""
+def _is_parcel_field(field):
+    return field.get("key") in PARCEL_KEYS and (field.get("label_ar") or field.get("label") or "").strip() in PARCEL_FIELD_LABELS
+
+
+def _parcel_question():
+    return {
+        "key": PARCEL_QUESTION_KEY,
+        "label_ar": PARCEL_QUESTION_LABEL,
+        "label_en": PARCEL_QUESTION_LABEL_EN,
+        "type": "select",
+        "required": False,
+        "options": copy.deepcopy(YES_NO_OPTIONS),
+        "help_text_ar": PARCEL_QUESTION_HELP["ar"],
+        "help_text_en": PARCEL_QUESTION_HELP["en"],
+        "source_section": "B10-1/2/3",
+    }
+
+
+def apply_schema_rules(schema, *, gate_all_parcel_fields=False):
+    """Return a new schema with the approved field rules applied. The input is not modified.
+
+    ``gate_all_parcel_fields`` (owner decision B4 option A, total-closure pass):
+    a form that collects the parcel and basin numbers («رقم القطعة» / «رقم الحوض»)
+    but does not ask «هل تعرف رقم القطعة والحوض؟» gets the question inserted
+    right before the first of those fields, so every land service applies the
+    same yes/no gate. Without the flag (migration ``services.0014``) only forms
+    whose source sheet asks the question are gated.
+    """
     if not isinstance(schema, list):
         return schema
     fields = copy.deepcopy(schema)
     question = next((field for field in fields if isinstance(field, dict) and _is_parcel_question(field)), None)
+    if question is None and gate_all_parcel_fields:
+        first_parcel = next(
+            (index for index, field in enumerate(fields) if isinstance(field, dict) and _is_parcel_field(field)),
+            None,
+        )
+        keys = {str(field.get("key")) for field in fields if isinstance(field, dict)}
+        if first_parcel is not None and PARCEL_QUESTION_KEY not in keys:
+            question = _parcel_question()
+            fields.insert(first_parcel, question)
+            for order, field in enumerate(fields, start=1):
+                if isinstance(field, dict):
+                    field["display_order"] = order
 
     for field in fields:
         if not isinstance(field, dict):
@@ -167,3 +211,17 @@ def drop_merged_aliases(slug, fields, documents):
     fields = [field for field in fields if aliases["fields"].get(field.get("key")) not in field_keys]
     documents = [document for document in documents if aliases["documents"].get(document.get("code")) not in document_codes]
     return fields, documents
+
+
+# Brand (owner decision): visible text uses «خلصني» and "Khalsni". The client
+# sheets write «خلّصني»; domains and e-mail addresses (khalisni.com) are not text
+# and are never changed.
+import re as _re
+
+_LATIN_VARIANT = _re.compile(r"\bKhalisni\b(?![.@\w])")
+
+
+def normalize_brand(text):
+    if not isinstance(text, str) or not text:
+        return text
+    return _LATIN_VARIANT.sub("Khalsni", text.replace("خلّصني", "خلصني"))

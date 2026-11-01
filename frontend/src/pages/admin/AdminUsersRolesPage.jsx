@@ -15,7 +15,7 @@ const EMPTY_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
 
 const defaultUserValues = {
   full_name: '', email: '', phone: '', password: '',
-  role: 'employee', national_id: '', is_active: true, is_verified: false,
+  role: 'employee', national_id: '', is_active: true,
 }
 const fallbackRoleOptions = ['employee', 'support', 'provider']
 // An organization admin creates accounts inside an organization they administer.
@@ -128,6 +128,9 @@ function PermissionsPanel({ user, onSaved }) {
 // Account state comes from is_deleted / is_active only. Being active says
 // nothing about verification, which is shown from its own fields, each one
 // separately: no combined "verified" value is derived here (audit B10-8).
+// Owner decision B10-8: the generic "account verified" flag (is_verified) is not
+// a business/KYC gate in the MVP, so it is neither shown nor editable here; only
+// the concrete email/phone confirmation facts are shown, read-only.
 function AccountStateBadge({ row, tr }) {
   const [label, className] = row.is_deleted
     ? [tr('محذوف', 'Deleted'), 'border-danger/20 bg-danger/10 text-danger']
@@ -139,7 +142,6 @@ function AccountStateBadge({ row, tr }) {
 
 function VerificationFacts({ row, tr }) {
   const facts = [
-    ['is_verified', tr('الحساب موثّق', 'Account verified')],
     ['is_email_verified', tr('البريد الإلكتروني مؤكَّد', 'Email confirmed')],
     ['is_phone_verified', tr('رقم الهاتف مؤكَّد', 'Phone confirmed')],
   ]
@@ -226,7 +228,7 @@ function AdminUsersRolesPage() {
     reset(selectedUser ? {
       full_name: selectedUser.full_name || '', email: selectedUser.email || '', phone: selectedUser.phone || '',
       password: '', role: selectedUser.role || 'employee', national_id: selectedUser.national_id || '',
-      is_active: Boolean(selectedUser.is_active), is_verified: Boolean(selectedUser.is_verified),
+      is_active: Boolean(selectedUser.is_active),
     } : defaultUserValues)
   }, [selectedUser, reset])
 
@@ -477,7 +479,6 @@ function AdminUsersRolesPage() {
                 <p className="text-sm font-bold text-ink">{tr('إعدادات الحساب', 'Account settings')}</p>
                 <div className="grid gap-3 md:grid-cols-2">
                   <CheckboxField label={tr('الحساب نشط', 'Account active')} registration={userForm.register('is_active')} />
-                  <CheckboxField label={tr('الحساب موثّق', 'Account verified')} registration={userForm.register('is_verified')} />
                 </div>
               </div>
             </form>

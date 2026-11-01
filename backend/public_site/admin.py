@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from public_site.models import Advertisement, ContactInquiry, MissingServiceRequest, PublicPageContent, SiteTheme
+from public_site.models import (
+    Advertisement,
+    ContactInquiry,
+    LegalDocument,
+    MissingServiceRequest,
+    PublicPageContent,
+    SiteTheme,
+)
 
 
 @admin.register(ContactInquiry)
@@ -82,6 +89,8 @@ class PublicPageContentAdmin(admin.ModelAdmin):
                     "email",
                     "office_address",
                     "office_address_en",
+                    "office_hours_ar",
+                    "office_hours_en",
                     "footer_text",
                     "footer_text_en",
                 )
@@ -149,3 +158,21 @@ class MissingServiceRequestAdmin(admin.ModelAdmin):
         ("Handling", {"fields": ("matched_service", "assigned_to", "internal_notes", "response_message")}),
         ("Audit", {"fields": ("resolved_at", "created_at", "updated_at")}),
     )
+
+
+@admin.register(LegalDocument)
+class LegalDocumentAdmin(admin.ModelAdmin):
+    """Read-only listing: versions are created, approved and published through the admin API/page."""
+
+    list_display = ("kind", "version", "effective_date", "approval_status", "is_published", "published_at", "updated_at")
+    list_filter = ("kind", "approval_status", "is_published")
+    search_fields = ("version", "title_ar", "title_en")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

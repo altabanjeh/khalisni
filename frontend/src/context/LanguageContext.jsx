@@ -4,6 +4,7 @@ import {
   getDirectionForLanguage,
   getInitialLanguage,
   getLocaleForLanguage,
+  interpolateMessage,
   isRtlLanguage,
   LANGUAGE_STORAGE_KEY,
   normalizeLanguage,
@@ -16,7 +17,7 @@ const defaultLanguageContext = {
   direction: 'rtl',
   isArabic: true,
   setLanguage: () => {},
-  t: (_key, fallback = '') => fallback,
+  t: (_key, fallback = '', values = {}) => interpolateMessage(fallback, values),
 }
 
 const LanguageContext = createContext(defaultLanguageContext)

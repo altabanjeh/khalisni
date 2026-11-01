@@ -34,6 +34,7 @@ import {
   visibleSchemaFields,
 } from '../../utils/serviceForms'
 import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../utils/orderConsent'
+import OrderConsentStatement from '../../components/OrderConsentStatement'
 
 function StepPanel({ eyebrow, title, description, children }) {
   return (
@@ -574,7 +575,7 @@ function CustomerCreateOrderPage() {
 
                   <label className="flex items-start gap-3 rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-sm font-semibold text-ink">
                     <input className="mt-1 h-4 w-4" type="checkbox" {...register('consent', { required: isArabic ? 'يجب الموافقة للمتابعة' : 'You must agree to continue' })} />
-                    <span>{T.consent}</span>
+                    <OrderConsentStatement language={isArabic ? 'ar' : 'en'} />
                   </label>
                   {errors.consent ? <p className="text-xs font-bold text-danger" role="alert">{errors.consent.message}</p> : null}
                   {errors.root?.server ? <p className="text-sm font-bold text-danger" role="alert">{errors.root.server.message}</p> : null}

@@ -1,4 +1,4 @@
-import { LogIn, Mail, MapPin, Menu, MessageCircle, Phone, UserRound, X } from 'lucide-react'
+import { LogIn, Menu, MessageCircle, UserRound, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -8,6 +8,7 @@ import { getDefaultDashboardPath } from '../utils/authz'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import SkipLink from '../components/SkipLink'
 import { KhalsniLogo } from '../components/brand/KhalsniLogo'
+import PublishedContactDetails from '../components/public/PublishedContactDetails'
 import { getLocalizedField } from '../utils/i18n'
 
 // Footer links are at least 24px tall (WCAG 2.2 target size, audit B09) and keep a visible focus ring.
@@ -30,8 +31,8 @@ const copy = {
     quickLinks: 'روابط سريعة',
     specialRequest: 'طلب خاص',
     privacy: 'سياسة الخصوصية',
+    terms: 'شروط الاستخدام',
     contactTitle: 'تواصل معنا',
-    noContact: 'معلومات التواصل غير منشورة حالياً.',
     copyright: 'جميع الحقوق محفوظة © 2026 خلصني',
     homeLink: 'الصفحة الرئيسية لخلصني',
     openMenu: 'فتح قائمة التنقل',
@@ -53,20 +54,13 @@ const copy = {
     quickLinks: 'Quick links',
     specialRequest: 'Special request',
     privacy: 'Privacy policy',
+    terms: 'Terms of use',
     contactTitle: 'Contact',
-    noContact: 'Contact details are not published yet.',
     copyright: 'All rights reserved © 2026 Khalsni',
     homeLink: 'Khalsni home',
     openMenu: 'Open navigation menu',
     closeMenu: 'Close navigation menu',
   },
-}
-
-// A tel: URI carries only the digits and a leading +; the visible text keeps
-// the spacing the content editor typed ("+962 6 560 9000" -> "tel:+96265609000").
-function telHref(phone) {
-  const value = String(phone || '').trim()
-  return (value.startsWith('+') ? '+' : '') + value.replace(/\D/g, '')
 }
 
 function PublicLayoutContent() {
@@ -77,7 +71,6 @@ function PublicLayoutContent() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const portalPath = user ? getDefaultDashboardPath(user) : ''
-  const officeAddress = getLocalizedField(content, { ar: 'office_address', en: 'office_address_en' }, isArabic ? 'ar' : 'en')
   const footerText = getLocalizedField(content, { ar: 'footer_text', en: 'footer_text_en' }, isArabic ? 'ar' : 'en')
 
   const links = [
@@ -232,33 +225,14 @@ function PublicLayoutContent() {
                 <Link className={FOOTER_LINK} to="/track-order">{dictionary.track}</Link>
                 <Link className={FOOTER_LINK} to="/faq">{dictionary.faq}</Link>
                 <Link className={FOOTER_LINK} to="/privacy">{dictionary.privacy}</Link>
+                <Link className={FOOTER_LINK} to="/terms">{dictionary.terms}</Link>
               </div>
             </div>
 
             <div>
               <h2 className="text-sm font-extrabold text-[var(--khalsni-public-navy)]">{dictionary.contactTitle}</h2>
-              <div className="mt-4 grid gap-3 text-sm text-[var(--khalsni-public-text-secondary)]">
-                {content.contact_phone ? (
-                  <a className={`${FOOTER_LINK} gap-2`} href={`tel:${telHref(content.contact_phone)}`}>
-                    <Phone className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
-                    <span>{content.contact_phone}</span>
-                  </a>
-                ) : null}
-                {content.email ? (
-                  <a className={`${FOOTER_LINK} gap-2`} href={`mailto:${content.email}`}>
-                    <Mail className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
-                    <span>{content.email}</span>
-                  </a>
-                ) : null}
-                {officeAddress ? (
-                  <p className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-[var(--khalsni-public-primary)]" />
-                    <span>{officeAddress}</span>
-                  </p>
-                ) : null}
-                {!content.contact_phone && !content.email && !officeAddress ? (
-                  <p className="text-sm leading-7 text-[var(--khalsni-public-text-secondary)]">{dictionary.noContact}</p>
-                ) : null}
+              <div className="mt-4 text-sm text-[var(--khalsni-public-text-secondary)]">
+                <PublishedContactDetails content={content} isArabic={isArabic} linkClassName={`${FOOTER_LINK} gap-2`} />
               </div>
             </div>
           </div>

@@ -11,6 +11,7 @@ import {
   Workflow,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import DataTable from '../../components/DataTable'
 import FormModal from '../../components/FormModal'
@@ -22,6 +23,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { useExclusiveAction } from '../../hooks/useExclusiveAction'
 import { getLocalizedField } from '../../utils/i18n'
+import { getAuditActionLabel, getAuditSourceLabel, getAuditStatusLabel } from '../../utils/auditPresentation'
 import { describeRule, getRoleLabel, getWorkflowActionLabel, getWorkflowChannelLabel, getWorkflowCheckLabel } from '../../utils/workflowPresentation'
 
 const SERVICE_TABS = [
@@ -35,32 +37,6 @@ const SERVICE_TABS = [
   { id: 'audit', icon: ShieldCheck },
   { id: 'settings', icon: Settings },
 ]
-
-const DEFAULT_SERVICE_FORM = {
-  category_id: '',
-  name_ar: '',
-  name_en: '',
-  short_description_ar: '',
-  short_description_en: '',
-  description_ar: '',
-  description_en: '',
-  base_price: '0.00',
-  government_fee: '0.00',
-  service_fee: '0.00',
-  estimated_duration: 1,
-  estimated_duration_min: 1,
-  estimated_duration_max: 3,
-  estimated_duration_unit: 'days',
-  delivery_time_mode: 'duration',
-  price_type: 'fixed',
-  provider_required: true,
-  requires_manual_review: true,
-  requires_appointment: false,
-  is_online: true,
-  is_featured: false,
-  is_active: true,
-  display_order: 0,
-}
 
 const DEFAULT_DOCUMENT_FORM = {
   service_id: '',
@@ -281,11 +257,6 @@ function AdminRuleManagementPage() {
     sms: tx('رسائل SMS', 'SMS'),
     whatsapp: tx('واتساب', 'WhatsApp'),
   }
-  const durationUnitLabels = {
-    hours: tx('ساعات', 'Hours'),
-    days: tx('أيام', 'Days'),
-    weeks: tx('أسابيع', 'Weeks'),
-  }
   const fileExtensionLabels = {
     '.pdf': tx('ملف PDF', 'PDF document'),
     '.jpg': tx('صورة JPG', 'JPG image'),
@@ -323,7 +294,6 @@ function AdminRuleManagementPage() {
     onConfirm: null,
   })
 
-  const [selectedServiceId, setSelectedServiceId] = useState(null)
   const [selectedDocumentId, setSelectedDocumentId] = useState(null)
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null)
   const [selectedProviderId, setSelectedProviderId] = useState(null)
@@ -333,7 +303,6 @@ function AdminRuleManagementPage() {
   const [selectedSettingId, setSelectedSettingId] = useState(null)
   const [activeEditor, setActiveEditor] = useState(null)
 
-  const [serviceForm, setServiceForm] = useState(DEFAULT_SERVICE_FORM)
   const [documentForm, setDocumentForm] = useState(DEFAULT_DOCUMENT_FORM)
   const [assignmentForm, setAssignmentForm] = useState(DEFAULT_ASSIGNMENT_FORM)
   const [providerActionForm, setProviderActionForm] = useState(DEFAULT_PROVIDER_ACTION)
@@ -345,8 +314,7 @@ function AdminRuleManagementPage() {
   const [auditFilters, setAuditFilters] = useState(DEFAULT_AUDIT_FILTERS)
   const [deleteGuardForm, setDeleteGuardForm] = useState(DEFAULT_DELETE_GUARD_FORM)
 
-  const { data: categories = [], loading: categoriesLoading } = useAsyncData(() => api.getAdminCategories(), [], [])
-  const { data: services = [], loading: servicesLoading, reload: reloadServices } = useAsyncData(() => api.getAdminServices(), [], [])
+  const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
   const { data: documents = [], loading: documentsLoading, reload: reloadDocuments } = useAsyncData(() => api.getAdminServiceDocuments(), [], [])
   const { data: assignments = [], loading: assignmentsLoading, reload: reloadAssignments } = useAsyncData(() => api.getAdminServiceAssignments(), [], [])
   const { data: providers = [], loading: providersLoading, reload: reloadProviders } = useAsyncData(() => api.getProviders(), [], [])
@@ -362,7 +330,6 @@ function AdminRuleManagementPage() {
   const { data: deleteGuard = null, loading: deleteGuardLoading, reload: reloadDeleteGuard } = useAsyncData(() => api.getDeleteGuardConfig(), [], null)
   const { data: auditLogs = [], loading: auditLoading, reload: reloadAudit } = useAsyncData(() => api.getAuditLogs(auditFilters), [auditFilters], [])
 
-  const selectedService = services.find((item) => String(item.id) === String(selectedServiceId)) || null
   const selectedDocument = documents.find((item) => String(item.id) === String(selectedDocumentId)) || null
   const selectedAssignment = assignments.find((item) => String(item.id) === String(selectedAssignmentId)) || null
   const selectedProvider = providers.find((item) => String(item.id) === String(selectedProviderId)) || null
@@ -372,7 +339,6 @@ function AdminRuleManagementPage() {
   const selectedSetting = systemSettings.find((item) => String(item.id || item.setting_id) === String(selectedSettingId)) || null
 
   const busy =
-    categoriesLoading ||
     servicesLoading ||
     documentsLoading ||
     assignmentsLoading ||
@@ -384,38 +350,6 @@ function AdminRuleManagementPage() {
     settingsLoading ||
     deleteGuardLoading ||
     auditLoading
-
-  useEffect(() => {
-    setServiceForm(      selectedService
-        ? {
-            category_id: selectedService.category?.id || '',
-            name_ar: selectedService.name_ar || '',
-            name_en: selectedService.name_en || '',
-            short_description_ar: selectedService.short_description_ar || '',
-            short_description_en: selectedService.short_description_en || '',
-            description_ar: selectedService.description_ar || '',
-            description_en: selectedService.description_en || '',
-            base_price: selectedService.base_price ?? '0.00',
-            government_fee: selectedService.government_fee ?? '0.00',
-            service_fee: selectedService.service_fee ?? '0.00',
-            estimated_duration: selectedService.estimated_duration ?? 1,
-            estimated_duration_min: selectedService.estimated_duration_min ?? selectedService.estimated_duration ?? 1,
-            estimated_duration_max: selectedService.estimated_duration_max ?? selectedService.estimated_duration ?? 1,
-            estimated_duration_unit: selectedService.estimated_duration_unit || 'days',
-            delivery_time_mode: selectedService.delivery_time_mode === 'date_range' ? 'duration' : selectedService.delivery_time_mode || 'duration',
-            price_type: selectedService.price_type || 'fixed',
-            provider_required: Boolean(selectedService.provider_required),
-            requires_manual_review: Boolean(selectedService.requires_manual_review),
-            requires_appointment: Boolean(selectedService.requires_appointment),
-            is_online: Boolean(selectedService.is_online),
-            is_featured: Boolean(selectedService.is_featured),
-            is_active: Boolean(selectedService.is_active),
-            display_order: selectedService.display_order ?? 0,
-          }
-        : DEFAULT_SERVICE_FORM,
-    )
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedServiceId, services])
 
   useEffect(() => {
     setDocumentForm(      selectedDocument
@@ -528,18 +462,6 @@ function AdminRuleManagementPage() {
     setFeedback((current) => ({ ...current, [section]: { type, text } }))
   }
 
-  function openServiceEditor(id = null) {
-    setSelectedServiceId(id)
-    if (!id) setServiceForm(DEFAULT_SERVICE_FORM)
-    setActiveEditor('service')
-  }
-
-  function closeServiceEditor() {
-    setActiveEditor((current) => (current === 'service' ? null : current))
-    setSelectedServiceId(null)
-    setServiceForm(DEFAULT_SERVICE_FORM)
-  }
-
   function openDocumentEditor(id = null) {
     setSelectedDocumentId(id)
     if (!id) setDocumentForm(DEFAULT_DOCUMENT_FORM)
@@ -628,35 +550,6 @@ function AdminRuleManagementPage() {
 
   function openConfirm(title, description, onConfirm) {
     setConfirmState({ open: true, title, description, onConfirm })
-  }
-
-  async function handleServiceSave() {
-    try {
-      const isDurationRange = serviceForm.delivery_time_mode === 'duration_range'
-      const durationMin = Number(serviceForm.estimated_duration_min || serviceForm.estimated_duration || 1)
-      const durationMax = Number(serviceForm.estimated_duration_max || serviceForm.estimated_duration || durationMin)
-      const payload = {
-        ...serviceForm,
-        category_id: Number(serviceForm.category_id),
-        estimated_duration: isDurationRange ? durationMax : Number(serviceForm.estimated_duration || 1),
-        estimated_duration_min: isDurationRange ? durationMin : null,
-        estimated_duration_max: isDurationRange ? durationMax : null,
-        delivery_time_mode: serviceForm.delivery_time_mode,
-        delivery_start_date: null,
-        delivery_end_date: null,
-        display_order: Number(serviceForm.display_order || 0),
-      }
-      if (selectedService) {
-        await api.updateAdminService(selectedService.id, payload)
-      } else {
-        await api.createAdminService(payload)
-      }
-      reloadServices()
-      closeServiceEditor()
-      setSectionFeedback('services', 'success', tx('تم حفظ قواعد الخدمة.', 'Service rules saved.'))
-    } catch (error) {
-      setSectionFeedback('services', 'error', getDisplayError(error))
-    }
   }
 
   async function handleDocumentSave() {
@@ -866,9 +759,17 @@ function AdminRuleManagementPage() {
     </div>
   )
 
+  // Read-only overview: /admin/services is the one canonical service and price
+  // editor, so this tab links there instead of offering a second editor.
+  const serviceEditHref = (row) => {
+    const params = new URLSearchParams({ edit: String(row.id) })
+    const search = row.slug || row.name_ar || row.name_en
+    if (search) params.set('search', search)
+    return `/admin/services?${params.toString()}`
+  }
   const serviceColumns = [
     { key: 'name', label: tx('الخدمة', 'Service'), render: (row) => getLocalizedName(row) },
-    { key: 'category_name', label: tx('التصنيف', 'Category') },
+    { key: 'category_name', label: tx('التصنيف', 'Category'), render: (row) => (row.category && typeof row.category === 'object' ? getLocalizedName(row.category, 'name_ar', 'name_en', row.category_name || '') : row.category_name || '—') },
     { key: 'base_price', label: tx('السعر الأساسي', 'Base price'), render: (row) => formatPriceWithCurrency(row.base_price) },
     {
       key: 'duration_display',
@@ -882,30 +783,24 @@ function AdminRuleManagementPage() {
       key: 'actions',
       label: tx('الإجراءات', 'Actions'),
       render: (row) => (
-        <div className="flex gap-2">
-          <button className="btn-secondary px-3 py-2 text-xs" onClick={() => openServiceEditor(row.id)} type="button">
-            {tx('تعديل', 'Edit')}
-          </button>
-          <button
-            className="rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
-            onClick={() =>
-              openConfirm(tx('تعطيل الخدمة', 'Disable service'), tx('يتم تعطيل الخدمات المستخدمة فقط ولا تُحذف من السجل أبداً.', 'Used services are only disabled, never removed from history.'), async () => {
-                await api.deleteAdminService(row.id)
-                reloadServices()
-                setConfirmState({ open: false, title: '', description: '', onConfirm: null })
-              })
-            }
-            type="button"
-          >
-            {tx('تعطيل', 'Disable')}
-          </button>
-        </div>
+        <Link
+          aria-label={tx(`تعديل ${getLocalizedName(row)} في إدارة الخدمات`, `Edit ${getLocalizedName(row)} in Services`)}
+          className="btn-secondary min-h-9 px-3 py-2 text-xs"
+          to={serviceEditHref(row)}
+        >
+          {tx('تعديل في إدارة الخدمات', 'Edit in Services')}
+        </Link>
       ),
     },
   ]
 
+  // service_name is Arabic-only on the API; resolve it from the loaded services (DEF-A03).
+  const ruleServiceName = (row) => {
+    const service = services.find((item) => String(item.id) === String(row?.service_id ?? row?.service))
+    return service ? getLocalizedName(service, 'name_ar', 'name_en', row?.service_name || '') : row?.service_name || ''
+  }
   const documentColumns = [
-    { key: 'service_name', label: tx('الخدمة', 'Service') },
+    { key: 'service_name', label: tx('الخدمة', 'Service'), render: (row) => ruleServiceName(row) },
     { key: 'name', label: tx('اسم المستند', 'Document name'), render: (row) => getLocalizedName(row) },
     { key: 'is_required', label: tx('المتطلب', 'Requirement'), render: (row) => (row.is_required ? tx('مطلوب', 'Required') : tx('اختياري', 'Optional')) },
     { key: 'allowed_extensions', label: tx('أنواع الملفات', 'File types'), render: (row) => formatExtensionList(row.allowed_extensions) },
@@ -941,7 +836,7 @@ function AdminRuleManagementPage() {
   ]
 
   const assignmentColumns = [
-    { key: 'service_name', label: tx('الخدمة', 'Service') },
+    { key: 'service_name', label: tx('الخدمة', 'Service'), render: (row) => ruleServiceName(row) },
     { key: 'provider_name', label: tx('مزود الخدمة', 'Provider') },
     { key: 'provider_city', label: tx('المدينة', 'City') },
     { key: 'provider_is_approved', label: tx('معتمد', 'Approved'), render: (row) => (row.provider_is_approved ? tx('نعم', 'Yes') : tx('لا', 'No')) },
@@ -1085,9 +980,9 @@ function AdminRuleManagementPage() {
 
   const auditColumns = [
     { key: 'user_name', label: tx('المستخدم', 'User') },
-    { key: 'module', label: tx('الوحدة', 'Module') },
-    { key: 'action', label: tx('الإجراء', 'Action') },
-    { key: 'status', label: tx('النتيجة', 'Result') },
+    { key: 'module', label: tx('الوحدة', 'Module'), render: (row) => getAuditSourceLabel(row.module, language) },
+    { key: 'action', label: tx('الإجراء', 'Action'), render: (row) => getAuditActionLabel(row.action, language) },
+    { key: 'status', label: tx('النتيجة', 'Result'), render: (row) => getAuditStatusLabel(row.status, language) },
     { key: 'message', label: tx('الرسالة', 'Message') },
     { key: 'created_at', label: tx('التاريخ', 'Date'), render: (row) => formatDateTime(row.created_at, locale, tx('غير متوفر', 'Not available')) },
   ]
@@ -1148,15 +1043,15 @@ function AdminRuleManagementPage() {
         <section className="glass-panel p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <EmptyHelp
-              title={tx('إدارة الخدمات', 'Service management')}
+              title={tx('نظرة عامة على الخدمات والأسعار', 'Services and prices overview')}
               text={tx(
-                'أدر فقط تفاصيل الخدمات الظاهرة للأعمال. تبقى المعرفات الداخلية مخفية ويتم تعطيل الخدمات المستخدمة بدلاً من حذفها.',
-                'Manage only business-facing service details. Internal identifiers stay hidden and used services are disabled instead of deleted.',
+                'هذه نظرة للقراءة فقط. تُعدَّل الخدمات وأسعارها ومددها من صفحة إدارة الخدمات فقط حتى لا تتعارض التعديلات.',
+                'This is a read-only overview. Services, prices and durations are edited only in the Services page so edits never conflict.',
               )}
             />
-            <button className="btn-primary" onClick={() => openServiceEditor()} type="button">
-              {tx('خدمة جديدة', 'New service')}
-            </button>
+            <Link className="btn-primary" to="/admin/services">
+              {tx('فتح إدارة الخدمات', 'Open Services')}
+            </Link>
           </div>
           <DataTable
             ariaLabel={tabLabels.services}
@@ -1408,107 +1303,6 @@ function AdminRuleManagementPage() {
           <SectionMessage message={feedback.settings} />
         </section>
       ) : null}
-
-      <FormModal
-        open={activeEditor === 'service'}
-        onClose={closeServiceEditor}
-        size="xl"
-        title={selectedService ? tx('تعديل الخدمة', 'Edit service') : tx('خدمة جديدة', 'New service')}
-        description={tx(
-          'أدر تفاصيل الخدمة الظاهرة للأعمال داخل نافذة مركزة واحدة دون ضغط عرض الجدول.',
-          'Manage business-facing service details in one focused popup without compressing the table view.',
-        )}
-        footer={
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button className="btn-secondary" onClick={closeServiceEditor} type="button">
-              {tx('إلغاء', 'Cancel')}
-            </button>
-            <button className="btn-primary min-w-40" disabled={Boolean(saving)} onClick={exclusive('service', handleServiceSave)} type="button">
-              {tx('حفظ الخدمة', 'Save service')}
-            </button>
-          </div>
-        }
-      >
-        <EmptyHelp
-          title={tx('قواعد التسعير', 'Price rules')}
-          text={tx(
-            'يتم تدقيق السعر الأساسي والرسوم الإضافية ومتطلبات المراجعة ومتطلبات المزود. لا يسمح هذا النموذج بتجاوز سير العمل مباشرة.',
-            'Base price, extra fees, review requirement, and provider requirement are audited. This form does not allow direct workflow bypass.',
-          )}
-          warning={tx('تظهر تغييرات الأسعار للموظفين فوراً ويتم تسجيلها في سجل التدقيق.', 'Price changes are visible to staff immediately and are recorded in the audit log.')}
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Field label={tx('التصنيف', 'Category')} help={tx('اختر التصنيف التجاري الظاهر للمشرفين والعملاء.', 'Choose the business category shown to admins and clients.')}>
-            <select className="field" value={serviceForm.category_id} onChange={(event) => setServiceForm({ ...serviceForm, category_id: event.target.value })}>
-              <option value="">{tx('اختر التصنيف', 'Choose category')}</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {getLocalizedName(category)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label={tx('الاسم العربي', 'Arabic name')} help={tx('اسم الخدمة الرئيسي الظاهر في الشاشات العربية.', 'Main service name visible in Arabic screens.')}>
-            <input className="field" value={serviceForm.name_ar} onChange={(event) => setServiceForm({ ...serviceForm, name_ar: event.target.value })} />
-          </Field>
-          <Field label={tx('الاسم الإنجليزي', 'English name')} help={tx('يستخدم في الشاشات الثنائية اللغة والتقارير.', 'Used in bilingual screens and reports.')}>
-            <input className="field" value={serviceForm.name_en} onChange={(event) => setServiceForm({ ...serviceForm, name_en: event.target.value })} />
-          </Field>
-          <Field label={tx('العملة', 'Currency')} help={tx('جميع الأسعار في هذه الشاشة تحفظ بنفس العملة.', 'All prices in this screen use the same currency.')}>
-            <input className="field bg-slate-50 text-slate-600" readOnly value={SERVICE_CURRENCY_CODE} />
-          </Field>
-          <Field label={tx(`السعر الأساسي (${SERVICE_CURRENCY_CODE})`, `Base price (${SERVICE_CURRENCY_CODE})`)} help={tx('المبلغ الرئيسي للخدمة قبل الرسوم الأخرى.', 'Main service amount before other fees.')}>
-            <input className="field" type="number" value={serviceForm.base_price} onChange={(event) => setServiceForm({ ...serviceForm, base_price: event.target.value })} />
-          </Field>
-          <Field label={tx(`الرسوم الحكومية (${SERVICE_CURRENCY_CODE})`, `Government fee (${SERVICE_CURRENCY_CODE})`)} help={tx('مبلغ حكومي اختياري إذا كانت الخدمة تتطلبه.', 'Optional government amount if this service needs it.')}>
-            <input className="field" type="number" value={serviceForm.government_fee} onChange={(event) => setServiceForm({ ...serviceForm, government_fee: event.target.value })} />
-          </Field>
-          <Field label={tx(`رسوم خدمة إضافية (${SERVICE_CURRENCY_CODE})`, `Extra service fee (${SERVICE_CURRENCY_CODE})`)} help={tx('أي رسوم داخلية إضافية يسمح بها نموذج العمل.', 'Any extra internal fee allowed by the business model.')}>
-            <input className="field" type="number" value={serviceForm.service_fee} onChange={(event) => setServiceForm({ ...serviceForm, service_fee: event.target.value })} />
-          </Field>
-          <Field label={tx('نوع المدة المتوقعة', 'Expected time type')} help={tx('استخدم مدة واحدة أو نطاقاً نسبياً يبدأ من تاريخ طلب العميل.', 'Use a single duration or a relative range that starts from the customer order date.')}>
-            <select className="field" value={serviceForm.delivery_time_mode} onChange={(event) => setServiceForm({ ...serviceForm, delivery_time_mode: event.target.value })}>
-              <option value="duration">{tx('مدة متوقعة', 'Expected duration')}</option>
-              <option value="duration_range">{tx('نطاق متوقع', 'Expected range')}</option>
-            </select>
-          </Field>
-          <Field label={tx('وحدة المدة', 'Duration unit')} help={tx('اختر أوضح وحدة للعمليات.', 'Choose the clearest unit for operations.')}>
-            <select className="field" value={serviceForm.estimated_duration_unit} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_unit: event.target.value })}>
-              <option value="hours">{durationUnitLabels.hours}</option>
-              <option value="days">{durationUnitLabels.days}</option>
-              <option value="weeks">{durationUnitLabels.weeks}</option>
-            </select>
-          </Field>
-          {serviceForm.delivery_time_mode === 'duration_range' ? (
-            <>
-              <Field label={tx('من', 'From')} help={tx('أقل مدة متوقعة بعد تاريخ الطلب.', 'Minimum expected time after the order date.')}>
-                <input className="field" min="1" type="number" value={serviceForm.estimated_duration_min} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_min: event.target.value })} />
-              </Field>
-              <Field label={tx('إلى', 'To')} help={tx('أقصى مدة متوقعة بعد تاريخ الطلب.', 'Maximum expected time after the order date.')}>
-                <input className="field" min="1" type="number" value={serviceForm.estimated_duration_max} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration_max: event.target.value })} />
-              </Field>
-            </>
-          ) : (
-            <Field label={tx('المدة التقديرية', 'Estimated duration')} help={tx('استخدم رقماً بسيطاً للمشرفين غير التقنيين.', 'Use a simple number for non-technical admins.')}>
-              <input className="field" min="1" type="number" value={serviceForm.estimated_duration} onChange={(event) => setServiceForm({ ...serviceForm, estimated_duration: event.target.value })} />
-            </Field>
-          )}
-          <Field label={tx('الوصف العربي', 'Arabic description')} help={tx('اشرح الخدمة بلغة بسيطة.', 'Explain the service in simple language.')}>
-            <textarea className="field min-h-28" value={serviceForm.description_ar} onChange={(event) => setServiceForm({ ...serviceForm, description_ar: event.target.value })} />
-          </Field>
-          <Field label={tx('الوصف الإنجليزي', 'English description')} help={tx('وصف ثنائي اللغة اختياري.', 'Optional bilingual description.')}>
-            <textarea className="field min-h-28" value={serviceForm.description_en} onChange={(event) => setServiceForm({ ...serviceForm, description_en: event.target.value })} />
-          </Field>
-        </div>
-        <div className="mt-4 grid gap-3">
-          <ToggleField checked={serviceForm.provider_required} help={tx('أوقف هذا فقط للخدمات التي تُنجز بالكامل داخل المكتب.', 'Turn this off only for services completed fully inside the office.')} label={tx('المزود مطلوب', 'Provider is required')} onChange={(value) => setServiceForm({ ...serviceForm, provider_required: value })} />
-          <ToggleField checked={serviceForm.requires_manual_review} help={tx('أبقِ هذا مفعلاً عندما يجب أن يراجع موظف كل طلب قبل التنفيذ.', 'Keep this on when an employee must review each order before execution.')} label={tx('مراجعة الموظف مطلوبة', 'Employee review is required')} onChange={(value) => setServiceForm({ ...serviceForm, requires_manual_review: value })} />
-          <ToggleField checked={serviceForm.is_active} help={tx('تبقى الخدمات غير النشطة في السجل لكنها تتوقف عن استقبال طلبات جديدة.', 'Inactive services stay in history but stop accepting new orders.')} label={tx('الخدمة نشطة', 'Service is active')} onChange={(value) => setServiceForm({ ...serviceForm, is_active: value })} />
-        </div>
-        <div className="mt-4">
-          <SectionMessage message={feedback.services} />
-        </div>
-      </FormModal>
 
       <FormModal
         open={activeEditor === 'document'}

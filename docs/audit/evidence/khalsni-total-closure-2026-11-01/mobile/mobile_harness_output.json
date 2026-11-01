@@ -1,0 +1,588 @@
+{
+  "generated": "2026-11-01T08:34:46.797Z",
+  "adapter": "axios Node http adapter (not React Native XHR)",
+  "passed": 38,
+  "total": 38,
+  "results": [
+    {
+      "id": "DEF-pagination-1",
+      "name": "getCustomerOrders follows `next` until null (45 items over 3 pages, base URL kept)",
+      "pass": true,
+      "evidence": {
+        "count": 45,
+        "requests": [
+          "/api/customer/orders/",
+          "/api/customer/orders/?page=2",
+          "/api/customer/orders/?page=3"
+        ],
+        "lastId": 45
+      }
+    },
+    {
+      "id": "DEF-pagination-2",
+      "name": "notifications page API exposes next/count for load-more; page 2 reachable",
+      "pass": true,
+      "evidence": {
+        "page1": {
+          "n": 20,
+          "count": 25,
+          "next": "http://127.0.0.1:8097/api/notifications/?page=2"
+        },
+        "page2": {
+          "n": 5,
+          "next": null
+        }
+      }
+    },
+    {
+      "id": "DEF-pagination-3",
+      "name": "dashboard unread count uses /notifications/unread-count/ (server count, not page 1)",
+      "pass": true,
+      "evidence": {
+        "unread": 37
+      }
+    },
+    {
+      "id": "DEF-service-answers-1",
+      "name": "keys are raw schema keys (name ?? key ?? field ?? id ?? field_N), hidden fields omitted, checkbox booleans, select sends option value, empty optional omitted",
+      "pass": true,
+      "evidence": {
+        "answersWhenNo": {
+          "12": false,
+          "knows_parcel": "no",
+          "agree_terms": true,
+          "field_6": "نص حر",
+          "urgent_reason": "سفر"
+        },
+        "keys": [
+          "knows_parcel",
+          "parcel_number",
+          "Basin",
+          "agree_terms",
+          "12",
+          "field_6",
+          "visit_date",
+          "urgent_reason"
+        ]
+      }
+    },
+    {
+      "id": "DEF-service-answers-2",
+      "name": "controller = yes shows parcel/basin; unticked checkbox controller hides its dependent field",
+      "pass": true,
+      "evidence": {
+        "answersWhenYes": {
+          "12": false,
+          "knows_parcel": "yes",
+          "parcel_number": "123",
+          "Basin": "9",
+          "agree_terms": false,
+          "field_6": "نص حر"
+        }
+      }
+    },
+    {
+      "id": "DEF-service-answers-3",
+      "name": "generated \"البيانات الإضافية المطلوبة:\" notes builder removed from mobile",
+      "pass": true,
+      "evidence": {
+        "buildDynamicNotesExported": false
+      }
+    },
+    {
+      "id": "DEF-service-answers-4",
+      "name": "POST /api/orders/ is multipart with service_answers = JSON object string; notes carries only customer text",
+      "pass": true,
+      "evidence": {
+        "contentType": "multipart/form-data",
+        "service_answers": "{\"12\":false,\"knows_parcel\":\"no\",\"agree_terms\":true,\"field_6\":\"نص حر\",\"urgent_reason\":\"سفر\"}",
+        "notes": "ملاحظتي فقط"
+      }
+    },
+    {
+      "id": "DEF-service-answers-5",
+      "name": "service_answers {key: msg} and document_errors {type: msg} exposed per key (interceptor-normalized error keeps them)",
+      "pass": true,
+      "evidence": {
+        "serviceAnswerErrors": {
+          "parcel_number": "This field is required.",
+          "visit_date": "Enter a date as YYYY-MM-DD."
+        },
+        "documentErrors": {
+          "national_id": "Unsupported file type."
+        },
+        "fieldErrorKeys": [
+          "phone"
+        ]
+      }
+    },
+    {
+      "id": "DEF-M10",
+      "name": "network, timeout and 5xx errors show Arabic text (no axios English); a server 4xx detail is still shown",
+      "pass": true,
+      "evidence": {
+        "html500": "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد قليل.",
+        "json500": "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد قليل.",
+        "timeout": "انتهت مهلة الاتصال بالخادم. تحقق من اتصالك ثم حاول مرة أخرى.",
+        "refused": "تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت ثم حاول مرة أخرى.",
+        "detail400": "تم رفض الطلب لسبب محدد من الخادم."
+      }
+    },
+    {
+      "id": "DEF-M09-1",
+      "name": "2xx application/pdf is saved; token obtained via axios (401 -> refresh -> retry); download uses ?token= without bearer; filename sanitized inside target dir",
+      "pass": true,
+      "evidence": {
+        "uri": "5-report_1_.pdf",
+        "tokenRequests": [
+          "Bearer expired-access",
+          "Bearer fresh-access"
+        ],
+        "downloadQuery": "?token=tok-5-2",
+        "downloadAuth": null
+      }
+    },
+    {
+      "id": "DEF-M09-2",
+      "name": "non-2xx (404, 403) and 200-with-JSON-body are refused with Arabic messages and the written file is deleted",
+      "pass": true,
+      "evidence": {
+        "r404": {
+          "ok": false,
+          "message": "الملف غير متاح حالياً.",
+          "status": 404
+        },
+        "r403": {
+          "ok": false,
+          "message": "لا تملك صلاحية تنزيل هذا الملف أو انتهت صلاحية رابط التنزيل.",
+          "status": 403
+        },
+        "r200json": {
+          "ok": false,
+          "message": "وصلت استجابة غير صالحة بدلاً من الملف. حاول مرة أخرى.",
+          "status": 200
+        },
+        "leftoverFiles": []
+      }
+    },
+    {
+      "id": "DEF-M09-3",
+      "name": "sanitizeFilename strips traversal, separators, control and reserved characters",
+      "pass": true,
+      "evidence": {
+        "a": "a_b_.pdf",
+        "b": "document",
+        "c": "passwd"
+      }
+    },
+    {
+      "id": "DEF-M04-1",
+      "name": "production bundle refuses placeholder / localhost / http / missing URL (blocking configError, empty base URL); accepts real https; dev keeps local default",
+      "pass": true,
+      "evidence": {
+        "prod_placeholder": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL is a placeholder or local address (\"https://api.example.com\").",
+          "isProduction": true
+        },
+        "prod_localhost": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL must use https:// (got \"http://127.0.0.1:8000\").",
+          "isProduction": true
+        },
+        "prod_http": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL must use https:// (got \"http://api.khalsni.jo\").",
+          "isProduction": true
+        },
+        "prod_missing": {
+          "apiBaseUrl": "",
+          "configError": "EXPO_PUBLIC_API_BASE_URL is not set.",
+          "isProduction": true
+        },
+        "prod_valid": {
+          "apiBaseUrl": "https://api.khalsni.jo/api",
+          "configError": null,
+          "isProduction": true
+        },
+        "dev_missing": {
+          "apiBaseUrl": "http://127.0.0.1:8000/api",
+          "configError": null,
+          "isProduction": false
+        }
+      }
+    },
+    {
+      "id": "DEF-M04-2",
+      "name": "app.config.js fails EAS preview/production builds without a real https URL; passes valid URL and local dev",
+      "pass": true,
+      "evidence": {
+        "production_example": "throws: [khalsni] Refusing to build profile \"production\": EXPO_PUBLIC_API_BASE_URL is a placeholde",
+        "production_missing": "throws: [khalsni] Refusing to build profile \"production\": EXPO_PUBLIC_API_BASE_URL is not set. Set",
+        "preview_loopback": "throws: [khalsni] Refusing to build profile \"preview\": EXPO_PUBLIC_API_BASE_URL must use https:// ",
+        "production_valid": "ok",
+        "local_expo_start": "ok"
+      }
+    },
+    {
+      "id": "DEF-M04-3",
+      "name": "eas.json no longer names api.example.com or 127.0.0.1",
+      "pass": true,
+      "evidence": {
+        "easJsonHasPlaceholder": false
+      }
+    },
+    {
+      "id": "DEF-M02",
+      "name": "timeline: system_event rendered in Arabic, sorted oldest first; REJECTED reason taken from the timeline note (fallback rejection_reason); status labels Arabic",
+      "pass": true,
+      "evidence": {
+        "underReview": "الطلب قيد المراجعة.",
+        "closureReason": "الوثيقة منتهية الصلاحية، يرجى تقديم طلب جديد.",
+        "recovered": "أعاد الفريق الطلب إلى المراجعة لأن طلب المستندات السابق لم يكن قابلاً للرفع. السبب: خطأ"
+      }
+    },
+    {
+      "id": "DEF-M03",
+      "name": "document statuses Arabic; requested documents labelled by Arabic name (never the code); per-requirement extensions/size enforced; .docx allowed by global fallback",
+      "pass": true,
+      "evidence": {
+        "docStatuses": [
+          "مرفوع",
+          "بانتظار التحقق",
+          "معتمد",
+          "مرفوض",
+          "بانتظار الفحص الأمني",
+          "مؤرشف"
+        ],
+        "missing": [
+          "تفويض رسمي",
+          "مستند مطلوب",
+          "مستند مطلوب"
+        ],
+        "big": "حجم الملف يتجاوز الحد المسموح (2.0 MB).",
+        "wrongExt": "صيغة الملف غير مدعومة. المسموح: .pdf",
+        "docxDefault": null
+      }
+    },
+    {
+      "id": "TC-REG-1",
+      "name": "register payload: text trimmed, blank national_id omitted, password untouched; POST /api/auth/register/ JSON with Accept-Language ar; client-side required/min-length errors Arabic",
+      "pass": true,
+      "evidence": {
+        "payload": {
+          "full_name": "سارة أحمد",
+          "phone": "079 123 4567",
+          "email": "sara@example.jo",
+          "password": " pass word9 "
+        },
+        "request": {
+          "method": "POST",
+          "lang": "ar",
+          "contentType": "application/json",
+          "body": {
+            "full_name": "سارة أحمد",
+            "phone": "079 123 4567",
+            "email": "sara@example.jo",
+            "password": " pass word9 "
+          }
+        },
+        "localErrs": {
+          "full_name": "الاسم الكامل مطلوب.",
+          "phone": "رقم الهاتف مطلوب.",
+          "email": "أدخل بريداً إلكترونياً صحيحاً.",
+          "password": "كلمة المرور يجب أن تكون 8 أحرف على الأقل."
+        }
+      }
+    },
+    {
+      "id": "TC-REG-2",
+      "name": "server field errors land on their fields (first message each, Arabic server text); non_field_errors -> general; field-only error -> no general banner; 429 -> general server detail",
+      "pass": true,
+      "evidence": {
+        "mappedFieldErr": {
+          "fieldErrors": {
+            "email": "يوجد حساب مسجل بهذا البريد الإلكتروني.",
+            "phone": "أدخل رقم هاتف صحيحاً، مثل 0791234567 أو ‎+962791234567. للأرقام من خارج الأردن أضف رمز الدولة مسبوقاً بـ + أو 00.",
+            "password": "كلمة المرور هذه شائعة جداً."
+          },
+          "general": "تعذر إنشاء الحساب الآن."
+        },
+        "mappedThrottle": {
+          "fieldErrors": {},
+          "general": "تم تجاوز عدد المحاولات. حاول لاحقاً."
+        },
+        "onlyFields": {
+          "fieldErrors": {
+            "phone": "رقم غير صحيح"
+          },
+          "general": ""
+        }
+      }
+    },
+    {
+      "id": "TC-REG-3",
+      "name": "password rules and phone hint mirror the web text; Register screen is in the auth stack and linked from Login; signs in after creation with fallback to Login(email prefilled)",
+      "pass": true,
+      "evidence": {
+        "rules": [
+          "8 أحرف على الأقل",
+          "لا تتكون من أرقام فقط",
+          "ليست كلمة مرور شائعة أو سهلة التخمين",
+          "لا تشبه اسمك أو بريدك الإلكتروني أو رقم هاتفك"
+        ],
+        "phoneHint": "مثال: 0791234567 أو ‎+962791234567. للأرقام من خارج الأردن أضف رمز الدولة مسبوقاً بـ +."
+      }
+    },
+    {
+      "id": "TC-TRACK-1",
+      "name": "GET /api/orders/track/?order_number=&phone= (trimmed, Arabic digits -> Latin, upper-cased); Arabic status; missing documents by Arabic name (English name masked); upload needs sign-in",
+      "pass": true,
+      "evidence": {
+        "query": "?order_number=KH-2026-000123&phone=0791234567",
+        "summary": {
+          "orderNumber": "KH-2026-000123",
+          "statusLabel": "بانتظار العميل",
+          "missingDocuments": [
+            "صورة الهوية",
+            "مستند مطلوب"
+          ],
+          "needsCustomerUpload": true,
+          "finalDocumentsCount": 0,
+          "timeline": [
+            {
+              "id": 1,
+              "old_status": "",
+              "new_status": "NEW",
+              "note": "",
+              "system_event": "",
+              "created_at": "2026-10-30T09:00:00Z"
+            },
+            {
+              "id": 2,
+              "old_status": "NEW",
+              "new_status": "WAITING_CUSTOMER",
+              "note": "يرجى رفع صورة الهوية.",
+              "system_event": "",
+              "created_at": "2026-10-31T09:00:00Z"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "TC-TRACK-2",
+      "name": "404 -> specific Arabic not-found message; both fields required; screen offers sign-in for uploads; reachable from Login and dashboard, and /track-order links go to TrackOrder (not MyOrders)",
+      "pass": true,
+      "evidence": {
+        "notFound": "لم نجد طلباً بهذا الرقم ورقم الهاتف. تحقق من البيانات وحاول مرة أخرى.",
+        "emptyErrs": {
+          "orderNumber": "رقم الطلب مطلوب.",
+          "phone": "رقم الهاتف مطلوب."
+        }
+      }
+    },
+    {
+      "id": "TC-RATE-1",
+      "name": "rating payload {score, comment?} (comment trimmed, blank omitted) POSTed as JSON to /customer/orders/<id>/rating/; 1..5 integers only; rateable only when COMPLETED and unrated",
+      "pass": true,
+      "evidence": {
+        "ratingPayload": {
+          "score": 5,
+          "comment": "خدمة ممتازة"
+        },
+        "request": {
+          "score": 5,
+          "comment": "خدمة ممتازة"
+        }
+      }
+    },
+    {
+      "id": "TC-RATE-2",
+      "name": "stars are 52x52 touch targets with radio semantics; existing rating rendered instead of the form",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "TC-DETAIL-1",
+      "name": "expected delivery: a date when present, otherwise the service's \"after review\" sentence or the approved default; customer notes and customer-visible notes/messages rendered",
+      "pass": true,
+      "evidence": {
+        "afterReview": "تُحدَّد مدة الإنجاز بعد مراجعة الطلب.",
+        "custom": "نؤكد الموعد هاتفياً بعد المراجعة.",
+        "noService": "تُحدَّد مدة الإنجاز بعد مراجعة الطلب.",
+        "dated": "٢٠ تشرين الثاني ٢٠٢٦"
+      }
+    },
+    {
+      "id": "TC-DELIVERY-1",
+      "name": "GET /customer/orders/<id>/delivery/: hidden for electronic without instructions; Arabic label + instructions otherwise; card placed next to the final result",
+      "pass": true,
+      "evidence": {
+        "d1": null,
+        "d2": {
+          "label": "تسليم ورقي - استلام",
+          "instructions": "استلم الأصل من مكتب عمّان مع الهوية."
+        },
+        "d3": {
+          "label": "تسليم إلكتروني (تنزيل النتيجة)",
+          "instructions": "رابط التتبع يصلك برسالة."
+        }
+      }
+    },
+    {
+      "id": "TC-COMPLAINT-1",
+      "name": "complaints GET list (oldest first) with «قيد المتابعة»/«تمت المعالجة»; POST {\"description\"} trimmed -> 201; empty rejected client-side and server error mapped; 404 -> section hidden",
+      "pass": true,
+      "evidence": {
+        "statuses": [
+          "قيد المتابعة",
+          "تمت المعالجة"
+        ],
+        "request": {
+          "description": "لم يتم التواصل معي"
+        },
+        "cErr": "هذا الحقل مطلوب."
+      }
+    },
+    {
+      "id": "TC-SAFE-1",
+      "name": "AppScreen applies useSafeAreaInsets (top/sides; bottom on stacks) under SafeAreaProvider; back button «رجوع» on stacked screens; tab bar adds bottom inset; no screen returns a bare Loading/ErrorState outside AppScreen",
+      "pass": true,
+      "evidence": {
+        "bareEarlyReturns": [],
+        "safeAreaPkg": "5.6.2"
+      }
+    },
+    {
+      "id": "TC-CONSENT-1",
+      "name": "consent version order-consent-mobile-v2 with the exact owner text; request sends consent_version + consent_source=mobile; legal links next to the switch",
+      "pass": true,
+      "evidence": {
+        "version": "order-consent-mobile-v2",
+        "text": "أوافق على شروط الاستخدام وسياسة الخصوصية، وعلى استخدام بياناتي ومستنداتي لإنجاز هذه الخدمة فقط وإشعاري بأي نواقص.",
+        "backendHasV2": true,
+        "backendTextIdentical": true
+      }
+    },
+    {
+      "id": "TC-LEGAL-1",
+      "name": "GET /public-site/legal/<kind>/: draft_requires_approval -> draft banner (exact text); approved -> no banner; 404 -> «لم تُنشر بعد»; 5xx -> Arabic error; body split into heading/paragraph/bullet; linked from consent, registration and account",
+      "pass": true,
+      "evidence": {
+        "states": {
+          "404": "not_published",
+          "500": "error",
+          "draft": "published(draft=true)",
+          "approved": "published(draft=false)"
+        }
+      }
+    },
+    {
+      "id": "TC-MSG-1",
+      "name": "messages: GET thread sorted oldest first with Arabic author labels; POST {\"message\"} trimmed JSON; 404 -> unavailable (fallback to notes, send box hidden); empty/too long rejected",
+      "pass": true,
+      "evidence": {
+        "order": [
+          7,
+          8
+        ],
+        "request": {
+          "message": "مرحباً، أريد الاستفسار"
+        },
+        "missing": {
+          "state": "unavailable"
+        }
+      }
+    },
+    {
+      "id": "TC-BRAND-1",
+      "name": "no «خلّصني» / \"Khalisni\" in visible sources; brand constants «خلصني» | Khalsni; developer copy (JWT, \"نفس منطق\", \"docs/mobile\", endpoint) gone (M-22/M-23)",
+      "pass": true,
+      "evidence": {
+        "brandHits": [],
+        "devCopy": []
+      }
+    },
+    {
+      "id": "TC-P3-M28",
+      "name": "currency in Arabic like the web (\"٥٠٫٠٠ د.أ\"); step numbers without leading zero",
+      "pass": true,
+      "evidence": {
+        "c50": "٥٠٫٠٠ د.أ",
+        "c1250": "١٬٢٥٠٫٥٠ د.أ",
+        "step10": "١٠"
+      }
+    },
+    {
+      "id": "TC-P3-M18",
+      "name": "date fields: YYYY-MM-DD placeholder + Arabic hint, invalid date -> Arabic error, Arabic digits sent Latin; English-only label -> «معلومة مطلوبة N»; options without Arabic label -> «خيار N»; English placeholder dropped, format example kept",
+      "pass": true,
+      "evidence": {
+        "labels": [
+          "معلومة مطلوبة 1",
+          "النوع",
+          "الهاتف"
+        ],
+        "options": [
+          {
+            "value": "residential",
+            "label": "خيار 1"
+          },
+          {
+            "value": "سكني",
+            "label": "سكني"
+          },
+          {
+            "value": "x",
+            "label": "خيار 3"
+          },
+          {
+            "value": "3",
+            "label": "3"
+          }
+        ],
+        "dateErr": "أدخل التاريخ بالصيغة سنة-شهر-يوم، مثل 2026-01-31.",
+        "answers": {
+          "visit": "2026-01-31",
+          "kind": "x",
+          "mobile": "0791234567"
+        }
+      }
+    },
+    {
+      "id": "TC-P3-M20-M21",
+      "name": "no silent first-service preselection; unknown/zero file size refused (resolveFileSize tried first in every picker)",
+      "pass": true,
+      "evidence": {
+        "unknown": "تعذر التحقق من حجم الملف. اختر ملفاً من ذاكرة الجهاز لا يتجاوز 10 MB."
+      }
+    },
+    {
+      "id": "TC-P3-M24-M29",
+      "name": "role label Arabic; profile edits email + national_id (current_password on email/phone change, server field errors on fields); unknown role -> null -> UnknownRoleScreen (never customer UI)",
+      "pass": true,
+      "evidence": {
+        "auditor": null
+      }
+    },
+    {
+      "id": "TC-P3-M25-M26-M30",
+      "name": "notifications show title + mark-all-read; UploadOrderDocumentsScreen removed and MissingDocumentRequests reachable from the dashboard; homepage failure does not block the dashboard",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "TC-P3-M27",
+      "name": "RTL policy: explicit row-reverse/right-align with native RTL locked off - plugin writes android:supportsRtl=\"false\", app.config adds it, index.ts calls allowRTL(false)/forceRTL(false); README documents it",
+      "pass": true,
+      "evidence": {
+        "supportsRtl": "false",
+        "plugins": [
+          "expo-font",
+          "./plugins/withLtrLayoutLock"
+        ]
+      }
+    }
+  ]
+}

@@ -1,10 +1,12 @@
+from django.utils import timezone
 from rest_framework import serializers
 
 from accounts.fields import CanonicalPhoneField
 
 from core.reserved_domains import is_reserved_email
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
-from public_site.models import Advertisement, ContactInquiry, PublicPageContent, SiteTheme
+from public_site.models import Advertisement, ContactInquiry, LegalDocument, PublicPageContent, SiteTheme
+from public_site.validators import validate_no_script_content
 from public_site.models import MissingServiceRequest
 
 
@@ -82,6 +84,8 @@ class PublicPageContentPublicSerializer(SoftDeleteFieldsReadOnlyMixin, serialize
             "email",
             "office_address",
             "office_address_en",
+            "office_hours_ar",
+            "office_hours_en",
             "footer_text",
             "footer_text_en",
             "privacy_policy_ar",
@@ -192,6 +196,8 @@ class PublicPageContentAdminSerializer(SoftDeleteFieldsReadOnlyMixin, serializer
             "email",
             "office_address",
             "office_address_en",
+            "office_hours_ar",
+            "office_hours_en",
             "footer_text",
             "footer_text_en",
             "privacy_policy_ar",
@@ -325,3 +331,126 @@ class MissingServiceRequestAdminSerializer(SoftDeleteFieldsReadOnlyMixin, PkAsId
             "updated_at",
         )
         read_only_fields = ("request_id", "request_number", "created_at", "updated_at", "resolved_at")
+
+
+# Public contract for legal documents (other clients, including the mobile app,
+# depend on exactly these keys).
+LEGAL_DOCUMENT_PUBLIC_FIELDS = (
+    "kind",
+    "version",
+    "effective_date",
+    "title_ar",
+    "title_en",
+    "body_ar",
+    "body_en",
+    "approval_status",
+    "updated_at",
+)
+
+
+class LegalDocumentPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LegalDocument
+        fields = LEGAL_DOCUMENT_PUBLIC_FIELDS
+        read_only_fields = LEGAL_DOCUMENT_PUBLIC_FIELDS
+
+
+class LegalDocumentAdminSerializer(PkAsIdMixin, serializers.ModelSerializer):
+    approved_by_name = serializers.CharField(source="approved_by.full_name", read_only=True, default="")
+    created_by_name = serializers.CharField(source="created_by.full_name", read_only=True, default="")
+    is_draft = serializers.BooleanField(read_only=True)
+    was_published = serializers.BooleanField(read_only=True)
+    is_editable = serializers.SerializerMethodField()
+    # Declared explicitly: uniqueness (one published version per kind, one row
+    # per kind + version) is checked in validate(), not by generated validators.
+    kind = serializers.ChoiceField(choices=LegalDocument.Kind.choices)
+    version = serializers.CharField(max_length=64, validators=[validate_no_script_content])
+
+    class Meta:
+        model = LegalDocument
+        validators = []
+        fields = (
+            "legal_document_id",
+            "kind",
+            "version",
+            "effective_date",
+            "title_ar",
+            "title_en",
+            "body_ar",
+            "body_en",
+            "approval_status",
+            "approval_note",
+            "is_draft",
+            "is_published",
+            "was_published",
+            "is_editable",
+            "published_at",
+            "approved_by",
+            "approved_by_name",
+            "approved_at",
+            "created_by",
+            "created_by_name",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "legal_document_id",
+            "is_published",
+            "published_at",
+            "approved_by",
+            "approved_at",
+            "created_by",
+            "created_at",
+            "updated_at",
+        )
+
+    def get_is_editable(self, obj):
+        return not obj.was_published
+
+    def validate(self, attrs):
+        instance = self.instance
+        if instance is not None and instance.was_published:
+            raise serializers.ValidationError(
+                {"detail": "A version that has been published is read-only. Create a new version instead."}
+            )
+        if instance is not None and "kind" in attrs and attrs["kind"] != instance.kind:
+            raise serializers.ValidationError({"kind": "The kind of an existing version cannot change."})
+        kind = attrs.get("kind", getattr(instance, "kind", None))
+        version = (attrs.get("version", getattr(instance, "version", "")) or "").strip()
+        if "version" in attrs:
+            attrs["version"] = version
+        if kind and version:
+            duplicates = LegalDocument.objects.filter(kind=kind, version=version)
+            if instance is not None:
+                duplicates = duplicates.exclude(pk=instance.pk)
+            if duplicates.exists():
+                raise serializers.ValidationError({"version": "This version already exists for this document. Use a new version label."})
+        status_value = attrs.get("approval_status", getattr(instance, "approval_status", None))
+        note = attrs.get("approval_note", getattr(instance, "approval_note", "")) or ""
+        if status_value == LegalDocument.ApprovalStatus.APPROVED and not note.strip():
+            raise serializers.ValidationError(
+                {"approval_note": "Record who approved this wording and the reference of that approval."}
+            )
+        return attrs
+
+    def _stamp_approval(self, validated_data, instance=None):
+        request = self.context.get("request")
+        status_value = validated_data.get("approval_status", getattr(instance, "approval_status", None))
+        if status_value == LegalDocument.ApprovalStatus.APPROVED:
+            if instance is None or instance.approval_status != LegalDocument.ApprovalStatus.APPROVED:
+                validated_data["approved_at"] = timezone.now()
+                user = getattr(request, "user", None)
+                validated_data["approved_by"] = user if getattr(user, "is_authenticated", False) else None
+        else:
+            validated_data["approved_at"] = None
+            validated_data["approved_by"] = None
+        return validated_data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        validated_data["created_by"] = user if getattr(user, "is_authenticated", False) else None
+        return super().create(self._stamp_approval(validated_data))
+
+    def update(self, instance, validated_data):
+        return super().update(instance, self._stamp_approval(validated_data, instance))

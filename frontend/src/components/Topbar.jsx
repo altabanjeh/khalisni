@@ -3,6 +3,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useNotifications } from '../context/NotificationContext'
 import { useDialogFocus } from '../hooks/useDialogFocus'
 import { getRoleLabel } from '../utils/format'
 import HelpGuidePanel from './HelpGuidePanel'
@@ -21,6 +22,11 @@ function Topbar({ title, onMenuClick }) {
   const notificationsPanelRef = useRef(null)
   const notificationsPanelId = useId()
   const notificationsTitleId = useId()
+  const notificationsBadgeId = useId()
+  const { notifications: bellNotifications = [], unreadCount: serverUnreadCount } = useNotifications()
+  // Unread badge on the bell, from the server count (DEF-C05).
+  const unreadCount = serverUnreadCount ?? bellNotifications.filter((item) => !item.is_read).length
+  const unreadBadge = unreadCount > 99 ? '99+' : String(unreadCount)
   const closeNotifications = useCallback(() => setNotificationsOpen(false), [])
   const closeHelp = useCallback(() => setHelpOpen(false), [])
 
@@ -91,12 +97,23 @@ function Topbar({ title, onMenuClick }) {
             aria-controls={notificationsOpen ? notificationsPanelId : undefined}
             aria-label={t('topbar.notifications', 'الإشعارات')}
             aria-expanded={notificationsOpen}
+            aria-describedby={unreadCount > 0 ? notificationsBadgeId : undefined}
             aria-haspopup="dialog"
-            className="btn-secondary min-h-10 min-w-10 px-2 py-2 text-xs"
+            className="btn-secondary relative min-h-10 min-w-10 px-2 py-2 text-xs"
             onClick={() => setNotificationsOpen((current) => !current)}
             type="button"
           >
             <Bell className="h-4 w-4" />
+            {unreadCount > 0 ? (
+              <span
+                className="absolute -end-1.5 -top-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[0.65rem] font-black leading-none text-white ring-2 ring-white"
+                data-testid="bell-unread-badge"
+                id={notificationsBadgeId}
+              >
+                <span aria-hidden="true">{unreadBadge}</span>
+                <span className="sr-only">{isArabic ? `${unreadCount} إشعارات غير مقروءة` : `${unreadCount} unread notifications`}</span>
+              </span>
+            ) : null}
           </button>
           {notificationsOpen ? (
             <div

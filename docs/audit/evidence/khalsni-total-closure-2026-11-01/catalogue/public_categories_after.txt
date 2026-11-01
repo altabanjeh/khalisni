@@ -1,0 +1,10 @@
+
+GET /api/public-site/service-categories/ (real catalogue after migrations)
+1. land-and-survey              العقارات والأراضي / Real Estate and Land  services=18
+2. business_services            خدمات الأعمال / Business Services  services=10
+3. tax                          الضرائب والرسوم / Taxes and Fees  services=1
+4. quick-public-services        المركبات والنقل / Vehicles and Transport  services=1
+5. ministry-of-labour           العمالة والإقامة / Labour and Residency  services=0
+6. civil-status-and-passports   الوثائق والتصديقات / Documents and Attestations  services=3
+7. international-services       الخدمات الدولية / International Services  services=0
+8. special-request              طلب خاص / Special Request  services=0

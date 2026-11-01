@@ -1,0 +1,84 @@
+URL: http://127.0.0.1:4361/terms
+TITLE: خلصني | Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+Terms of Use
+
+Terms of Use
+
+The terms for using the Khalsni platform.
+
+Draft — requires owner/legal approval before production
+
+Version: 2026-11-01-draft · Effective: 2026-11-01
+
+This is a draft. It describes the terms for using the Khalsni platform as the system works in this release. It must be reviewed and approved by the owner and a legal advisor before it is relied on in production.
+
+1. The service
+
+Khalsni lets customers request government and administrative services, upload the required documents, follow the progress of each request and receive the result. Platform staff review each request, and a service provider may be assigned to carry out the work.
+
+2. Your account
+
+• Provide accurate details when you register and keep them up to date.
+• Keep your password confidential. Activity carried out with your account is treated as yours.
+• The operator may deactivate an account that is used in breach of these terms.
+
+3. Submitting a request
+
+• A request is submitted only after you accept the consent statement on the request form.
+• Provide correct information, and upload only genuine documents that you are entitled to submit.
+• Staff may ask you for missing or clearer documents; you are told through a notification inside your account.
+• A request may be rejected or cancelled; the reason is recorded and shown to you.
+
+4. Prices and payment
+
+The price information shown for a service is the information published on the platform at the time. This release does not take online payments; the operator tells you how payment is made.
+
+5. Timelines
+
+Durations shown for services are expected durations. The actual time can vary with the authority responsible for the service and with the documents provided.
+
+6. Results
+
+When a request is completed, the result is made available in your account and its status appears on the tracking page.
+
+7. Acceptable use
+
+Do not use the platform for unlawful purposes, do not upload forged or misleading documents, and do not try to access data that does not belong to you.
+
+8. Privacy
+
+How personal data is handled is described in the Privacy Policy, which forms part of these terms.
+
+9. Versions
+
+Each version of these terms has a version label and an effective date. A new version is published as a new record, previous versions are kept, and the version in force when you submit a request is recorded with your consent.
+
+10. To be completed before approval
+
+The owner and the legal advisor set the operator's legal identity, the governing law, liability, complaints handling and any refund rules. This draft does not decide them.
+
+Privacy Policy
+
+Khalsni is a Jordanian platform for managing and tracking public and administrative service requests digitally.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Terms of use
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

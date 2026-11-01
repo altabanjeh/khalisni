@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from accounts.models import CustomUser
+from core.management.production_guard import refuse_in_production
 from documents.models import Document
 from documents.services import create_order_document
 from orders.models import Order, OrderNote
@@ -50,6 +51,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not settings.DEBUG:
             raise CommandError("The client-audit QA seed is available only with DJANGO_DEBUG=True.")
+        refuse_in_production("seed_client_audit_qa")
         password = os.getenv("KHALSNI_QA_PASSWORD", "")
         if len(password) < 12:
             raise CommandError("Set KHALSNI_QA_PASSWORD to a noncommitted value of at least 12 characters.")

@@ -190,6 +190,7 @@ class StaffDocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSe
             "order_number": order.order_number,
             "status": order.status,
             "service_name": getattr(order.service, "name_ar", ""),
+            "service_name_en": getattr(order.service, "name_en", "") or getattr(order.service, "name_ar", ""),
         }
 
 

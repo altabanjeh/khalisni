@@ -100,3 +100,39 @@ export interface CreateOrderPayload {
   document_types?: string[];
   documents?: unknown[];
 }
+
+// GET /api/orders/track/ (backend orders/serializers.py TrackOrderSerializer).
+export interface TrackOrderResult {
+  id: number;
+  order_number: string;
+  status: string;
+  timeline?: OrderStatusLog[];
+  missing_documents?: string[];
+  missing_document_details?: Array<{ document_type: string; name_ar?: string; name_en?: string }>;
+  final_documents?: OrderDocument[];
+}
+
+// GET/POST /api/customer/orders/<id>/messages/.
+export interface OrderMessage {
+  id: number;
+  message: string;
+  author_role: 'customer' | 'staff';
+  created_at?: string;
+}
+
+// GET /api/customer/orders/<id>/delivery/ (backend orders/delivery.py).
+export interface OrderDelivery {
+  delivery_method: 'electronic' | 'paper_pickup' | 'paper_courier' | string;
+  delivery_method_label_ar?: string;
+  delivery_method_label_en?: string;
+  delivery_instructions?: string;
+}
+
+// GET/POST /api/customer/orders/<id>/complaints/ (backend orders/complaints.py).
+export interface OrderComplaint {
+  id: number;
+  description: string;
+  is_resolved: boolean;
+  created_at?: string;
+  resolved_at?: string | null;
+}

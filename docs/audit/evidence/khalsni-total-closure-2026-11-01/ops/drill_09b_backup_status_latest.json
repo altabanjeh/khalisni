@@ -1,0 +1,16 @@
+{
+  "last_run_at": "2026-11-01T08:38:27Z",
+  "last_result": "failure",
+  "last_success_at": "2026-11-01T08:38:10Z",
+  "last_failure_at": "2026-11-01T08:38:38Z",
+  "last_error": "step offsite failed",
+  "backup_dir": "<scratch>/drill/backups/khalsni-20261101T083828Z",
+  "offsite": "failed",
+  "artifacts": [
+    {"name": "database.dump", "bytes": 476815, "sha256": "61a5bc6d25a7671680254ca397d02df493902e833ba9c60644800aff41d11802"},
+    {"name": "database.toc", "bytes": 93577, "sha256": "727e4e51ca196fe1d93f462d854eaecffbd451c135be463e3f05eb301d9c81de"},
+    {"name": "media.tar.gz", "bytes": 783227, "sha256": "1b508314bbe2cdea70ceac58699f56624b70aeefa2f69807e0c7b1ba2abb87cd"},
+    {"name": "media.inventory.tsv", "bytes": 3224, "sha256": "58ef95f258a1c07e5fe36783548e93cdc87f9ef920b591e452d39b2081680b3b"},
+    {"name": "manifest.json", "bytes": 966, "sha256": "65fbeda5b473d5423294125d79ce1751bd7421347d2219d57a53135dd2c94bce"}
+  ]
+}

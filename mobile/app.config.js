@@ -44,5 +44,9 @@ module.exports = ({ config }) => {
       );
     }
   }
-  return config;
+  // RTL policy (README "RTL policy"): native RTL mirroring stays off so the
+  // explicit right-to-left styles are never flipped a second time.
+  const plugins = Array.isArray(config.plugins) ? config.plugins : [];
+  const lock = './plugins/withLtrLayoutLock';
+  return { ...config, plugins: plugins.includes(lock) ? plugins : [...plugins, lock] };
 };

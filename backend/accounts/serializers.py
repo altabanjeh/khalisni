@@ -257,6 +257,13 @@ class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Model
             if CustomUser._base_manager.filter(phone=attrs["phone"]).exclude(pk=getattr(user, "pk", None)).exists():
                 language = request_language(self.context.get("request"))
                 raise serializers.ValidationError({"phone": [pick(REGISTER_DUPLICATE_MESSAGES["phone"], language)]})
+        # A national ID another account already holds is a field error, not a
+        # database constraint failure (unique_non_empty_user_national_id).
+        national_id = (attrs.get("national_id") or "").strip()
+        if national_id and national_id != (getattr(user, "national_id", "") or ""):
+            if CustomUser._base_manager.filter(national_id=national_id).exclude(pk=getattr(user, "pk", None)).exists():
+                language = request_language(self.context.get("request"))
+                raise serializers.ValidationError({"national_id": [pick(REGISTER_DUPLICATE_MESSAGES["national_id"], language)]})
         if changed and user is not None and user.has_usable_password():
             if not current_password:
                 raise serializers.ValidationError(
@@ -323,6 +330,9 @@ class AdminUserSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerial
             # Shown, never set from this screen: who verifies what is not decided (audit B10-8).
             "is_email_verified",
             "is_phone_verified",
+            # Owner decision (B10-8): is_verified is not a business/KYC gate in the
+            # MVP. The column stays in the database but cannot be edited here.
+            "is_verified",
         )
 
     def get_current_permissions(self, obj):

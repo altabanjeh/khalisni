@@ -1,0 +1,38 @@
+$ manage.py audit_demo_data   (real catalogue copy after migrations; read-only)
+Demo / debug / QA data audit: REPORT (read-only; nothing was changed)
+- [user] admin@khalisni.local: demo/reserved domain @khalisni.local; SUPERUSER -> deactivate
+- [user] customer@khalisni.local: demo/reserved domain @khalisni.local -> deactivate
+- [user] provider@khalisni.local: demo/reserved domain @khalisni.local -> deactivate
+- [user] employee@khalisni.local: demo/reserved domain @khalisni.local -> deactivate
+- [user] admin-debug@example.com: debug account -> deactivate
+- [user] provider-debug@example.com: debug account -> deactivate
+- [user] admin-debug-2@example.com: debug account -> deactivate
+- [user] provider-debug-2@example.com: debug account -> deactivate
+- [user] 0799100003@guest.khalisni.local: guest-checkout customer (may be a real person) -> review (use --include-guests to deactivate)
+- [user] admin-debug-3@example.com: debug account -> deactivate
+- [user] provider-debug-3@example.com: debug account -> deactivate
+- [user] 0799200003@guest.khalisni.local: guest-checkout customer (may be a real person) -> review (use --include-guests to deactivate)
+- [user] audit-login@example.com: demo/reserved domain @example.com -> deactivate
+- [advertisement] 1 «إعلان ترحيبي»: seeded sample advertisement -> deactivate
+- [advertisement] 3 «متابعة فورية للطلبات التجريبية»: demo marker «التجريبية» -> deactivate
+- [advertisement] 5 «تنبيه تجريبي: جهز وثائقك قبل الطلب»: demo marker «تجريبي» -> deactivate
+- [public content] Khalisni Public Demo Homepage: published homepage content row is named as demo content -> manual: publish owner-approved content (not changed automatically)
+- [public theme] Khalisni Public Demo Theme: theme named as demo -> manual: review the theme (not changed automatically)
+- [provider] 2 (provider-debug@example.com): provider type «Tester» -> make unavailable
+- [provider] 3 (provider-debug-2@example.com): provider type «Tester» -> make unavailable
+- [provider] 4 (provider-debug-3@example.com): provider type «Tester» -> make unavailable
+Summary: 19 demo/debug/QA record(s) found, 2 for review, 19 still open.
+
+$ manage.py audit_demo_data --apply   (on a throwaway copy)
+Applied: 17 record(s) deactivated or soft-deleted. Orders and history were not touched.
+Summary: 19 demo/debug/QA record(s) found, 2 for review, 2 still open (manual).
+
+$ manage.py audit_demo_data --strict   (after --apply)
+CommandError: 2 demo/debug/QA record(s) remain; see the report above.
+Demo / debug / QA data audit: REPORT (read-only; nothing was changed)
+- [user] 0799100003@guest.khalisni.local: guest-checkout customer (may be a real person) -> review (use --include-guests to deactivate)
+- [user] 0799200003@guest.khalisni.local: guest-checkout customer (may be a real person) -> review (use --include-guests to deactivate)
+- [public content] Khalisni Public Demo Homepage: published homepage content row is named as demo content -> manual: publish owner-approved content (not changed automatically)
+- [public theme] Khalisni Public Demo Theme: theme named as demo -> manual: review the theme (not changed automatically)
+Summary: 2 demo/debug/QA record(s) found, 2 for review, 2 still open.
+exit=1

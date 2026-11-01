@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsyncData } from '../../hooks/useAsyncData'
+import { getLocalizedField } from '../../utils/i18n'
 import { formatCurrency } from '../../utils/format'
 
 function ReportsPage() {
@@ -43,7 +44,7 @@ function ReportsPage() {
 
       <DataTable
         columns={[
-          { key: 'service__name_ar', label: isArabic ? 'الخدمة' : 'Service' },
+          { key: 'service__name_ar', label: isArabic ? 'الخدمة' : 'Service', render: (row) => getLocalizedField(row, { ar: 'service__name_ar', en: 'service__name_en' }, language, '—') },
           { key: 'total', label: isArabic ? 'عدد الطلبات' : 'Requests' },
         ]}
         emptyDescription={isArabic ? 'ستظهر الخدمات الأعلى طلباً هنا.' : 'The most-requested services will appear here.'}
@@ -63,7 +64,7 @@ function ReportsPage() {
 
       <DataTable
         columns={[
-          { key: 'category_name', label: isArabic ? 'التصنيف' : 'Category' },
+          { key: 'category_name', label: isArabic ? 'التصنيف' : 'Category', render: (row) => (isArabic ? row.category_name : row.category_name_en || row.category_name) },
           { key: 'orders_count', label: isArabic ? 'عدد الطلبات' : 'Requests' },
           { key: 'revenue', label: isArabic ? 'الإيراد' : 'Revenue', render: (row) => formatCurrency(row.revenue || 0, language) },
           { key: 'completed_orders', label: isArabic ? 'المكتمل' : 'Completed' },

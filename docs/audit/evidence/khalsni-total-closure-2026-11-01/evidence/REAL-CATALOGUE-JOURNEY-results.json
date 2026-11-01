@@ -1,0 +1,143 @@
+{
+ "service": "business_trademark_services",
+ "id": 8,
+ "number": "KH-2026-000008",
+ "steps": [
+  {
+   "step": "1 register (UI)",
+   "result": "PASS",
+   "detail": "/login?registered=1&email=journey-1793524171620%40example.org"
+  },
+  {
+   "step": "1b login",
+   "result": "PASS",
+   "detail": "/customer"
+  },
+  {
+   "step": "2 browse real category",
+   "result": "PASS",
+   "detail": {
+    "category": "خدمات الأعمال"
+   }
+  },
+  {
+   "step": "3 open real service (orderable)",
+   "result": "PASS",
+   "detail": {
+    "slug": "business_trademark_services",
+    "orderable": true
+   }
+  },
+  {
+   "step": "4-6 dynamic form + uploads + submit",
+   "result": "PASS",
+   "detail": {
+    "number": "KH-2026-000008",
+    "id": 8
+   }
+  },
+  {
+   "step": "7 employee review (UI)",
+   "result": "PASS",
+   "detail": "UNDER_REVIEW"
+  },
+  {
+   "step": "8 missing-document request (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "WAITING_CUSTOMER",
+    "requested": "document_5eb4193ba1"
+   }
+  },
+  {
+   "step": "9 customer notification (bell)",
+   "result": "PASS",
+   "detail": "bell"
+  },
+  {
+   "step": "10 customer resubmission (UI)",
+   "result": "PASS",
+   "detail": "UNDER_REVIEW"
+  },
+  {
+   "step": "11 employee verification (UI)",
+   "result": "PASS",
+   "detail": []
+  },
+  {
+   "step": "12 provider assignment (UI)",
+   "result": "PASS",
+   "detail": "ASSIGNED"
+  },
+  {
+   "step": "13 provider accepts/starts (UI)",
+   "result": "PASS",
+   "detail": "IN_PROGRESS"
+  },
+  {
+   "step": "14 provider uploads final output (UI)",
+   "result": "PASS",
+   "detail": {
+    "status": "READY_FOR_DELIVERY",
+    "final": 19
+   }
+  },
+  {
+   "step": "15-16 approval + completed order (UI)",
+   "result": "PASS",
+   "detail": "COMPLETED"
+  },
+  {
+   "step": "17 completion notification",
+   "result": "PASS",
+   "detail": "order_completed"
+  },
+  {
+   "step": "18 final download bytes == provider upload",
+   "result": "PASS",
+   "detail": {
+    "name": "qa-final-distinct.pdf",
+    "bytes": 170
+   }
+  },
+  {
+   "step": "19 re-login keeps COMPLETED",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "step": "20 no duplicate order/transition/notification",
+   "result": "PASS",
+   "detail": {
+    "transitions": [
+     "->NEW",
+     "NEW->UNDER_REVIEW",
+     "UNDER_REVIEW->WAITING_CUSTOMER",
+     "WAITING_CUSTOMER->UNDER_REVIEW",
+     "UNDER_REVIEW->ASSIGNED",
+     "ASSIGNED->IN_PROGRESS",
+     "IN_PROGRESS->READY_FOR_DELIVERY",
+     "READY_FOR_DELIVERY->COMPLETED"
+    ],
+    "notifications": [
+     "order_completed:8:2026-11-01T09:11:05.488056+00:00",
+     "order_ready_for_delivery:19",
+     "provider_completed_work:19",
+     "provider_started_work:8:ASSIGNED:IN_PROGRESS",
+     "provider_assigned:8:0:5",
+     "document_verified:11",
+     "document_verified:12",
+     "document_verified:13",
+     "document_verified:14",
+     "document_verified:15",
+     "document_verified:16",
+     "document_verified:17",
+     "document_verified:18",
+     "missing_documents_requested:8:3",
+     "order_under_review:8:NEW:UNDER_REVIEW",
+     "order_submitted:8"
+    ]
+   }
+  }
+ ]
+}

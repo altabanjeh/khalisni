@@ -67,11 +67,22 @@ def visible_services_queryset(*, organization=None):
     ).prefetch_related(Prefetch("partner_configs", queryset=config_qs, to_attr="_matched_partner_configs"))
 
 
-def visible_service_categories_queryset(*, organization=None):
+def visible_service_categories_queryset(*, organization=None, include_empty_client_worlds=False):
+    """Published categories with at least one service visible to the customer.
+
+    ``include_empty_client_worlds`` (public category list only, owner decision
+    CN-ACT-04): the client's eight top-level category "worlds" stay listed while
+    they have no services yet (e.g. «الخدمات الدولية», «طلب خاص»).
+    """
+    from services.client_categories import PUBLIC_CATEGORY_SLUGS
+
     services = visible_services_queryset(organization=organization)
+    condition = Q(pk__in=ServiceCategory.objects.filter(services__in=services).values("pk"))
+    if include_empty_client_worlds:
+        condition |= Q(slug__in=PUBLIC_CATEGORY_SLUGS, parent__isnull=True)
     return ServiceCategory.objects.filter(
+        condition,
         is_active=True,
         is_deleted=False,
         show_on_public_site=True,
-        services__in=services,
     ).select_related("parent").prefetch_related("children").distinct().order_by("sort_order", "display_order", "name_ar")

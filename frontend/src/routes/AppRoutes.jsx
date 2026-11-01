@@ -19,6 +19,7 @@ import {
   MessageSquareMore,
   Monitor,
   Palette,
+  Scale,
   Settings,
   ShieldCheck,
   UserCog,
@@ -49,6 +50,7 @@ const AboutPage = lazy(() => import('../pages/public/AboutPage'))
 const ContactPage = lazy(() => import('../pages/public/ContactPage'))
 const FaqPage = lazy(() => import('../pages/public/FaqPage'))
 const PrivacyPolicyPage = lazy(() => import('../pages/public/PrivacyPolicyPage'))
+const TermsPage = lazy(() => import('../pages/public/TermsPage'))
 
 const CustomerDashboardHome = lazy(() => import('../pages/customer/CustomerDashboardHome'))
 const CustomerCreateOrderPage = lazy(() => import('../pages/customer/CustomerCreateOrderPage'))
@@ -74,6 +76,7 @@ const AdminCmsPage = lazy(() => import('../pages/admin/AdminCmsPage'))
 const ServicesManagementPage = lazy(() => import('../pages/admin/ServicesManagementPage'))
 const PublicSiteManagementPage = lazy(() => import('../pages/admin/PublicSiteManagementPage'))
 const HomepageContentEditorPage = lazy(() => import('../pages/admin/HomepageContentEditorPage'))
+const LegalDocumentsEditorPage = lazy(() => import('../pages/admin/LegalDocumentsEditorPage'))
 const AdvertisementManagerPage = lazy(() => import('../pages/admin/AdvertisementManagerPage'))
 const ThemeSettingsPage = lazy(() => import('../pages/admin/ThemeSettingsPage'))
 const PreviewPublicPage = lazy(() => import('../pages/admin/PreviewPublicPage'))
@@ -101,7 +104,7 @@ function PageLoader() {
 }
 
 function AppRoutes() {
-  const { t } = useLanguage()
+  const { t, isArabic } = useLanguage()
 
   const customerLinks = [
     { to: '/customer', label: t('customer.dashboard', 'لوحتي'), icon: Home },
@@ -146,6 +149,7 @@ function AppRoutes() {
     { to: '/admin/provider-services', label: t('admin.providerServices', 'خدمات المزوّدين'), icon: ClipboardList, group: gPeople },
     { to: '/admin/public-site', label: t('admin.publicSite', 'الموقع العام'), icon: Monitor, group: gContent },
     { to: '/admin/public-site/content', label: t('admin.homepageContent', 'محتوى الرئيسية'), icon: FileText, group: gContent },
+    { to: '/admin/public-site/legal', label: t('admin.legalDocuments', isArabic ? 'الوثائق القانونية' : 'Legal documents'), icon: Scale, group: gContent },
     { to: '/admin/public-site/advertisements', label: t('admin.advertisements', 'الإعلانات'), icon: ImagePlus, group: gContent },
     { to: '/admin/public-site/theme', label: t('admin.theme', 'المظهر العام'), icon: Palette, group: gContent },
     { to: '/admin/public-site/preview', label: t('admin.preview', 'معاينة الواجهة'), icon: Eye, group: gContent },
@@ -177,6 +181,7 @@ function AppRoutes() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
@@ -227,6 +232,7 @@ function AppRoutes() {
               <Route path="/admin/service-relations" element={<ServiceRelationsManagementPage />} />
               <Route path="/admin/public-site" element={<PublicSiteManagementPage />} />
               <Route path="/admin/public-site/content" element={<HomepageContentEditorPage />} />
+              <Route path="/admin/public-site/legal" element={<LegalDocumentsEditorPage />} />
               <Route path="/admin/public-site/advertisements" element={<AdvertisementManagerPage />} />
               <Route path="/admin/public-site/theme" element={<ThemeSettingsPage />} />
               <Route path="/admin/public-site/preview" element={<PreviewPublicPage />} />

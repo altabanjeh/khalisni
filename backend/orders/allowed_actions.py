@@ -146,6 +146,12 @@ def get_order_allowed_actions(*, user, order, can_view=None):
         "can_request_documents": "request_missing_documents" in available_actions
         and (_has_perm(user, "orders.request_missing_documents") or is_partner_operational_user(user)),
         "can_assign_provider": "assign_provider" in available_actions and _can_assign_provider(user=user, order=order),
+        # Provider reassignment (team decision): staff with the assign permission, while assigned or in progress.
+        "can_reassign_provider": (
+            order.status in {OrderStatus.ASSIGNED, OrderStatus.IN_PROGRESS}
+            and bool(order.assigned_provider_id)
+            and (_has_perm(user, "orders.assign_order") or is_partner_admin(user))
+        ),
         "can_add_internal_note": can_add_internal_note,
         "can_add_customer_note": can_view
         and (role in {UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.SUPPORT} or is_partner_operational_user(user))

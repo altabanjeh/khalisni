@@ -1,0 +1,26 @@
+Khalsni total-closure 2026-11-01 - Stream E (ops) evidence. Text only; secrets never written; scratch paths shown as <scratch>.
+Drill stack: compose project khalsni-tc = docker-compose.yml + scripts/drill/docker-compose.drill.yml (loopback port 18080, SMTP sink),
+throwaway env (admin/owner/app roles, production settings, DJANGO_DEBUG=False), images built with BUILD_SHA=fa5a19b (git rev-parse --short HEAD;
+working tree also contained uncommitted Stream A-E changes at build time). Torn down afterwards (containers, volumes, images).
+
+TIMELINE (UTC, 2026-11-01)
+08:16-08:21  image build (backend, db-init, frontend)            4 m 43 s   drill_01_image_build.log
+08:21        stack up, all healthy                                67 s
+08:22        build identity on the running stack                             build_sha_drill.txt, version_endpoint_cases.txt
+08:22        seed_demo + seed_client_audit_qa (DJANGO_DEBUG=True one-off)  25 s   drill_02a/02b
+08:23        API journey: order + upload + consent -> review -> verify -> assign -> provider final result -> verify -> complete -> customer download  4 s   drill_02_api_order_journey.log
+08:25        first scheduled backup: verify failed on Git Bash sha256sum "*name" lines (script bug, fixed)   drill_03a/03b
+08:26        scheduled backup OK: backup + verify + off-server copy + rotation   25 s   drill_03c..03g
+08:28-08:30  restore attempts 1 (public-schema bug; transaction rolled back, target untouched) and 2 (media check flagged an image added by backend start; check relaxed to "every backed-up file identical")   drill_05a/05b/05c
+08:32        destroy (down -v) 11 s, fresh empty stack 52 s, restore 61 s -> RESTORE OK     drill_04a/04b, drill_05d/05e
+08:33        API downloads byte-identical, DB roles, consent trigger, consistency   drill_06/07/08
+08:35        SMTP proof AR/EN against sink                                    smtp/
+08:36-08:37  release gate: run1 FAIL (blank drill content), run2 PASSED, wrong-SHA negative FAIL   release_gate_run*.log
+08:37        backup failure modes: offsite failure, rotation KEEP=1, bad KEEP, tampered set   drill_09*
+08:39-08:42  phone normalization + equivalence + F02 on copies of the real catalogue DB (SQLite)   rehearsal_*.log
+08:44        backend rebuilt from the current tree (other streams' changes), gate run3            release_gate_run3_current_tree_rebuilt_backend.log
+
+RESTORE RESULT
+row counts (manifest == restored): users 11, services 8, orders 11, documents 15, order_consents 3, payments 0, audit_logs 130, migrations 117
+media: 22 files / 699141 bytes, all byte-identical (sha256) after restore; customer upload (doc 14) and final result (doc 15) downloaded
+through the API with the recorded sha256; backend role drill_app: not superuser, owns 0 objects; trigger orders_orderconsent_append_only enabled.

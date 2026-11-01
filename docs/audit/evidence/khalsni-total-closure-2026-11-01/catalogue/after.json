@@ -1,0 +1,104 @@
+{
+ "services": 35,
+ "customer_visible": 33,
+ "errors": 5,
+ "warnings": 11,
+ "findings": [
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "7 no-criminal-record-certificate",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "8 passport-appointment-booking",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "9 traffic-fines-payment",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "10 property-registration-deed",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document national-id",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "warning",
+   "service": "11 business-license-renewal",
+   "where": "document authorization-letter",
+   "message": "No allowed file types (the global list applies)."
+  },
+  {
+   "level": "error",
+   "service": "12 business_company_registration",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "error",
+   "service": "13 business_company_information_amendment",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "error",
+   "service": "14 business_company_add_activities",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "warning",
+   "service": "18 business_trademark_services",
+   "where": "field trademark_class",
+   "message": "Optional select field has no options."
+  },
+  {
+   "level": "error",
+   "service": "19 business_license_services",
+   "where": "field municipality",
+   "message": "A select field needs at least one option."
+  },
+  {
+   "level": "error",
+   "service": "20 business_company_closure_liquidation",
+   "where": "field company_type",
+   "message": "A select field needs at least one option."
+  }
+ ]
+}

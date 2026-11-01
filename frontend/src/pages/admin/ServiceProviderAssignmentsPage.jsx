@@ -10,6 +10,7 @@ import { getDisplayError } from '../../api/client'
 import { api } from '../../api/services'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../context/ToastContext'
+import { getAdminName, resolveCatalogName } from '../../utils/servicePresentation'
 import { useAsyncData } from '../../hooks/useAsyncData'
 
 const defaultAssignmentValues = {
@@ -37,7 +38,7 @@ function Field({ label, children }) {
 }
 
 function ServiceProviderAssignmentsPage() {
-  const { isArabic } = useLanguage()
+  const { isArabic, language } = useLanguage()
   const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const providerQuery = searchParams.get('provider') || ''
@@ -50,6 +51,8 @@ function ServiceProviderAssignmentsPage() {
   )
   const { data: services = [], loading: servicesLoading } = useAsyncData(() => api.getAdminServices(), [], [])
   const { data: providers = [], loading: providersLoading } = useAsyncData(() => api.getProviders(), [], [])
+  // service_name is Arabic-only on the API; show the screen language (DEF-A03).
+  const serviceLabel = (row) => resolveCatalogName(row?.service_id ?? row?.service, services, row?.service_name, language)
 
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -161,7 +164,7 @@ function ServiceProviderAssignmentsPage() {
         </div>
       ),
     },
-    { key: 'service_name', label: isArabic ? 'الخدمة' : 'Service' },
+    { key: 'service_name', label: isArabic ? 'الخدمة' : 'Service', render: (row) => serviceLabel(row) },
     { key: 'provider_city', label: isArabic ? 'المدينة' : 'City' },
     {
       key: 'provider_is_approved',
@@ -246,7 +249,7 @@ function ServiceProviderAssignmentsPage() {
                   {row.is_deleted ? (isArabic ? 'محذوف' : 'Deleted') : row.is_active ? (isArabic ? 'نشط' : 'Active') : (isArabic ? 'موقوف' : 'Inactive')}
                 </span>
               </div>
-              <p className="text-sm text-slate-600">{row.service_name}</p>
+              <p className="text-sm text-slate-600">{serviceLabel(row)}</p>
               <p className="text-sm text-slate-500">{row.provider_city || (isArabic ? 'بدون مدينة' : 'No city')}</p>
             </div>
           )}
@@ -307,7 +310,7 @@ function ServiceProviderAssignmentsPage() {
             >
               <option value="">{isArabic ? 'اختر الخدمة' : 'Select service'}</option>
               {availableServices.map((service) => (
-                <option key={service.id} value={service.id}>{isArabic ? service.name_ar : (service.name_en || service.name_ar)}</option>
+                <option key={service.id} value={service.id}>{getAdminName(service, language)}</option>
               ))}
             </select>
           </Field>
@@ -324,8 +327,8 @@ function ServiceProviderAssignmentsPage() {
         confirmLabel={isArabic ? 'تأكيد الحذف' : 'Confirm delete'}
         description={
           isArabic
-            ? `سيتم إخفاء ربط "${pendingDelete?.service_name || ''}" مع "${pendingDelete?.provider_name || ''}" من مسارات التعيين.`
-            : `This will hide the assignment of "${pendingDelete?.service_name || ''}" to "${pendingDelete?.provider_name || ''}" from assignment flows.`
+            ? `سيتم إخفاء ربط "${serviceLabel(pendingDelete)}" مع "${pendingDelete?.provider_name || ''}" من مسارات التعيين.`
+            : `This will hide the assignment of "${serviceLabel(pendingDelete)}" to "${pendingDelete?.provider_name || ''}" from assignment flows.`
         }
         impact={
           isArabic

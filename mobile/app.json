@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Khalsni Mobile",
+    "name": "Khalsni",
     "slug": "khalsni-mobile",
     "scheme": "khalsni",
     "version": "1.0.0",
@@ -36,7 +36,7 @@
       "expo-font"
     ],
     "extra": {
-      "appName": "Khalsni Mobile"
+      "appName": "Khalsni"
     }
   }
 }

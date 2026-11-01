@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import AdminUsersRolesPage from './AdminUsersRolesPage'
 import { api } from '../../api/services'
 
@@ -35,7 +35,6 @@ test('an active user is not shown as verified, and each verification fact is sep
   const active = rowOf('Active Unverified')
   expect(within(active).getByTestId('user-account-state')).toHaveTextContent('نشط')
   expect(facts(active)).toEqual({
-    is_verified: 'الحساب موثّق:لا',
     is_email_verified: 'البريد الإلكتروني مؤكَّد:لا',
     is_phone_verified: 'رقم الهاتف مؤكَّد:لا',
   })
@@ -45,15 +44,26 @@ test('an active user is not shown as verified, and each verification fact is sep
   expect(within(inactive).getByTestId('user-account-state')).toHaveTextContent('غير نشط')
   // 13. verification shown independently of the account state
   expect(facts(inactive).is_email_verified).toBe('البريد الإلكتروني مؤكَّد:نعم')
-  expect(facts(inactive).is_verified).toBe('الحساب موثّق:لا')
+  expect(facts(inactive)).not.toHaveProperty('is_verified')
 
   const verified = rowOf('Active Verified')
   expect(facts(verified)).toEqual({
-    is_verified: 'الحساب موثّق:نعم',
     is_email_verified: 'البريد الإلكتروني مؤكَّد:لا',
     is_phone_verified: 'رقم الهاتف مؤكَّد:نعم',
   })
   expect(document.body.textContent).not.toMatch(/تم التحقق/)
+  // Owner decision B10-8: the generic is_verified flag is not a gate in the MVP,
+  // so the ambiguous "account verified" fact is not shown at all.
+  expect(document.body.textContent).not.toMatch(/الحساب موثّق/)
+})
+
+test('the user form has no "account verified" control (owner decision B10-8)', async () => {
+  mockAdminUsersPage(users)
+  render(<AdminUsersRolesPage />)
+  await screen.findByText('Active Verified')
+  fireEvent.click(within(rowOf('Active Verified')).getByRole('button', { name: 'تعديل' }))
+  await screen.findByRole('checkbox', { name: /الحساب نشط/ })
+  expect(screen.queryByRole('checkbox', { name: /موثّق|verified/i })).not.toBeInTheDocument()
 })
 
 test('a missing verification field is reported as not available, never as verified', async () => {
