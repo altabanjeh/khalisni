@@ -27,7 +27,7 @@ Every engineering-controlled requirement is PASS or justified NOT_APPLICABLE. Th
 
 ## B. FINAL SHA
 
-`{{SHA}}` on `fix/total-closure` (local; not pushed).
+`329f9ed` on `fix/total-closure` (local; not pushed).
 
 ## C. DEPLOYED SHA
 
@@ -244,7 +244,7 @@ Catalogue migrations (services 0017–0025, help_guides 0007–0008, public_site
 
 ## P. FILES CHANGED
 
-See `git show --stat f35a640` and `git show --stat {{SHA}}`. Main areas:
+See `git show --stat f35a640` and `git show --stat 329f9ed`. Main areas:
 - **Backend:**
   - services: client categories, pricing, document merges, translations, repeaters, developer-note items, upload limits;
   - orders: messages, reassignment, delivery, complaints, overdue alerts, form timing;
@@ -262,7 +262,7 @@ See `git show --stat f35a640` and `git show --stat {{SHA}}`. Main areas:
 ## Q. COMMITS CREATED
 
 - `f35a640`: Total closure: client categories, legal/consent, contact, retention, messaging, reassignment, mobile parity, ops tooling.
-- `{{SHA}}`: Total closure (final): repeaters, developer-note fields, large uploads, success metrics, monthly report/CSV, late alerts to customer/provider, national ID, mobile admin soft delete, matrix and report.
+- `329f9ed`: Total closure (final): repeaters, developer-note fields, large uploads, success metrics, monthly report/CSV, late alerts to customer/provider, national ID, mobile admin soft delete, matrix and report.
 
 Nothing was pushed or deployed.
 
