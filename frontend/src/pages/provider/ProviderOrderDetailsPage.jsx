@@ -17,6 +17,7 @@ import { formatDate, getStatusLabel } from '../../utils/format'
 import { getServiceName } from '../../utils/servicePresentation'
 import { buildAcceptValue, buildUploadHint, validateSingleFileList } from '../../utils/serviceForms'
 import OrderNumber from '../../components/OrderNumber'
+import OrderRequestDetails from '../../components/OrderRequestDetails'
 
 function Panel({ icon: Icon, title, description, children }) {
   return (
@@ -121,6 +122,9 @@ function ProviderOrderDetailsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-6">
+          <Panel icon={MessageSquare} title={isArabic ? 'تفاصيل الطلب' : 'Request details'} description={isArabic ? 'البيانات التي أدخلها العميل لهذه الخدمة.' : 'The details the customer entered for this service.'}>
+            <OrderRequestDetails text={order.assigned_work_details} />
+          </Panel>
           <Panel icon={FileText} title={isArabic ? 'مستندات الطلب' : 'Request documents'} description={isArabic ? 'راجع ملفّات الطلب والمرفقات قبل إرسال النتيجة.' : 'Review the request files and attachments before sending the result.'}>
             <DocumentList documents={order.documents || []} />
           </Panel>

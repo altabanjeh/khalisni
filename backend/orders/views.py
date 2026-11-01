@@ -30,6 +30,7 @@ from core.errors import localize_message
 from core.i18n import request_language
 from workflow.rules import WORKFLOW_TRANSITIONS
 from documents.serializers import DocumentUploadSerializer
+from documents.upload_limits import allowed_upload_size, copy_request_data, order_requirement_for
 from orders.models import Order, OrderIssue, OrderNote, Rating
 from orders.selectors import get_orders_for_user, get_reviewable_orders_for_user
 from orders.serializers import (
@@ -79,7 +80,8 @@ def _submission_fingerprint(data):
     entries = []
     pairs = data.lists() if hasattr(data, "lists") else ((key, value if isinstance(value, list) else [value]) for key, value in data.items())
     for key, values in sorted(pairs, key=lambda item: item[0]):
-        if key == "csrfmiddlewaretoken":
+        # The form timing changes on a retry of the same submission.
+        if key in ("csrfmiddlewaretoken", "form_duration_seconds"):
             continue
         normalized = []
         for value in values:
@@ -275,7 +277,8 @@ class CustomerOrderDocumentUploadAPIView(APIView):
             context={
                 "order": order,
                 "uploaded_by": request.user,
-                "max_size": settings.FILE_UPLOAD_MAX_SIZE,
+                # CN-BIZ-09: the requirement's own limit (e.g. 50 MB drawings).
+                "max_size": allowed_upload_size(order_requirement_for(order, request.data.get("document_type"))),
                 "allowed_extensions": settings.ALLOWED_UPLOAD_EXTENSIONS,
                 "allowed_mime_types": settings.ALLOWED_UPLOAD_MIME_TYPES,
             },
@@ -606,7 +609,7 @@ class AdminOrderFinalDocumentAPIView(APIView):
 
     def post(self, request, pk):
         order = generics.get_object_or_404(get_orders_for_user(request.user), pk=pk)
-        payload = request.data.copy()
+        payload = copy_request_data(request.data)  # never copies uploaded files
         payload["is_final_document"] = True
         serializer = DocumentUploadSerializer(
             data=payload,

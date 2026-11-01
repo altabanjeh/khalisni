@@ -33,4 +33,7 @@ export interface ApiError {
   documentErrors?: Record<string, string>;
   // `service_answers` from order creation: { schema field key: message }.
   serviceAnswerErrors?: Record<string, string>;
+  // The same `service_answers` object as sent: a repeater's entry may be
+  // {"<row>": {"<item key>": message}} (see utils/serviceForms.ts).
+  serviceAnswerDetails?: Record<string, unknown>;
 }

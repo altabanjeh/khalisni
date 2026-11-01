@@ -53,6 +53,8 @@ function FileUploader({
   accept,
   hint,
   onChange: externalOnChange,
+  // Per-document limit in bytes (a requirement's `max_file_size`); defaults to the global 10 MB.
+  maxSize = MAX_SIZE,
 }) {
   const { isArabic, t } = useLanguage()
   const inputRegistration = registration || (typeof register === 'function' && name ? register(name) : {})
@@ -96,12 +98,13 @@ function FileUploader({
   }
 
   function fileProblem(candidates) {
-    const oversized = candidates.find((file) => file.size > MAX_SIZE)
+    const limit = Number(maxSize) > 0 ? Number(maxSize) : MAX_SIZE
+    const oversized = candidates.find((file) => file.size > limit)
     if (oversized) {
       return t(
         'upload.error.size',
-        isArabic ? 'الملف "{name}" يتجاوز الحد الأقصى المسموح (10 MB).' : 'File "{name}" exceeds the maximum allowed size (10 MB).',
-        { name: oversized.name },
+        isArabic ? 'الملف "{name}" يتجاوز الحد الأقصى المسموح ({max}).' : 'File "{name}" exceeds the maximum allowed size ({max}).',
+        { name: oversized.name, max: formatSize(limit) },
       )
     }
     const invalid = candidates.find((file) => !isAcceptedFile(file, acceptValue))

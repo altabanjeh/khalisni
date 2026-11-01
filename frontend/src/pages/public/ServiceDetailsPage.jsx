@@ -70,6 +70,7 @@ function getInformationFieldGuidance(type, isArabic) {
   if (['select', 'radio', 'choice'].includes(kind)) return isArabic ? 'اختر الإجابة المناسبة عند تعبئة الطلب.' : 'Choose the appropriate option when completing the request.'
   if (['textarea', 'long_text'].includes(kind)) return isArabic ? 'اكتب التفاصيل المطلوبة عند تعبئة الطلب.' : 'Enter the requested details when completing the request.'
   if (['number', 'integer', 'decimal'].includes(kind)) return isArabic ? 'أدخل القيمة الرقمية المطلوبة عند تعبئة الطلب.' : 'Enter the requested number when completing the request.'
+  if (kind === 'repeater') return isArabic ? 'أضف إدخالاً لكل عنصر عند تعبئة الطلب.' : 'Add one entry per item when completing the request.'
   return isArabic ? 'أدخل هذه المعلومة عند تعبئة الطلب.' : 'Enter this information when completing the request.'
 }
 
@@ -342,6 +343,12 @@ function ServiceDetailsPage() {
                         {required ? <span className="rounded-full bg-[var(--khalsni-public-primary-soft)] px-3 py-1 text-xs font-bold text-[var(--khalsni-public-accent-text)]">{isArabic ? 'مطلوب' : 'Required'}</span> : null}
                       </div>
                       <p className="mt-3 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">{help || getInformationFieldGuidance(type, isArabic)}</p>
+                      {String(type).toLowerCase() === 'repeater' && Array.isArray(field?.item_fields) && field.item_fields.length ? (
+                        <p className="mt-2 text-sm font-semibold leading-7 text-[var(--khalsni-public-text-secondary)]">
+                          {isArabic ? 'لكل إدخال: ' : 'For each entry: '}
+                          {field.item_fields.map((item, itemIndex) => getInformationFieldLabel(item, language, itemIndex)).join(isArabic ? '، ' : ', ')}
+                        </p>
+                      ) : null}
                     </div>
                   )
                 })}

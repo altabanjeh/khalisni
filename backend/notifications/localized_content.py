@@ -10,6 +10,8 @@ EVENT_ARABIC = {
     "client_uploaded_missing_document": ("تم رفع مستند مطلوب", "رفع العميل مستنداً مطلوباً للطلب {{order_number}}."),
     "customer_message_received": ("رسالة جديدة من العميل", "أرسل العميل رسالة بخصوص الطلب {{order_number}}."),
     "order_overdue": ("طلب تجاوز موعده المتوقع", "تجاوز الطلب {{order_number}} موعد التسليم المتوقع."),
+    "order_overdue_customer": ("طلبك يستغرق وقتاً أطول من المتوقع", "تجاوز طلبك {{order_number}} موعد التسليم المتوقع، وفريقنا يتابعه."),
+    "order_overdue_provider": ("طلب مسند إليك تجاوز موعده", "تجاوز الطلب {{order_number}} المسند إليك موعد التسليم المتوقع."),
     "customer_complaint_received": ("شكوى جديدة من العميل", "قدّم العميل شكوى بخصوص الطلب {{order_number}}."),
     "document_rejected": ("المستند يحتاج إلى تصحيح", "تم رفض مستند للطلب {{order_number}} ويحتاج إلى تصحيح."),
     "document_verified": ("تمت مراجعة المستند", "تم اعتماد مستند للطلب {{order_number}}."),

@@ -71,6 +71,9 @@ MESSAGES = {
     "Enter a valid email address.": "أدخل بريداً إلكترونياً صالحاً.",
     "Enter a date as YYYY-MM-DD.": "أدخل التاريخ بالصيغة سنة-شهر-يوم.",
     "Enter yes or no.": "اختر نعم أو لا.",
+    "Enter a single value.": "أدخل قيمة واحدة.",
+    "Enter the entries as a list.": "أرسل الإدخالات على شكل قائمة.",
+    "Each entry must be an object.": "كل إدخال يجب أن يكون مجموعة حقول.",
     # Account conflicts
     "This phone number is already used by another account.": "رقم الهاتف مستخدم في حساب آخر.",
     "This phone number is already used by another account. Sign in or use a different number.": "رقم الهاتف مستخدم في حساب آخر. سجّل الدخول أو استخدم رقماً آخر.",
@@ -145,6 +148,9 @@ MESSAGES = {
     "This setting is not available in the admin rule screen.": "هذا الإعداد غير متاح في شاشة القواعد.",
     "System settings cannot be deleted from this screen.": "لا يمكن حذف إعدادات النظام من هذه الشاشة.",
     "Only admin users can delete or deactivate records.": "الحذف أو الإيقاف متاح للمديرين فقط.",
+    # Delete guard (core/delete_guard.py): shown inside the web and mobile delete modals.
+    "Current admin password is required.": "أدخل كلمة مرور حسابك الإداري الحالية لتأكيد الحذف.",
+    "Current admin password is incorrect.": "كلمة مرور حسابك الإداري غير صحيحة.",
     "Only a platform super admin can approve or activate providers.": "اعتماد مزودي الخدمة أو تفعيلهم متاح لمدير المنصة فقط.",
     "Only a platform super admin can assign platform roles.": "تعيين أدوار المنصة متاح لمدير المنصة فقط.",
     "Only a platform super admin can assign this role.": "تعيين هذا الدور متاح لمدير المنصة فقط.",
@@ -182,6 +188,12 @@ MESSAGES = {
     "The condition refers to an answer that the controlling field does not offer.": "الشرط يشير إلى إجابة غير موجودة في الحقل المتحكم.",
     "A required field cannot depend on a hidden controlling field.": "لا يمكن أن يعتمد حقل مطلوب على حقل متحكم مخفي.",
     "Unknown field type.": "نوع الحقل غير معروف.",
+    "A repeater field needs at least one item field.": "الحقل المتكرر يحتاج إلى حقل فرعي واحد على الأقل.",
+    "Every repeater item field needs a key, a label and a supported type.": "كل حقل فرعي في الحقل المتكرر يحتاج إلى مفتاح وعنوان ونوع مدعوم.",
+    "Repeater item field keys must be unique.": "مفاتيح الحقول الفرعية في الحقل المتكرر يجب أن تكون مختلفة.",
+    "Repeater item fields cannot have conditions or nested repeaters.": "الحقول الفرعية في الحقل المتكرر لا تقبل شروط ظهور أو حقولاً متكررة داخلها.",
+    "Repeater limits must be whole numbers with 0 <= min_items <= max_items <= 20.": "حدود الحقل المتكرر يجب أن تكون أعداداً صحيحة: الحد الأدنى من 0 والحد الأقصى حتى 20، والأدنى لا يتجاوز الأقصى.",
+    "A condition cannot refer to a repeater field.": "لا يمكن أن يعتمد شرط الظهور على حقل متكرر.",
 }
 
 # Messages that carry a value. Each entry: (compiled English pattern, Arabic template).
@@ -198,6 +210,7 @@ PATTERNS = [
     (re.compile(r"^Allowed image extensions are: (?P<v>.+)\.$"), "امتدادات الصور المسموحة: {v}."),
     (re.compile(r"^Maximum file size cannot exceed (?P<v>\d+) bytes\.$"), "لا يمكن أن يتجاوز الحد الأقصى لحجم الملف {v} بايت."),
     (re.compile(r"^Image size must not exceed (?P<v>\d+) bytes\.$"), "يجب ألا يتجاوز حجم الصورة {v} بايت."),
+    (re.compile(r"^Maximum file size cannot exceed (?P<v>\d+) MB\.$"), "لا يمكن أن يتجاوز الحد الأقصى لحجم الملف {v} ميغابايت."),
     (re.compile(r"^This required prerequisite creates a circular dependency: (?P<v>.+)$"), "هذا المتطلب يُنشئ اعتماداً دائرياً: {v}"),
     (re.compile(r"^Field key '(?P<v>[^']+)' is used more than once\.$"), "مفتاح الحقل '{v}' مستخدم أكثر من مرة."),
     (re.compile(r"^Field (?P<v>\d+) must be an object\.$"), "الحقل {v} يجب أن يكون كائناً."),
@@ -208,6 +221,8 @@ PATTERNS = [
     (re.compile(r"^Field (?P<v>\d+) visible_when must be .+$"), "شرط ظهور الحقل {v} غير صالح."),
     (re.compile(r"^Field (?P<v>\d+) visible_when refers to an unknown field\.$"), "شرط ظهور الحقل {v} يشير إلى حقل غير موجود."),
     (re.compile(r"^Field '(?P<k>[^']+)': (?P<m>.+)$"), None),  # schema problem wrapper, see below
+    (re.compile(r"^Add at least (?P<v>\d+) entries\.$"), "أضف إدخالات حتى تصل إلى الحد الأدنى: {v}."),
+    (re.compile(r"^Add no more than (?P<v>\d+) entries\.$"), "عدد الإدخالات أكبر من الحد الأقصى: {v}."),
     (re.compile(r"^Unknown status group: (?P<v>.+)$"), "مجموعة حالات غير معروفة."),
     (re.compile(r"^Invalid order status: (?P<v>.+)$"), "حالة الطلب غير صالحة."),
 ]

@@ -29,6 +29,7 @@ import {
   findRequiredDocument,
   getRequiredDocumentLabel,
   validateSingleFileList,
+  getUploadRules,
 } from '../../utils/serviceForms'
 import { getServiceName } from '../../utils/servicePresentation'
 import OrderNumber from '../../components/OrderNumber'
@@ -251,7 +252,7 @@ function CustomerOrderDetailsPage() {
             description={tr('أي ملاحظة أدخلتها عند إنشاء الطلب أو أثناء المتابعة تظهر هنا.', 'Any note you entered when creating or following the request appears here.')}
           >
             <div className="rounded-[var(--radius-md)] border border-border bg-brand-50/40 p-4 text-sm leading-7 text-slate-600">
-              {order.customer_notes ? <bdi>{order.customer_notes}</bdi> : tr('لا توجد ملاحظات مسجلة على هذا الطلب.', 'No notes are recorded on this request.')}
+              {order.customer_notes ? <p className="whitespace-pre-line text-start"><bdi>{order.customer_notes}</bdi></p> : tr('لا توجد ملاحظات مسجلة على هذا الطلب.', 'No notes are recorded on this request.')}
             </div>
           </SectionCard>
 
@@ -297,6 +298,7 @@ function CustomerOrderDetailsPage() {
                   accept={buildAcceptValue(selectedRequirement)}
                   error={uploadForm.formState.errors.file}
                   hint={buildUploadHint(selectedRequirement, language)}
+                  maxSize={getUploadRules(selectedRequirement).max_file_size}
                   label={<HelpLabel fieldKey="file">{tr('الملف', 'File')}</HelpLabel>}
                   registration={uploadForm.register('file', {
                     validate: (fileList) => validateSingleFileList(fileList, selectedRequirement, tr('الملف مطلوب', 'A file is required'), language),

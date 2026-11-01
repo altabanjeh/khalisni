@@ -1,5 +1,5 @@
-URL: http://127.0.0.1:4361/contact
-TITLE: خلصني | Khalsni
+URL: http://127.0.0.1:4363/contact
+TITLE: خلصني
 DIR: rtl LANG: ar
 OVERFLOW_X: 0
 CONSOLE_ERRORS: []

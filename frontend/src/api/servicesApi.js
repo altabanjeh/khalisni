@@ -323,6 +323,18 @@ export const servicesApi = {
     return http.get('/admin/reports/weekly/')
   },
 
+  getOperationalSummary() {
+    return http.get('/reports/summary/')
+  },
+
+  getMonthlyReport(month) {
+    return http.get(`/admin/reports/monthly/${buildQuery({ month })}`)
+  },
+
+  exportReport(params = {}) {
+    return http.get(`/admin/reports/export/${buildQuery(params)}`, { responseType: 'blob' })
+  },
+
   async getWorkflowRules() {
     return unwrapList(await http.get('/admin/workflow-rules/'))
   },

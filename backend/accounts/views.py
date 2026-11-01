@@ -32,7 +32,7 @@ from accounts.serializers import (
 )
 from audit.utils import create_audit_log
 from core.i18n import request_language
-from core.delete_guard import AdminDeleteGuardMixin, _include_deleted, get_delete_guard_setting
+from core.delete_guard import AdminDeleteGuardMixin, _extract_delete_reason, _include_deleted, get_delete_guard_setting
 from config.permissions import CanManageUserRoles, IsAdminRole, IsCustomerRole, PlatformRecordWriteMixin
 from organizations.selectors import active_memberships_for_user, has_scoped_memberships, is_platform_super_admin
 
@@ -274,7 +274,8 @@ class AdminUserViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         old_value = {"role": user.role, "is_active": user.is_active, "is_deleted": user.is_deleted}
         self.enforce_delete_guard(request, instance=user, old_value=old_value)
         with transaction.atomic():
-            user.soft_delete(user=request.user)
+            # The reason typed in the delete modal (web and mobile) is kept on the record.
+            user.soft_delete(user=request.user, reason=_extract_delete_reason(request))
             create_audit_log(
                 request=request,
                 user=request.user,

@@ -97,3 +97,17 @@ def phone_number_error(value):
     if canonical is None:
         return "invalid"
     return None
+
+
+def normalize_national_id(value):
+    """One stored form for a national ID / passport number (OD-17).
+
+    The client sheets ask for «الرقم الوطني / رقم الجواز» (a Jordanian national
+    number *or* a passport number), so no length or digit-only rule applies.
+    Only presentation differences are removed: surrounding and inner spaces,
+    Arabic-Indic digits, and letter case. Equivalent forms are one identity
+    for the unique-ID check.
+    """
+    if value is None:
+        return ""
+    return re.sub(r"\s+", "", str(value)).translate(_ARABIC_DIGITS).upper()

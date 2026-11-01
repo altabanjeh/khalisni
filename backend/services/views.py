@@ -424,7 +424,7 @@ class RequiredDocumentDefinitionAdminViewSet(PlatformRecordWriteMixin, AdminDele
     search_fields = ["code", "name_ar", "name_en"]
     pagination_class = None
     audit_entity_type = "RequiredDocumentDefinition"
-    audit_fields = ("code", "name_ar", "name_en", "max_file_size", "is_active")
+    audit_fields = ("code", "name_ar", "name_en", "max_file_size", "max_file_size_mb", "is_active")
 
     def get_queryset(self):
         queryset = super().get_queryset()

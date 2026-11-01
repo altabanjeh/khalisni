@@ -21,8 +21,13 @@ export const servicesApi = {
   updateAdminService(serviceId: number | string, payload: Partial<Service>) {
     return apiClient.patch<Service>(`/admin/services/${serviceId}/`, payload).then((res) => res.data);
   },
-  deleteAdminService(serviceId: number | string, deletePassword: string) {
-    return secureAdminDelete(`/admin/services/${serviceId}/`, deletePassword);
+  // Guarded soft delete (backend AdminDeleteGuardMixin): the acting admin's
+  // current password and the reason travel in the DELETE body.
+  deleteAdminService(serviceId: number | string, deletePassword: string, deleteReason = '') {
+    return secureAdminDelete(`/admin/services/${serviceId}/`, deletePassword, { data: { delete_reason: deleteReason.trim() } });
+  },
+  restoreAdminService(serviceId: number | string) {
+    return apiClient.post<Service>(`/admin/services/${serviceId}/restore/`).then((res) => res.data);
   },
   getAdminCategories(params: ApiListParams = {}) {
     return apiClient.get<ServiceCategory[]>('/admin/categories/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));

@@ -1,0 +1,150 @@
+{
+  "generated": "2026-11-01T17:11:51.968Z",
+  "requirement": "SD-MOB",
+  "adapter": "axios Node http adapter (not React Native XHR)",
+  "passed": 9,
+  "total": 9,
+  "results": [
+    {
+      "id": "SD-MOB-1",
+      "name": "filter options are Active/Deleted/All in Arabic with Active as default; params mirror the web (include_deleted, server-side is_deleted where supported)",
+      "pass": true,
+      "evidence": {
+        "options": [
+          {
+            "value": "active",
+            "label": "النشطة",
+            "accessibilityLabel": "عرض السجلات النشطة"
+          },
+          {
+            "value": "deleted",
+            "label": "المحذوفة",
+            "accessibilityLabel": "عرض السجلات المحذوفة"
+          },
+          {
+            "value": "all",
+            "label": "الكل",
+            "accessibilityLabel": "عرض كل السجلات"
+          }
+        ]
+      }
+    },
+    {
+      "id": "SD-MOB-2",
+      "name": "lists: services deleted -> ?include_deleted=true&is_deleted=true; active -> no params; users all -> include_deleted only; advertisements deleted -> include_deleted then client filter",
+      "pass": true,
+      "evidence": {
+        "svcQuery": "?include_deleted=true&is_deleted=true",
+        "usrQuery": "?include_deleted=true",
+        "adsQuery": "?include_deleted=true",
+        "svcDeleted": [
+          6
+        ],
+        "adsDeleted": [
+          4
+        ]
+      }
+    },
+    {
+      "id": "SD-MOB-3",
+      "name": "DELETE sends JSON { delete_password, delete_reason } (trimmed) with Accept-Language: ar for services, users and advertisements",
+      "pass": true,
+      "evidence": {
+        "services": {
+          "delete_reason": "خدمة متوقفة",
+          "delete_password": "Password@123"
+        },
+        "users": {
+          "delete_reason": "حساب مكرر",
+          "delete_password": "Password@123"
+        },
+        "ads": {
+          "delete_reason": "إعلان منتهي",
+          "delete_password": "Password@123"
+        }
+      }
+    },
+    {
+      "id": "SD-MOB-4",
+      "name": "wrong password / 403 show the Arabic server message; an empty password is refused before any request",
+      "pass": true,
+      "evidence": {
+        "wrong": "كلمة مرور حسابك الإداري غير صحيحة.",
+        "forbidden": "الحذف أو الإيقاف متاح للمديرين فقط.",
+        "empty": "كلمة مرور المشرف الحالية مطلوبة."
+      }
+    },
+    {
+      "id": "SD-MOB-5",
+      "name": "restore POSTs <resource>/<id>/restore/ for services, users and advertisements (advertisement_id key)",
+      "pass": true,
+      "evidence": {
+        "r1": true,
+        "r2": true,
+        "r3": true
+      }
+    },
+    {
+      "id": "SD-MOB-6",
+      "name": "modal validation: reason and admin password both required, Arabic messages",
+      "pass": true,
+      "evidence": {
+        "errs": {
+          "delete_reason": "سبب الحذف مطلوب.",
+          "delete_password": "كلمة مرور حسابك الإداري الحالية مطلوبة."
+        }
+      }
+    },
+    {
+      "id": "SD-MOB-7",
+      "name": "actions only for backend is_platform_super_admin (admin role, superuser, active platform_super_admin membership); per-row admin-account rule matches the web",
+      "pass": true,
+      "evidence": {
+        "admin": true,
+        "employee": false,
+        "support": false,
+        "provider": false,
+        "customer": false,
+        "none": false,
+        "superuser": true,
+        "platformMembership": true,
+        "inactiveMembership": false,
+        "partnerOwner": false
+      }
+    },
+    {
+      "id": "SD-MOB-8",
+      "name": "services, users and advertisements screens: filter (default Active), delete modal with server error, restore confirm, role-gated actions, list invalidation after mutations",
+      "pass": true,
+      "evidence": {
+        "ManageServicesScreen": {
+          "filter": true,
+          "modal": true,
+          "restore": true,
+          "gated": true,
+          "invalidates": true
+        },
+        "ManageUsersScreen": {
+          "filter": true,
+          "modal": true,
+          "restore": true,
+          "gated": true,
+          "invalidates": true
+        },
+        "ManageAdvertisementsScreen": {
+          "filter": true,
+          "modal": true,
+          "restore": true,
+          "gated": true,
+          "invalidates": true
+        }
+      }
+    },
+    {
+      "id": "SD-MOB-9",
+      "name": "a11y: radiogroup/radio with checked state and 44pt options; modal shows record name + impact, secure password field, alert role on server error; row buttons 44pt with labels naming the record",
+      "pass": true,
+      "evidence": {}
+    }
+  ]
+}

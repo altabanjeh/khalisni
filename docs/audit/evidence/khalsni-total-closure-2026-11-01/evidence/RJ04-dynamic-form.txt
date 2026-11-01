@@ -1,5 +1,5 @@
-URL: http://127.0.0.1:4361/customer/orders/new?service=18
-TITLE: خلصني | Khalsni
+URL: http://127.0.0.1:4363/customer/orders/new?service=18
+TITLE: خلصني
 DIR: rtl LANG: ar
 OVERFLOW_X: 0
 CONSOLE_ERRORS: []

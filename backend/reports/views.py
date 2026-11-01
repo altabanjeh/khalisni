@@ -1,18 +1,23 @@
-from datetime import date, timedelta
+import calendar
+import csv
 from collections import Counter
+from datetime import date, timedelta
 from decimal import Decimal
+from io import StringIO
 
-from django.db.models import Count, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import TruncDate
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import permissions, response
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
 from config.permissions import CanViewReportsDashboard, CanViewScopedReports
+from core.i18n import request_language
 from documents.models import Document
 from organizations.selectors import is_provider_user, is_platform_super_admin, is_platform_support
-from orders.models import Order, OrderStatusLog
+from orders.models import Order, OrderStatusLog, Rating
 from orders.selectors import get_orders_for_user, get_reviewable_orders_for_user
 from orders.serializers import OrderListSerializer, ProviderOrderListSerializer
 from payment.models import Payment
@@ -67,6 +72,35 @@ def _payment_summary(queryset):
         "total_amount": payments.aggregate(total=Sum("amount"))["total"] or 0,
         "by_status": list(payments.values("status").annotate(total=Count("pk")).order_by("status")),
     }
+
+
+def _payments_by_method(queryset):
+    """Paid payment records per method (B05: staff-recorded payments only)."""
+    return list(
+        Payment.objects.filter(order__in=queryset, status=Payment.PaymentStatus.PAID)
+        .values("method")
+        .annotate(records=Count("pk"), amount=Sum("amount"))
+        .order_by("method")
+    )
+
+
+def _report_period(request):
+    """``(period, start, end)`` from ``?period=daily|weekly|monthly&month=YYYY-MM``."""
+    today = timezone.localdate()
+    period = request.query_params.get("period") or "monthly"
+    if period == "daily":
+        return period, today, today
+    if period == "weekly":
+        return period, today - timedelta(days=6), today
+    if period != "monthly":
+        raise ValidationError({"period": "Use daily, weekly or monthly."})
+    month = request.query_params.get("month") or today.strftime("%Y-%m")
+    try:
+        year, number = (int(part) for part in month.split("-"))
+        start = date(year, number, 1)
+    except (TypeError, ValueError):
+        raise ValidationError({"month": "Use YYYY-MM."})
+    return period, start, date(year, number, calendar.monthrange(year, number)[1])
 
 
 def _employee_workload(queryset, user):
@@ -134,6 +168,84 @@ def _provider_performance(queryset, user):
         }
         for row in rows[:10]
     ]
+
+
+def _median(values):
+    values = sorted(values)
+    if not values:
+        return None
+    middle = len(values) // 2
+    return values[middle] if len(values) % 2 else (values[middle - 1] + values[middle]) / 2
+
+
+def _success_metrics(queryset):
+    """The five PRD success metrics (docs/PRD.md), from recorded data only."""
+    finished = queryset.filter(status__in=[Order.Status.COMPLETED, Order.Status.ARCHIVED])
+    followed_up = set(
+        OrderStatusLog.objects.filter(order__in=finished, new_status=Order.Status.WAITING_CUSTOMER).values_list("order_id", flat=True)
+    )
+    finished_ids = list(finished.values_list("pk", flat=True))
+    durations = list(queryset.exclude(form_duration_seconds=None).values_list("form_duration_seconds", flat=True))
+
+    per_service = {}
+    for service_id, name_ar, name_en, created_at, completed_at in finished.exclude(completed_at=None).values_list(
+        "service_id", "service__name_ar", "service__name_en", "created_at", "completed_at"
+    ):
+        row = per_service.setdefault(service_id, {"service_name_ar": name_ar, "service_name_en": name_en, "hours": []})
+        row["hours"].append((completed_at - created_at).total_seconds() / 3600)
+    processing = sorted(
+        (
+            {
+                "service_name_ar": row["service_name_ar"],
+                "service_name_en": row["service_name_en"],
+                "completed_orders": len(row["hours"]),
+                "average_hours": round(sum(row["hours"]) / len(row["hours"]), 1),
+            }
+            for row in per_service.values()
+        ),
+        key=lambda row: (-row["completed_orders"], row["service_name_ar"] or ""),
+    )[:10]
+
+    providers = (
+        queryset.exclude(assigned_provider=None)
+        .values("assigned_provider__user__full_name")
+        .annotate(
+            total_orders=Count("pk", distinct=True),
+            completed_orders=Count("pk", filter=Q(status__in=[Order.Status.COMPLETED, Order.Status.ARCHIVED]), distinct=True),
+        )
+        .order_by("-completed_orders", "assigned_provider__user__full_name")[:10]
+    )
+    ratings = Rating.objects.filter(order__in=queryset, is_deleted=False)
+    rating_summary = ratings.aggregate(average=Avg("score"), total=Count("pk"))
+    return {
+        "time_to_create_request": {
+            "measured_orders": len(durations),
+            "median_seconds": _median(durations),
+        },
+        "completed_without_follow_up": {
+            "completed_orders": len(finished_ids),
+            "without_missing_document_request": len([pk for pk in finished_ids if pk not in followed_up]),
+            "percent": round(100 * (len(finished_ids) - len(followed_up)) / len(finished_ids), 1) if finished_ids else None,
+        },
+        "processing_duration_by_service": processing,
+        "provider_throughput": [
+            {
+                "provider_name": row["assigned_provider__user__full_name"] or "",
+                "total_orders": row["total_orders"],
+                "completed_orders": row["completed_orders"],
+                "completion_rate": round(100 * row["completed_orders"] / row["total_orders"], 1) if row["total_orders"] else None,
+            }
+            for row in providers
+        ],
+        "customer_satisfaction": {
+            "ratings": rating_summary["total"],
+            "average_score": round(rating_summary["average"], 2) if rating_summary["average"] is not None else None,
+            "distribution": {
+                str(score): count
+                for score, count in ratings.values_list("score").annotate(count=Count("pk")).order_by("score")
+            },
+        },
+    }
 
 
 def _service_volume(queryset):
@@ -365,6 +477,7 @@ class WeeklyReportAPIView(APIView):
             "orders_by_organization": _organization_summary(queryset),
             "orders_by_branch": _branch_summary(queryset),
             "orders_by_status": _status_summary(queryset),
+            "payments_by_method": _payments_by_method(queryset),
         }
         if is_platform_super_admin(request.user):
             return response.Response(full_data)
@@ -377,6 +490,81 @@ class WeeklyReportAPIView(APIView):
                 "orders_by_status": full_data["orders_by_status"],
             }
         )
+
+
+class MonthlyReportAPIView(APIView):
+    """Monthly management report (PROP-WEB-05): volume, revenue, categories, payment methods."""
+
+    permission_classes = [permissions.IsAuthenticated, CanViewReportsDashboard]
+
+    def get(self, request):
+        if not is_platform_super_admin(request.user):
+            return response.Response({"detail": "Only administrators can read the monthly report."}, status=403)
+        _period, start, end = _report_period(request)
+        queryset = _scoped_orders_for_reports(request.user).filter(created_at__date__gte=start, created_at__date__lte=end)
+        finished = queryset.filter(status__in=[Order.Status.COMPLETED, Order.Status.ARCHIVED])
+        return response.Response({
+            "month": start.strftime("%Y-%m"),
+            "start_date": str(start),
+            "end_date": str(end),
+            "created_orders": queryset.count(),
+            "completed_orders": finished.count(),
+            "revenue_summary": finished.aggregate(total=Sum("final_price"))["total"] or 0,
+            "orders_by_category": _category_summary(queryset),
+            "orders_by_status": _status_summary(queryset),
+            "payments_by_method": _payments_by_method(queryset),
+        })
+
+
+class ReportExportAPIView(APIView):
+    """CSV export of the orders in a report period (PROP-WEB-05).
+
+    One row per order with operational columns only: no customer name, phone,
+    national ID or notes leave the system through this file.
+    """
+
+    permission_classes = [permissions.IsAuthenticated, CanViewReportsDashboard]
+
+    def get(self, request):
+        if not is_platform_super_admin(request.user):
+            return response.Response({"detail": "Only administrators can export reports."}, status=403)
+        period, start, end = _report_period(request)
+        english = request_language(request) == "en"
+        orders = (
+            _scoped_orders_for_reports(request.user)
+            .filter(created_at__date__gte=start, created_at__date__lte=end)
+            .select_related("service__category")
+            .order_by("created_at")
+        )
+        payments = {}
+        for order_id, method, status in Payment.objects.filter(order__in=orders).order_by("created_at").values_list("order_id", "method", "status"):
+            payments[order_id] = (method, status)
+        buffer = StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(
+            ["Order number", "Created", "Service", "Category", "Status", "Final price (JOD)", "Completed", "Payment method", "Payment status"]
+            if english else
+            ["رقم الطلب", "تاريخ الإنشاء", "الخدمة", "التصنيف", "الحالة", "السعر النهائي (د.أ)", "تاريخ الإنجاز", "طريقة الدفع", "حالة الدفع"]
+        )
+        for order in orders:
+            service = order.service
+            category = getattr(service, "category", None)
+            method, payment_status = payments.get(order.pk, ("", ""))
+            writer.writerow([
+                order.order_number,
+                timezone.localtime(order.created_at).strftime("%Y-%m-%d %H:%M"),
+                ((service.name_en if english else "") or service.name_ar) if service else order.service_name_snapshot,
+                ((category.name_en if english else "") or category.name_ar) if category else order.service_category_name_snapshot,
+                order.status,
+                order.final_price if order.final_price is not None else "",
+                timezone.localtime(order.completed_at).strftime("%Y-%m-%d %H:%M") if order.completed_at else "",
+                method,
+                payment_status,
+            ])
+        # UTF-8 with BOM so spreadsheet programs read the Arabic text correctly.
+        result = HttpResponse("﻿" + buffer.getvalue(), content_type="text/csv; charset=utf-8")
+        result["Content-Disposition"] = f'attachment; filename="khalsni-{period}-{start}-{end}.csv"'
+        return result
 
 
 class EmployeeDashboardAPIView(APIView):
@@ -496,14 +684,17 @@ class OperationalSummaryReportAPIView(APIView):
             "completed_orders": _completed_orders_payload(orders, request),
             "service_volume": _service_volume(orders),
             "payment_summary": _payment_summary(orders),
+            "success_metrics": _success_metrics(orders),
         }
         if role == "customer":
             # A customer's own summary: no staff or provider names.
             data.pop("employee_workload")
             data.pop("provider_performance")
+            data.pop("success_metrics")
         if is_provider_user(request.user):
             # SRS: providers cannot access finance figures.
             data.pop("payment_summary")
+            data.pop("success_metrics")
             for key in ("orders_by_category", "orders_by_organization", "orders_by_branch"):
                 for row in data[key]:
                     row.pop("revenue", None)

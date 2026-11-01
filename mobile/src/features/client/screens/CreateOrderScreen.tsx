@@ -10,6 +10,7 @@ import { AppScreen } from '../../../components/AppScreen';
 import { ErrorState } from '../../../components/ErrorState';
 import { LoadingState } from '../../../components/LoadingState';
 import { PublicServiceCard } from '../../../components/public/PublicServiceCard';
+import { RepeaterField } from '../../../components/RepeaterField';
 import { ordersApi } from '../../../api/orders.api';
 import { servicesApi } from '../../../api/services.api';
 import { getDisplayError, normalizeApiError } from '../../../api/client';
@@ -27,6 +28,11 @@ import {
   validateUploadableFile,
   validateSchemaAnswerFormat,
   isSchemaFieldVisible,
+  getRepeaterRows,
+  mapRepeaterServerError,
+  validateRepeaterRows,
+  type RepeaterRow,
+  type RepeaterValues,
 } from '../../../utils/serviceForms';
 import { ORDER_CONSENT_SOURCE, ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../../utils/orderConsent';
 import { resolveFileSize } from '../../../utils/file';
@@ -62,6 +68,8 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
   const [notes, setNotes] = useState('');
   const [consent, setConsent] = useState(false);
   const [dynamicValues, setDynamicValues] = useState<Record<string, string | boolean>>({});
+  // Repeater rows as displayed (CN-BIZ-01 partners, CN-BIZ-04 plots), by input name.
+  const [repeaterRows, setRepeaterRows] = useState<RepeaterValues>({});
   const [selectedDocuments, setSelectedDocuments] = useState<Record<string, UploadableDocument>>({});
   const [generalDocuments, setGeneralDocuments] = useState<UploadableDocument[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,6 +77,8 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
   // One Idempotency-Key per form attempt: reused while the same unchanged form
   // is retried, replaced when the content changes or the order is created.
   const submissionRef = useRef<{ key: string; fingerprint: string } | null>(null);
+  // PRD success metric "time to create request": seconds from opening the form to submitting it.
+  const formOpenedAt = useRef(Date.now());
 
   const servicesQuery = useQuery({ queryKey: ['services'], queryFn: () => servicesApi.getServices() });
 
@@ -106,7 +116,12 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       if (!consent) validationErrors.consent = 'يجب الموافقة على الشروط قبل الإرسال.';
 
       schemaFields.forEach((field) => {
+        if (field.type !== 'repeater' || !isSchemaFieldVisible(field, schemaFields, dynamicValues)) return;
+        Object.assign(validationErrors, validateRepeaterRows(field, getRepeaterRows(field, repeaterRows)));
+      });
+      schemaFields.forEach((field) => {
         const value = dynamicValues[field.inputName];
+        if (field.type === 'repeater') return;
         if (!field.required || !isSchemaFieldVisible(field, schemaFields, dynamicValues)) return;
         if (field.type === 'checkbox' && !value) {
           validationErrors[field.inputName] = `${field.label} مطلوب.`;
@@ -140,7 +155,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       // `notes` is only the customer's own text; the server writes the
       // additional-information section from the validated service_answers.
       const customerNotes = notes.trim();
-      const serviceAnswers = buildServiceAnswers(schemaFields, dynamicValues);
+      const serviceAnswers = buildServiceAnswers(schemaFields, dynamicValues, repeaterRows);
       const serviceAnswersJson = JSON.stringify(serviceAnswers);
       const describeFile = (file: UploadableDocument) => [file.uri, file.name, file.size ?? null];
       const fingerprint = JSON.stringify([
@@ -175,6 +190,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
       // Names the consent statement shown on this screen (backend/orders/consent.py).
       formData.append('consent_version', ORDER_CONSENT_VERSION);
       formData.append('consent_source', ORDER_CONSENT_SOURCE);
+      formData.append('form_duration_seconds', String(Math.round((Date.now() - formOpenedAt.current) / 1000)));
 
       if (requiredDocuments.length) {
         requiredDocuments.forEach((document, index) => {
@@ -240,6 +256,14 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
 
     Object.entries(apiError.serviceAnswerErrors ?? {}).forEach(([key, message]) => {
       const field = visibleFields.find((candidate) => candidate.key === key);
+      if (field?.type === 'repeater') {
+        // A string is a whole-field error; {"<row>": {"<item>": message}} is per row.
+        const mapped = mapRepeaterServerError(field, apiError.serviceAnswerDetails?.[key] ?? message);
+        Object.assign(placed, mapped.placed);
+        general.push(...mapped.general);
+        if (!Object.keys(mapped.placed).length && !mapped.general.length) general.push(message);
+        return;
+      }
       if (field) placed[field.inputName] = message;
       else general.push(message);
     });
@@ -354,6 +378,7 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
                 label={service.name_ar}
                 onPress={() => {
                   setSelectedServiceId(service.id);
+                  setRepeaterRows({});
                   setSelectedDocuments({});
                   setGeneralDocuments([]);
                   setErrors({});
@@ -379,7 +404,20 @@ export function CreateOrderScreen({ route, navigation }: { route: any; navigatio
             <Text style={styles.sectionTitle}>البيانات الإضافية المطلوبة</Text>
             {schemaFields.filter((field) => isSchemaFieldVisible(field, schemaFields, dynamicValues)).map((field) => (
               <View key={field.inputName} style={styles.stack}>
-                {field.type === 'checkbox' ? (
+                {field.type === 'repeater' ? (
+                  <RepeaterField
+                    field={field}
+                    rows={getRepeaterRows(field, repeaterRows)}
+                    errors={errors}
+                    onChange={(rows: RepeaterRow[]) => {
+                      setRepeaterRows((current) => ({ ...current, [field.inputName]: rows }));
+                      // Row positions may have changed: drop this repeater's stale messages.
+                      setErrors((current) => Object.fromEntries(
+                        Object.entries(current).filter(([key]) => key !== field.inputName && !key.startsWith(`${field.inputName}.`)),
+                      ));
+                    }}
+                  />
+                ) : field.type === 'checkbox' ? (
                   <View style={styles.toggleRow}>
                     <Switch
                       value={Boolean(dynamicValues[field.inputName])}

@@ -687,6 +687,29 @@ export const api = {
       provider_performance: mockAdminDashboard.provider_performance,
     }),
 
+  getMonthlyReport: async (month) =>
+    withTestValue(() => servicesApi.getMonthlyReport(month), {
+      month: month || '2026-11',
+      created_orders: 12,
+      completed_orders: 7,
+      revenue_summary: 420,
+      orders_by_status: [],
+      payments_by_method: [{ method: 'cash', records: 4, amount: '120.00' }],
+    }),
+  exportReport: servicesApi.exportReport,
+  getOperationalSummary: async () =>
+    withTestValue(() => servicesApi.getOperationalSummary(), {
+      success_metrics: {
+        time_to_create_request: { measured_orders: 4, median_seconds: 210 },
+        completed_without_follow_up: { completed_orders: 4, without_missing_document_request: 3, percent: 75 },
+        processing_duration_by_service: [
+          { service_name_ar: 'طلب سند تسجيل', service_name_en: 'Property registration certificate', completed_orders: 3, average_hours: 26.5 },
+        ],
+        provider_throughput: [{ provider_name: 'Provider Alpha', total_orders: 5, completed_orders: 4, completion_rate: 80 }],
+        customer_satisfaction: { ratings: 3, average_score: 4.33, distribution: { 4: 2, 5: 1 } },
+      },
+    }),
+
   getProviders: async (params = {}) => withTestValue(() => providersApi.getProviders(params), filterSoftDeleted(mockProviderRecords, params)),
   getProvidersPage: async (params = {}) =>
     withTestValue(() => providersApi.getProvidersPage(params), mockPage(filterSoftDeleted(mockProviderRecords, params))),

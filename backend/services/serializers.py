@@ -19,6 +19,7 @@ from services.models import (
 from services.catalog_defaults import fallback_slug, suggest_category_icon
 from services.order_validation import get_completed_service_ids_for_customer
 from services.pricing import public_pricing
+from documents.upload_limits import hard_max_size, hard_max_size_mb
 from services.schema_rules import SEMANTIC_MESSAGES, order_blockers, schema_problems
 from services.service_relations import RELATION_TYPE_HELP_TEXT
 from services.selectors import resolve_service_organization_from_request, visible_services_queryset
@@ -672,6 +673,10 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
 
 
 class RequiredDocumentDefinitionSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSerializer):
+    # CN-BIZ-09: per-definition size override in MB (empty = the default limit).
+    max_file_size_mb = serializers.IntegerField(required=False, allow_null=True, min_value=1)
+    max_file_size_mb_ceiling = serializers.SerializerMethodField()
+
     class Meta:
         model = RequiredDocumentDefinition
         fields = (
@@ -684,10 +689,22 @@ class RequiredDocumentDefinitionSerializer(SoftDeleteFieldsReadOnlyMixin, serial
             "allowed_extensions",
             "allowed_mime_types",
             "max_file_size",
+            "max_file_size_mb",
+            "max_file_size_mb_ceiling",
             "sort_order",
             "is_active",
             "is_deleted",
         )
+        read_only_fields = ("max_file_size_mb_ceiling",)
+
+    def get_max_file_size_mb_ceiling(self, obj):
+        return hard_max_size_mb()
+
+    def validate_max_file_size_mb(self, value):
+        ceiling = hard_max_size_mb()
+        if value is not None and value > ceiling:
+            raise serializers.ValidationError(f"Maximum file size cannot exceed {ceiling} MB.")
+        return value
 
 
 class AdminRequiredDocumentDefinitionSerializer(RequiredDocumentDefinitionSerializer):
@@ -771,6 +788,10 @@ class AdminRequiredDocumentRuleSerializer(SoftDeleteFieldsReadOnlyMixin, seriali
         return sorted(SAFE_ADMIN_DOCUMENT_EXTENSIONS)
 
     def get_max_file_size_limit(self, obj):
+        # CN-BIZ-09: a definition with its own size override sets the limit.
+        definition = getattr(obj, "document_definition", None)
+        if definition is not None and definition.max_file_size_mb:
+            return definition.max_file_size
         return getattr(settings, "FILE_UPLOAD_MAX_SIZE", 0)
 
     def run_validators(self, value):
@@ -791,7 +812,8 @@ class AdminRequiredDocumentRuleSerializer(SoftDeleteFieldsReadOnlyMixin, seriali
         return sorted(set(normalized))
 
     def validate_max_file_size(self, value):
-        max_allowed_size = getattr(settings, "FILE_UPLOAD_MAX_SIZE", value)
+        # The per-definition limit is checked in validate(); this is the hard ceiling.
+        max_allowed_size = hard_max_size()
         if value <= 0:
             raise serializers.ValidationError("Maximum file size must be greater than zero.")
         if max_allowed_size and value > max_allowed_size:
@@ -820,8 +842,17 @@ class AdminRequiredDocumentRuleSerializer(SoftDeleteFieldsReadOnlyMixin, seriali
         attrs["name_en"] = definition.name_en
         if not attrs.get("allowed_extensions"):
             attrs["allowed_extensions"] = list(definition.allowed_extensions or [])
-        if not attrs.get("max_file_size"):
+        if definition.max_file_size_mb:
+            # CN-BIZ-09: the definition's size override is authoritative.
             attrs["max_file_size"] = definition.max_file_size
+        elif not attrs.get("max_file_size"):
+            attrs["max_file_size"] = definition.max_file_size
+        else:
+            default_limit = getattr(settings, "FILE_UPLOAD_MAX_SIZE", 0)
+            if default_limit and attrs["max_file_size"] > default_limit:
+                raise serializers.ValidationError(
+                    {"max_file_size": f"Maximum file size cannot exceed {default_limit} bytes."}
+                )
         return attrs
 
 

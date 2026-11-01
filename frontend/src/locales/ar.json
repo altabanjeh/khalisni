@@ -170,7 +170,7 @@
   "upload.replace": "استبدال",
   "upload.replaceFile": "استبدال الملف {name}",
   "upload.dropHere": "أفلت الملف هنا",
-  "upload.error.size": "الملف \"{name}\" يتجاوز الحد الأقصى المسموح (10 MB).",
+  "upload.error.size": "الملف \"{name}\" يتجاوز الحد الأقصى المسموح ({max}).",
   "upload.error.type": "نوع الملف \"{name}\" غير مدعوم لهذا الحقل.",
   "upload.hint": "الملفات المسموحة: PDF, JPG, PNG, DOC, DOCX | الحد الأقصى: 10 MB",
   "upload.removeFile": "حذف الملف {name}",

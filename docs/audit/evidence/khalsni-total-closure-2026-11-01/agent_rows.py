@@ -1,0 +1,31 @@
+# Matrix rows for the items implemented in the second half of the total-closure pass
+# (read by build_matrix.py). Evidence from the final-build probes on the real catalogue copy.
+DEV = "backend/services/tests_developer_note_items.py"
+AGENT_ROWS = {
+    "CN-BIZ-01": row("Per-partner data (name, national ID/passport, nationality, share) entered as repeated rows, as many as there are partners (1-20).",
+                     "services/schema_rules.py repeater type (schema_problems, validate_answers, notes); migration services 0023 (partners); importer catalogue_schema; DynamicServiceFields useFieldArray; mobile RepeaterField; admin builder edits repeaters",
+                     REPEATER + "; frontend DynamicServiceFields.repeater.test.jsx, serviceFormsRepeater.test.js, ServicesManagementPage.repeater.test.jsx; mobile repeater harness 19/19",
+                     "repeater_ui step 5 (partners repeater served with 4 item fields)", EV + "/REPEATER-UI-results.json; " + E + "/mobile/mobile_repeater_harness_output.txt", PASS,
+                     "Repeater shipped; the company-registration service itself still waits on the company-type list (CN-BIZ-00)"),
+    "CN-BIZ-04": row("Plot numbers added dynamically (2-20 parcel/basin rows) on property consolidation, behind the yes/no parcel gate (B10-3).",
+                     "migration services 0023 (plots repeater + gate); server per-row validation", REPEATER,
+                     "repeater_ui steps 1-2: hidden before yes, 2 rows, add/remove (AR 390, EN 1366), server refuses an empty row", EV + "/RP-plots-ar.png; " + EV + "/RP-plots-en.png", PASS,
+                     approval="Owner decision B10-1/2/3 (gate on all land services)"),
+    "CN-BIZ-05": row("Boundary demarcation: optional site coordinates (free text) for the provider and optional site photos (jpg/png).",
+                     "migration services 0025; importer; provider order pages show the answers (OrderRequestDetails)", DEV,
+                     "repeater_ui step 3", EV + "/REPEATER-UI-results.json", PASS),
+    "CN-BIZ-07": row("Mortgage: mortgagee, bank/other, mortgage value and financing documents.",
+                     "already in the imported form: field_08d94d2888, field_d6467d46cf, field_3ece488644, document_5c2f8f95d1", DEV + "; " + SVC + " ImporterAgreementTests",
+                     "verified on the real catalogue copy", E + "/catalogue/after.txt", PASS),
+    "CN-BIZ-08": row("Mortgage release: release letter upload and the approval issue date.",
+                     "document_d2024a06a1 (existing); optional date field release_approval_date (migration services 0025)", DEV, "-", E + "/catalogue/after.txt", PASS),
+    "CN-BIZ-09": row("Large engineering drawings: per-definition upload limit, 50 MB for engineering drawings, hard ceiling ENGINEERING_UPLOAD_MAX_SIZE; nginx body limit raised.",
+                     "RequiredDocumentDefinition.max_file_size_mb (migration 0024), documents/upload_limits.py, admin input, FileUploader maxSize; copy_request_data fixes >2.5 MB order uploads",
+                     DEV + "; ServicesManagementPage.fileSize.test.jsx; mobile repeater harness U01-U04",
+                     "repeater_ui step 4 (max_file_size 52428800)", EV + "/REPEATER-UI-results.json", PASS),
+    "SD-MOB": row("Mobile admin: Active/Deleted/All filter, guarded delete (name, impact, reason, password), restore — Services, Users, Advertisements.",
+                  "mobile AdminSoftDeleteModal, SoftDeleteFilter, SoftDeleteRowActions, useAdminSoftDelete; delete reason saved for users/advertisements; Arabic delete-guard messages",
+                  "backend/core/tests_admin_soft_delete_contract.py; mobile soft-delete harness 9/9; npm run typecheck",
+                  "-", E + "/mobile/mobile_softdelete_harness_output.json", PASS,
+                  "Mobile has no category screen; the device run is tracked in B09"),
+}

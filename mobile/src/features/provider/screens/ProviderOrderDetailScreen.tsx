@@ -33,6 +33,9 @@ export function ProviderOrderDetailScreen({ route, navigation }: { route: any; n
             <KeyValueRow label="الخدمة" value={query.data.service?.name_ar} />
             <KeyValueRow label="المدينة" value={query.data.city} />
             <Text style={{ textAlign: 'right' }}>التعليمات: {providerInstructions || 'لا توجد تعليمات للمزوّد.'}</Text>
+            {/* The service answers (repeater rows included) are multi-line text; Text keeps the line breaks. */}
+            <Text style={{ textAlign: 'right', fontWeight: '700' }}>بيانات الطلب</Text>
+            <Text style={{ textAlign: 'right' }}>{query.data.assigned_work_details?.trim() || 'لا توجد بيانات إضافية لهذا الطلب.'}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <AppButton label="تحديث الحالة" onPress={() => navigation.navigate('ProviderTaskUpdate', { orderId })} style={{ flex: 1 }} />
               <AppButton label="رفع مستند نهائي" variant="secondary" onPress={() => navigation.navigate('UploadFinalDocument', { orderId })} style={{ flex: 1 }} />

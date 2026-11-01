@@ -1,0 +1,244 @@
+URL: http://127.0.0.1:4363/services/request-building-permit
+TITLE: Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+Services
+About
+For business
+FAQ
+Contact
+Arabic
+English
+Sign in
+Create account
+Real Estate and Land
+Request Building Permit
+
+This service lets you request a building permit for a property or land plot, following up the request with the municipality or the Greater Amman Municipality and the competent authorities until the building permit is issued once the technical and zoning requirements are complete.
+
+According to the procedures of the municipality or the Greater Amman Municipality and the competent authorities.
+Final fees are confirmed after document review.
+6 documents
+Start request
+All services
+
+Overview
+
+What to know before starting
+
+This service lets you request a building permit for a property or land plot, following up the request with the municipality or the Greater Amman Municipality and the competent authorities until the building permit is issued once the technical and zoning requirements are complete.
+
+Duration
+
+According to the procedures of the municipality or the Greater Amman Municipality and the competent authorities.
+
+Category
+
+Real Estate and Land
+
+Required documents
+
+Prepare files before starting
+
+National ID copy
+
+Required
+
+Property registration certificate
+
+Required
+
+Zoning site plan
+
+Required
+
+Engineering drawings
+
+Required
+
+Legal power of attorney
+
+Optional
+
+Any additional documents requested by the competent authority
+
+Optional
+
+Request details
+
+Information requested by the form
+
+Full name
+
+Required
+
+Enter this information when completing the request.
+
+National ID number
+
+Required
+
+Enter this information when completing the request.
+
+Phone number
+
+Required
+
+Enter this information when completing the request.
+
+Do you know the parcel and basin numbers?
+
+If you do not know the parcel and basin numbers, choose “No” and our team will help identify them while reviewing your request.
+
+Parcel number
+
+Required
+
+Enter this information when completing the request.
+
+Basin number
+
+Required
+
+Enter this information when completing the request.
+
+Area
+
+Required
+
+Enter this information when completing the request.
+
+Governorate
+
+Required
+
+Enter this information when completing the request.
+
+Engineering office name
+
+Required
+
+Enter this information when completing the request.
+
+Additional notes
+
+Enter the requested details when completing the request.
+
+Is there an accredited engineering office?
+
+Enter this information when completing the request.
+
+Is the permit for a new building or a rebuild?
+
+Choose the appropriate option when completing the request.
+
+How many floors?
+
+Enter the requested number when completing the request.
+
+Is there a legal power of attorney?
+
+Enter this information when completing the request.
+
+Process
+
+Clear path from submission to completion
+1
+
+Confirm the request and basic details
+
+2
+
+Upload the required documents
+
+3
+
+Review and process the request
+
+4
+
+Deliver the final result
+
+Service notes
+
+Notes before submitting
+
+Conditions: • Submit the approved engineering plans. • Comply with the planning requirements. • Complete the required documents and pay the fees.
+Operational information: Executing authority: the municipality or the Greater Amman Municipality. Service provider: engineering office and transaction agent. Category: licences and construction.
+
+Manual review
+
+Khalsni may review the details before continuing.
+
+Provider-supported
+
+An eligible service provider may handle part of your request.
+
+Service summary
+
+Request Building Permit
+
+Duration
+
+According to the procedures of the municipality or the Greater Amman Municipality and the competent authorities.
+
+Start request
+Track existing request
+
+Your data is protected
+
+You can review your request documents from your account after signing in.
+
+Related services
+
+You may also need
+All services
+Real Estate and Land
+Request Property Registration Certificate
+
+This service lets the customer request an official registration deed for a property, with the Khalsni team following up the request with the Department of Lands and Survey until the registration deed is received and delivered to the customer.
+
+According to the Department of Lands and Survey procedures.
+View service
+Real Estate and Land
+Request Cadastral Map
+
+This service lets the customer request an official cadastral map issued by the Department of Lands and Survey, showing the parcel, basin, location and land boundaries according to the official records. The Khalsni team follows up the request until the map is issued and delivered to the customer.
+
+According to the Department of Lands and Survey procedures.
+View service
+Real Estate and Land
+Request Property Ownership Transfer
+
+This service lets the customer request the transfer of a property's ownership between the seller and the buyer, with the Khalsni team following up all procedures with the Department of Lands and Survey until the transfer is completed and the registration deed is issued in the new owner's name.
+
+According to the Department of Lands and Survey procedures and the completion of the documents.
+View service
+Real Estate and Land
+Request Inheritance Registration
+
+This service lets the customer request the registration of an inheritance and the transfer of a property from the deceased to the legal heirs based on the inheritance certificate issued by the competent court, following up all procedures with the Department of Lands and Survey until the registration deeds are issued in the heirs' names.
+
+According to the Department of Lands and Survey procedures and the completion of the documents.
+View service
+
+Khalsni is a Jordanian platform for managing and tracking public and administrative service requests digitally.
+
+Services
+Services
+Special request
+Quick links
+Home
+Services
+Track request
+FAQ
+Privacy policy
+Terms of use
+Contact
+
+Contact details are not published yet.
+
+All rights reserved © 2026 Khalsni

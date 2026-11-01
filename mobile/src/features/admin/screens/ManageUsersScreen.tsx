@@ -2,20 +2,50 @@ import { Alert, FlatList, Text, View } from 'react-native';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { AdminSoftDeleteModal } from '../../../components/AdminSoftDeleteModal';
 import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { AppInput } from '../../../components/AppInput';
 import { AppScreen } from '../../../components/AppScreen';
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { EmptyState } from '../../../components/EmptyState';
 import { ErrorState } from '../../../components/ErrorState';
 import { LoadingState } from '../../../components/LoadingState';
+import { SoftDeleteFilter } from '../../../components/SoftDeleteFilter';
+import { DeletedBadge, SoftDeleteRowActions } from '../../../components/SoftDeleteRowActions';
 import { usersApi } from '../../../api/users.api';
 import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
+import type { AdminUser } from '../../../types/user';
+import { useAdminSoftDelete } from '../hooks/useAdminSoftDelete';
+import {
+  canManageUserRecord,
+  DEFAULT_SOFT_DELETE_STATUS,
+  filterBySoftDeleteStatus,
+  softDeleteListParams,
+  type SoftDeleteFields,
+  type SoftDeleteStatus,
+} from '../../../utils/softDelete';
+
+type AdminUserRow = AdminUser & SoftDeleteFields;
 
 export function ManageUsersScreen() {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ['admin-users'], queryFn: () => usersApi.getUsers() });
+  const [status, setStatus] = useState<SoftDeleteStatus>(DEFAULT_SOFT_DELETE_STATUS);
+  const query = useQuery({
+    queryKey: ['admin-users', status],
+    // AdminUserViewSet narrows `is_deleted` itself when include_deleted is set.
+    queryFn: async () => filterBySoftDeleteStatus(
+      (await usersApi.getUsers(softDeleteListParams(status, true))) as AdminUserRow[],
+      status,
+    ),
+  });
+  const softDelete = useAdminSoftDelete<AdminUserRow>({
+    entity: 'user',
+    deleteRecord: (record, payload) => usersApi.deleteUser(record.id, payload.delete_password, payload.delete_reason),
+    restoreRecord: (record) => usersApi.restoreUser(record.id),
+    invalidateKeys: [['admin-users']],
+  });
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -35,6 +65,11 @@ export function ManageUsersScreen() {
     onError: (error) => Alert.alert('تعذر الإنشاء', getDisplayError(error)),
   });
 
+  const rows = query.data ?? [];
+  // Same rule as the web users page: the server lists `admin` among the role
+  // options only for platform super admins, who may manage admin accounts.
+  const canManageAdminUsers = Boolean(rows.find((item) => Array.isArray(item.role_options))?.role_options?.includes('admin'));
+
   return (
     <AppScreen title="إدارة المستخدمين">
       <AppCard>
@@ -45,21 +80,54 @@ export function ManageUsersScreen() {
         <AppInput label="كلمة المرور" value={password} onChangeText={setPassword} secureTextEntry />
         <AppButton label="إنشاء مستخدم" onPress={() => mutation.mutate()} loading={mutation.isPending} />
       </AppCard>
+      <SoftDeleteFilter value={status} onChange={setStatus} accessibilityLabel="تصفية المستخدمين حسب الحالة" />
       {query.isLoading ? <LoadingState /> : null}
       {query.isError ? <ErrorState message={getDisplayError(query.error)} onRetry={query.refetch} /> : null}
-      {!query.isLoading && !query.isError && !(query.data?.length) ? <EmptyState title="لا يوجد مستخدمون" /> : null}
+      {!query.isLoading && !query.isError && !rows.length ? (
+        <EmptyState title={status === 'deleted' ? 'لا يوجد مستخدمون محذوفون' : 'لا يوجد مستخدمون'} />
+      ) : null}
       <FlatList
-        data={query.data ?? []}
+        data={rows}
         scrollEnabled={false}
         keyExtractor={(item) => String(item.id)}
         ItemSeparatorComponent={() => <View style={{ height: theme.spacing.md }} />}
         renderItem={({ item }) => (
-          <AppCard>
+          <AppCard variant={item.is_deleted ? 'muted' : 'default'}>
             <Text style={{ textAlign: 'right', fontSize: 18, fontWeight: '700' }}>{item.full_name}</Text>
             <Text style={{ textAlign: 'right' }}>{item.email}</Text>
             <Text style={{ textAlign: 'right' }}>الدور: {item.role}</Text>
+            {item.is_deleted ? <DeletedBadge deletedReason={item.delete_reason} /> : null}
+            {softDelete.canSoftDelete ? (
+              <SoftDeleteRowActions
+                recordName={item.full_name}
+                isDeleted={Boolean(item.is_deleted)}
+                deleteLabel="تعطيل"
+                onDelete={() => softDelete.requestDelete(item)}
+                onRestore={() => softDelete.requestRestore(item)}
+                disabled={!canManageUserRecord(item, canManageAdminUsers)}
+              />
+            ) : null}
           </AppCard>
         )}
+      />
+      <AdminSoftDeleteModal
+        visible={Boolean(softDelete.pendingDelete)}
+        title={softDelete.copy.title}
+        recordName={softDelete.pendingDelete?.full_name ?? ''}
+        impact={softDelete.copy.impact}
+        confirmLabel={softDelete.copy.confirmLabel}
+        loading={softDelete.deleting}
+        serverError={softDelete.deleteError}
+        onCancel={softDelete.cancelDelete}
+        onConfirm={softDelete.confirmDelete}
+      />
+      <ConfirmDialog
+        visible={Boolean(softDelete.pendingRestore)}
+        title={softDelete.copy.restoreTitle}
+        message={softDelete.copy.restoreMessage(softDelete.pendingRestore?.full_name ?? '')}
+        confirmLabel="استعادة الحساب"
+        onConfirm={softDelete.confirmRestore}
+        onCancel={softDelete.cancelRestore}
       />
     </AppScreen>
   );

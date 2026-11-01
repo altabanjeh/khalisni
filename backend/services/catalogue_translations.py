@@ -26,6 +26,12 @@ FIELD_LABELS_EN = {
     ("partner_id", "الرقم الوطني / رقم الجواز للشريك"): "Partner's national ID / passport number",
     ("partner_nationality", "جنسية كل شريك"): "Nationality of each partner",
     ("partner_share", "حصة كل شريك"): "Share of each partner",
+    # CN-BIZ-01: the four partner fields as one repeater (catalogue_rules.apply_repeater_rules).
+    ("partners", "بيانات الشركاء"): "Partners' details",
+    ("name", "اسم كل شريك"): "Name of each partner",
+    ("id", "الرقم الوطني / رقم الجواز للشريك"): "Partner's national ID / passport number",
+    ("nationality", "جنسية كل شريك"): "Nationality of each partner",
+    ("share", "حصة كل شريك"): "Share of each partner",
     ("authorized_signatories", "المفوض/المفوضون بالتوقيع"): "Authorized signatory/signatories",
     ("signing_authority", "صلاحيات التوقيع"): "Signing powers",
     ("company_registration_number", "رقم تسجيل الشركة"): "Company registration number",
@@ -118,6 +124,11 @@ FIELD_LABELS_EN = {
     ("field_9fe181a6e8", "هل جميع الملاك موافقون؟"): "Do all the owners agree?",
     ("field_56b1987951", "أرقام القطع المطلوب توحيدها"): "Numbers of the plots to consolidate",
     ("field_7d9efcd6d5", "أرقام الأحواض"): "Basin numbers",
+    # CN-BIZ-04: plot and basin numbers as one repeater.
+    ("plots", "أرقام القطع المطلوب توحيدها"): "Numbers of the plots to consolidate",
+    # CN-BIZ-05 / CN-BIZ-08 developer-note fields (catalogue_rules.DEVELOPER_NOTE_FIELDS).
+    ("site_coordinates", "إحداثيات الموقع (اختياري)"): "Site coordinates (optional)",
+    ("release_approval_date", "تاريخ إصدار موافقة فك الرهن (اختياري)"): "Mortgage release approval issue date (optional)",
     ("field_b8d4677c65", "كم عدد القطع المطلوب توحيدها؟"): "How many plots are to be consolidated?",
     ("field_da334d766f", "هل جميع القطع مملوكة لنفس المالك؟"): "Are all the plots owned by the same owner?",
     ("field_b07ae7100c", "هل القطع متجاورة؟"): "Are the plots adjacent?",
@@ -275,6 +286,7 @@ DOCUMENT_NAMES_EN = {
     ("document_5c2f8f95d1", "عقد التمويل أو اتفاقية الرهن (إن وجدت)"): "Financing contract or mortgage agreement (if any)",
     ("document_d2024a06a1", "كتاب أو موافقة فك الرهن من الجهة المرتهنة"): "Mortgage release letter or consent from the mortgagee",
     ("document_3443627d36", "المخططات الهندسية"): "Engineering drawings",
+    ("site_photos", "صور الموقع"): "Site photos",
 }
 
 _BUSINESS_SUFFIX_AR = (
@@ -577,6 +589,106 @@ SERVICE_TEXT_EN = {
     },
 }
 
+
+# slug -> (Arabic terms as imported from the client sheet, English translation)
+TERMS_EN = {
+    'request-property-registration-certificate': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• تقديم الوثائق المطلوبة.• تخضع الخدمة لإجراءات ورسوم دائرة الأراضي والمساحة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات معتمد.يمكن تنفيذها بوكالة: نعم.تحتاج حضور العميل: حسب الحالة.تصنيف التشغيل: خدمة وثائق عقارية.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • The service is subject to the procedures and fees of the Department of Lands and Survey.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited transaction agent. Can be carried out under a power of attorney: yes. Customer attendance required: depending on the case. Operational category: property documents service.',
+    ),
+    'request-cadastral-map': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة لإجراءات ورسوم دائرة الأراضي والمساحة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات معتمد.يمكن تنفيذها بوكالة: نعم.تحتاج حضور العميل: غالبًا لا.تصنيف التشغيل: خدمة وثائق ومخططات عقارية.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • The service is subject to the procedures and fees of the Department of Lands and Survey.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited transaction agent. Can be carried out under a power of attorney: yes. Customer attendance required: usually not. Operational category: property documents and plans service.',
+    ),
+    'request-property-ownership-transfer': (
+        'الشروط: • حضور الأطراف أو من يمثلهم قانونيًا عند الحاجة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.قد تتطلب حضور الأطراف: حسب الحالة.تصنيف التشغيل: معاملات نقل الملكية.',
+        'Conditions: • Attendance of the parties or their legal representatives when needed. • Submission of all the required documents. • The transaction is subject to the official regulations and fees.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: property transaction agent. Can be carried out under a power of attorney: yes. May require the attendance of the parties: depending on the case. Operational category: ownership transfer transactions.',
+    ),
+    'request-inheritance-registration': (
+        'الشروط: • صدور حجة حصر إرث من المحكمة المختصة.• تقديم جميع الوثائق المطلوبة.• حضور الورثة أو من يمثلهم قانونيًا عند الحاجة.• قد تختلف المتطلبات حسب طبيعة العقار وعدد الورثة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.الجهة المرجعية: المحكمة الشرعية أو المحكمة الكنسية لإصدار حجة حصر الإرث.مزود الخدمة: معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.تصنيف التشغيل: معاملات نقل الملكية بالإرث.',
+        'Conditions: • An inheritance limitation deed issued by the competent court. • Submission of all the required documents. • Attendance of the heirs or their legal representatives when needed. • Requirements may differ depending on the nature of the property and the number of heirs.\nOperational information: Executing authority: Department of Lands and Survey. Reference authority: the Sharia court or the ecclesiastical court, which issues the inheritance limitation deed. Service provider: property transaction agent. Can be carried out under a power of attorney: yes. Operational category: ownership transfer by inheritance.',
+    ),
+    'request-property-gift-transfer': (
+        'الشروط: • أن يكون الواهب مالكًا للعقار.• حضور الأطراف أو من يمثلهم قانونيًا عند الحاجة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.قد تتطلب حضور الأطراف حسب الحالة.تصنيف التشغيل: معاملات نقل الملكية - هبة.',
+        'Conditions: • The donor must own the property. • Attendance of the parties or their legal representatives when needed. • Submission of all the required documents. • The transaction is subject to the official regulations and fees.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: property transaction agent. Can be carried out under a power of attorney: yes. May require the attendance of the parties depending on the case. Operational category: ownership transfer transactions - gift.',
+    ),
+    'request-termination-of-co-ownership': (
+        'الشروط: • أن يكون العقار مملوكًا على الشيوع.• تقديم الوثائق المطلوبة.• قد تتطلب المعاملة موافقة جميع الشركاء أو قرارًا من الجهة المختصة.• تخضع المعاملة للأنظمة النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة/معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.قد تتطلب حضور الشركاء حسب الحالة.تصنيف التشغيل: خدمات مكتب المساحة.',
+        'Conditions: • The property must be jointly owned. • Submission of the required documents. • The transaction may require the approval of all co-owners or a decision by the competent authority. • The transaction is subject to the regulations in force.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: survey office / property transaction agent. Can be carried out under a power of attorney: yes. May require the attendance of the co-owners depending on the case. Operational category: survey office services.',
+    ),
+    'request-property-subdivision': (
+        'الشروط: • أن يستوفي العقار شروط الإفراز.• تقديم جميع الوثائق المطلوبة.• قد تتطلب المعاملة مخططات أو تقارير فنية.• تخضع لموافقة الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب كشفًا ميدانيًا.تصنيف التشغيل: خدمات مكتب المساحة.',
+        'Conditions: • The property must meet the subdivision requirements. • Submission of all the required documents. • The transaction may require plans or technical reports. • Subject to the approval of the competent authorities.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited survey office. Can be carried out under a power of attorney: yes. May require a site inspection. Operational category: survey office services.',
+    ),
+    'request-property-consolidation': (
+        'الشروط: • أن تستوفي القطع شروط التوحيد.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة لموافقة الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب كشفًا ميدانيًا.تصنيف التشغيل: خدمات مكتب المساحة.',
+        'Conditions: • The plots must meet the consolidation requirements. • Submission of all the required documents. • The transaction is subject to the approval of the competent authorities.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited survey office. Can be carried out under a power of attorney: yes. May require a site inspection. Operational category: survey office services.',
+    ),
+    'request-boundary-demarcation': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• قد يتطلب الأمر كشفاً ميدانياً.• تخضع المعاملة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب كشفاً ميدانياً.تصنيف التشغيل: خدمات مكتب المساحة.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • A site inspection may be required. • The transaction is subject to the regulations and instructions in force.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited survey office. Can be carried out under a power of attorney: yes. May require a site inspection. Operational category: survey office services.',
+    ),
+    'request-land-survey': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• قد يتطلب الأمر كشفاً ميدانياً.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: مكتب مساحة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب كشفاً ميدانياً.تصنيف التشغيل: خدمات مكتب المساحة.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • A site inspection may be required. • The service is subject to the regulations and instructions in force.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: accredited survey office. Can be carried out under a power of attorney: yes. May require a site inspection. Operational category: survey office services.',
+    ),
+    'request-property-readjustment': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة للأنظمة والتعليمات النافذة.• قد تتطلب موافقات من الجهات المختصة.\nمعلومات التشغيل: الجهة المنفذة: الجهات المختصة ودائرة الأراضي والمساحة.مزود الخدمة: مكتب هندسي/مزود خدمة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب مراجعات ميدانية.تصنيف التشغيل: خدمات تنظيم الأراضي.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • The service is subject to the regulations and instructions in force. • Approvals from the competent authorities may be required.\nOperational information: Executing authority: the competent authorities and the Department of Lands and Survey. Service provider: engineering office / accredited service provider. Can be carried out under a power of attorney: yes. May require site follow-ups. Operational category: land organisation services.',
+    ),
+    'request-zoning-certificate': (
+        'الشروط: • تقديم بيانات العقار.• توفير الوثائق المطلوبة.• تخضع لإجراءات الجهة المختصة.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو الجهة التنظيمية المختصة.مزود الخدمة: معقب معاملات/مكتب هندسي حسب الحالة.التصنيف: خدمات التنظيم.',
+        'Conditions: • Provide the property details. • Provide the required documents. • Subject to the procedures of the competent authority.\nOperational information: Executing authority: the municipality or the competent planning authority. Service provider: transaction agent / engineering office depending on the case. Category: planning services.',
+    ),
+    'request-land-use-classification-change': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفير الوثائق المطلوبة.• تخضع الخدمة لموافقة الجهات المختصة.• قد تتطلب دراسة فنية أو تنظيمية.\nمعلومات التشغيل: الجهة المنفذة: الجهات التنظيمية المختصة.مزود الخدمة: مكتب هندسي/مزود خدمة معتمد.يمكن تنفيذها بوكالة: نعم.قد تتطلب كشفاً أو دراسة فنية.تصنيف التشغيل: خدمات التنظيم.',
+        'Conditions: • Provide the property details correctly. • Provide the required documents. • The service is subject to the approval of the competent authorities. • A technical or planning study may be required.\nOperational information: Executing authority: the competent planning authorities. Service provider: engineering office / accredited service provider. Can be carried out under a power of attorney: yes. May require an inspection or a technical study. Operational category: planning services.',
+    ),
+    'request-zoning-plan': (
+        'الشروط: • تقديم بيانات العقار بشكل صحيح.• توفر رقم القطعة والحوض.• قد يطلب إثبات ملكية أو وكالة قانونية.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو أمانة عمان أو الجهة التنظيمية المختصة.مزود الخدمة: ممثل معاملات معتمد.يمكن تنفيذها بوكالة: نعم.تصنيف التشغيل: خدمات التنظيم.',
+        'Conditions: • Provide the property details correctly. • The plot and basin numbers must be available. • Proof of ownership or a legal power of attorney may be requested. • The service is subject to the regulations and instructions in force.\nOperational information: Executing authority: the municipality, the Greater Amman Municipality or the competent planning authority. Service provider: accredited transaction representative. Can be carried out under a power of attorney: yes. Operational category: planning services.',
+    ),
+    'request-change-statement': (
+        'الشروط: • إدخال بيانات العقار بشكل صحيح.• توفر الوثائق المطلوبة.• تخضع الخدمة للأنظمة والتعليمات النافذة.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة أو الجهة المختصة.مزود الخدمة: معقب معاملات معتمد.يمكن تنفيذها بوكالة: نعم.تصنيف التشغيل: خدمات السجلات العقارية.',
+        'Conditions: • Enter the property details correctly. • The required documents must be available. • The service is subject to the regulations and instructions in force.\nOperational information: Executing authority: the Department of Lands and Survey or the competent authority. Service provider: accredited transaction agent. Can be carried out under a power of attorney: yes. Operational category: property records services.',
+    ),
+    'request-property-mortgage-registration': (
+        'الشروط: • أن يكون العقار قابلاً للرهن.• تقديم جميع الوثائق المطلوبة.• حضور الأطراف أو من يمثلهم قانونياً عند الحاجة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.التصنيف: الرهون والحقوق.',
+        'Conditions: • The property must be mortgageable. • Submission of all the required documents. • Attendance of the parties or their legal representatives when needed. • The transaction is subject to the official regulations and fees.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: property transaction agent. Can be carried out under a power of attorney: yes. Category: mortgages and rights.',
+    ),
+    'request-mortgage-release': (
+        'الشروط: • استكمال متطلبات الجهة المرتهنة.• تقديم جميع الوثائق المطلوبة.• تخضع المعاملة للأنظمة والرسوم الرسمية.\nمعلومات التشغيل: الجهة المنفذة: دائرة الأراضي والمساحة.مزود الخدمة: معقب معاملات عقارية.يمكن تنفيذها بوكالة: نعم.التصنيف: الرهون والحقوق.',
+        "Conditions: • Complete the mortgagee's requirements. • Submission of all the required documents. • The transaction is subject to the official regulations and fees.\nOperational information: Executing authority: Department of Lands and Survey. Service provider: property transaction agent. Can be carried out under a power of attorney: yes. Category: mortgages and rights.",
+    ),
+    'request-building-permit': (
+        'الشروط: • تقديم المخططات الهندسية المعتمدة.• مطابقة متطلبات التنظيم.• استكمال الوثائق المطلوبة وسداد الرسوم.\nمعلومات التشغيل: الجهة المنفذة: البلدية أو أمانة عمان.مزود الخدمة: مكتب هندسي ومعقب معاملات.التصنيف: رخص وإنشاءات.',
+        'Conditions: • Submit the approved engineering plans. • Comply with the planning requirements. • Complete the required documents and pay the fees.\nOperational information: Executing authority: the municipality or the Greater Amman Municipality. Service provider: engineering office and transaction agent. Category: licences and construction.',
+    ),
+}
+for _slug, _pair in TERMS_EN.items():
+    SERVICE_TEXT_EN.setdefault(_slug, {})["terms"] = _pair
+
+# Field help text (Arabic as imported) -> English
+HELP_TEXTS_EN = {
+    'إصدار / تجديد / تعديل / إلغاء': 'Issue / renew / amend / cancel',
+    'اختياري': 'Optional',
+    'الاسم، العنوان، رأس المال، الشركاء، الحصص، الإدارة، المفوضون وغيرها': 'Name, address, capital, partners, shares, management, authorized signatories, etc.',
+    'الغايات/الأنشطة المطلوبة': 'The required objectives/activities',
+    'تسجيل جديد / تحري / تجديد / تعديل / نقل ملكية / إصدار أو تصديق وثائق / أخرى': 'New registration / search / renewal / amendment / ownership transfer / issuing or certifying documents / other',
+    'حسب الجنسية': 'Depending on nationality',
+    'حسب الصفة': 'Depending on capacity',
+    'حسب عدد الشركاء': 'Depending on the number of partners',
+    'شركة / مؤسسة فردية': 'Company / sole proprietorship',
+    'شطب / تصفية': 'Deregistration / liquidation',
+    'عادية / مصدقة عند توفر الخيار': 'Regular / certified, when the option is available',
+    'فرد / شركة': 'Individual / company',
+    'فرد / شركة / مؤسسة': 'Individual / company / establishment',
+    'قائمة أنواع الشركات': 'List of company types',
+    'للتسجيل والخدمات المرتبطة بالفئات': 'For registration and class-related services',
+    'مالك / مستأجر / غير ذلك': 'Owner / tenant / other',
+    'يفضل ربطها بقائمة الغايات الرسمية': 'Preferably linked to the official objectives list',
+}
+
 # ServiceRelation.message_to_customer has one (customer-facing, Arabic) field:
 # the two English development messages are replaced by their Arabic translation.
 RELATION_MESSAGES_AR = {
@@ -595,7 +707,10 @@ def _blank_english(value, code=""):
 
 
 def translate_schema(schema):
-    """Return ``(new_schema, filled_count)`` with blank English labels filled from the tables."""
+    """Return ``(new_schema, filled_count)`` with blank English labels and help texts filled from the tables.
+
+    Repeater item fields are translated with the same tables.
+    """
     if not isinstance(schema, list):
         return schema, 0
     filled = 0
@@ -611,6 +726,10 @@ def translate_schema(schema):
         if english and not (field.get("label_en") or "").strip():
             field["label_en"] = english
             filled += 1
+        help_en = HELP_TEXTS_EN.get((field.get("help_text_ar") or field.get("help_text") or "").strip())
+        if help_en and not (field.get("help_text_en") or "").strip():
+            field["help_text_en"] = help_en
+            filled += 1
         options = field.get("options")
         if isinstance(options, list):
             new_options = []
@@ -622,6 +741,10 @@ def translate_schema(schema):
                         filled += 1
                 new_options.append(option)
             field["options"] = new_options
+        items = field.get("item_fields")
+        if isinstance(items, list):
+            field["item_fields"], item_filled = translate_schema(items)
+            filled += item_filled
         result.append(field)
     return result, filled
 

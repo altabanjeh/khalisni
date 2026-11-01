@@ -1,12 +1,12 @@
 {
  "service": "business_trademark_services",
- "id": 8,
- "number": "KH-2026-000008",
+ "id": 12,
+ "number": "KH-2026-000012",
  "steps": [
   {
    "step": "1 register (UI)",
    "result": "PASS",
-   "detail": "/login?registered=1&email=journey-1793524171620%40example.org"
+   "detail": "/login?registered=1&email=journey-1793556071821%40example.org"
   },
   {
    "step": "1b login",
@@ -29,11 +29,20 @@
    }
   },
   {
+   "step": "3b admin adds related-service rule",
+   "result": "PASS",
+   "detail": {
+    "status": 201,
+    "target": "passport-appointment-booking",
+    "relation": 3
+   }
+  },
+  {
    "step": "4-6 dynamic form + uploads + submit",
    "result": "PASS",
    "detail": {
-    "number": "KH-2026-000008",
-    "id": 8
+    "number": "KH-2026-000012",
+    "id": 12
    }
   },
   {
@@ -79,7 +88,7 @@
    "result": "PASS",
    "detail": {
     "status": "READY_FOR_DELIVERY",
-    "final": 19
+    "final": 31
    }
   },
   {
@@ -120,23 +129,70 @@
      "READY_FOR_DELIVERY->COMPLETED"
     ],
     "notifications": [
-     "order_completed:8:2026-11-01T09:11:05.488056+00:00",
-     "order_ready_for_delivery:19",
-     "provider_completed_work:19",
-     "provider_started_work:8:ASSIGNED:IN_PROGRESS",
-     "provider_assigned:8:0:5",
-     "document_verified:11",
-     "document_verified:12",
-     "document_verified:13",
-     "document_verified:14",
-     "document_verified:15",
-     "document_verified:16",
-     "document_verified:17",
-     "document_verified:18",
-     "missing_documents_requested:8:3",
-     "order_under_review:8:NEW:UNDER_REVIEW",
-     "order_submitted:8"
+     "service_relation_recommendation:12:8",
+     "order_completed:12:2026-11-01T18:03:29.831725+00:00",
+     "order_ready_for_delivery:31",
+     "provider_completed_work:31",
+     "provider_started_work:12:ASSIGNED:IN_PROGRESS",
+     "provider_assigned:12:0:5",
+     "document_verified:23",
+     "document_verified:24",
+     "document_verified:25",
+     "document_verified:26",
+     "document_verified:27",
+     "document_verified:28",
+     "document_verified:29",
+     "document_verified:30",
+     "missing_documents_requested:12:4",
+     "order_under_review:12:NEW:UNDER_REVIEW",
+     "order_submitted:12"
     ]
+   }
+  },
+  {
+   "step": "21 related-service suggestion notification",
+   "result": "PASS",
+   "detail": "passport-appointment-booking"
+  },
+  {
+   "step": "22 customer message reaches staff",
+   "result": "PASS",
+   "detail": {
+    "msgStatus": 201
+   }
+  },
+  {
+   "step": "23 complaint filed + resolved",
+   "result": "PASS",
+   "detail": {
+    "cStatus": 201,
+    "rStatus": 200
+   }
+  },
+  {
+   "step": "24 rating (UI)",
+   "result": "PASS",
+   "detail": {
+    "id": 1,
+    "score": 5,
+    "comment": "خدمة ممتازة",
+    "created_at": "2026-11-01T21:03:55.178878+03:00"
+   }
+  },
+  {
+   "step": "25 admin archives completed order",
+   "result": "PASS",
+   "detail": {
+    "aStatus": 200,
+    "status": "ARCHIVED"
+   }
+  },
+  {
+   "step": "26 monthly CSV export",
+   "result": "PASS",
+   "detail": {
+    "status": 200,
+    "rows": 7
    }
   }
  ]

@@ -6,7 +6,7 @@ from django.db import IntegrityError, transaction
 
 from accounts.models import CustomUser, CustomerProfile, SystemSetting
 from accounts.fields import CanonicalPhoneField
-from accounts.validators import phone_identity
+from accounts.validators import normalize_national_id, phone_identity
 from core.i18n import pick, request_language
 from core.delete_guard import get_delete_guard_setting, update_delete_guard_password
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
@@ -143,7 +143,7 @@ class RegisterSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
         return value
 
     def validate_national_id(self, value):
-        value = (value or "").strip()
+        value = normalize_national_id(value)
         if value and self._taken("national_id", value):
             raise serializers.ValidationError(pick(REGISTER_DUPLICATE_MESSAGES["national_id"], self._language()))
         return value
@@ -241,6 +241,8 @@ class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Model
     def validate(self, attrs):
         current_password = attrs.pop("current_password", "")
         user = self.instance
+        if "national_id" in attrs:
+            attrs["national_id"] = normalize_national_id(attrs["national_id"])
         def stored(field):
             value = getattr(user, field, "") or ""
             return phone_identity(value) if field == "phone" else value
@@ -259,7 +261,7 @@ class CustomerProfileSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Model
                 raise serializers.ValidationError({"phone": [pick(REGISTER_DUPLICATE_MESSAGES["phone"], language)]})
         # A national ID another account already holds is a field error, not a
         # database constraint failure (unique_non_empty_user_national_id).
-        national_id = (attrs.get("national_id") or "").strip()
+        national_id = attrs.get("national_id") or ""
         if national_id and national_id != (getattr(user, "national_id", "") or ""):
             if CustomUser._base_manager.filter(national_id=national_id).exclude(pk=getattr(user, "pk", None)).exists():
                 language = request_language(self.context.get("request"))

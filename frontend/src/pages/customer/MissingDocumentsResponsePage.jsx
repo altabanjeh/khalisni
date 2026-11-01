@@ -20,6 +20,7 @@ import {
   findRequiredDocument,
   getRequiredDocumentLabel,
   validateSingleFileList,
+  getUploadRules,
 } from '../../utils/serviceForms'
 import OrderNumber from '../../components/OrderNumber'
 
@@ -231,6 +232,7 @@ function MissingDocumentsResponsePage() {
                   accept={buildAcceptValue(requirement)}
                   error={errors[`file_${index}`]}
                   hint={buildUploadHint(requirement, language)}
+                  maxSize={getUploadRules(requirement).max_file_size}
                   registration={register(`file_${index}`, {
                     validate: (fileList) => validateSingleFileList(fileList, requirement, isArabic ? 'هذا المستند مطلوب قبل إعادة الإرسال' : 'This document is required before resubmitting', language),
                   })}

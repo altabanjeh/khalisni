@@ -131,7 +131,13 @@ test('fresh client audit request completes through customer, employee, and provi
   await expect(page.getByText(missingNotice.title).first()).toBeVisible()
   await page.getByRole('button', { name: 'Notifications' }).click()
   await expect(page.getByText(missingNotice.title).last()).toBeVisible()
-  await page.locator('button').filter({ hasText: missingNotice.title }).last().click()
+  // The bell lists every loaded notification (newest first, with "load more"),
+  // so older notices with the same title can be present: open this order's one.
+  await page.getByTestId('notification-list').locator('button')
+    .filter({ hasText: missingNotice.title })
+    .filter({ hasText: missingNotice.message || number })
+    .first()
+    .click()
   await expect(page).toHaveURL(new RegExp(`/customer/orders/${id}/missing-docs$`))
   const readNotice = await (await good('customer_a', 'GET', '/notifications/')).json()
   const readItems = Array.isArray(readNotice) ? readNotice : readNotice.results

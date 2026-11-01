@@ -19,8 +19,11 @@ export const usersApi = {
   updateUser(userId: number | string, payload: Partial<AdminUser>) {
     return apiClient.patch<AdminUser>(`/admin/users/${userId}/`, payload).then((res) => res.data);
   },
-  deleteUser(userId: number | string, deletePassword: string) {
-    return secureAdminDelete(`/admin/users/${userId}/`, deletePassword);
+  deleteUser(userId: number | string, deletePassword: string, deleteReason = '') {
+    return secureAdminDelete(`/admin/users/${userId}/`, deletePassword, { data: { delete_reason: deleteReason.trim() } });
+  },
+  restoreUser(userId: number | string) {
+    return apiClient.post<AdminUser>(`/admin/users/${userId}/restore/`).then((res) => res.data);
   },
   getAvailablePermissions() {
     return apiClient.get<Record<string, AvailablePermission[]>>('/admin/available-permissions/').then((res) => res.data);

@@ -1,0 +1,117 @@
+URL: http://127.0.0.1:4363/customer/orders/new?service=28
+TITLE: Khalsni
+DIR: ltr LANG: en
+OVERFLOW_X: 0
+CONSOLE_ERRORS: []
+
+Skip to main content
+
+WORK PORTAL
+
+Customer portal
+
+My dashboard
+New request
+My requests
+Browse services
+Profile
+Manual
+Customer portal
+
+CUSTOMER PORTAL
+
+New service request
+Save draft
+
+Choose the service, enter your details and upload the required documents, then review and submit.
+
+DONE
+Service
+2
+CURRENT
+Applicant
+3
+3
+Documents
+4
+4
+Review
+
+STEP 2
+
+Applicant
+
+Your contact details for follow-up.
+
+Full name
+*
+Phone number
+*
+National ID
+City
+*
+
+Additional service information
+
+Applicant name
+National ID number
+Phone number
+Do you know the parcel and basin numbers?
+Select a value
+Yes
+No
+
+If you do not know the parcel and basin numbers, choose “No” and our team will help identify them while reviewing your request.
+
+Numbers of the plots to consolidate*
+
+Minimum: 2 · Maximum: 20
+
+Entry 1
+Remove
+Parcel number*
+Basin number*
+Entry 2
+Remove
+Parcel number*
+Basin number*
++ Add entry
+Area
+Governorate
+Additional notes
+How many plots are to be consolidated?
+Are all the plots owned by the same owner?
+Are all the plots owned by the same owner?
+Are the plots adjacent?
+Are the plots adjacent?
+Is there a legal representative?
+Is there a legal representative?
+Back
+Next
+
+SERVICE SUMMARY
+
+Request Property Consolidation
+
+This service lets you request the consolidation of two or more plots into a single plot, following up all procedures with the Department of Lands and Survey and the competent authorities until the consolidation is complete and the new registration deed is issued.
+
+Price:
+Final fees are confirmed after document review.
+Expected duration:
+According to the Department of Lands and Survey procedures and the nature of the transaction.
+
+COMPLETION CHECKLIST
+
+Service
+2
+Applicant
+3
+Documents
+
+REQUIRED DOCUMENTS
+
+National ID copy
+Registration deeds of all the plots
+Cadastral map
+Legal power of attorney
+Any additional documents requested by the competent authority

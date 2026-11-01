@@ -49,12 +49,16 @@ Last updated: 2026-11-01
 | Should provider reassignment be allowed? | Yes, by staff with the assign permission, with a required reason, while the order is ASSIGNED or IN_PROGRESS. The order returns to ASSIGNED, the previous provider loses access, the new provider is notified, and history and audit are kept. | `orders/reassignment.py`, `POST /api/admin/orders/<id>/reassign-provider/` | Decided (implemented, 2026-11-01) |
 | Customer ↔ support messages | A thread per order (customer-visible notes). Staff identity is not shown. Staff are notified. | `orders/messages.py` | Decided (implemented, 2026-11-01) |
 | Customer complaints | A complaint is an issue on the customer's own order. Staff list and resolve it with a note sent to the customer. | `orders/complaints.py` | Decided (implemented, 2026-11-01) |
-| Late-order alert | Daily command alerts the assigned employee and admins once per order and expected date. Orders with no promised date are never "late". | `orders/overdue.py`, `notify_overdue_orders` | Decided (implemented, 2026-11-01) |
+| Late-order alert | A daily command alerts the supervisors (assigned employee and admins), the customer and the assigned provider. Each gets its own wording, once per order and expected date. Orders with no promised date are never "late". | `orders/overdue.py`, `notify_overdue_orders` | Decided (implemented, 2026-11-01) |
 | Paper delivery | Staff record electronic, paper pickup or paper courier, with customer-visible instructions. No partner or fee is assumed. | `orders/delivery.py` | Decided (implemented, 2026-11-01) |
 | Should the provider see client documents? | Only the documents of the orders assigned to them, through `can_user_download_document` | documents permissions | Decided (implemented) |
 | Should completed orders be editable directly? | No; finalized orders are blocked from direct edits | `orders/views.py` | Decided (implemented) |
 | Should audit logs ever be deletable? | Never through the business UI (read-only API) | audit app | Decided (implemented) |
 | Should more business settings be editable by admin? | Only whitelisted safe settings | safe-settings model | Decided (implemented) |
+| Who reads the document verification note (OD-16)? | The owning customer and staff; nobody else. This is the same boundary as the rejection reason (F04). | `documents/serializers.py` | Decided (owner F04, applied) |
+| National ID format (OD-17) | Free text, because the client sheets accept a national number or a passport number. It is stored in one form (spaces removed, Arabic-Indic digits converted, upper case) and is unique per account. | `accounts/validators.py` normalize_national_id | Decided (implemented, 2026-11-01) |
+| Success metrics (PRD) | The operational summary reports the five PRD metrics from recorded data. Form timing is measured by the client and is never part of the idempotency fingerprint. | `reports/views.py` _success_metrics | Decided (implemented, 2026-11-01) |
+| Report export | Admins only. Monthly and weekly CSV with operational columns only: no customer name, phone, national ID or notes. | `reports/views.py` ReportExportAPIView | Decided (implemented, 2026-11-01) |
 
 ## C. Facts only the owner can supply (not decided by the team)
 
@@ -67,4 +71,5 @@ These are external values. The code supports them, but they cannot be invented. 
 - confirmed fixed prices if a breakdown is ever to be shown;
 - the English wording of the slogan;
 - the real SMTP mailbox;
-- the production API host for the mobile build.
+- the production API host for the mobile build;
+- the provider-compensation rule, if a provider earnings view is wanted (CN-MAP-04).

@@ -32,6 +32,7 @@ import {
   validateMultipleFiles,
   validateSingleFileList,
   visibleSchemaFields,
+  getUploadRules,
 } from '../../utils/serviceForms'
 import { ORDER_CONSENT_TEXT, ORDER_CONSENT_VERSION } from '../../utils/orderConsent'
 import OrderConsentStatement from '../../components/OrderConsentStatement'
@@ -71,6 +72,8 @@ function CustomerCreateOrderPage() {
   const { language, isArabic } = useLanguage()
   const [searchParams] = useSearchParams()
   const [step, setStep] = useState(0)
+  // PRD success metric "time to create request": seconds from opening the form to submitting it.
+  const formOpenedAt = useRef(Date.now())
   const [submittedOrder, setSubmittedOrder] = useState(null)
   const [maxReached, setMaxReached] = useState(0)
   const topRef = useRef(null)
@@ -82,7 +85,7 @@ function CustomerCreateOrderPage() {
   const submitInFlightRef = useRef(false)
 
   const { data: categories = [], error: categoriesError, reload: reloadCategories } = useAsyncData(() => api.getCategories(), [], [])
-  const { data: services = [], error: servicesError, reload: reloadServices } = useAsyncData(() => api.getServices(), [], [])
+  const { data: services = [], loading: servicesLoading, error: servicesError, reload: reloadServices } = useAsyncData(() => api.getServices(), [], [])
   const catalogError = servicesError || categoriesError
   function reloadCatalog() {
     if (categoriesError) reloadCategories()
@@ -92,6 +95,7 @@ function CustomerCreateOrderPage() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     reset,
@@ -138,7 +142,10 @@ function CustomerCreateOrderPage() {
   // A service whose form cannot be completed (e.g. a required list with no
   // choices yet) is not offered as an online request; the server refuses it too.
   const serviceNotOrderable = Boolean(selectedServiceDetails && selectedServiceDetails.orderable === false)
-  const serviceStepBlocked = Boolean(catalogError || serviceNotOrderable || (selectedService && (serviceDetailsError || serviceDetailsLoading)))
+  // Opened from a service page: until the catalogue has loaded, the service is not
+  // selected yet, so an early Next would validate an empty service step and stall.
+  const requestedServicePending = Boolean(requestedServiceId && servicesLoading)
+  const serviceStepBlocked = Boolean(catalogError || serviceNotOrderable || requestedServicePending || (selectedService && (serviceDetailsError || serviceDetailsLoading)))
   const categoryLabel = (category) => (isArabic
     ? category?.full_path_name || getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'ar')
     : getLocalizedField(category, { ar: 'name_ar', en: 'name_en' }, 'en', category?.full_path_name || ''))
@@ -162,7 +169,7 @@ function CustomerCreateOrderPage() {
           lockedFromService: 'تم اختيار هذه الخدمة من صفحة تفاصيل الخدمة.',
           fullName: 'الاسم الكامل', phone: 'رقم الهاتف', nationalId: 'الرقم الوطني', city: 'المدينة',
           extra: 'بيانات إضافية للخدمة',
-          docsIntro: 'ارفع كل مستند مطلوب. الملفات المسموحة: PDF و JPG و PNG و DOC، بحد أقصى 10 ميغابايت.',
+          docsIntro: 'ارفع كل مستند مطلوب. الملفات المسموحة والحد الأقصى للحجم مذكوران تحت كل مستند (10 ميغابايت ما لم يُذكر غير ذلك).',
           generalUpload: 'ارفع المستندات الداعمة',
           notes: 'ملاحظات إضافية (اختياري)',
           consent: ORDER_CONSENT_TEXT.ar,
@@ -187,7 +194,7 @@ function CustomerCreateOrderPage() {
           lockedFromService: 'This service was chosen from its detail page.',
           fullName: 'Full name', phone: 'Phone number', nationalId: 'National ID', city: 'City',
           extra: 'Additional service information',
-          docsIntro: 'Upload every required document. Allowed: PDF, JPG, PNG, DOC — up to 10 MB.',
+          docsIntro: 'Upload every required document. The allowed files and maximum size are shown under each document (10 MB unless stated otherwise).',
           generalUpload: 'Upload supporting documents',
           notes: 'Additional notes (optional)',
           consent: ORDER_CONSENT_TEXT.en,
@@ -238,7 +245,8 @@ function CustomerCreateOrderPage() {
   const docFieldNames = requiredDocuments.map((doc, i) => getDocumentFieldName(doc, i))
   const stepFieldNames = {
     0: startedFromService ? [] : ['category_slug', 'service'],
-    1: ['full_name', 'phone', 'city', ...visibleSchemaFields(schemaFields, getValues()).filter((f) => f.required).map((f) => f.inputName)],
+    // A repeater's name validates every item input of its rows.
+    1: ['full_name', 'phone', 'city', ...visibleSchemaFields(schemaFields, getValues()).filter((f) => f.required || f.type === 'repeater').map((f) => f.inputName)],
     2: [...(requiredDocuments.length ? docFieldNames : ['documents']), 'consent'],
     3: [],
   }
@@ -291,6 +299,7 @@ function CustomerCreateOrderPage() {
     // Names the statement shown above so the server records exactly what was accepted.
     formData.append('consent_version', ORDER_CONSENT_VERSION)
     formData.append('consent_source', 'web')
+    formData.append('form_duration_seconds', String(Math.round((Date.now() - formOpenedAt.current) / 1000)))
 
     // The requirements actually sent, in order. Server errors that refer to a
     // position are resolved through this list, not the full requirement list.
@@ -351,7 +360,8 @@ function CustomerCreateOrderPage() {
       // Jump to the earliest step that received an error. Errors without a
       // visible field stay on screen in the general error area of any step.
       if (!startedFromService && outcome.fields.some((f) => f === 'category_slug' || f === 'service')) setStep(0)
-      else if (outcome.fields.some((f) => stepOneFields.includes(f))) setStep(1)
+      // Repeater row errors are named "<repeater>.<row>.<item>".
+      else if (outcome.fields.some((f) => stepOneFields.includes(f) || stepOneFields.includes(f.split('.')[0]))) setStep(1)
       else if (outcome.fields.some((f) => stepTwoFields.includes(f))) setStep(2)
       toast(
         outcome.fields.length
@@ -518,7 +528,7 @@ function CustomerCreateOrderPage() {
                 {schemaFields.length ? (
                   <div className="mt-6 rounded-[var(--radius-lg)] border border-border bg-brand-50/40 p-4">
                     <p className="mb-3 text-sm font-black text-ink">{T.extra}</p>
-                    <DynamicServiceFields errors={errors} register={register} service={selectedServiceDetails} watch={watch} />
+                    <DynamicServiceFields control={control} errors={errors} register={register} service={selectedServiceDetails} watch={watch} />
                   </div>
                 ) : null}
               </StepPanel>
@@ -549,6 +559,7 @@ function CustomerCreateOrderPage() {
                               accept={buildAcceptValue(document)}
                               error={errors[fieldName]}
                               hint={buildUploadHint(document, language)}
+                              maxSize={getUploadRules(document).max_file_size}
                               registration={register(fieldName, {
                                 validate: (fileList) =>
                                   validateSingleFileList(fileList, document, optional ? undefined : isArabic ? `الملف "${label}" مطلوب` : `"${label}" is required`, language),

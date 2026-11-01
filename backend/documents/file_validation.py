@@ -71,7 +71,9 @@ def requirement_upload_error(upload, requirement):
     ]
     if allowed_extensions and extension not in allowed_extensions:
         return REQUIREMENT_EXTENSION_ERROR
-    max_file_size = getattr(requirement, "max_file_size", None) or 0
+    from documents.upload_limits import requirement_max_size
+
+    max_file_size = requirement_max_size(requirement)
     if max_file_size and upload.size > max_file_size:
         return REQUIREMENT_SIZE_ERROR
     if not sniff_matches_extension(upload, extension):

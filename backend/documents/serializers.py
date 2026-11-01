@@ -37,8 +37,8 @@ class DocumentSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.ModelSeriali
         # customer who owns the order (and to staff). Anyone else -- another
         # customer, anonymous public tracking -- gets no reason at all.
         # The verification (approval / delivery) note follows the same
-        # boundary: its customer visibility is an open owner decision, so the
-        # owning customer keeps what they had, and nobody else receives it.
+        # boundary (OD-16, decided with F04): the owning customer and staff
+        # read it; nobody else receives it.
         request = self.context.get("request")
         if not _may_read_review_notes(request, instance):
             data.pop("rejection_reason", None)

@@ -13,6 +13,7 @@ from audit.utils import create_audit_log
 from config.permissions import CanAssignOrders, CanManageUserRoles, IsProviderRole
 from core.delete_guard import AdminDeleteGuardMixin, _include_deleted
 from documents.serializers import DocumentUploadSerializer
+from documents.upload_limits import copy_request_data
 from organizations.selectors import (
     active_memberships_for_user,
     enforce_organization_scope,
@@ -400,7 +401,7 @@ class ProviderFinalDocumentAPIView(APIView):
 
     def post(self, request, pk):
         order = generics.get_object_or_404(provider_orders_queryset(request.user), pk=pk)
-        payload = request.data.copy()
+        payload = copy_request_data(request.data)  # never copies uploaded files
         payload["is_final_document"] = True
         serializer = DocumentUploadSerializer(
             data=payload,

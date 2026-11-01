@@ -218,6 +218,9 @@ export function normalizeApiError(error: unknown): ApiError {
       fieldErrors: Object.keys(fieldErrors).length ? fieldErrors : undefined,
       documentErrors: toMessageMap(responseData?.document_errors),
       serviceAnswerErrors: toMessageMap(responseData?.service_answers),
+      serviceAnswerDetails: responseData?.service_answers && typeof responseData.service_answers === 'object' && !Array.isArray(responseData.service_answers)
+        ? (responseData.service_answers as Record<string, unknown>)
+        : undefined,
     };
   }
 

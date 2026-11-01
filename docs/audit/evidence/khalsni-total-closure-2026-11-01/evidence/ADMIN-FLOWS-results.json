@@ -1,0 +1,81 @@
+{
+ "steps": [
+  {
+   "step": "1 admin edits a service; public API reflects it",
+   "result": "PASS",
+   "detail": {
+    "service": "tax-clearance",
+    "eStatus": 200
+   }
+  },
+  {
+   "step": "2 admin uploads a category image",
+   "result": "PASS",
+   "detail": {
+    "category": "civil-status",
+    "status": 200,
+    "image": true,
+    "body": ""
+   }
+  },
+  {
+   "step": "3 soft delete (guarded) + deleted filter + restore",
+   "result": "PASS",
+   "detail": {
+    "created": 201,
+    "createdBody": "",
+    "withoutPassword": 400,
+    "deleted": 204,
+    "restored": 200,
+    "definitionsBefore": 72
+   }
+  },
+  {
+   "step": "4 disposable customer + order (form timing recorded)",
+   "result": "PASS",
+   "detail": {
+    "reg": 201,
+    "oStatus": 201,
+    "order": "KH-2026-000011",
+    "detail": ""
+   }
+  },
+  {
+   "step": "5 staff records a manual payment (B05: staff records only)",
+   "result": "PASS",
+   "detail": {
+    "pStatus": 201,
+    "payment": "PAY-000003"
+   }
+  },
+  {
+   "step": "5b customer cannot create payments (B05)",
+   "result": "PASS",
+   "detail": {
+    "custPay": 405
+   }
+  },
+  {
+   "step": "6 rejection with reason; owning customer sees it",
+   "result": "PASS",
+   "detail": {
+    "rvStatus": 200,
+    "rjStatus": 200,
+    "status": "REJECTED",
+    "body": ""
+   }
+  },
+  {
+   "step": "6b reason shown in the customer UI",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "step": "7 admin pages render (services, payments, reports)",
+   "result": "PASS",
+   "detail": {
+    "consoleErrors": []
+   }
+  }
+ ]
+}

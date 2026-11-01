@@ -7,6 +7,7 @@ signed and expired download tokens, provider identity to customers).
 """
 
 import json
+from datetime import timedelta
 import shutil
 import tempfile
 from unittest import mock
@@ -14,6 +15,7 @@ from unittest import mock
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core import signing
 from django.test import override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomUser
@@ -305,6 +307,27 @@ class OverdueAndComplaintTests(APITestCase):
         call_command("notify_overdue_orders", stdout=StringIO())
         call_command("notify_overdue_orders", stdout=StringIO())
         self.assertEqual(Notification.objects.filter(template_key="order_overdue", recipient=self.employee).count(), 1)
+        # CN-MAP-05: the customer is told too, once, in their own wording.
+        customer_alerts = Notification.objects.filter(template_key="order_overdue_customer", recipient=self.customer)
+        self.assertEqual(customer_alerts.count(), 1)
+        self.assertFalse(Notification.objects.filter(template_key="order_overdue", recipient=self.customer).exists())
+
+    def test_overdue_order_alerts_the_assigned_provider(self):
+        from datetime import timedelta
+        from io import StringIO
+
+        from django.core.management import call_command
+        from django.utils import timezone
+
+        provider_user = CustomUser.objects.create_user(email="od-p@example.org", password="x-Pass-2026!", full_name="Provider Delta",
+                                                       phone="+962791700099", role="provider")
+        provider = ProviderProfile.objects.filter(user=provider_user).first() or ProviderProfile.objects.create(
+            user=provider_user, provider_type="individual", city="Amman", is_available=True, is_approved=True)
+        Order.objects.filter(pk=self.order.pk).update(status=Order.Status.ASSIGNED, assigned_provider=provider,
+                                                      expected_delivery_date=timezone.localdate() - timedelta(days=1))
+        call_command("notify_overdue_orders", stdout=StringIO())
+        call_command("notify_overdue_orders", stdout=StringIO())
+        self.assertEqual(Notification.objects.filter(template_key="order_overdue_provider", recipient=provider_user).count(), 1)
 
     def test_customer_complaint_is_followed_up_by_staff_and_private(self):
         self.client.force_authenticate(self.customer)
@@ -422,3 +445,123 @@ class SloganOverDemoHeadlineTests(APITestCase):
         self.assertEqual(demo.hero_title_ar, migration.SLOGAN_AR)
         self.assertEqual(demo.hero_title_en, migration.SLOGAN_EN)
         self.assertEqual(client.hero_title_ar, migration.DEMO_AR)
+
+
+class NationalIdNormalizationTests(APITestCase):
+    """OD-17: national ID / passport number is free text; presentation differences are one identity."""
+
+    def test_normalize_national_id(self):
+        from accounts.validators import normalize_national_id
+        self.assertEqual(normalize_national_id(" ٩٨٧ ٦٥٤٣٢١٠ "), "9876543210")
+        self.assertEqual(normalize_national_id("ab 12345"), "AB12345")
+        self.assertEqual(normalize_national_id(None), "")
+
+    def test_registration_rejects_arabic_digit_form_of_taken_id(self):
+        CustomUser.objects.create_user(email="nid-a@example.test", password="x-Pass-2026!", full_name="A",
+                                       phone="0791500101", national_id="9876543210", role=CustomUser.Role.CUSTOMER)
+        response = self.client.post("/api/auth/register/", {
+            "full_name": "B", "email": "nid-b@example.test", "phone": "0791500102",
+            "password": "x-Pass-2026!", "national_id": "٩٨٧٦٥٤٣٢١٠",
+        }, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("national_id", response.json().get("errors", response.json()) if isinstance(response.json(), dict) else {})
+
+
+class SuccessMetricsTests(APITestCase):
+    """PRD-M: the five PRD success metrics in the operational summary; form timing is outside the idempotency fingerprint."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from orders.models import OrderStatusLog, Rating
+        make = CustomUser.objects.create_user
+        cls.customer = make(email="sm-c@example.org", password="x-Pass-2026!", full_name="عميل", phone="+962791800001", role="customer")
+        cls.admin = make(email="sm-a@example.org", password="x-Pass-2026!", full_name="مدير", phone="+962791800002", role="admin", is_staff=True, is_superuser=True)
+        provider_user = make(email="sm-p@example.org", password="x-Pass-2026!", full_name="Provider Gamma", phone="+962791800003", role="provider")
+        provider = ProviderProfile.objects.filter(user=provider_user).first() or ProviderProfile.objects.create(
+            user=provider_user, provider_type="individual", city="Amman", is_available=True, is_approved=True)
+        category = ServiceCategory.objects.create(name_ar="ت", name_en="C", slug="sm-cat", show_on_public_site=True)
+        cls.service = Service.objects.create(category=category, name_ar="خدمة", name_en="Svc", slug="sm-svc", description_ar="و",
+                                             show_on_public_site=True, is_active=True)
+        clean = Order.objects.create(customer=cls.customer, service=cls.service, city="عمّان", form_duration_seconds=120)
+        followed = Order.objects.create(customer=cls.customer, service=cls.service, city="عمّان", form_duration_seconds=300)
+        Order.objects.create(customer=cls.customer, service=cls.service, city="عمّان", status=Order.Status.ASSIGNED, assigned_provider=provider)
+        for order in (clean, followed):
+            Order.objects.filter(pk=order.pk).update(status=Order.Status.COMPLETED, assigned_provider=provider,
+                                                     completed_at=order.created_at + timedelta(hours=10))
+        OrderStatusLog.objects.create(order=followed, old_status="UNDER_REVIEW", new_status=Order.Status.WAITING_CUSTOMER, changed_by=cls.admin)
+        clean.refresh_from_db()
+        followed.refresh_from_db()
+        Rating.objects.create(order=clean, customer=cls.customer, score=5)
+        Rating.objects.create(order=followed, customer=cls.customer, score=3)
+
+    def test_admin_summary_has_the_five_metrics(self):
+        self.client.force_authenticate(self.admin)
+        metrics = self.client.get("/api/reports/summary/").json()["success_metrics"]
+        self.assertEqual(metrics["time_to_create_request"], {"measured_orders": 2, "median_seconds": 210})
+        self.assertEqual(metrics["completed_without_follow_up"]["completed_orders"], 2)
+        self.assertEqual(metrics["completed_without_follow_up"]["without_missing_document_request"], 1)
+        self.assertEqual(metrics["completed_without_follow_up"]["percent"], 50.0)
+        self.assertEqual(metrics["processing_duration_by_service"][0]["average_hours"], 10.0)
+        self.assertEqual(metrics["provider_throughput"][0]["completion_rate"], 66.7)
+        self.assertEqual(metrics["customer_satisfaction"], {"ratings": 2, "average_score": 4.0, "distribution": {"3": 1, "5": 1}})
+
+    def test_customer_summary_has_no_metrics(self):
+        self.client.force_authenticate(self.customer)
+        self.assertNotIn("success_metrics", self.client.get("/api/reports/summary/").json())
+
+    def test_form_timing_is_stored_and_ignored_by_the_replay_fingerprint(self):
+        from uuid import uuid4
+        self.client.force_authenticate(self.customer)
+        key = str(uuid4())
+        payload = {"service": self.service.pk, "full_name": "عميل", "phone": "+962791800001", "city": "Amman", "consent": True}
+        first = self.client.post("/api/orders/", {**payload, "form_duration_seconds": 95}, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        retry = self.client.post("/api/orders/", {**payload, "form_duration_seconds": 140}, format="json", HTTP_IDEMPOTENCY_KEY=key)
+        self.assertEqual(first.status_code, 201, first.content)
+        self.assertEqual(retry.status_code, 200)
+        self.assertEqual(Order.objects.get(pk=first.json()["id"]).form_duration_seconds, 95)
+        clock_skew = self.client.post("/api/orders/", {**payload, "notes": "b", "form_duration_seconds": -5}, format="json")
+        self.assertEqual(Order.objects.get(pk=clock_skew.json()["id"]).form_duration_seconds, None)
+
+
+class MonthlyReportAndExportTests(APITestCase):
+    """PROP-WEB-05: monthly report with payment methods, and a CSV export without personal data."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from payment.models import Payment
+        make = CustomUser.objects.create_user
+        cls.customer = make(email="mr-c@example.org", password="x-Pass-2026!", full_name="عميل سري", phone="+962791900001",
+                            national_id="5550001112", role="customer")
+        cls.admin = make(email="mr-a@example.org", password="x-Pass-2026!", full_name="مدير", phone="+962791900002", role="admin", is_staff=True, is_superuser=True)
+        cls.employee = make(email="mr-e@example.org", password="x-Pass-2026!", full_name="موظف", phone="+962791900003", role="employee", is_staff=True)
+        category = ServiceCategory.objects.create(name_ar="عقارات", name_en="Land", slug="mr-cat", show_on_public_site=True)
+        service = Service.objects.create(category=category, name_ar="خدمة شهرية", name_en="Monthly service", slug="mr-svc", description_ar="و",
+                                         show_on_public_site=True, is_active=True)
+        cls.order = Order.objects.create(customer=cls.customer, service=service, city="عمّان", customer_notes="ملاحظة خاصة")
+        Payment.objects.create(order=cls.order, amount="25.00", method=Payment.PaymentMethod.CASH,
+                               status=Payment.PaymentStatus.PAID)
+
+    def test_monthly_report_has_payment_methods(self):
+        self.client.force_authenticate(self.admin)
+        month = timezone.localdate().strftime("%Y-%m")
+        data = self.client.get(f"/api/admin/reports/monthly/?month={month}").json()
+        self.assertEqual(data["month"], month)
+        self.assertEqual(data["created_orders"], 1)
+        self.assertEqual(data["payments_by_method"][0]["method"], "cash")
+        self.assertEqual(data["payments_by_method"][0]["records"], 1)
+        self.assertEqual(self.client.get("/api/admin/reports/monthly/?month=2026-13").status_code, 400)
+
+    def test_csv_export_is_admin_only_and_has_no_personal_data(self):
+        self.client.force_authenticate(self.employee)
+        self.assertEqual(self.client.get("/api/admin/reports/export/?period=weekly").status_code, 403)
+        self.client.force_authenticate(self.admin)
+        response = self.client.get("/api/admin/reports/export/?period=monthly", HTTP_ACCEPT_LANGUAGE="en")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response["Content-Type"].startswith("text/csv"))
+        body = response.content.decode("utf-8-sig")
+        self.assertIn("Order number,Created,Service", body)
+        self.assertIn(self.order.order_number, body)
+        self.assertIn("Monthly service", body)
+        self.assertIn("cash", body)
+        for secret in ("عميل سري", "+962791900001", "5550001112", "ملاحظة خاصة"):
+            self.assertNotIn(secret, body)

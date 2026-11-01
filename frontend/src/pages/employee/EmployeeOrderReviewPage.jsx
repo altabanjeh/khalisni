@@ -25,6 +25,7 @@ import { getAdminName, getServiceName } from '../../utils/servicePresentation'
 import { findRequiredDocument,
   getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
 import OrderNumber from '../../components/OrderNumber'
+import OrderRequestDetails from '../../components/OrderRequestDetails'
 
 const REVIEW_STARTED_NOTE_AR = 'بدأ الموظف مراجعة الطلب.'
 
@@ -231,6 +232,9 @@ function EmployeeOrderReviewPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
+          <SectionCard icon={FileText} title={tr('تفاصيل الطلب', 'Request details')} description={tr('ملاحظات العميل وإجاباته على نموذج الخدمة.', 'The customer’s notes and answers to the service form.')}>
+            <OrderRequestDetails text={order.customer_notes} />
+          </SectionCard>
           <SectionCard icon={ShieldCheck} title={tr('متطلبات الخدمة والوثائق', 'Service & document requirements')} description={tr('تحقق من كل مستند مطلوب واعتمده قبل إسناد الطلب إلى المزوّد.', 'Verify and approve every required document before assigning the request to a provider.')}>
             <div className="grid gap-3">
               {requiredDocumentRows.length ? requiredDocumentRows.map((item) => (

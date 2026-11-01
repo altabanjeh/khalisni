@@ -1,0 +1,67 @@
+{
+ "steps": [
+  {
+   "step": "0 disposable customer",
+   "result": "PASS",
+   "detail": 201
+  },
+  {
+   "step": "1 plots repeater (ar): hidden before yes, 2 rows, add/remove",
+   "result": "PASS",
+   "detail": {
+    "addButtonsBeforeGate": 0,
+    "inputsShown": 4,
+    "afterAdd": 6,
+    "afterRemove": 4,
+    "consoleErrors": []
+   }
+  },
+  {
+   "step": "1 plots repeater (en): hidden before yes, 2 rows, add/remove",
+   "result": "PASS",
+   "detail": {
+    "addButtonsBeforeGate": 0,
+    "inputsShown": 4,
+    "afterAdd": 6,
+    "afterRemove": 4,
+    "consoleErrors": []
+   }
+  },
+  {
+   "step": "2 server refuses an empty required plot row",
+   "result": "PASS",
+   "detail": {
+    "status": 400,
+    "body": "{\"service_answers\":{\"applicant_name\":\"هذا الحقل مطلوب.\",\"national_id\":\"هذا الحقل مطلوب.\",\"phone_number\":\"هذا الحقل مطلوب.\",\"plots\":{\"1\":{\"parcel_number\":\"هذا الحقل مطلوب.\",\"basin_number\":\"هذا الحقل مط"
+   }
+  },
+  {
+   "step": "3 boundary: optional coordinates + optional site photos (CN-BIZ-05)",
+   "result": "PASS",
+   "detail": {
+    "coords": "إحداثيات الموقع (اختياري)",
+    "photos": "صور الموقع"
+   }
+  },
+  {
+   "step": "4 building permit: engineering drawings accept 50 MB (CN-BIZ-09)",
+   "result": "PASS",
+   "detail": {
+    "max_file_size": 52428800
+   }
+  },
+  {
+   "step": "5 company registration: partners repeater (CN-BIZ-01)",
+   "result": "PASS",
+   "detail": {
+    "items": [
+     "name",
+     "id",
+     "nationality",
+     "share"
+    ],
+    "min": 1
+   }
+  }
+ ]
+}

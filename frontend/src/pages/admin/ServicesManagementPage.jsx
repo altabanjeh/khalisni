@@ -16,6 +16,7 @@ import { useAsyncData } from '../../hooks/useAsyncData'
 import { generateCatalogSlug, suggestCategoryIcon } from '../../utils/catalogDefaults'
 import { getAdminCategoryPath } from '../../utils/servicePresentation'
 import { resolveServiceImage } from '../../utils/catalogImagery'
+import { formatBytes } from '../../utils/serviceForms'
 
 const defaultCategoryValues = {
   name_ar: '',
@@ -79,8 +80,20 @@ const defaultDefinitionValues = {
   description_en: '',
   allowed_extensions: ['.pdf', '.jpg', '.png'],
   max_file_size: 10485760,
+  max_file_size_mb: '',
   sort_order: 0,
   is_active: true,
+}
+
+// CN-BIZ-09: a definition may allow larger files (engineering drawings), up to
+// the server ceiling (ENGINEERING_UPLOAD_MAX_SIZE, 50 MB by default).
+const DEFAULT_MAX_FILE_SIZE_MB_CEILING = 50
+
+function definitionSizeLabel(definition, fallback) {
+  if (definition?.max_file_size_mb) return `${definition.max_file_size_mb} MB`
+  const option = DOCUMENT_SIZE_OPTIONS.find((item) => item.value === Number(definition?.max_file_size || 0))
+  if (option) return option.label
+  return Number(definition?.max_file_size || 0) ? formatBytes(definition.max_file_size) : fallback
 }
 
 const SERVICE_CURRENCY_CODE = 'JOD'
@@ -162,7 +175,12 @@ const schemaFieldTypeOptions = [
   { value: 'date', label_ar: 'تاريخ', label_en: 'Date' },
   { value: 'select', label_ar: 'قائمة خيارات', label_en: 'Options list' },
   { value: 'checkbox', label_ar: 'صح / خطأ', label_en: 'True / false' },
+  // CN-BIZ-01 / CN-BIZ-04: rows the customer adds (partners, plots).
+  { value: 'repeater', label_ar: 'مجموعة متكررة (صفوف يضيفها العميل)', label_en: 'Repeater (rows the customer adds)' },
 ]
+// Item fields of a repeater are ordinary fields: never another repeater.
+const repeaterItemTypeOptions = schemaFieldTypeOptions.filter((option) => option.value !== 'repeater')
+const REPEATER_MAX_ITEMS = 20
 
 let schemaFieldRowCounter = 0
 
@@ -171,12 +189,17 @@ function nextSchemaFieldRowId() {
   return `schema-field-${schemaFieldRowCounter}`
 }
 
-function normalizeSchemaFieldType(value) {
+function normalizeSchemaFieldType(value, options = schemaFieldTypeOptions) {
   const nextValue = String(value || 'text').trim().toLowerCase()
-  if (schemaFieldTypeOptions.some((option) => option.value === nextValue)) {
+  if (options.some((option) => option.value === nextValue)) {
     return nextValue
   }
   return 'text'
+}
+
+function cloneSchemaValue(value) {
+  if (value == null || typeof value !== 'object') return value
+  return JSON.parse(JSON.stringify(value))
 }
 
 function serializeSchemaOptions(value) {
@@ -210,18 +233,71 @@ function sanitizeSchemaFieldToken(value, fallback) {
   return nextValue || fallback
 }
 
-function createSchemaFieldRow(field = {}) {
+/**
+ * A builder row keeps the stored field (`original`) so saving never drops what
+ * the builder does not edit: English labels and help (`label_en`,
+ * `help_text_en`), `visible_when` conditions, option values, import metadata
+ * and repeater `item_fields`. Edited properties are written over it.
+ */
+function createSchemaItemRow(item = {}) {
+  const optionsText = serializeSchemaOptions(item.options ?? item.choices ?? item.values)
   return {
     row_id: nextSchemaFieldRowId(),
+    original: cloneSchemaValue(item) || {},
+    key: String(item.key ?? item.name ?? item.field ?? item.id ?? '').trim(),
+    label_ar: String(item.label_ar ?? item.label ?? '').trim(),
+    label_en: String(item.label_en ?? '').trim(),
+    type: normalizeSchemaFieldType(item.type ?? item.field_type ?? item.input_type, repeaterItemTypeOptions),
+    required: Boolean(item.required),
+    options_text: optionsText,
+    original_options_text: optionsText,
+  }
+}
+
+function createSchemaFieldRow(field = {}) {
+  const optionsText = serializeSchemaOptions(field.options ?? field.choices ?? field.values)
+  const type = normalizeSchemaFieldType(field.type ?? field.field_type ?? field.input_type)
+  return {
+    row_id: nextSchemaFieldRowId(),
+    original: cloneSchemaValue(field) || {},
     technical_name: String(field.name ?? field.key ?? field.field ?? '').trim(),
     label_ar: String(field.label_ar ?? field.name_ar ?? '').trim(),
-    label: String(field.label ?? field.title ?? '').trim(),
-    type: normalizeSchemaFieldType(field.type ?? field.field_type ?? field.input_type),
+    label: String(field.label_en ?? field.label ?? field.title ?? '').trim(),
+    type,
     required: Boolean(field.required),
-    placeholder: String(field.placeholder ?? '').trim(),
-    help_text: String(field.help_text ?? field.description ?? '').trim(),
-    options_text: serializeSchemaOptions(field.options ?? field.choices ?? field.values),
+    placeholder: String(field.placeholder ?? field.placeholder_ar ?? '').trim(),
+    help_text: String(field.help_text_ar ?? field.help_text ?? field.description ?? '').trim(),
+    options_text: optionsText,
+    original_options_text: optionsText,
+    min_items: field.min_items == null ? '' : String(field.min_items),
+    max_items: field.max_items == null ? '' : String(field.max_items),
+    items: Array.isArray(field.item_fields) ? field.item_fields.map((item) => createSchemaItemRow(item)) : [],
   }
+}
+
+function buildSchemaOptions(row, original) {
+  // Unchanged options keep their stored values and English labels.
+  if (row.options_text === row.original_options_text && Array.isArray(original.options)) return cloneSchemaValue(original.options)
+  return parseSchemaOptionsText(row.options_text)
+}
+
+function buildRepeaterItem(item, index) {
+  const original = item.original || {}
+  const type = normalizeSchemaFieldType(item.type, repeaterItemTypeOptions)
+  const payload = { ...cloneSchemaValue(original) }
+  delete payload.name
+  delete payload.visible_when
+  delete payload.item_fields
+  payload.key = sanitizeSchemaFieldToken(item.key || item.label_en || `item_${index + 1}`, `item_${index + 1}`)
+  payload.type = type
+  payload.required = Boolean(item.required)
+  if (item.label_ar.trim()) payload.label_ar = item.label_ar.trim()
+  else delete payload.label_ar
+  if (item.label_en.trim()) payload.label_en = item.label_en.trim()
+  else delete payload.label_en
+  if (type === 'select') payload.options = buildSchemaOptions(item, original)
+  else delete payload.options
+  return payload
 }
 
 function isSchemaFieldRowBlank(field) {
@@ -245,11 +321,56 @@ function getGeneratedSchemaFieldName(field, index) {
   return sanitizeSchemaFieldToken(field.label || field.placeholder || `field_${index + 1}`, `field_${index + 1}`)
 }
 
+function parseWholeNumber(value) {
+  const text = String(value ?? '').trim()
+  if (!text) return null
+  const number = Number(text)
+  return Number.isInteger(number) && number >= 0 ? number : NaN
+}
+
+function validateRepeaterRow(field, index, isArabic) {
+  const errors = []
+  const label = isArabic ? `الحقل ${index + 1}` : `Field ${index + 1}`
+  const minItems = parseWholeNumber(field.min_items)
+  const maxItems = parseWholeNumber(field.max_items)
+  if (Number.isNaN(minItems) || Number.isNaN(maxItems)) {
+    errors.push(isArabic ? `${label}: الحد الأدنى والأقصى يجب أن يكونا أرقاماً صحيحة.` : `${label}: the minimum and maximum must be whole numbers.`)
+  } else {
+    if (maxItems !== null && (maxItems < 1 || maxItems > REPEATER_MAX_ITEMS)) {
+      errors.push(isArabic ? `${label}: الحد الأقصى بين 1 و${REPEATER_MAX_ITEMS}.` : `${label}: the maximum must be between 1 and ${REPEATER_MAX_ITEMS}.`)
+    }
+    if (minItems !== null && minItems > (maxItems ?? REPEATER_MAX_ITEMS)) {
+      errors.push(isArabic ? `${label}: الحد الأدنى أكبر من الحد الأقصى.` : `${label}: the minimum is larger than the maximum.`)
+    }
+  }
+  if (!field.items.length) {
+    errors.push(isArabic ? `${label}: أضف بنداً واحداً على الأقل إلى الصف.` : `${label}: add at least one item to the row.`)
+  }
+  const seen = new Set()
+  field.items.forEach((item, itemIndex) => {
+    const itemLabel = isArabic ? `${label}، البند ${itemIndex + 1}` : `${label}, item ${itemIndex + 1}`
+    if (!item.label_ar.trim() && !item.label_en.trim()) {
+      errors.push(isArabic ? `${itemLabel}: أضف الاسم الظاهر.` : `${itemLabel}: add the display name.`)
+    }
+    const key = sanitizeSchemaFieldToken(item.key || item.label_en || `item_${itemIndex + 1}`, `item_${itemIndex + 1}`)
+    if (seen.has(key)) {
+      errors.push(isArabic ? `${itemLabel}: المعرّف «${key}» مكرر.` : `${itemLabel}: the identifier "${key}" is used twice.`)
+    }
+    seen.add(key)
+    if (normalizeSchemaFieldType(item.type, repeaterItemTypeOptions) === 'select' && !parseSchemaOptionsText(item.options_text).length) {
+      errors.push(isArabic ? `${itemLabel}: أضف خيارات القائمة.` : `${itemLabel}: add the list options.`)
+    }
+  })
+  return errors
+}
+
 function validateSchemaFieldRows(fields, isArabic) {
   const errors = []
 
   fields.forEach((field, index) => {
     if (isSchemaFieldRowBlank(field)) return
+
+    if (normalizeSchemaFieldType(field.type) === 'repeater') errors.push(...validateRepeaterRow(field, index, isArabic))
 
     if (!field.label_ar.trim() && !field.label.trim()) {
       errors.push(isArabic
@@ -272,20 +393,123 @@ function buildRequiredInformationSchema(fields) {
     .filter((field) => !isSchemaFieldRowBlank(field))
     .map((field, index) => {
       const type = normalizeSchemaFieldType(field.type)
-      const payload = {
-        name: getGeneratedSchemaFieldName(field, index),
-        type,
-        required: Boolean(field.required),
-      }
+      const original = field.original || {}
+      const payload = { ...cloneSchemaValue(original) }
+      const name = getGeneratedSchemaFieldName(field, index)
+      // Keep the stored key property; new fields use `name` as before.
+      if (original.key != null && original.name == null) payload.key = name
+      else payload.name = name
+      payload.type = type
+      payload.required = Boolean(field.required)
 
-      if (field.label_ar.trim()) payload.label_ar = field.label_ar.trim()
-      if (field.label.trim()) payload.label = field.label.trim()
-      if (field.placeholder.trim()) payload.placeholder = field.placeholder.trim()
-      if (field.help_text.trim()) payload.help_text = field.help_text.trim()
-      if (type === 'select') payload.options = parseSchemaOptionsText(field.options_text)
+      const setText = (property, value) => {
+        if (value.trim()) payload[property] = value.trim()
+        else delete payload[property]
+      }
+      setText('label_ar', field.label_ar)
+      // The English label: `label_en` on stored bilingual fields, `label` otherwise.
+      if ('label_en' in original) {
+        setText('label_en', field.label)
+        if ('label' in original) setText('label', field.label)
+      } else {
+        setText('label', field.label)
+      }
+      setText('placeholder_ar' in original && !('placeholder' in original) ? 'placeholder_ar' : 'placeholder', field.placeholder)
+      setText('help_text_ar' in original ? 'help_text_ar' : 'help_text', field.help_text)
+      if (type === 'select') payload.options = buildSchemaOptions(field, original)
+
+      if (type === 'repeater') {
+        const minItems = parseWholeNumber(field.min_items)
+        const maxItems = parseWholeNumber(field.max_items)
+        if (Number.isInteger(minItems)) payload.min_items = minItems
+        else delete payload.min_items
+        if (Number.isInteger(maxItems)) payload.max_items = maxItems
+        else delete payload.max_items
+        payload.item_fields = field.items.map((item, itemIndex) => buildRepeaterItem(item, itemIndex))
+      } else {
+        delete payload.item_fields
+        delete payload.min_items
+        delete payload.max_items
+      }
 
       return payload
     })
+}
+
+function RepeaterItemsEditor({ field, onChange }) {
+  const { isArabic } = useLanguage()
+  const tr = (ar, en) => (isArabic ? ar : en)
+  const updateItem = (rowId, key, value) => onChange('items', field.items.map((item) => (
+    item.row_id === rowId
+      ? { ...item, [key]: key === 'type' ? normalizeSchemaFieldType(value, repeaterItemTypeOptions) : value }
+      : item
+  )))
+  return (
+    <div className="space-y-4 rounded-2xl border border-brand-100 bg-brand-50/40 p-4" data-testid="repeater-items-editor">
+      <div>
+        <p className="text-sm font-bold text-ink">{tr('بنود كل صف', 'Items in each row')}</p>
+        <p className="text-xs text-slate-500">
+          {tr(
+            `يضيف العميل صفاً لكل عنصر (مثل كل شريك أو كل قطعة). الحد الأقصى ${REPEATER_MAX_ITEMS} صفاً.`,
+            `The customer adds one row per entry (for example each partner or each plot). At most ${REPEATER_MAX_ITEMS} rows.`,
+          )}
+        </p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field hint={tr('اتركه فارغاً لصف واحد على الأقل عندما يكون الحقل مطلوباً.', 'Leave empty for at least one row when the field is required.')} label={tr('أقل عدد من الصفوف', 'Minimum rows')}>
+          <input className="field" inputMode="numeric" min="0" onChange={(event) => onChange('min_items', event.target.value)} type="number" value={field.min_items} />
+        </Field>
+        <Field hint={tr(`اتركه فارغاً لـ ${REPEATER_MAX_ITEMS}.`, `Leave empty for ${REPEATER_MAX_ITEMS}.`)} label={tr('أكبر عدد من الصفوف', 'Maximum rows')}>
+          <input className="field" inputMode="numeric" max={REPEATER_MAX_ITEMS} min="1" onChange={(event) => onChange('max_items', event.target.value)} type="number" value={field.max_items} />
+        </Field>
+      </div>
+      {field.items.map((item, itemIndex) => (
+        <div className="space-y-3 rounded-2xl border border-border bg-white p-3" key={item.row_id}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-ink">{tr(`البند ${itemIndex + 1}`, `Item ${itemIndex + 1}`)}</p>
+            <button
+              aria-label={tr(`حذف البند ${itemIndex + 1}`, `Remove item ${itemIndex + 1}`)}
+              className="min-h-[44px] rounded-2xl border border-danger/20 px-3 py-2 text-xs font-semibold text-danger"
+              onClick={() => onChange('items', field.items.filter((candidate) => candidate.row_id !== item.row_id))}
+              type="button"
+            >
+              {tr('حذف البند', 'Remove item')}
+            </button>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Field label={tr('الاسم الظاهر بالعربية', 'Display name (Arabic)')}>
+              <input className="field" onChange={(event) => updateItem(item.row_id, 'label_ar', event.target.value)} value={item.label_ar} />
+            </Field>
+            <Field label={tr('الاسم الظاهر بالإنجليزية', 'Display name (English)')}>
+              <input className="field" dir="ltr" onChange={(event) => updateItem(item.row_id, 'label_en', event.target.value)} value={item.label_en} />
+            </Field>
+            <Field label={tr('المعرّف التقني', 'Technical identifier')}>
+              <input className="field font-mono" dir="ltr" onChange={(event) => updateItem(item.row_id, 'key', event.target.value)} value={item.key} />
+            </Field>
+            <Field label={tr('نوع البند', 'Item type')}>
+              <select className="field" onChange={(event) => updateItem(item.row_id, 'type', event.target.value)} value={item.type}>
+                {repeaterItemTypeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{isArabic ? option.label_ar : option.label_en}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          {item.type === 'select' ? (
+            <Field hint={tr('كل خيار في سطر منفصل.', 'One option per line.')} label={tr('خيارات القائمة', 'List options')}>
+              <textarea className="field min-h-20" onChange={(event) => updateItem(item.row_id, 'options_text', event.target.value)} value={item.options_text} />
+            </Field>
+          ) : null}
+          <CheckboxField
+            label={tr('البند مطلوب في كل صف', 'Item is required in every row')}
+            registration={{ checked: item.required, onChange: (event) => updateItem(item.row_id, 'required', event.target.checked) }}
+          />
+        </div>
+      ))}
+      <button className="btn-secondary min-h-[44px]" onClick={() => onChange('items', [...field.items, createSchemaItemRow()])} type="button">
+        {tr('+ بند في الصف', '+ Row item')}
+      </button>
+    </div>
+  )
 }
 
 function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField, onRemoveField }) {
@@ -387,6 +611,10 @@ function ServiceSchemaBuilder({ fields, errorMessages, onAddField, onChangeField
                 </Field>
               </div>
 
+              {field.type === 'repeater' ? (
+                <RepeaterItemsEditor field={field} onChange={(key, value) => onChangeField(field.row_id, key, value)} />
+              ) : null}
+
               {field.type === 'select' ? (
                 <Field hint={tr('كل خيار في سطر منفصل.', 'One option per line.')} label={tr('خيارات القائمة', 'List options')}>
                   <textarea
@@ -440,8 +668,7 @@ function isClearImageValue(value) {
 function formatDefinitionSummary(definition, isArabic) {
   const extensions = formatExtensionList(definition.allowed_extensions, isArabic)
   if (!extensions) return isArabic ? 'بدون امتدادات مخصصة' : 'No custom extensions'
-  const sizeOption = DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(definition.max_file_size || 0))
-  return `${extensions} | ${sizeOption?.label || (isArabic ? 'حجم مخصص' : 'Custom size')}`
+  return `${extensions} | ${definitionSizeLabel(definition, isArabic ? 'حجم مخصص' : 'Custom size')}`
 }
 
 const EMPTY_SERVICE_PAGE = { results: [], count: 0, hasNext: false, hasPrevious: false }
@@ -548,6 +775,11 @@ function ServicesManagementPage() {
     () => definitions.find((item) => String(item.id) === String(selectedDefinitionId)) || null,
     [definitions, selectedDefinitionId],
   )
+  const maxFileSizeMbCeiling = Number(
+    selectedDefinition?.max_file_size_mb_ceiling
+      || definitions.find((item) => item?.max_file_size_mb_ceiling)?.max_file_size_mb_ceiling
+      || DEFAULT_MAX_FILE_SIZE_MB_CEILING,
+  )
   const schemaPreviewJson = useMemo(() => JSON.stringify(buildRequiredInformationSchema(serviceSchemaFields), null, 2), [serviceSchemaFields])
 
   useEffect(() => {
@@ -638,6 +870,7 @@ function ServicesManagementPage() {
             description_en: selectedDefinition.description_en || '',
             allowed_extensions: selectedDefinition.allowed_extensions || ['.pdf'],
             max_file_size: selectedDefinition.max_file_size ?? 10485760,
+            max_file_size_mb: selectedDefinition.max_file_size_mb ?? '',
             sort_order: selectedDefinition.sort_order ?? 0,
             is_active: Boolean(selectedDefinition.is_active),
           }
@@ -852,6 +1085,7 @@ function ServicesManagementPage() {
               ...field,
               [key]: key === 'type' ? normalizeSchemaFieldType(value) : value,
               ...(key === 'type' && value !== 'select' ? { options_text: '' } : {}),
+              ...(key === 'type' && value === 'repeater' && !field.items.length ? { items: [createSchemaItemRow()] } : {}),
             }
           : field,
       ),
@@ -879,6 +1113,8 @@ function ServicesManagementPage() {
               .map((item) => item.trim())
               .filter(Boolean),
         max_file_size: Number(values.max_file_size || 0),
+        // Empty = the default limit; a number = this definition's own limit in MB.
+        max_file_size_mb: String(values.max_file_size_mb ?? '').trim() ? Number(values.max_file_size_mb) : null,
         sort_order: Number(values.sort_order || 0),
         is_active: Boolean(values.is_active),
       }
@@ -1092,7 +1328,7 @@ function ServicesManagementPage() {
     {
       key: 'max_file_size',
       label: tr('الحد الأقصى للحجم', 'Max size'),
-      render: (row) => DOCUMENT_SIZE_OPTIONS.find((option) => option.value === Number(row.max_file_size || 0))?.label || tr('حجم مخصص', 'Custom size'),
+      render: (row) => definitionSizeLabel(row, tr('حجم مخصص', 'Custom size')),
     },
     { key: 'sort_order', label: tr('الترتيب', 'Order') },
     { key: 'is_active', label: tr('الحالة', 'Status'), render: statusCell },
@@ -1709,7 +1945,39 @@ function ServicesManagementPage() {
                     {option.label}
                   </option>
                 ))}
+                {selectedDefinition?.max_file_size && !DOCUMENT_SIZE_OPTIONS.some((option) => option.value === Number(selectedDefinition.max_file_size)) ? (
+                  <option value={selectedDefinition.max_file_size}>{formatBytes(selectedDefinition.max_file_size)}</option>
+                ) : null}
               </select>
+            </Field>
+            <Field
+              hint={tr(
+                `اختياري: لملفات كبيرة مثل المخططات الهندسية. اتركه فارغاً لاستخدام الحد الافتراضي؛ الحد الأعلى ${maxFileSizeMbCeiling} ميغابايت. عند تعبئته يُستخدم بدل القائمة أعلاه.`,
+                `Optional: for large files such as engineering drawings. Leave empty to use the default limit; the ceiling is ${maxFileSizeMbCeiling} MB. When filled it replaces the list above.`,
+              )}
+              label={tr('الحد الأقصى لحجم الملف (ميغابايت)', 'Maximum file size (MB)')}
+            >
+              <input
+                className="field"
+                dir="ltr"
+                inputMode="numeric"
+                max={maxFileSizeMbCeiling}
+                min="1"
+                step="1"
+                type="number"
+                {...definitionForm.register('max_file_size_mb', {
+                  validate: (value) => {
+                    const text = String(value ?? '').trim()
+                    if (!text) return true
+                    const number = Number(text)
+                    return (Number.isInteger(number) && number >= 1 && number <= maxFileSizeMbCeiling)
+                      || tr(`أدخل رقماً صحيحاً بين 1 و${maxFileSizeMbCeiling}.`, `Enter a whole number between 1 and ${maxFileSizeMbCeiling}.`)
+                  },
+                })}
+              />
+              {definitionForm.formState.errors.max_file_size_mb ? (
+                <p className="text-sm text-danger" role="alert">{definitionForm.formState.errors.max_file_size_mb.message}</p>
+              ) : null}
             </Field>
           </div>
           <CheckboxField label={tr('التعريف نشط', 'Definition is active')} registration={definitionForm.register('is_active')} />

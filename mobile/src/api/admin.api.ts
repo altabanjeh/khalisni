@@ -62,8 +62,11 @@ export const adminApi = {
   updateAdminAdvertisement(id: number | string, payload: Record<string, unknown>) {
     return apiClient.patch(`/admin/public-site/advertisements/${id}/`, payload).then((res) => res.data);
   },
-  deleteAdminAdvertisement(id: number | string, deletePassword: string) {
-    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`, deletePassword);
+  deleteAdminAdvertisement(id: number | string, deletePassword: string, deleteReason = '') {
+    return secureAdminDelete(`/admin/public-site/advertisements/${id}/`, deletePassword, { data: { delete_reason: deleteReason.trim() } });
+  },
+  restoreAdminAdvertisement(id: number | string) {
+    return apiClient.post<PublicAdvertisement>(`/admin/public-site/advertisements/${id}/restore/`).then((res) => res.data);
   },
   getAdminPublicContent() {
     return apiClient.get('/admin/public-site/content/').then((res) => res.data);

@@ -22,6 +22,7 @@ import { getServiceName } from '../../utils/servicePresentation'
 import { getRequiredDocumentLabel, getRequiredDocumentType } from '../../utils/serviceForms'
 import { describeTransitionBlock } from '../../utils/workflowPresentation'
 import OrderNumber from '../../components/OrderNumber'
+import OrderRequestDetails from '../../components/OrderRequestDetails'
 
 function Panel({ icon: Icon, title, description, children, tone }) {
   return (
@@ -207,6 +208,9 @@ function AdminOrderDetailsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
+          <Panel icon={MessageSquare} title={isArabic ? 'تفاصيل الطلب' : 'Request details'} description={isArabic ? 'ملاحظات العميل وإجاباته على نموذج الخدمة.' : 'The customer’s notes and answers to the service form.'}>
+            <OrderRequestDetails text={order.customer_notes} />
+          </Panel>
           <Panel icon={FileText} title={isArabic ? 'الوثائق المرفوعة' : 'Uploaded documents'} description={isArabic ? 'راجع كل الوثائق قبل تحديث الحالة أو اتخاذ قرار نهائي.' : 'Review every document before changing status or making a final decision.'}>
             <DocumentList documents={order.documents || []} requiredDocuments={order.required_documents || []} />
           </Panel>

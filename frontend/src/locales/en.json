@@ -170,7 +170,7 @@
   "upload.replace": "Replace",
   "upload.replaceFile": "Replace file {name}",
   "upload.dropHere": "Drop the file here",
-  "upload.error.size": "File \"{name}\" exceeds the maximum allowed size (10 MB).",
+  "upload.error.size": "File \"{name}\" exceeds the maximum allowed size ({max}).",
   "upload.error.type": "File type \"{name}\" is not supported for this field.",
   "upload.hint": "Allowed files: PDF, JPG, PNG, DOC, DOCX | Maximum size: 10 MB",
   "upload.removeFile": "Remove file {name}",

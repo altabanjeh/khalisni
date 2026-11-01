@@ -1,4 +1,4 @@
-import { Alert, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { AppButton } from '../../../components/AppButton';
@@ -38,6 +38,8 @@ export function EmployeeOrderDetailScreen({ route, navigation }: { route: any; n
             <KeyValueRow label="الخدمة" value={query.data.service?.name_ar} />
             <KeyValueRow label="العميل" value={query.data.customer?.full_name} />
             <KeyValueRow label="المزوّد" value={query.data.assigned_provider?.full_name} />
+            <Text style={{ textAlign: 'right', fontWeight: '700' }}>بيانات الطلب وملاحظات العميل</Text>
+            <Text style={{ textAlign: 'right' }}>{query.data.customer_notes?.trim() || 'لا توجد ملاحظات أو بيانات إضافية.'}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <AppButton label="التحقق من المستندات" onPress={() => navigation.navigate('VerifyDocuments', { orderId })} style={{ flex: 1 }} />
               <AppButton label="طلب نواقص" variant="secondary" onPress={() => navigation.navigate('RequestMissingDocument', { orderId })} style={{ flex: 1 }} />

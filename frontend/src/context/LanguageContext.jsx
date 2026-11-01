@@ -29,6 +29,7 @@ export function LanguageProvider({ children }) {
     const normalizedLanguage = normalizeLanguage(language)
     document.documentElement.lang = normalizedLanguage
     document.documentElement.dir = getDirectionForLanguage(normalizedLanguage)
+    document.title = isRtlLanguage(normalizedLanguage) ? 'خلصني' : 'Khalsni'
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, normalizedLanguage)
   }, [language])
 

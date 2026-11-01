@@ -8,17 +8,27 @@ const globalUploadRules = {
   max_file_size: 10 * 1024 * 1024,
 };
 
+export type ServiceSchemaItemType = 'text' | 'textarea' | 'number' | 'email' | 'tel' | 'date' | 'select' | 'checkbox';
+
 export interface ServiceSchemaField {
   key: string;
   inputName: string;
   label: string;
-  type: 'text' | 'textarea' | 'number' | 'email' | 'tel' | 'date' | 'select' | 'checkbox';
+  type: ServiceSchemaItemType | 'repeater';
   required: boolean;
   placeholder: string;
   helpText: string;
   options: Array<{ value: string; label: string }>;
   visibleWhen: { field: string; equals: string } | null;
+  // Repeater only (CN-BIZ-01 partners, CN-BIZ-04 plots): the columns of one row
+  // and the row limits. Empty / defaults for every other type.
+  itemFields: ServiceSchemaField[];
+  minItems: number;
+  maxItems: number;
 }
+
+/** Hard cap on repeater rows; the server refuses more (backend services/schema_rules.py). */
+export const REPEATER_MAX_ITEMS = 20;
 
 function normalizeExtension(value: string) {
   const normalized = String(value || '').trim().toLowerCase();
@@ -68,12 +78,18 @@ function normalizeOptions(options: unknown): Array<{ value: string; label: strin
     .filter((option): option is { value: string; label: string } => Boolean(option));
 }
 
-function normalizeSchemaType(value: unknown): ServiceSchemaField['type'] {
+function normalizeSchemaType(value: unknown, allowRepeater = true): ServiceSchemaField['type'] {
   const normalized = String(value || 'text').trim().toLowerCase();
   if (['textarea', 'number', 'email', 'tel', 'date', 'select', 'checkbox'].includes(normalized)) {
     return normalized as ServiceSchemaField['type'];
   }
+  if (normalized === 'repeater' && allowRepeater) return 'repeater';
   return 'text';
+}
+
+function toCount(value: unknown, fallback: number) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric >= 0 ? Math.floor(numeric) : fallback;
 }
 
 function sanitizeFieldToken(value: unknown, fallback: string) {
@@ -126,37 +142,56 @@ export function getDocumentFieldName(item?: string | ServiceRequirement | null, 
   return `document_${sanitizeFieldToken(getRequiredDocumentType(item, index), `document_${index}`)}`;
 }
 
+function normalizeSchemaField(
+  record: Record<string, unknown>,
+  index: number,
+  inputPrefix: string,
+  allowRepeater: boolean,
+): ServiceSchemaField {
+  const rawKey = record.name ?? record.key ?? record.field ?? record.id ?? `field_${index + 1}`;
+  const inputName = `${inputPrefix}${sanitizeFieldToken(rawKey, `field_${index + 1}`)}`;
+  // Arabic copy only: label_ar first, then any Arabic label; otherwise the
+  // same neutral fallback as the web ("معلومة مطلوبة N"), never English.
+  const label = firstArabic(record.label_ar, record.label, record.name_ar, record.title, record.placeholder_ar)
+    || `معلومة مطلوبة ${index + 1}`;
+  const type = normalizeSchemaType(record.type || record.field_type || record.input_type, allowRepeater);
+  const latinPlaceholder = String(record.placeholder ?? '').trim();
+  const itemFields = type === 'repeater' && Array.isArray(record.item_fields)
+    ? record.item_fields
+        .map((item, itemIndex) => (item && typeof item === 'object'
+          ? normalizeSchemaField(item as Record<string, unknown>, itemIndex, '', false)
+          : null))
+        .filter((item): item is ServiceSchemaField => Boolean(item))
+    : [];
+  const maxItems = Math.min(Math.max(toCount(record.max_items, REPEATER_MAX_ITEMS), 1), REPEATER_MAX_ITEMS);
+
+  return {
+    key: String(rawKey),
+    inputName,
+    label,
+    type,
+    required: Boolean(record.required),
+    placeholder: firstArabic(record.placeholder_ar, record.placeholder)
+      || (FORMAT_EXAMPLE.test(latinPlaceholder) ? latinPlaceholder : '')
+      || (type === 'date' ? DATE_PLACEHOLDER : ''),
+    helpText: firstArabic(record.help_text_ar, record.help_text, record.description_ar, record.description)
+      || (type === 'date' ? DATE_HINT_AR : ''),
+    options: normalizeOptions(record.options || record.choices || record.values),
+    // Item fields never carry a condition (the repeater itself may).
+    visibleWhen: allowRepeater ? normalizeVisibleWhen(record.visible_when) : null,
+    itemFields,
+    minItems: type === 'repeater' ? Math.min(toCount(record.min_items, 0), maxItems) : 0,
+    maxItems: type === 'repeater' ? maxItems : 0,
+  };
+}
+
 export function getServiceSchemaFields(service?: Service | null): ServiceSchemaField[] {
   const schema = Array.isArray(service?.required_information_schema) ? service.required_information_schema : [];
 
   return schema
     .map((field, index) => {
       if (!field || typeof field !== 'object') return null;
-
-      const record = field as Record<string, unknown>;
-      const rawKey = record.name ?? record.key ?? record.field ?? record.id ?? `field_${index + 1}`;
-      const inputName = `service_info_${sanitizeFieldToken(rawKey, `field_${index + 1}`)}`;
-      // Arabic copy only: label_ar first, then any Arabic label; otherwise the
-      // same neutral fallback as the web ("معلومة مطلوبة N"), never English.
-      const label = firstArabic(record.label_ar, record.label, record.name_ar, record.title, record.placeholder_ar)
-        || `معلومة مطلوبة ${index + 1}`;
-      const type = normalizeSchemaType(record.type || record.field_type || record.input_type);
-      const latinPlaceholder = String(record.placeholder ?? '').trim();
-
-      return {
-        key: String(rawKey),
-        inputName,
-        label,
-        type,
-        required: Boolean(record.required),
-        placeholder: firstArabic(record.placeholder_ar, record.placeholder)
-          || (FORMAT_EXAMPLE.test(latinPlaceholder) ? latinPlaceholder : '')
-          || (type === 'date' ? DATE_PLACEHOLDER : ''),
-        helpText: firstArabic(record.help_text_ar, record.help_text, record.description_ar, record.description)
-          || (type === 'date' ? DATE_HINT_AR : ''),
-        options: normalizeOptions(record.options || record.choices || record.values),
-        visibleWhen: normalizeVisibleWhen(record.visible_when),
-      };
+      return normalizeSchemaField(field as Record<string, unknown>, index, 'service_info_', true);
     })
     .filter((field): field is ServiceSchemaField => Boolean(field));
 }
@@ -210,7 +245,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Arabic format error for a filled answer, mirroring the server checks; null when valid. */
 export function validateSchemaAnswerFormat(field: ServiceSchemaField, value: unknown) {
-  if (field.type === 'checkbox' || value == null || typeof value === 'boolean') return null;
+  if (field.type === 'checkbox' || field.type === 'repeater' || value == null || typeof value === 'boolean') return null;
   const text = normalizeAnswerText(field, value);
   if (!text) return null;
   if (field.type === 'number' && !Number.isFinite(Number(text.replace(',', '.')))) {
@@ -238,6 +273,129 @@ function normalizeAnswerText(field: ServiceSchemaField, value: unknown) {
 }
 
 export type ServiceAnswerValue = string | boolean;
+export type RepeaterRow = Record<string, string | boolean>;
+/** Repeater rows as displayed, keyed by the repeater's input name. */
+export type RepeaterValues = Record<string, RepeaterRow[]>;
+export type ServiceAnswers = Record<string, ServiceAnswerValue | Array<Record<string, ServiceAnswerValue>>>;
+
+/**
+ * Rows a repeater must have when it is answered. A required repeater needs at
+ * least one row (or `min_items`); an optional one may stay empty, but once rows
+ * are added there must be at least `min_items` (backend schema_rules.py).
+ */
+export function repeaterMinimum(field: ServiceSchemaField) {
+  return field.required ? Math.max(field.minItems, 1) : field.minItems;
+}
+
+/** Rows shown before the customer touches a repeater: as many as it requires. */
+export function initialRepeaterRows(field: ServiceSchemaField): RepeaterRow[] {
+  const count = field.required ? repeaterMinimum(field) : 0;
+  return Array.from({ length: count }, () => ({}));
+}
+
+export function getRepeaterRows(field: ServiceSchemaField, rows: RepeaterValues | undefined) {
+  return rows?.[field.inputName] ?? initialRepeaterRows(field);
+}
+
+/** Error-map key of one cell, so a message sits under the input it belongs to. */
+export function repeaterErrorKey(field: ServiceSchemaField, rowIndex: number, itemKey: string) {
+  return `${field.inputName}.${rowIndex}.${itemKey}`;
+}
+
+function buildRepeaterAnswer(field: ServiceSchemaField, rows: RepeaterRow[]) {
+  // Every displayed row is sent, blank or not, so server errors keyed by row
+  // index point at the row the customer sees.
+  return rows.map((row) => {
+    const answer: Record<string, ServiceAnswerValue> = {};
+    field.itemFields.forEach((item) => {
+      const rawValue = row[item.key];
+      if (item.type === 'checkbox') {
+        answer[item.key] = rawValue === true || rawValue === 'true';
+        return;
+      }
+      if (rawValue == null || typeof rawValue === 'boolean') return;
+      const text = normalizeAnswerText(item, rawValue);
+      if (text) answer[item.key] = text;
+    });
+    return answer;
+  });
+}
+
+/**
+ * Arabic client-side errors for a visible repeater (row count, required cells,
+ * cell formats), keyed by the repeater input name or by `repeaterErrorKey`.
+ */
+export function validateRepeaterRows(field: ServiceSchemaField, rows: RepeaterRow[]) {
+  const errors: Record<string, string> = {};
+  const minimum = repeaterMinimum(field);
+  if (rows.length > field.maxItems) {
+    errors[field.inputName] = `لا يمكن إضافة أكثر من ${field.maxItems} إدخالاً في ${field.label}.`;
+  } else if (field.required && !rows.length) {
+    errors[field.inputName] = `${field.label} مطلوب.`;
+  } else if (rows.length && rows.length < minimum) {
+    errors[field.inputName] = minimum === 2
+      ? `أضف إدخالين على الأقل في ${field.label}.`
+      : `أضف ${minimum} إدخالات على الأقل في ${field.label}.`;
+  }
+  rows.forEach((row, rowIndex) => {
+    field.itemFields.forEach((item) => {
+      const value = row[item.key];
+      const key = repeaterErrorKey(field, rowIndex, item.key);
+      if (item.type === 'checkbox') {
+        if (item.required && !(value === true || value === 'true')) errors[key] = `${item.label} مطلوب.`;
+        return;
+      }
+      if (item.required && !String(value ?? '').trim()) {
+        errors[key] = `${item.label} مطلوب.`;
+        return;
+      }
+      const formatError = validateSchemaAnswerFormat(item, value);
+      if (formatError) errors[key] = formatError;
+    });
+  });
+  return errors;
+}
+
+/**
+ * Place a server `service_answers[<repeater key>]` error: a string is a
+ * whole-field error; an object `{"<row>": {"<item key>": message}}` is a
+ * per-row error. Messages for unknown rows or items are returned as `general`.
+ */
+export function mapRepeaterServerError(field: ServiceSchemaField, detail: unknown) {
+  const placed: Record<string, string> = {};
+  const general: string[] = [];
+  const firstText = (value: unknown): string => {
+    if (typeof value === 'string') return value.trim();
+    if (Array.isArray(value)) return value.map(firstText).find(Boolean) ?? '';
+    return '';
+  };
+  const whole = firstText(detail);
+  if (whole) {
+    placed[field.inputName] = whole;
+    return { placed, general };
+  }
+  if (!detail || typeof detail !== 'object') return { placed, general };
+  Object.entries(detail as Record<string, unknown>).forEach(([rowKey, rowErrors]) => {
+    const rowIndex = Number(rowKey);
+    const rowMessage = firstText(rowErrors);
+    if (!Number.isInteger(rowIndex) || rowIndex < 0) {
+      if (rowMessage) general.push(rowMessage);
+      return;
+    }
+    if (rowMessage) {
+      placed[field.inputName] = `الإدخال ${rowIndex + 1}: ${rowMessage}`;
+      return;
+    }
+    if (!rowErrors || typeof rowErrors !== 'object') return;
+    Object.entries(rowErrors as Record<string, unknown>).forEach(([itemKey, message]) => {
+      const text = firstText(message);
+      if (!text) return;
+      if (field.itemFields.some((item) => item.key === itemKey)) placed[repeaterErrorKey(field, rowIndex, itemKey)] = text;
+      else general.push(`${field.label} - الإدخال ${rowIndex + 1}: ${text}`);
+    });
+  });
+  return { placed, general };
+}
 
 /**
  * The `service_answers` object sent with POST /api/orders/: one entry per
@@ -245,18 +403,25 @@ export type ServiceAnswerValue = string | boolean;
  * ?? id ?? field_N`, not the sanitized input name). Hidden `visible_when`
  * fields are left out entirely. Checkboxes are booleans; select fields send
  * the option value; other types send trimmed text, and an empty optional
- * answer is omitted. The server validates these answers and builds the
- * "additional information" section of the order notes itself, so `notes`
+ * answer is omitted. A repeater sends its displayed rows as a list of
+ * `{item key: value}` objects. The server validates these answers and builds
+ * the "additional information" section of the order notes itself, so `notes`
  * carries only the customer's own text.
  */
 export function buildServiceAnswers(
   schemaFields: ServiceSchemaField[],
   values: Record<string, string | boolean>,
+  repeaterRows?: RepeaterValues,
 ) {
-  const answers: Record<string, ServiceAnswerValue> = {};
+  const answers: ServiceAnswers = {};
   schemaFields
     .filter((field) => isSchemaFieldVisible(field, schemaFields, values))
     .forEach((field) => {
+      if (field.type === 'repeater') {
+        const rows = getRepeaterRows(field, repeaterRows);
+        if (rows.length) answers[field.key] = buildRepeaterAnswer(field, rows);
+        return;
+      }
       const rawValue = values[field.inputName];
       if (field.type === 'checkbox') {
         answers[field.key] = rawValue === true || rawValue === 'true';

@@ -44,6 +44,11 @@ def audit_public_catalog_arabic():
             field_id = f"{service.pk}:{index}"
             check("service_field", field_id, "label_ar", field.get("label_ar"), counterpart=field.get("label_en"), required=True)
             check("service_field", field_id, "help_text_ar", field.get("help_text_ar"), counterpart=field.get("help_text_en"))
+            # Repeater item fields (CN-BIZ-01/04) carry their own labels.
+            items = field.get("item_fields")
+            for item_index, item in enumerate(items if isinstance(items, list) else []):
+                if isinstance(item, dict):
+                    check("service_field", f"{field_id}:{item_index}", "label_ar", item.get("label_ar"), counterpart=item.get("label_en"), required=True)
             options = field.get("options") or field.get("choices") or field.get("values") or []
             for option_index, option in enumerate(options if isinstance(options, list) else []):
                 if isinstance(option, dict):

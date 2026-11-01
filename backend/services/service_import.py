@@ -16,11 +16,15 @@ from django.utils.text import slugify
 
 from services.catalog_defaults import suggest_category_icon
 from services.catalogue_rules import (
+    DEVELOPER_NOTE_DOCUMENTS,
     EITHER_OR_QUESTION_OPTIONS,
+    LARGE_UPLOAD_DEFINITIONS,
     OPEN_QUESTION_PREFIX,
     YES_NO_OPTIONS,
     APPROVED_PRICE_NOTE,
+    apply_developer_note_fields,
     apply_identifier_rules,
+    apply_repeater_rules,
     apply_schema_rules,
     approved_delivery_note,
     approved_price_note,
@@ -190,7 +194,10 @@ def _field_from_label(label, *, source_type="", required=True, note="", order=0,
     mapped_type = _map_field_type(source_type, label)
     warnings = []
     if "repeater" in source_type.lower():
-        warnings.append("Current platform has no first-class repeater field; imported as editable textarea/field metadata.")
+        # The known repeater groups (the partner fields) become one ``repeater``
+        # field in ``catalogue_schema`` (catalogue_rules.apply_repeater_rules);
+        # any other repeater item stays one free-text field.
+        warnings.append("Source repeater item: grouped into a repeater field when it belongs to a known group, otherwise imported as a textarea.")
         mapped_type = "textarea"
     if label in EITHER_OR_QUESTION_OPTIONS:
         mapped_type = "select"
@@ -597,11 +604,36 @@ def discover_and_normalize(source_dir):
     return ImportResult(normalized=normalized, inventory_rows=inventory_rows, conflicts=conflicts, warnings=warnings)
 
 
+def catalogue_schema(service_data):
+    """The request form a service gets from its source fields.
+
+    Owner decisions B10-1/2/3 and B4 (parcel gate), identifier fields as text,
+    the repeater groups (CN-BIZ-01 partners, CN-BIZ-04 plots), the developer-note
+    fields (CN-BIZ-05, CN-BIZ-08), then the English labels. The data migrations
+    apply the same functions to existing services, so a fresh import agrees.
+    """
+    slug = service_data.get("slug", "")
+    schema = apply_identifier_rules(apply_schema_rules(service_data.get("fields", []), gate_all_parcel_fields=True))
+    schema = apply_developer_note_fields(apply_repeater_rules(schema, slug), slug)
+    schema, _filled = translate_schema(schema)
+    return schema
+
+
+def catalogue_documents(service_data):
+    """The service's source documents plus the developer-note documents (CN-BIZ-05)."""
+    documents = list(service_data.get("documents", []))
+    codes = {document.get("code") for document in documents}
+    for document in DEVELOPER_NOTE_DOCUMENTS.get(service_data.get("slug", ""), ()):
+        if document["code"] not in codes:
+            documents.append({**copy.deepcopy(document), "display_order": len(documents) + 1})
+    return documents
+
+
 def catalogue_form_problems(services):
     """The admin editor's form rules (services/schema_rules.py) applied to the import."""
     problems = []
     for service in services:
-        schema = apply_identifier_rules(apply_schema_rules(service.get("fields", []), gate_all_parcel_fields=True))
+        schema = catalogue_schema(service)
         for _number, key, message in schema_problems(schema):
             problems.append({"service": service["slug"], "field": key, "message": message})
     return problems
@@ -747,7 +779,7 @@ def apply_import(result):
             service, created = Service.objects.get_or_create(slug=service_data["slug"], defaults=service_defaults)
             changed = _update_if_changed(service, service_defaults)
             _count(result, "services", created, changed)
-            _sync_documents(result, service, service_data["documents"])
+            _sync_documents(result, service, catalogue_documents(service_data))
     return result
 
 
@@ -764,11 +796,14 @@ def _service_defaults(service_data, category):
     english = {
         name: english_text
         for name, (arabic, english_text) in SERVICE_TEXT_EN.get(service_data.get("slug", ""), {}).items()
-        if {"short_description": short_description_ar, "description": description_ar, "delivery_note": delivery_note_ar}.get(name) == arabic
+        if {
+            "short_description": short_description_ar,
+            "description": description_ar,
+            "delivery_note": delivery_note_ar,
+            "terms": service_data.get("terms_ar", ""),
+        }.get(name) == arabic
     }
-    schema, _filled = translate_schema(
-        apply_identifier_rules(apply_schema_rules(service_data.get("fields", []), gate_all_parcel_fields=True))
-    )
+    schema = catalogue_schema(service_data)
     # Brand spelling is normalized after the translation lookup (which compares the source text).
     short_description_ar = normalize_brand(short_description_ar)
     description_ar = normalize_brand(description_ar)
@@ -798,7 +833,7 @@ def _service_defaults(service_data, category):
         "delivery_note_ar": delivery_note_ar,
         "delivery_note_en": delivery_note_en or english.get("delivery_note", ""),
         "terms_ar": normalize_brand(service_data.get("terms_ar", "")),
-        "terms_en": "",
+        "terms_en": english.get("terms", ""),
         "is_online": True,
         "requires_appointment": False,
         "requires_manual_review": bool(service_data.get("requires_manual_review", True)),
@@ -828,10 +863,14 @@ def _sync_documents(result, service, documents):
         definition_defaults = {
             "name_ar": document["name_ar"],
             "name_en": document.get("name_en", ""),
-            "allowed_extensions": [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"],
+            "allowed_extensions": list(document.get("allowed_extensions") or [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"]),
             "max_file_size": 10 * 1024 * 1024,
             "is_active": True,
         }
+        if document["code"] in LARGE_UPLOAD_DEFINITIONS:
+            # CN-BIZ-09: engineering drawings may be large files.
+            definition_defaults["max_file_size_mb"] = LARGE_UPLOAD_DEFINITIONS[document["code"]]
+            definition_defaults["max_file_size"] = LARGE_UPLOAD_DEFINITIONS[document["code"]] * 1024 * 1024
         definition, definition_created = RequiredDocumentDefinition.objects.get_or_create(
             code=document["code"],
             defaults=definition_defaults,
@@ -844,13 +883,13 @@ def _sync_documents(result, service, documents):
             "name_ar": definition.name_ar,
             "name_en": definition.name_en,
             "instructions_ar": document.get("instructions_ar", ""),
-            "instructions_en": "",
+            "instructions_en": document.get("instructions_en", ""),
             "is_required": bool(document.get("is_required")),
             "allowed_extensions": list(definition.allowed_extensions or []),
             "max_file_size": definition.max_file_size,
             "requires_verification": True,
             "client_can_replace_file": True,
-            "provider_can_view_file": bool(service.provider_required),
+            "provider_can_view_file": bool(service.provider_required or document.get("provider_can_view_file")),
             "display_order": int(document.get("display_order") or 0),
             "is_active": True,
         }
@@ -925,7 +964,7 @@ def _write_current_model(path):
 
 ## Dynamic Forms
 
-Customer-supplied fields are stored in `Service.required_information_schema` as JSON and rendered by the frontend dynamic field helpers. Supported rendered types are text, textarea, number, email, tel, date, select, and checkbox. The current platform has no first-class repeater/group, customer eligibility, dynamic-question table, or conditional-document rule table.
+Customer-supplied fields are stored in `Service.required_information_schema` as JSON and rendered by the frontend dynamic field helpers. Supported rendered types are text, textarea, number, email, tel, date, select, checkbox, and repeater (a list of rows with its own item fields, `min_items`/`max_items` up to 20). The current platform has no customer eligibility field, dynamic-question table, or conditional-document rule table.
 
 ## Pricing And Duration
 
@@ -1074,7 +1113,7 @@ def _write_validation_report(path, result, *, applied):
         f"Placeholder price visibility check: {'PASS' if not price_public_failures else 'FAIL'}",
         "Conditional document handling: PASS - conditional source documents imported as non-mandatory with source instructions.",
         "Arabic extraction check: PASS - source XML decoded as UTF-8 and normalized JSON is written as UTF-8.",
-        "Known platform gaps: no first-class repeater/group field, no conditional-document rule table, no customer eligibility field, no dedicated dynamic-question table.",
+        "Known platform gaps: no conditional-document rule table, no customer eligibility field, no dedicated dynamic-question table.",
         "",
         f"Final status: {status}",
     ]

@@ -265,10 +265,12 @@ class Document(models.Model):
                 ]
             )
 
-            max_size = getattr(
-                settings,
-                "FILE_UPLOAD_MAX_SIZE",
-                10 * 1024 * 1024
+            # CN-BIZ-09: a requirement may allow larger files (up to the hard
+            # ceiling); its own smaller limit is checked before upload.
+            from documents.upload_limits import allowed_upload_size, order_requirement_for
+
+            max_size = allowed_upload_size(
+                order_requirement_for(self.order, self.document_type) if self.order_id else None
             )
 
             original_name = self.file.name or ""

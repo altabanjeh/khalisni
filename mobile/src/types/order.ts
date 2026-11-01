@@ -68,6 +68,8 @@ export interface Order extends BaseEntity {
   expected_delivery_date?: string | null;
   final_price?: number | null;
   customer_notes?: string;
+  // Provider detail: the customer's notes and the service answers block (multi-line).
+  assigned_work_details?: string;
   internal_notes?: string;
   provider_instructions?: string[] | null;
   missing_document_types?: string[];

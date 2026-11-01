@@ -553,6 +553,9 @@ class RequiredDocumentDefinition(SoftDeleteModel):
     allowed_extensions = models.JSONField(default=list, blank=True)
     allowed_mime_types = models.JSONField(default=list, blank=True)
     max_file_size = models.PositiveBigIntegerField(default=10 * 1024 * 1024)
+    # CN-BIZ-09: a larger limit for this document (e.g. engineering drawings),
+    # in MB, up to ENGINEERING_UPLOAD_MAX_SIZE. Empty = the default limit.
+    max_file_size_mb = models.PositiveIntegerField(null=True, blank=True)
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
@@ -615,6 +618,16 @@ class RequiredDocumentDefinition(SoftDeleteModel):
             ).exists()
         ):
             errors["name_ar"] = "Arabic document name must be unique among active definitions."
+        if self.max_file_size_mb is not None:
+            from documents.upload_limits import MB, hard_max_size_mb
+
+            ceiling_mb = hard_max_size_mb()
+            if self.max_file_size_mb <= 0:
+                errors["max_file_size_mb"] = "Maximum file size must be greater than zero."
+            elif self.max_file_size_mb > ceiling_mb:
+                errors["max_file_size_mb"] = f"Maximum file size cannot exceed {ceiling_mb} MB."
+            else:
+                self.max_file_size = self.max_file_size_mb * MB
         if self.max_file_size <= 0:
             errors["max_file_size"] = "Maximum file size must be greater than zero."
         if errors:
@@ -623,8 +636,23 @@ class RequiredDocumentDefinition(SoftDeleteModel):
     def save(self, *args, **kwargs):
         if self.is_deleted:
             self.is_active = False
+        previous_mb = (
+            type(self)._base_manager.filter(pk=self.pk).values_list("max_file_size_mb", flat=True).first()
+            if self.pk
+            else None
+        )
+        if self.max_file_size_mb is None and previous_mb is not None:
+            # The override was removed: back to (at most) the default limit.
+            from documents.upload_limits import default_max_size
+
+            self.max_file_size = min(self.max_file_size or default_max_size(), default_max_size())
         self.full_clean()
         super().save(*args, **kwargs)
+        if self.max_file_size_mb is not None or previous_mb is not None:
+            # Linked service requirements carry the limit (and so do new order snapshots).
+            ServiceRequiredDocument.objects.filter(document_definition=self, is_deleted=False).exclude(
+                max_file_size=self.max_file_size
+            ).update(max_file_size=self.max_file_size)
 
 
 class ServiceRelation(SoftDeleteModel):
@@ -902,7 +930,8 @@ class ServiceRequiredDocument(SoftDeleteModel):
             self.name_en = self.document_definition.name_en
             if not self.allowed_extensions:
                 self.allowed_extensions = list(self.document_definition.allowed_extensions or [])
-            if not self.max_file_size:
+            if not self.max_file_size or self.document_definition.max_file_size_mb:
+                # CN-BIZ-09: a definition's own size override is authoritative.
                 self.max_file_size = self.document_definition.max_file_size
         self.document_type = _normalize_code(self.document_type)
         self.allowed_extensions = _normalize_extension_list(self.allowed_extensions)

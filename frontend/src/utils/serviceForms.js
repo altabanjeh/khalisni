@@ -36,13 +36,17 @@ function normalizeOptions(options, language = 'ar') {
     .filter(Boolean)
 }
 
-function normalizeSchemaType(value) {
+const ITEM_FIELD_TYPES = ['textarea', 'number', 'email', 'tel', 'date', 'select', 'checkbox']
+
+function normalizeSchemaType(value, { allowRepeater = true } = {}) {
   const nextValue = String(value || 'text').trim().toLowerCase()
-  if (['textarea', 'number', 'email', 'tel', 'date', 'select', 'checkbox'].includes(nextValue)) {
-    return nextValue
-  }
+  if (ITEM_FIELD_TYPES.includes(nextValue)) return nextValue
+  if (allowRepeater && nextValue === 'repeater') return 'repeater'
   return 'text'
 }
+
+/** Hard cap on repeater rows; the server refuses more (services/schema_rules.py). */
+export const REPEATER_MAX_ITEMS = 20
 
 function sanitizeFieldToken(value, fallback) {
   const nextValue = String(value || fallback)
@@ -93,6 +97,45 @@ export function getDocumentFieldName(item, index = 0) {
   return `document_${sanitizeFieldToken(getRequiredDocumentType(item, index), `document_${index}`)}`
 }
 
+function schemaFieldKey(field, index) {
+  return field.name ?? field.key ?? field.field ?? field.id ?? `field_${index + 1}`
+}
+
+function wholeNumber(value) {
+  if (value === null || value === undefined || value === '') return null
+  const number = Number(value)
+  return Number.isInteger(number) && number >= 0 ? number : null
+}
+
+/**
+ * The rows of a repeater (CN-BIZ-01 partners, CN-BIZ-04 plots): its item
+ * fields are ordinary fields. In the form each row is an object keyed by the
+ * item's `inputKey` (prefixed, so a schema key such as `id` never collides
+ * with react-hook-form's own row id); answers are keyed by the schema key.
+ */
+function normalizeItemFields(itemFields, language) {
+  if (!Array.isArray(itemFields)) return []
+  return itemFields
+    .map((item, index) => {
+      if (!item || typeof item !== 'object') return null
+      const rawKey = schemaFieldKey(item, index)
+      return {
+        key: String(rawKey),
+        inputKey: `f_${sanitizeFieldToken(rawKey, `item_${index + 1}`)}`,
+        label: String(getCatalogText(
+          item, { ar: 'label_ar', en: 'label_en' }, language,
+          language === 'en' ? `Item ${index + 1}` : `بند ${index + 1}`,
+        )),
+        type: normalizeSchemaType(item.type || item.field_type || item.input_type, { allowRepeater: false }),
+        required: Boolean(item.required),
+        placeholder: getCatalogText(item, { ar: 'placeholder_ar', en: 'placeholder_en' }, language, ''),
+        helpText: getCatalogText(item, { ar: 'help_text_ar', en: 'help_text_en' }, language, ''),
+        options: normalizeOptions(item.options || item.choices || item.values, language),
+      }
+    })
+    .filter(Boolean)
+}
+
 export function getServiceSchemaFields(service, language = 'ar') {
   const schema = Array.isArray(service?.required_information_schema) ? service.required_information_schema : []
 
@@ -100,24 +143,104 @@ export function getServiceSchemaFields(service, language = 'ar') {
     .map((field, index) => {
       if (!field || typeof field !== 'object') return null
 
-      const rawKey = field.name ?? field.key ?? field.field ?? field.id ?? `field_${index + 1}`
+      const rawKey = schemaFieldKey(field, index)
       const inputName = `service_info_${sanitizeFieldToken(rawKey, `field_${index + 1}`)}`
       const label = getCatalogText(
         field, { ar: 'label_ar', en: 'label_en' }, language,
         language === 'en' ? `Requested information ${index + 1}` : `معلومة مطلوبة ${index + 1}`,
       )
+      const type = normalizeSchemaType(field.type || field.field_type || field.input_type)
 
-      return {
+      const normalized = {
         key: String(rawKey),
         inputName,
         label: String(label),
-        type: normalizeSchemaType(field.type || field.field_type || field.input_type),
+        type,
         required: Boolean(field.required),
         placeholder: getCatalogText(field, { ar: 'placeholder_ar', en: 'placeholder_en' }, language, ''),
         helpText: getCatalogText(field, { ar: 'help_text_ar', en: 'help_text_en' }, language, ''),
         options: normalizeOptions(field.options || field.choices || field.values, language),
         visibleWhen: normalizeVisibleWhen(field.visible_when),
       }
+      if (type === 'repeater') {
+        const requestedMax = wholeNumber(field.max_items)
+        const maxItems = Math.max(1, Math.min(requestedMax || REPEATER_MAX_ITEMS, REPEATER_MAX_ITEMS))
+        normalized.itemFields = normalizeItemFields(field.item_fields, language)
+        normalized.minItems = Math.min(wholeNumber(field.min_items) ?? 0, maxItems)
+        normalized.maxItems = maxItems
+        // A required repeater needs at least one row; an optional one may stay empty.
+        normalized.effectiveMin = normalized.required ? Math.max(normalized.minItems, 1) : 0
+      }
+      return normalized
+    })
+    .filter(Boolean)
+}
+
+/** A blank row for a repeater, keyed by its item input keys. */
+export function emptyRepeaterRow(field) {
+  return Object.fromEntries((field?.itemFields || []).map((item) => [item.inputKey, item.type === 'checkbox' ? false : '']))
+}
+
+/** Rows to add when the customer presses "add": an optional repeater with a minimum starts at that minimum. */
+export function repeaterRowsToAdd(field, count) {
+  if (!field || count >= field.maxItems) return 0
+  if (count === 0 && field.minItems > 1) return Math.min(field.minItems, field.maxItems)
+  return 1
+}
+
+/** A row may be removed while the remaining rows still satisfy the minimum (zero rows is fine when optional). */
+export function canRemoveRepeaterRow(field, count) {
+  if (!field || count <= 0) return false
+  const remaining = count - 1
+  if (remaining < field.effectiveMin) return false
+  return remaining === 0 || remaining >= field.minItems
+}
+
+/** Form names of every item input of a repeater, for step validation. */
+export function repeaterItemInputNames(field, rowCount) {
+  const names = []
+  for (let row = 0; row < rowCount; row += 1) {
+    (field?.itemFields || []).forEach((item) => names.push(`${field.inputName}.${row}.${item.inputKey}`))
+  }
+  return names
+}
+
+function repeaterRowAnswer(field, row) {
+  const answer = {}
+  field.itemFields.forEach((item) => {
+    const rawValue = row?.[item.inputKey]
+    if (item.type === 'checkbox') {
+      answer[item.key] = Boolean(rawValue)
+      return
+    }
+    if (rawValue == null) return
+    const text = String(rawValue).trim()
+    if (text) answer[item.key] = text
+  })
+  return answer
+}
+
+function itemDisplayValue(item, rawValue, language = 'ar') {
+  if (item.type === 'checkbox') return rawValue ? (language === 'en' ? 'Yes' : 'نعم') : ''
+  if (item.type === 'select') {
+    const option = item.options.find((candidate) => candidate.value === String(rawValue ?? ''))
+    if (option) return option.label
+  }
+  return rawValue == null ? '' : String(rawValue).trim()
+}
+
+/** Readable lines for repeater rows: "1. itemLabel: value؛ itemLabel: value". */
+export function repeaterRowLines(field, rows, language = 'ar') {
+  const separator = language === 'en' ? '; ' : '؛ '
+  return (Array.isArray(rows) ? rows : [])
+    .map((row, index) => {
+      const parts = field.itemFields
+        .map((item) => {
+          const value = itemDisplayValue(item, row?.[item.inputKey], language)
+          return value ? `${item.label}: ${value}` : ''
+        })
+        .filter(Boolean)
+      return parts.length ? `${index + 1}. ${parts.join(separator)}` : ''
     })
     .filter(Boolean)
 }
@@ -154,6 +277,13 @@ export function buildServiceAnswers(schemaFields, values) {
   const answers = {}
   visibleSchemaFields(schemaFields, values).forEach((field) => {
     const rawValue = values?.[field.inputName]
+    if (field.type === 'repeater') {
+      // Every displayed row is sent, blank or not, so server errors keyed by
+      // row index point at the row the customer sees.
+      const rows = Array.isArray(rawValue) ? rawValue : []
+      if (rows.length) answers[field.key] = rows.map((row) => repeaterRowAnswer(field, row))
+      return
+    }
     if (field.type === 'checkbox') {
       answers[field.key] = Boolean(rawValue)
       return
@@ -169,6 +299,11 @@ export function buildDynamicNotes(baseNotes, schemaFields, values) {
   const extraLines = visibleSchemaFields(schemaFields, values)
     .map((field) => {
       const rawValue = values?.[field.inputName]
+
+      if (field.type === 'repeater') {
+        const rows = repeaterRowLines(field, rawValue)
+        return rows.length ? [`${field.label}:`, ...rows.map((line) => `  ${line}`)].join('\n') : ''
+      }
 
       if (field.type === 'checkbox') {
         return rawValue ? `${field.label}: نعم` : ''
@@ -340,6 +475,27 @@ export function applyServerFieldErrors({
   if (answersByKey) {
     Object.entries(answersByKey).forEach(([key, messages]) => {
       const field = schemaFields.find((candidate) => candidate.key === key)
+      if (field?.type === 'repeater' && messages && typeof messages === 'object' && !Array.isArray(messages)) {
+        // Per-row errors: {"<row index>": {"<item key>": message}}.
+        Object.entries(messages).forEach(([row, rowErrors]) => {
+          if (!rowErrors || typeof rowErrors !== 'object' || Array.isArray(rowErrors)) {
+            assign('', firstMessage(rowErrors))
+            return
+          }
+          Object.entries(rowErrors).forEach(([itemKey, itemMessages]) => {
+            const item = field.itemFields.find((candidate) => candidate.key === itemKey)
+            const message = firstMessage(itemMessages)
+            if (message && item && /^\d+$/.test(row) && (!known || known.has(field.inputName))) {
+              const name = `${field.inputName}.${row}.${item.inputKey}`
+              setError(name, { type: 'server', message })
+              fields.push(name)
+            } else {
+              assign('', message)
+            }
+          })
+        })
+        return
+      }
       assign(field?.inputName || '', firstMessage(messages))
     })
   }

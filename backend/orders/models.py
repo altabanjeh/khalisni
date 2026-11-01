@@ -221,6 +221,14 @@ class Order(models.Model):
         blank=True,
     )
 
+    # PRD success metric "time to create request": seconds between opening the
+    # order form and submitting it, measured by the web/mobile client. Optional;
+    # never part of the idempotency fingerprint.
+    form_duration_seconds = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
+
     cancelled_at = models.DateTimeField(
         null=True,
         blank=True,

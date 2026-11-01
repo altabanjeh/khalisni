@@ -1364,6 +1364,10 @@ function AdminRuleManagementPage() {
                   {option.label}
                 </option>
               ))}
+              {/* A definition with its own larger limit (CN-BIZ-09, e.g. 50 MB drawings) keeps its value visible. */}
+              {Number(documentForm.max_file_size) && !DOCUMENT_SIZE_OPTIONS.some((option) => option.value === Number(documentForm.max_file_size)) ? (
+                <option value={documentForm.max_file_size}>{toMb(documentForm.max_file_size)}</option>
+              ) : null}
             </select>
           </Field>
           <div className="grid gap-3">

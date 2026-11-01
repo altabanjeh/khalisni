@@ -3,7 +3,7 @@ from django.db import transaction
 from django.db.models import F
 
 from accounts.models import CustomUser, CustomerProfile
-from accounts.validators import normalize_phone
+from accounts.validators import normalize_national_id, normalize_phone
 from audit.utils import create_audit_log
 from documents.file_validation import requirement_upload_error
 from documents.services import create_order_document
@@ -142,7 +142,7 @@ def create_public_order(*, data, request=None):
     This service owns the initial side effects so the create API stays thin.
     """
     initial_documents = list(data.get("initial_documents", []))
-    national_id = data.get("national_id", "")
+    national_id = normalize_national_id(data.get("national_id", ""))
     organization = resolve_order_organization(
         customer=None,
         service=data["service"],
@@ -168,6 +168,7 @@ def create_public_order(*, data, request=None):
             customer_notes=data.get("notes", ""),
             submission_key=data.get("submission_key"),
             submission_fingerprint=data.get("submission_fingerprint", ""),
+            form_duration_seconds=data.get("form_duration_seconds"),
         )
         OrderStatusLog.objects.create(order=order, old_status="", new_status=order.status, changed_by=customer)
 
@@ -223,8 +224,10 @@ def create_customer_order(*, customer, data, request=None):
             new_value = ""
         # A blank national ID on an order means "unchanged": an order never
         # clears identity data saved on the profile (DEF-C06).
-        if field_name == "national_id" and not str(new_value).strip():
-            continue
+        if field_name == "national_id":
+            new_value = normalize_national_id(new_value)
+            if not new_value:
+                continue
         if getattr(customer, field_name) != new_value:
             changes[field_name] = new_value
 
@@ -259,6 +262,7 @@ def create_customer_order(*, customer, data, request=None):
             customer_notes=data.get("notes", ""),
             submission_key=data.get("submission_key"),
             submission_fingerprint=data.get("submission_fingerprint", ""),
+            form_duration_seconds=data.get("form_duration_seconds"),
         )
         OrderStatusLog.objects.create(order=order, old_status="", new_status=order.status, changed_by=customer)
         consent = data.get("consent_evidence")

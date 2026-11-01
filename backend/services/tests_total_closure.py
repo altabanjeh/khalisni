@@ -691,3 +691,41 @@ class ImporterAgreementTests(TestCase):
                          ("legal_authorization", "وكالة عدلية أو تفويض خطي"))
         self.assertEqual(canonical_document("x", "وكالة قانونية إن وجدت"), ("legal_power_of_attorney", "وكالة قانونية (إن وجدت)"))
         self.assertEqual(canonical_document("document_11714fabf5", "تفويض خطي"), ("document_11714fabf5", "تفويض خطي"))
+
+
+class EnglishTermsAndHelpTests(TestCase):
+    """Migration 0022: the 18 land-service terms and 17 field help texts that existed only in Arabic."""
+
+    def test_terms_and_help_text_are_filled_from_matching_arabic(self):
+        from services.catalogue_translations import HELP_TEXTS_EN, TERMS_EN
+
+        category = ServiceCategory.objects.create(name_ar="عقارات", name_en="Land", slug="tc-terms")
+        arabic_terms, english_terms = TERMS_EN["request-building-permit"]
+        service = _service(
+            category, "request-building-permit", terms_ar=arabic_terms,
+            required_information_schema=[
+                {"key": "notes", "label_ar": "ملاحظات", "type": "textarea", "required": False, "options": [], "help_text_ar": "اختياري"},
+                {"key": "other", "label_ar": "أخرى", "type": "text", "required": False, "options": [],
+                 "help_text_ar": "حسب الصفة", "help_text_en": "Kept as edited"},
+            ],
+        )
+        edited = _service(category, "request-zoning-plan", terms_ar="شروط عدّلها المسؤول")
+        importlib.import_module("services.migrations.0022_english_terms_and_help").forwards(django_apps, None)
+        service.refresh_from_db()
+        edited.refresh_from_db()
+        self.assertEqual(service.terms_en, english_terms)
+        fields = {field["key"]: field for field in service.required_information_schema}
+        self.assertEqual(fields["notes"]["help_text_en"], HELP_TEXTS_EN["اختياري"])
+        self.assertEqual(fields["other"]["help_text_en"], "Kept as edited")
+        self.assertEqual(edited.terms_en, "")
+        self.assertEqual(apply_english_content(Service, RequiredDocumentDefinition, ServiceRequiredDocument, ServiceRelation), [])
+
+    def test_tables_have_no_arabic_in_english(self):
+        from services.catalogue_translations import HELP_TEXTS_EN, TERMS_EN
+
+        self.assertEqual(len(TERMS_EN), 18)
+        self.assertEqual(len(HELP_TEXTS_EN), 17)
+        for arabic, english in [*TERMS_EN.values(), *HELP_TEXTS_EN.items()]:
+            self.assertRegex(arabic, r"[؀-ۿ]")
+            self.assertTrue(english.strip())
+            self.assertNotRegex(english, r"[؀-ۿ]")

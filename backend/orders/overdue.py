@@ -3,7 +3,8 @@
 An order is late when it has an expected delivery date (services with a
 "confirmed after review" duration have none, so they are never "late"), the
 date is in the past, and the order is not finished. The assigned employee and
-the admins get one in-app notification per order and expected date; a new
+the admins, the customer and the assigned provider each get one in-app
+notification per order and expected date (CN-MAP-05); a new
 expected date can alert again. Run ``manage.py notify_overdue_orders`` daily
 (cron example in docs/operations/PRODUCTION_RELEASE_RUNBOOK.md).
 """
@@ -36,9 +37,16 @@ def notify_overdue_orders(*, today=None, dry_run=False):
     orders = list(overdue_orders(today))
     if not dry_run:
         for order in orders:
-            send_notification_event(
-                event_key="order_overdue",
-                order=order,
-                dedupe_key=f"order_overdue:{order.pk}:{order.expected_delivery_date.isoformat()}",
-            )
+            expected = order.expected_delivery_date.isoformat()
+            # Supervisors (assigned employee + admins), the customer, and the
+            # assigned provider -- client sitemap CN-MAP-05.
+            events = ["order_overdue", "order_overdue_customer"]
+            if order.assigned_provider_id:
+                events.append("order_overdue_provider")
+            for event_key in events:
+                send_notification_event(
+                    event_key=event_key,
+                    order=order,
+                    dedupe_key=f"{event_key}:{order.pk}:{expected}",
+                )
     return orders

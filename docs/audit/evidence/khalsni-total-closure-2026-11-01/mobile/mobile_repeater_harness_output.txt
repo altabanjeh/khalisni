@@ -1,0 +1,20 @@
+PASS R01 repeater type and item fields normalized
+PASS R02 max_items capped at 20; min kept
+PASS R03 item fields drop visible_when and never become repeaters
+PASS R04 initial rows = effective minimum
+PASS R05 hidden repeater (gate=no) not sent; rows sent in order incl. partial row
+PASS R06 visible repeater sends all rows, blank row as {} (indices match server), leading zero kept
+PASS R07 untouched required repeater sends its initial blank rows
+PASS R08 client validation: required cells per row
+PASS R09 client validation: minimum rows (Arabic)
+PASS R10 client validation: maximum rows (Arabic)
+PASS R11 client validation: required repeater with no rows
+PASS R12 optional repeater: zero rows OK, 1 row below min refused, starts empty
+PASS R13 server per-row errors placed under the cell; unknown item to general
+PASS R14 server whole-field string error placed on the repeater
+PASS R15 server whole-field list error placed on the repeater
+PASS U01 upload hint shows the requirement limit (50 MB)
+PASS U02 30 MB drawing accepted under a 50 MB requirement
+PASS U03 51 MB drawing refused with the 50 MB limit
+PASS U04 default 10 MB when the requirement carries no limit
+19/19 passed

@@ -52,6 +52,8 @@ export function AdminOrderDetailScreen({ route }: { route: any }) {
             <KeyValueRow label="رقم الطلب" value={query.data.order_number} />
             <KeyValueRow label="الخدمة" value={query.data.service?.name_ar} />
             <KeyValueRow label="العميل" value={query.data.customer?.full_name} />
+            <Text style={{ textAlign: 'right', fontWeight: '700' }}>بيانات الطلب وملاحظات العميل</Text>
+            <Text style={{ textAlign: 'right' }}>{query.data.customer_notes?.trim() || 'لا توجد ملاحظات أو بيانات إضافية.'}</Text>
             <Text style={{ textAlign: 'right' }}>الملاحظات الداخلية: {query.data.internal_notes || 'لا توجد'}</Text>
             <AppInput label="الحالة الجديدة" value={status} onChangeText={setStatus} />
             <AppInput label="ملاحظة / سبب" value={reason} onChangeText={setReason} multiline />

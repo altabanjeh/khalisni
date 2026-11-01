@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from audit.utils import create_audit_log
 from config.permissions import IsAdminRole, IsInternalStaffRole, PlatformRecordWriteMixin
-from core.delete_guard import AdminDeleteGuardMixin
+from core.delete_guard import AdminDeleteGuardMixin, _extract_delete_reason
 from public_site.defaults import DEFAULT_PUBLIC_PAGE_CONTENT, DEFAULT_SITE_THEME
 from public_site.models import Advertisement, LegalDocument, MissingServiceRequest, PublicPageContent, SiteTheme
 from public_site.services import notify_missing_service_request_assigned, notify_missing_service_request_created
@@ -343,7 +343,7 @@ class AdvertisementAdminViewSet(AdminDeleteGuardMixin, viewsets.ModelViewSet):
         )
         self.enforce_delete_guard(request, instance=instance, old_value=old_value)
         with transaction.atomic():
-            instance.soft_delete(user=request.user)
+            instance.soft_delete(user=request.user, reason=_extract_delete_reason(request))
             create_audit_log(
                 request=request,
                 user=request.user,

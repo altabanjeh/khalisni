@@ -10,6 +10,7 @@ from accounts.fields import CanonicalPhoneField
 from accounts.models import CustomUser
 from core.choices import DocumentType
 from documents.file_validation import requirement_upload_error
+from documents.upload_limits import copy_request_data
 from documents.serializers import DocumentSerializer, ProviderDocumentSerializer, StaffDocumentSerializer
 from documents.services import can_user_download_document, is_customer_visible_document
 from organizations.models import Branch
@@ -417,6 +418,9 @@ class PublicOrderCreateSerializer(serializers.Serializer):
     phone = CanonicalPhoneField()
     national_id = serializers.CharField(max_length=32, required=False, allow_blank=True)
     city = serializers.CharField(max_length=120)
+    # Seconds from opening the form to submitting it (PRD success metric). A
+    # value outside 0..2 days is a client clock problem and is dropped.
+    form_duration_seconds = serializers.IntegerField(required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
     consent = serializers.BooleanField()
     # Which consent statement the client showed, and which client it was.
@@ -431,7 +435,8 @@ class PublicOrderCreateSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         request = self.context.get("request")
-        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        # Uploaded files are not copied (a large upload is a temporary file).
+        payload = copy_request_data(data)
 
         if hasattr(payload, "setlist"):
             payload.setlist(
@@ -595,6 +600,8 @@ class PublicOrderCreateSerializer(serializers.Serializer):
         )
         payload["organization"] = payload.pop("organization_obj", None)
         payload["branch"] = payload.pop("branch_id", None)
+        duration = payload.get("form_duration_seconds")
+        payload["form_duration_seconds"] = duration if duration is not None and 0 <= duration <= 172800 else None
         payload["submission_key"] = self.context.get("submission_key")
         payload["submission_fingerprint"] = self.context.get("submission_fingerprint", "")
         try:

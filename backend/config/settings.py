@@ -361,6 +361,10 @@ ALLOWED_UPLOAD_MIME_TYPES = [
 ]
 
 FILE_UPLOAD_MAX_SIZE = int(os.getenv("FILE_UPLOAD_MAX_SIZE", str(10 * 1024 * 1024)))
+# CN-BIZ-09: hard ceiling for document definitions that allow larger files
+# (RequiredDocumentDefinition.max_file_size_mb, e.g. engineering drawings).
+# Keep nginx client_max_body_size (frontend/nginx.conf) above it.
+ENGINEERING_UPLOAD_MAX_SIZE = int(os.getenv("ENGINEERING_UPLOAD_MAX_SIZE", str(50 * 1024 * 1024)))
 
 EMAIL_BACKEND = os.getenv(
     "DJANGO_EMAIL_BACKEND",
