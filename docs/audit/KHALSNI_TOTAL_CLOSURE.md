@@ -27,7 +27,7 @@ Every engineering-controlled requirement is PASS or justified NOT_APPLICABLE. Th
 
 ## B. FINAL SHA
 
-`329f9ed` on `fix/total-closure` (local; not pushed).
+`a998b0a` on `fix/total-closure` (local; not pushed). This is the loose-end closure; the total closure was `329f9ed`.
 
 ## C. DEPLOYED SHA
 
@@ -136,7 +136,7 @@ Defects found and fixed during this pass:
 | Loose-end: mobile typecheck / harnesses | clean / pagination 8/8, soft delete 9/9 |
 | Loose-end: Playwright (a11y, axe-auth, p2-accessibility, public, routes, client-audit-ux, client-audit-responsive), 5 viewports, fresh QA DB | **440 passed, 0 failed, 10 designed skips** |
 | Loose-end: probes on the real catalogue | consolidation parity 5/5, VIS assertions 4/4, purity 48 pages 0 findings |
-| Loose-end: release sanity gate | {{GATE}} |
+| Loose-end: release sanity gate (`scripts/release_gate.sh` on a throwaway production-mode stack built at `a998b0a`) | **7/8 PASS**: version (backend and frontend a998b0a), migrations, deploy check, catalogue, demo data, phones and backup (verified, 0 h old). **content: FAIL, owner input only.** No published contact row (D05), and the privacy and terms are unapproved drafts (D06). No contact data was invented to make it pass. A first run also flagged two settings in my drill env (HSTS preload off, an `@example.org` admin); both were corrected. `ops/release_gate_2026-11-02_a998b0a.log` |
 
 New backend tests in this pass:
 - `config/tests_total_closure_authz.py`: authorization, messaging, reassignment, overdue alerts and complaints, delivery, profile, pricing leak, brand, slogan, national ID, success metrics, monthly report and export.
@@ -269,6 +269,9 @@ See `git show --stat f35a640` and `git show --stat 329f9ed`. Main areas:
 
 - `f35a640`: Total closure: client categories, legal/consent, contact, retention, messaging, reassignment, mobile parity, ops tooling.
 - `329f9ed`: Total closure (final): repeaters, developer-note fields, large uploads, success metrics, monthly report/CSV, late alerts to customer/provider, national ID, mobile admin soft delete, matrix and report.
+- `8b45cdc`: records the total-closure SHA in this report.
+- `a998b0a`: Loose-end closure: mobile admin pagination, deleted-service metadata, Arabic legal terms, CN-VIS runtime checks.
+- The commit after `a998b0a` records the release-gate result and this SHA.
 
 Nothing was pushed or deployed.
 
