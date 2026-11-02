@@ -14,7 +14,8 @@ import { theme } from '../../../theme';
 
 export function ManagePricesScreen() {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ['admin-services'], queryFn: () => servicesApi.getAdminServices() });
+  // Every page: a service is looked up by id, so none may be missing.
+  const query = useQuery({ queryKey: ['admin-services', 'all-pages'], queryFn: () => servicesApi.getAllAdminServices() });
   const [serviceId, setServiceId] = useState('');
   const [serviceFee, setServiceFee] = useState('');
   const [governmentFee, setGovernmentFee] = useState('');

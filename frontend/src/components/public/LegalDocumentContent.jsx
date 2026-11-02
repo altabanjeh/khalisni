@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { isDraftLegalDocument } from '../../api/legalApi'
 import { PublicPanel } from './PublicPage'
-import { LEGAL_DRAFT_BANNER, splitLegalParagraphs } from '../../utils/legalDocuments'
+import { LEGAL_DRAFT_BANNER, splitLegalParagraphs, displayLegalVersion } from '../../utils/legalDocuments'
 
 export function LegalDraftBanner({ isArabic }) {
   return (
@@ -22,7 +22,7 @@ export function LegalDocumentMeta({ document, isArabic }) {
   return (
     <p className="text-sm font-semibold text-[var(--khalsni-public-text-secondary)]" data-testid="legal-document-meta">
       {isArabic
-        ? `الإصدار: ${document.version} · تاريخ السريان: ${document.effective_date}`
+        ? `الإصدار: ${displayLegalVersion(document.version, true)} · تاريخ السريان: ${document.effective_date}`
         : `Version: ${document.version} · Effective: ${document.effective_date}`}
     </p>
   )

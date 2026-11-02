@@ -138,3 +138,44 @@ class AdminSoftDeleteContractTests(APITestCase):
             self.client.post(f"/api/admin/public-site/advertisements/{self.ad.pk}/restore/").status_code,
             status.HTTP_403_FORBIDDEN,
         )
+
+
+class ServiceDeletionMetadataTests(APITestCase):
+    """The services Deleted view shows the reason, time and actor to admins who may
+    delete/restore; catalogue managers (support) reading the same list do not get them."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = CustomUser.objects.create_user(
+            email="sd-meta-admin@example.com", password=PASSWORD, full_name="مدير الحذف",
+            phone="0795100011", role=CustomUser.Role.ADMIN, is_staff=True,
+        )
+        self.support = CustomUser.objects.create_user(
+            email="sd-meta-support@example.com", password=PASSWORD, full_name="Support",
+            phone="0795100012", role="support",
+        )
+        category = ServiceCategory.objects.create(name_ar="تصنيف", name_en="Category", slug="sd-meta-category")
+        self.deleted = Service.objects.create(category=category, name_ar="خدمة محذوفة", name_en="Deleted", slug="sd-meta-deleted", description_ar="و")
+        self.live = Service.objects.create(category=category, name_ar="خدمة نشطة", name_en="Live", slug="sd-meta-live", description_ar="و")
+        self.client.force_authenticate(self.admin)
+        response = self.client.delete(f"/api/admin/services/{self.deleted.pk}/", {"delete_password": PASSWORD, "delete_reason": "خدمة متوقفة مؤقتاً"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_admin_sees_reason_time_and_actor(self):
+        self.client.force_authenticate(self.admin)
+        rows = self.client.get("/api/admin/services/", {"include_deleted": "true", "is_deleted": "true"}).data["results"]
+        row = next(item for item in rows if item["id"] == self.deleted.pk)
+        self.assertTrue(row["is_deleted"])
+        self.assertEqual(row["delete_reason"], "خدمة متوقفة مؤقتاً")
+        self.assertTrue(row["deleted_at"])
+        self.assertEqual(row["deleted_by_name"], "مدير الحذف")
+
+    def test_catalogue_manager_does_not_get_deletion_metadata(self):
+        self.client.force_authenticate(self.support)
+        response = self.client.get("/api/admin/services/", {"include_deleted": "true"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = response.data["results"]
+        self.assertTrue(rows)
+        for row in rows:
+            for name in ("delete_reason", "deleted_at", "deleted_by_name"):
+                self.assertNotIn(name, row)

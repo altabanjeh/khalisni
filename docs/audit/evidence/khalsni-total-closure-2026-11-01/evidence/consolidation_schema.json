@@ -1,0 +1,201 @@
+{
+ "gate": "field_2fa52c6cfa",
+ "base": {
+  "applicant_name": "قيمة",
+  "national_id": "قيمة",
+  "phone_number": "قيمة",
+  "region": "قيمة",
+  "governorate": "قيمة"
+ },
+ "schema": [
+  {
+   "key": "applicant_name",
+   "label_ar": "اسم مقدم الطلب",
+   "type": "text",
+   "required": true,
+   "display_order": 1,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "Applicant name"
+  },
+  {
+   "key": "national_id",
+   "label_ar": "الرقم الوطني",
+   "type": "text",
+   "required": true,
+   "display_order": 2,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "National ID number"
+  },
+  {
+   "key": "phone_number",
+   "label_ar": "رقم الهاتف",
+   "type": "tel",
+   "required": true,
+   "display_order": 3,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "Phone number"
+  },
+  {
+   "key": "field_2fa52c6cfa",
+   "label_ar": "هل تعرف رقم القطعة والحوض؟",
+   "label_en": "Do you know the parcel and basin numbers?",
+   "type": "select",
+   "required": false,
+   "options": [
+    {
+     "value": "yes",
+     "label_ar": "نعم",
+     "label_en": "Yes"
+    },
+    {
+     "value": "no",
+     "label_ar": "لا",
+     "label_en": "No"
+    }
+   ],
+   "help_text_ar": "إذا لم تكن تعرف رقمي القطعة والحوض فاختر «لا»، ويساعدك فريقنا في تحديدهما أثناء مراجعة الطلب.",
+   "help_text_en": "If you do not know the parcel and basin numbers, choose “No” and our team will help identify them while reviewing your request.",
+   "source_section": "B10-1/2/3",
+   "display_order": 4
+  },
+  {
+   "key": "plots",
+   "type": "repeater",
+   "label_ar": "أرقام القطع المطلوب توحيدها",
+   "label_en": "Numbers of the plots to consolidate",
+   "required": true,
+   "min_items": 2,
+   "max_items": 20,
+   "item_fields": [
+    {
+     "key": "parcel_number",
+     "type": "text",
+     "label_ar": "رقم القطعة",
+     "label_en": "Parcel number",
+     "required": true
+    },
+    {
+     "key": "basin_number",
+     "type": "text",
+     "label_ar": "رقم الحوض",
+     "label_en": "Basin number",
+     "required": true
+    }
+   ],
+   "visible_when": {
+    "field": "field_2fa52c6cfa",
+    "equals": "yes"
+   },
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "Repeater",
+   "replaces_fields": [
+    "field_56b1987951",
+    "field_7d9efcd6d5"
+   ],
+   "display_order": 5
+  },
+  {
+   "key": "region",
+   "label_ar": "المنطقة",
+   "type": "text",
+   "required": true,
+   "display_order": 6,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "Area"
+  },
+  {
+   "key": "governorate",
+   "label_ar": "المحافظة",
+   "type": "text",
+   "required": true,
+   "display_order": 7,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "Governorate"
+  },
+  {
+   "key": "additional_notes",
+   "label_ar": "ملاحظات إضافية",
+   "type": "textarea",
+   "required": false,
+   "display_order": 8,
+   "help_text": "",
+   "options": [],
+   "source_section": "البيانات المطلوبة من العميل",
+   "source_type": "",
+   "import_warnings": [],
+   "label_en": "Additional notes"
+  },
+  {
+   "key": "field_b8d4677c65",
+   "label_ar": "كم عدد القطع المطلوب توحيدها؟",
+   "type": "number",
+   "required": false,
+   "display_order": 9,
+   "help_text": "",
+   "options": [],
+   "source_section": "الأسئلة الديناميكية المقترحة",
+   "source_type": "Yes/No",
+   "import_warnings": [],
+   "label_en": "How many plots are to be consolidated?"
+  },
+  {
+   "key": "field_da334d766f",
+   "label_ar": "هل جميع القطع مملوكة لنفس المالك؟",
+   "type": "checkbox",
+   "required": false,
+   "display_order": 10,
+   "help_text": "",
+   "options": [],
+   "source_section": "الأسئلة الديناميكية المقترحة",
+   "source_type": "Yes/No",
+   "import_warnings": [],
+   "label_en": "Are all the plots owned by the same owner?"
+  },
+  {
+   "key": "field_b07ae7100c",
+   "label_ar": "هل القطع متجاورة؟",
+   "type": "checkbox",
+   "required": false,
+   "display_order": 11,
+   "help_text": "",
+   "options": [],
+   "source_section": "الأسئلة الديناميكية المقترحة",
+   "source_type": "Yes/No",
+   "import_warnings": [],
+   "label_en": "Are the plots adjacent?"
+  },
+  {
+   "key": "field_307ab61eb9",
+   "label_ar": "هل يوجد وكيل قانوني؟",
+   "type": "checkbox",
+   "required": false,
+   "display_order": 12,
+   "help_text": "",
+   "options": [],
+   "source_section": "الأسئلة الديناميكية المقترحة",
+   "source_type": "Yes/No",
+   "import_warnings": [],
+   "label_en": "Is there a legal representative?"
+  }
+ ]
+}

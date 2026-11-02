@@ -1,6 +1,6 @@
 import { Alert, FlatList, Text, View } from 'react-native';
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AdminSoftDeleteModal } from '../../../components/AdminSoftDeleteModal';
 import { AppButton } from '../../../components/AppButton';
@@ -11,9 +11,11 @@ import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { EmptyState } from '../../../components/EmptyState';
 import { ErrorState } from '../../../components/ErrorState';
 import { LoadingState } from '../../../components/LoadingState';
+import { LoadMoreFooter } from '../../../components/LoadMoreFooter';
+import { usePagedList } from '../../../hooks/usePagedList';
 import { SoftDeleteFilter } from '../../../components/SoftDeleteFilter';
 import { DeletedBadge, SoftDeleteRowActions } from '../../../components/SoftDeleteRowActions';
-import { servicesApi } from '../../../api/services.api';
+import { ADMIN_SERVICES_URL, servicesApi } from '../../../api/services.api';
 import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
 import type { Service } from '../../../types/service';
@@ -31,14 +33,12 @@ type AdminServiceRow = Service & SoftDeleteFields;
 export function ManageServicesScreen() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<SoftDeleteStatus>(DEFAULT_SOFT_DELETE_STATUS);
-  const query = useQuery({
+  // Page by page; LoadMoreFooter below offers the next page while one exists.
+  const query = usePagedList<AdminServiceRow>({
     queryKey: ['admin-services', status],
-    // ServiceAdminViewSet narrows `is_deleted` itself; the client filter is a
-    // safety net for the "active" view.
-    queryFn: async () => filterBySoftDeleteStatus(
-      (await servicesApi.getAdminServices(softDeleteListParams(status, true))) as AdminServiceRow[],
-      status,
-    ),
+    url: ADMIN_SERVICES_URL,
+    params: softDeleteListParams(status, true),
+    select: (rows) => filterBySoftDeleteStatus(rows, status),
   });
   const softDelete = useAdminSoftDelete<AdminServiceRow>({
     entity: 'service',
@@ -70,7 +70,7 @@ export function ManageServicesScreen() {
     onError: (error) => Alert.alert('تعذر الإنشاء', getDisplayError(error)),
   });
 
-  const rows = query.data ?? [];
+  const rows = query.items;
 
   return (
     <AppScreen title="إدارة الخدمات">
@@ -96,7 +96,7 @@ export function ManageServicesScreen() {
           <AppCard variant={item.is_deleted ? 'muted' : 'default'}>
             <Text style={{ textAlign: 'right', fontSize: 18, fontWeight: '700' }}>{item.name_ar}</Text>
             <Text style={{ textAlign: 'right' }}>Slug: {item.slug}</Text>
-            {item.is_deleted ? <DeletedBadge deletedReason={item.delete_reason} /> : null}
+            {item.is_deleted ? <DeletedBadge record={item} /> : null}
             {softDelete.canSoftDelete ? (
               <SoftDeleteRowActions
                 recordName={item.name_ar}
@@ -107,6 +107,13 @@ export function ManageServicesScreen() {
             ) : null}
           </AppCard>
         )}
+      />
+      <LoadMoreFooter
+        shown={query.loadedCount}
+        total={query.total}
+        hasMore={Boolean(query.hasNextPage)}
+        loading={query.isFetchingNextPage}
+        onLoadMore={() => query.fetchNextPage()}
       />
       <AdminSoftDeleteModal
         visible={Boolean(softDelete.pendingDelete)}

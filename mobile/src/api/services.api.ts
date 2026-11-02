@@ -1,4 +1,6 @@
-import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
+import { apiClient, buildQuery, fetchAllPages, secureAdminDelete, unwrapListData } from './client';
+
+export const ADMIN_SERVICES_URL = '/admin/services/';
 import type { ApiListParams } from '../types/common';
 import type { Service, ServiceCategory } from '../types/service';
 
@@ -11,6 +13,10 @@ export const servicesApi = {
   },
   getService(slug: string) {
     return apiClient.get<Service>(`/services/${slug}/`).then((res) => res.data);
+  },
+  // Every page (pickers that look a service up by id must see all of them).
+  getAllAdminServices(params: ApiListParams = {}) {
+    return fetchAllPages<Service>(ADMIN_SERVICES_URL, params);
   },
   getAdminServices(params: ApiListParams = {}) {
     return apiClient.get<Service[]>('/admin/services/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));

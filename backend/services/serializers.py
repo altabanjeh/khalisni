@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from rest_framework import serializers
 
+from core.delete_guard import is_admin_delete_user
 from core.image_utils import optimize_image_upload
 from core.serializer_mixins import PkAsIdMixin, SoftDeleteFieldsReadOnlyMixin
 from public_site.validators import PublicSiteImageValidator
@@ -496,6 +497,9 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
         required=False,
     )
     required_documents = serializers.SerializerMethodField()
+    # Deletion metadata for the delete/restore UI; returned only to the users who
+    # may delete and restore (see to_representation).
+    deleted_by_name = serializers.CharField(source="deleted_by.full_name", read_only=True, default="")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -567,6 +571,9 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
             "is_featured",
             "is_active",
             "is_deleted",
+            "deleted_at",
+            "delete_reason",
+            "deleted_by_name",
             "show_on_public_site",
             "display_order",
             "duration_display",
@@ -576,6 +583,18 @@ class AdminServiceRuleSerializer(SoftDeleteFieldsReadOnlyMixin, serializers.Mode
             "required_documents",
         )
         read_only_fields = ("duration_display", "duration_display_ar", "duration_display_en", "image_url")
+
+    DELETION_FIELDS = ("deleted_at", "delete_reason", "deleted_by_name")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Catalogue managers can read this endpoint too; who deleted a service
+        # and why is for the admins who can delete and restore.
+        request = self.context.get("request")
+        if not is_admin_delete_user(getattr(request, "user", None)):
+            for name in self.DELETION_FIELDS:
+                data.pop(name, None)
+        return data
 
     def get_duration_display(self, obj):
         return obj.delivery_time_payload().get("label_en")

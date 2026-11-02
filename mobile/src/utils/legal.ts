@@ -14,6 +14,11 @@ export const LEGAL_DRAFT_STATUS = 'draft_requires_approval';
 export const LEGAL_DRAFT_BANNER = 'مسودة — تتطلب موافقة المالك/المستشار القانوني قبل الاعتماد';
 export const LEGAL_NOT_PUBLISHED = 'لم تُنشر بعد';
 
+/** The stored version id stays exact (consent records cite it); Arabic reads "-draft" as «(مسودة)». */
+export function displayLegalVersion(version: string | null | undefined) {
+  return String(version ?? '').replace(/-draft$/i, ' (مسودة)');
+}
+
 export function isLegalKind(value: unknown): value is LegalKind {
   return typeof value === 'string' && (LEGAL_KINDS as readonly string[]).includes(value);
 }

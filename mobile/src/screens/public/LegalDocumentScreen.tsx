@@ -10,6 +10,7 @@ import { LoadingState } from '../../components/LoadingState';
 import { theme } from '../../theme';
 import { formatDate } from '../../utils/format';
 import {
+  displayLegalVersion,
   LEGAL_DRAFT_BANNER,
   LEGAL_NOT_PUBLISHED,
   LEGAL_TITLES,
@@ -51,7 +52,7 @@ export function LegalDocumentScreen({ route }: { route: { params?: { kind?: stri
               <Text style={styles.meta}>
                 {[
                   result.document.effective_date ? `تاريخ السريان: ${formatDate(result.document.effective_date)}` : null,
-                  result.document.version ? `الإصدار: ${result.document.version}` : null,
+                  result.document.version ? `الإصدار: ${displayLegalVersion(result.document.version)}` : null,
                 ].filter(Boolean).join(' — ')}
               </Text>
             ) : null}

@@ -254,7 +254,7 @@ function AdminRuleManagementPage() {
   const channelLabels = {
     system: tx('النظام', 'System'),
     email: tx('البريد الإلكتروني', 'Email'),
-    sms: tx('رسائل SMS', 'SMS'),
+    sms: tx('الرسائل النصية القصيرة (SMS)', 'SMS'),
     whatsapp: tx('واتساب', 'WhatsApp'),
   }
   const fileExtensionLabels = {

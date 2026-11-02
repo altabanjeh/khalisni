@@ -58,7 +58,9 @@ test('the published legal document wins over the CMS text and shows the Arabic d
   expect(homepage).not.toHaveBeenCalled()
   expect(screen.getByTestId('legal-draft-banner')).toHaveTextContent('مسودة — تتطلب موافقة المالك/المستشار القانوني قبل الاعتماد')
   expect(screen.getByRole('heading', { name: '1. البيانات' })).toBeInTheDocument()
-  expect(screen.getByTestId('legal-document-meta')).toHaveTextContent('2026-11-01-draft')
+  // Arabic reads the draft suffix in Arabic; the id itself is unchanged.
+  expect(screen.getByTestId('legal-document-meta')).toHaveTextContent('الإصدار: 2026-11-01 (مسودة)')
+  expect(screen.getByTestId('legal-document-meta')).not.toHaveTextContent('draft')
   expect(screen.getByRole('link', { name: 'شروط الاستخدام' })).toHaveAttribute('href', '/terms')
 })
 

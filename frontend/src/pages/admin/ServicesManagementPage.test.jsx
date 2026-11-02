@@ -10,6 +10,8 @@ test('services management page builds required information schema from visual fi
   vi.spyOn(api, 'getAdminServiceDocuments').mockResolvedValue([])
   const createServiceSpy = vi.spyOn(api, 'createAdminService').mockResolvedValue({ id: 10 })
 
+  // Long values are pasted (one input event each) rather than typed key by key:
+  // the builder form re-renders on every keystroke and typing made this test slow.
   const user = userEvent.setup()
   render(
     <MemoryRouter>
@@ -23,13 +25,18 @@ test('services management page builds required information schema from visual fi
 
   await user.click(screen.getByRole('button', { name: '+ خدمة جديدة' }))
   await user.selectOptions(document.querySelector('select[name="category_id"]'), '1')
-  await user.type(document.querySelector('input[name="name_ar"]'), 'خدمة تجديد جواز السفر')
-  await user.type(document.querySelector('textarea[name="description_ar"]'), 'وصف الخدمة بالعربية')
+  await user.click(document.querySelector('input[name="name_ar"]'))
+  await user.paste('خدمة تجديد جواز السفر')
+  await user.click(document.querySelector('textarea[name="description_ar"]'))
+  await user.paste('وصف الخدمة بالعربية')
 
   await user.click(screen.getByRole('button', { name: '+ حقل مطلوب' }))
-  await user.type(screen.getByPlaceholderText('مثال: رقم الجواز'), 'رقم الجواز')
-  await user.type(screen.getByPlaceholderText('Passport number'), 'Passport number')
-  await user.type(screen.getByPlaceholderText('أدخل رقم الجواز'), 'أدخل رقم الجواز')
+  await user.click(screen.getByPlaceholderText('مثال: رقم الجواز'))
+  await user.paste('رقم الجواز')
+  await user.click(screen.getByPlaceholderText('Passport number'))
+  await user.paste('Passport number')
+  await user.click(screen.getByPlaceholderText('أدخل رقم الجواز'))
+  await user.paste('أدخل رقم الجواز')
   await user.click(screen.getByRole('checkbox', { name: 'الحقل مطلوب عند الطلب' }))
 
   await waitFor(() => {

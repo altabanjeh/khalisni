@@ -42,7 +42,10 @@ try {
       return clone.innerText
     })
     const cleaned = text.replace(/\S+@\S+|https?:\/\/\S+|KH-\d{4}-\d+/g, ' ')
-    const words = [...new Set(cleaned.match(/[A-Za-z][A-Za-z.'-]+/g) || [])].filter((w) => !ALLOWED.test(w))
+    // A technical abbreviation is acceptable once the page explains it in Arabic.
+    const GLOSSED = { IP: 'بروتوكول الإنترنت (IP)', SMS: 'الرسائل النصية القصيرة (SMS)' }
+    const words = [...new Set(cleaned.match(/[A-Za-z][A-Za-z.'-]+/g) || [])]
+      .filter((w) => !ALLOWED.test(w) && !(GLOSSED[w] && text.includes(GLOSSED[w])))
     if (words.length) res.arabicPagesWithLatin.push({ path, words: words.slice(0, 10) })
     if (path === '/') {
       const headings = await q.locator('main h1, main h2').allInnerTexts()

@@ -3,22 +3,7 @@
  "englishPagesWithArabic": [],
  "consoleErrors": [],
  "services": 33,
- "arabicPagesWithLatin": [
-  {
-   "path": "/privacy",
-   "words": [
-    "draft",
-    "IP",
-    "SMS"
-   ]
-  },
-  {
-   "path": "/terms",
-   "words": [
-    "draft"
-   ]
-  }
- ],
+ "arabicPagesWithLatin": [],
  "homeHeadings": [
   "ركّز على اللي بهمّك… وإحنا بنخلّص الباقي.",
   "متابعة لحظية",

@@ -18,3 +18,10 @@ export function splitLegalParagraphs(text) {
       return { heading: '', body: paragraph }
     })
 }
+
+// The stored version id stays exact (consent records cite it); the Arabic page
+// reads a trailing "-draft" as «(مسودة)» instead of an English word.
+export function displayLegalVersion(version, isArabic) {
+  const value = String(version || '')
+  return isArabic ? value.replace(/-draft$/i, ' (مسودة)') : value
+}

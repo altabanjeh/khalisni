@@ -1,6 +1,6 @@
 import { Alert, FlatList, Text, View } from 'react-native';
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AdminSoftDeleteModal } from '../../../components/AdminSoftDeleteModal';
 import { AppButton } from '../../../components/AppButton';
@@ -11,9 +11,11 @@ import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { EmptyState } from '../../../components/EmptyState';
 import { ErrorState } from '../../../components/ErrorState';
 import { LoadingState } from '../../../components/LoadingState';
+import { LoadMoreFooter } from '../../../components/LoadMoreFooter';
+import { usePagedList } from '../../../hooks/usePagedList';
 import { SoftDeleteFilter } from '../../../components/SoftDeleteFilter';
 import { DeletedBadge, SoftDeleteRowActions } from '../../../components/SoftDeleteRowActions';
-import { usersApi } from '../../../api/users.api';
+import { ADMIN_USERS_URL, usersApi } from '../../../api/users.api';
 import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
 import type { AdminUser } from '../../../types/user';
@@ -32,13 +34,12 @@ type AdminUserRow = AdminUser & SoftDeleteFields;
 export function ManageUsersScreen() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<SoftDeleteStatus>(DEFAULT_SOFT_DELETE_STATUS);
-  const query = useQuery({
+  // Page by page; LoadMoreFooter below offers the next page while one exists.
+  const query = usePagedList<AdminUserRow>({
     queryKey: ['admin-users', status],
-    // AdminUserViewSet narrows `is_deleted` itself when include_deleted is set.
-    queryFn: async () => filterBySoftDeleteStatus(
-      (await usersApi.getUsers(softDeleteListParams(status, true))) as AdminUserRow[],
-      status,
-    ),
+    url: ADMIN_USERS_URL,
+    params: softDeleteListParams(status, true),
+    select: (rows) => filterBySoftDeleteStatus(rows, status),
   });
   const softDelete = useAdminSoftDelete<AdminUserRow>({
     entity: 'user',
@@ -65,7 +66,7 @@ export function ManageUsersScreen() {
     onError: (error) => Alert.alert('تعذر الإنشاء', getDisplayError(error)),
   });
 
-  const rows = query.data ?? [];
+  const rows = query.items;
   // Same rule as the web users page: the server lists `admin` among the role
   // options only for platform super admins, who may manage admin accounts.
   const canManageAdminUsers = Boolean(rows.find((item) => Array.isArray(item.role_options))?.role_options?.includes('admin'));
@@ -96,7 +97,7 @@ export function ManageUsersScreen() {
             <Text style={{ textAlign: 'right', fontSize: 18, fontWeight: '700' }}>{item.full_name}</Text>
             <Text style={{ textAlign: 'right' }}>{item.email}</Text>
             <Text style={{ textAlign: 'right' }}>الدور: {item.role}</Text>
-            {item.is_deleted ? <DeletedBadge deletedReason={item.delete_reason} /> : null}
+            {item.is_deleted ? <DeletedBadge record={item} /> : null}
             {softDelete.canSoftDelete ? (
               <SoftDeleteRowActions
                 recordName={item.full_name}
@@ -109,6 +110,13 @@ export function ManageUsersScreen() {
             ) : null}
           </AppCard>
         )}
+      />
+      <LoadMoreFooter
+        shown={query.loadedCount}
+        total={query.total}
+        hasMore={Boolean(query.hasNextPage)}
+        loading={query.isFetchingNextPage}
+        onLoadMore={() => query.fetchNextPage()}
       />
       <AdminSoftDeleteModal
         visible={Boolean(softDelete.pendingDelete)}

@@ -1,4 +1,6 @@
-import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
+import { apiClient, buildQuery, fetchAllPages, secureAdminDelete, unwrapListData } from './client';
+
+export const ADMIN_ADVERTISEMENTS_URL = '/admin/public-site/advertisements/';
 import type { ApiListParams } from '../types/common';
 import type { Service } from '../types/service';
 import type { ProviderProfileBrief } from '../types/order';
@@ -32,10 +34,9 @@ export const adminApi = {
   getSystemSettings() {
     return apiClient.get('/admin/system-settings/').then((res) => res.data);
   },
+  // Every page: the assignment picker must offer every eligible provider.
   getProviders(params: ApiListParams = {}) {
-    return apiClient
-      .get<AdminProviderListRecord[]>('/admin/providers/', { params: buildQuery(params) })
-      .then((res) => unwrapListData(res.data));
+    return fetchAllPages<AdminProviderListRecord>('/admin/providers/', params);
   },
   updateProviderApproval(providerId: number | string, payload: { decision: 'approve' | 'reject'; reason?: string }) {
     return apiClient.post(`/admin/providers/${providerId}/approval/`, payload).then((res) => res.data);

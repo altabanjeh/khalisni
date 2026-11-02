@@ -26,6 +26,21 @@ export interface SoftDeleteFields {
   is_deleted?: boolean;
   deleted_at?: string | null;
   delete_reason?: string;
+  // Returned by the services list to admins who may delete/restore only.
+  deleted_by_name?: string;
+}
+
+/**
+ * The deletion facts the API returned for a deleted row, as Arabic lines
+ * (reason, time, who). Missing facts are left out, never invented.
+ */
+export function deletionDetails(record: SoftDeleteFields, formatTime: (value: string) => string): string[] {
+  if (!record?.is_deleted) return [];
+  const lines: string[] = [];
+  if (record.delete_reason?.trim()) lines.push(`السبب: ${record.delete_reason.trim()}`);
+  if (record.deleted_at) lines.push(`تاريخ الحذف: ${formatTime(record.deleted_at)}`);
+  if (record.deleted_by_name?.trim()) lines.push(`حذفه: ${record.deleted_by_name.trim()}`);
+  return lines;
 }
 
 /**

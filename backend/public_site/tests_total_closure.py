@@ -449,3 +449,20 @@ class LegalEvidenceFilesTests(TestCase):
             document = LegalDocument.objects.get(kind=kind, version=SEEDED)
             self.assertIn(document.body_ar, text)
             self.assertIn(document.body_en, text)
+
+
+class ArabicLegalTerminologyTests(TestCase):
+    """Loose-end closure 2026-11-02: the Arabic privacy draft explains technical
+    abbreviations at their first occurrence; the legal meaning is unchanged and
+    the version is still an unapproved draft."""
+
+    def test_arabic_privacy_explains_ip_and_sms(self):
+        privacy = LegalDocument.objects.get(kind="privacy", version=SEEDED)
+        self.assertIn("عنوان بروتوكول الإنترنت (IP)", privacy.body_ar)
+        self.assertIn("الرسائل النصية القصيرة (SMS)", privacy.body_ar)
+        self.assertNotIn("وعنوان IP المستخدم", privacy.body_ar)
+        first_ip = privacy.body_ar.index("IP")
+        self.assertTrue(privacy.body_ar[:first_ip].endswith("بروتوكول الإنترنت ("))
+        self.assertEqual(privacy.approval_status, "draft_requires_approval")
+        # The English text keeps its own wording.
+        self.assertIn("IP address", privacy.body_en)

@@ -1,0 +1,113 @@
+{
+ "hover no-preference": {
+  "liftPx": 4,
+  "imgScale": 1,
+  "maxTransitionS": 0.22
+ },
+ "hover reduce": {
+  "liftPx": 0,
+  "imgScale": 1,
+  "maxTransitionS": 0.00001
+ },
+ "CN_VIS_19": {
+  "pass": true,
+  "rule": "hover moves the card by 0-8px or zooms its image by at most 1.08, transition <= 0.5s; reduce-motion: no movement"
+ },
+ "spacing": {
+  "/ 1440": 56,
+  "/services 1440": 28,
+  "/login 1440": 28,
+  "/ 390": 40,
+  "/services 390": 20,
+  "/login 390": 20
+ },
+ "pageHeights": {
+  "/ 1440": 4333,
+  "/services 1440": 7887,
+  "/login 1440": 1040,
+  "/ 390": 7193,
+  "/services 390": 17875,
+  "/login 390": 1737
+ },
+ "CN_VIS_15": {
+  "pass": true,
+  "rule": "section vertical padding <= 96px (1440) / 64px (390)"
+ },
+ "categoryImages": [
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "land-and-survey.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "business_services.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "tax.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "quick-public-services.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "ministry-of-labour.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "civil-status-and-passports_6Ttg0Sz.jpg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "category.svg"
+  },
+  {
+   "loaded": true,
+   "ratio": 4.3125,
+   "src": "category.svg"
+  }
+ ],
+ "CN_VIS_18": {
+  "pass": true,
+  "rule": "every category image loads; one aspect ratio (±5%)",
+  "count": 8
+ },
+ "nesting": {
+  "/ 1440": {
+   "max": 2,
+   "worst": "shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[0.72rem] font-extrabold text"
+  },
+  "/services 1440": {
+   "max": 1,
+   "worst": "grid gap-5 rounded-[var(--radius-xl)] bg-white p-5 text-start shadow-soft ring-1"
+  },
+  "/login 1440": {
+   "max": 1,
+   "worst": "relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni"
+  },
+  "/ 390": {
+   "max": 2,
+   "worst": "shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[0.72rem] font-extrabold text"
+  },
+  "/services 390": {
+   "max": 1,
+   "worst": "grid gap-5 rounded-[var(--radius-xl)] bg-white p-5 text-start shadow-soft ring-1"
+  },
+  "/login 390": {
+   "max": 1,
+   "worst": "relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--khalsni"
+  }
+ },
+ "CN_VIS_10": {
+  "pass": true,
+  "rule": "card-like boxes nest at most two levels"
+ }
+}

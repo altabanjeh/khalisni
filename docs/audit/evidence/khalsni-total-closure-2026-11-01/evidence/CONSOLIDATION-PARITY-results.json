@@ -1,0 +1,100 @@
+{
+ "rule": "gate \"no\": plots hidden, not required, not sent; gate \"yes\": plots required, min 2 complete rows",
+ "parity": true,
+ "minItems": {
+  "web": 2,
+  "mobile": 2
+ },
+ "cases": {
+  "no_without_rows": {
+   "agree": true,
+   "web": {
+    "visible": false,
+    "sent": false,
+    "blocks": false
+   },
+   "mobile": {
+    "visible": false,
+    "sent": false,
+    "blocks": false
+   },
+   "server": {
+    "plots_error": null,
+    "plots_sent": false,
+    "other_errors": []
+   }
+  },
+  "no_with_partial_row": {
+   "agree": true,
+   "web": {
+    "visible": false,
+    "sent": false,
+    "blocks": false
+   },
+   "mobile": {
+    "visible": false,
+    "sent": false,
+    "blocks": false
+   },
+   "server": {
+    "plots_error": null,
+    "plots_sent": false,
+    "other_errors": []
+   }
+  },
+  "yes_without_rows": {
+   "agree": true,
+   "web": {
+    "visible": true,
+    "sent": false,
+    "blocks": true
+   },
+   "mobile": {
+    "visible": true,
+    "sent": false,
+    "blocks": true
+   },
+   "server": {
+    "plots_error": "Add at least 2 entries.",
+    "plots_sent": false,
+    "other_errors": []
+   }
+  },
+  "yes_one_complete_row": {
+   "agree": true,
+   "web": {
+    "visible": true,
+    "sent": true,
+    "blocks": true
+   },
+   "mobile": {
+    "visible": true,
+    "sent": true,
+    "blocks": true
+   },
+   "server": {
+    "plots_error": "Add at least 2 entries.",
+    "plots_sent": false,
+    "other_errors": []
+   }
+  },
+  "yes_two_complete_rows": {
+   "agree": true,
+   "web": {
+    "visible": true,
+    "sent": true,
+    "blocks": false
+   },
+   "mobile": {
+    "visible": true,
+    "sent": true,
+    "blocks": false
+   },
+   "server": {
+    "plots_error": null,
+    "plots_sent": true,
+    "other_errors": []
+   }
+  }
+ }
+}

@@ -2,15 +2,19 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from './AppButton';
 import { theme } from '../theme';
+import { formatDateTime } from '../utils/format';
+import { deletionDetails, type SoftDeleteFields } from '../utils/softDelete';
 
 /** "محذوف" badge for a soft-deleted row. */
-export function DeletedBadge({ deletedReason }: { deletedReason?: string | null }) {
+export function DeletedBadge({ record }: { record: SoftDeleteFields }) {
   return (
     <View style={styles.badgeRow}>
       <View style={styles.badge} accessibilityLabel="سجل محذوف">
         <Text style={styles.badgeLabel}>محذوف</Text>
       </View>
-      {deletedReason ? <Text style={styles.reason}>السبب: {deletedReason}</Text> : null}
+      {deletionDetails(record, formatDateTime).map((line) => (
+        <Text key={line} style={styles.reason}>{line}</Text>
+      ))}
     </View>
   );
 }

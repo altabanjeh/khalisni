@@ -37,14 +37,14 @@ Every engineering-controlled requirement is PASS or justified NOT_APPLICABLE. Th
 
 | | Count |
 |---|---|
-| Total rows | 212 (189 earlier + 23 closure-pass rows) |
-| PASS | 188 |
+| Total rows | 214 (189 earlier + 23 closure-pass rows + 2 loose-end rows: TC-MOB-PAGING, TC-LEGAL-AR-TERMS) |
+| PASS | 190 |
 | NOT_APPLICABLE | 7 (B05, B08 by owner decision; CN-ACT-01, CN-VIS-01 process notes; PROP-WEB-01, PROP-MOB-01, ARCH-01 superseded/not contractual) |
 | EXTERNAL_EVIDENCE_REQUIRED | 17 |
 | FAIL | 0 |
 | PARTIAL | 0 |
 
-Before this pass: PASS 89 · PARTIAL 45 · BLOCKED 47 · N/A 8.
+Before this pass: PASS 89 · PARTIAL 45 · BLOCKED 47 · N/A 8. After the total-closure commit (329f9ed): 212 rows, 188 PASS, 7 N/A, 17 external. The loose-end closure (2026-11-02) added two rows, both PASS. No row changed status, and none regressed.
 
 ## E. ORIGINAL 26
 
@@ -131,6 +131,12 @@ Defects found and fixed during this pass:
 | Keyboard / off-canvas probes | keyboard: skip link first (AR and EN); the notifications panel takes focus and returns it to the bell on Escape; the help panel keeps focus inside and closes on Escape; keyboard login works. Off-canvas: the closed drawer is aria-hidden, inert and visibility:hidden (`evidence/KEYBOARD-results.json`, `evidence/OFFCANVAS-results.json`). The probe's `skipLinkFirst` flag compares against English text; the Arabic first focus is the Arabic skip link |
 | Screenshot harness | the 232-capture harness was not re-run in this pass. The changed screens are captured by the probes (`evidence/TC-*`, `RP-*`, `AF-*`, `RJ-*`) with overflow and console checks |
 | `makemigrations --check`, `manage.py check` | no changes, no issues |
+| **Loose-end closure (2026-11-02):** backend affected suites (`public_site`, `orders.tests_consent_v2`, `core`, `services`) | **269 tests OK** |
+| Loose-end: frontend vitest (full) / lint | **85 files, 286 tests passed** / clean |
+| Loose-end: mobile typecheck / harnesses | clean / pagination 8/8, soft delete 9/9 |
+| Loose-end: Playwright (a11y, axe-auth, p2-accessibility, public, routes, client-audit-ux, client-audit-responsive), 5 viewports, fresh QA DB | **440 passed, 0 failed, 10 designed skips** |
+| Loose-end: probes on the real catalogue | consolidation parity 5/5, VIS assertions 4/4, purity 48 pages 0 findings |
+| Loose-end: release sanity gate | {{GATE}} |
 
 New backend tests in this pass:
 - `config/tests_total_closure_authz.py`: authorization, messaging, reassignment, overdue alerts and complaints, delivery, profile, pricing leak, brand, slogan, national ID, success metrics, monthly report and export.
@@ -187,7 +193,7 @@ The Expo app is Arabic-only:
 - form timing;
 - admin delete/restore with an Active/Deleted/All filter on Services, Users and Advertisements.
 
-Results: typecheck clean; harnesses 38/38, 19/19 and 9/9. **Not run on a device or simulator** (B09/CN-ACT-14). The production API host is an owner input (TC-MOB-HOST).
+Results: typecheck clean; harnesses 38/38, 19/19, 9/9 and (loose-end closure) pagination 8/8. Admin and staff lists reach every page (load more), and pickers read all pages. **Not run on a device or simulator** (B09/CN-ACT-14). The production API host is an owner input (TC-MOB-HOST).
 
 ## K. ACCESSIBILITY
 
@@ -266,6 +272,20 @@ See `git show --stat f35a640` and `git show --stat 329f9ed`. Main areas:
 
 Nothing was pushed or deployed.
 
+## LOOSE-END CLOSURE (2026-11-02)
+
+This pass closed only the engineering items the report had left open. It was not a new audit.
+
+| Item | What was done | Proof |
+|---|---|---|
+| 1. Property consolidation (approved behaviour kept) | The B10-1/2/3 rule is unchanged: "No" means the plot rows are hidden, not required and not sent; "Yes" means plot rows are required, at least 2 complete. | `probes/consolidation_parity.mjs` + `consolidation_parity_backend.py`: the migrated real schema gives the same verdict in backend, web and mobile on 5 cases (`evidence/CONSOLIDATION-PARITY-results.json`). Existing tests cover the "No" branch in each layer. |
+| 2. Mobile admin pagination | `usePagedList` (infinite query over DRF `next` links) and a `LoadMoreFooter` reading «معروض 20 من 45» with a «تحميل المزيد» button. Applied to services, users, advertisements, admin orders, employee tasks and review queues, and provider assigned orders. The id pickers (prices, permissions, provider assignment) read every page. | Mobile pagination harness 8/8: rows on pages 2 and 3 are reachable, internal-host `next` links are followed, pickers are complete (`mobile/mobile_pagination_harness_output.json`). |
+| 3. Mobile deleted-service reason | The services admin API now returns `deleted_at`, `delete_reason` and `deleted_by_name`, but only to users who may delete and restore; catalogue managers (support) do not get them. The mobile «محذوف» badge shows the reason, the deletion time and who deleted it, for services, users and advertisements, whenever the API provides them. | `core/tests_admin_soft_delete_contract.py` `ServiceDeletionMetadataTests` (admin sees all three; support sees none); pagination harness DEL-1/SRC-2. |
+| 4. Arabic legal terminology | In the Arabic privacy draft, the first occurrence of each abbreviation now reads «عنوان بروتوكول الإنترنت (IP)» and «الرسائل النصية القصيرة (SMS)»; the meaning is unchanged. The Arabic version label reads «2026-11-01 (مسودة)»; the stored id `2026-11-01-draft` is unchanged because consent records cite it. The admin channel label was fixed too. The seed migration's draft text was edited in place: that draft was never deployed or accepted by a real customer. The document is still `draft_requires_approval`; no legal approval is claimed. | `public_site/tests_total_closure.py` `ArabicLegalTerminologyTests`; `PrivacyPolicyPage.test.jsx`. The purity probe's Arabic pass now finds nothing on all 48 pages (`evidence/EN-PURITY-results.json`). |
+| 5. CN-VIS evidence | Runtime assertions were added where a row has behaviour or a measurable property (`probes/vis_assertions.mjs`, real catalogue). **CN-VIS-19:** hover lifts the card 4px over 0.22s; with reduced motion, nothing moves. **CN-VIS-15:** section padding is at most 56px at 1440 and 40px at 390 (limits 96/64). **CN-VIS-18:** 8/8 category images load at one rendered ratio. **CN-VIS-10:** cards nest at most 2 levels. **CN-VIS-20** is purely visual, so screenshots are its evidence. | `evidence/VIS-ASSERTIONS-results.json`, `evidence/VIS-home-ar-1440.png` |
+
+**Also fixed:** the services-builder unit test took 10 s and timed out under a parallel full run. Its long values are now pasted (real input events) instead of typed key by key: 4 s, same assertions.
+
 ## R. ANYTHING NOT PROVEN
 
 - **Not tested on real devices.** The mobile app and responsive web have never been checked on a physical device; the Expo app has not been rendered on a device or simulator.
@@ -279,7 +299,6 @@ Nothing was pushed or deployed.
   - the English slogan;
   - the mobile API host;
   - provider compensation.
-- **Design rows judged from screenshots.** CN-VIS-10/15/18/19/20 are PASS on screenshot review; the owner's visual sign-off is part of overall release acceptance.
-- **Remaining Latin tokens on Arabic legal pages.** They show the version identifier `2026-11-01-draft` (kept for traceability) and the terms IP/SMS inside the legal drafts.
-- **Mobile admin lists load only the first page,** including the Deleted view, as before this pass.
-- **The mobile Services Deleted view does not show the delete reason.** The reason is saved, but the services admin serializer does not return it; Users and Advertisements show it.
+- **CN-VIS-20 is judged from screenshots.** It is purely visual (overall impression). The owner's visual sign-off is part of overall release acceptance.
+
+No engineering-controlled item remains unproven. Everything above needs a device, production access, the owner or legal counsel.

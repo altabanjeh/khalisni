@@ -1,4 +1,7 @@
 import { apiClient, buildQuery, fetchAllPages, unwrapListData } from './client';
+
+export const ADMIN_ORDERS_URL = '/admin/orders/';
+export const PROVIDER_ORDERS_URL = '/provider/orders/';
 import type { ApiListParams, PaginatedResponse } from '../types/common';
 import type { Order, OrderComplaint, OrderDelivery, OrderMessage, TrackOrderResult } from '../types/order';
 

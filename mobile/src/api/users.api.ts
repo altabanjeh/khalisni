@@ -1,4 +1,6 @@
-import { apiClient, buildQuery, secureAdminDelete, unwrapListData } from './client';
+import { apiClient, buildQuery, fetchAllPages, secureAdminDelete, unwrapListData } from './client';
+
+export const ADMIN_USERS_URL = '/admin/users/';
 import type { ApiListParams } from '../types/common';
 import type { AdminUser, User } from '../types/user';
 
@@ -10,6 +12,10 @@ export interface AvailablePermission {
 }
 
 export const usersApi = {
+  // Every page (the permissions screen looks a user up by id).
+  getAllUsers(params: ApiListParams = {}) {
+    return fetchAllPages<AdminUser>(ADMIN_USERS_URL, params);
+  },
   getUsers(params: ApiListParams = {}) {
     return apiClient.get<AdminUser[]>('/admin/users/', { params: buildQuery(params) }).then((res) => unwrapListData(res.data));
   },

@@ -1,0 +1,27 @@
+{
+ "no_without_rows": {
+  "plots_error": null,
+  "plots_sent": false,
+  "other_errors": []
+ },
+ "no_with_partial_row": {
+  "plots_error": null,
+  "plots_sent": false,
+  "other_errors": []
+ },
+ "yes_without_rows": {
+  "plots_error": "Add at least 2 entries.",
+  "plots_sent": false,
+  "other_errors": []
+ },
+ "yes_one_complete_row": {
+  "plots_error": "Add at least 2 entries.",
+  "plots_sent": false,
+  "other_errors": []
+ },
+ "yes_two_complete_rows": {
+  "plots_error": null,
+  "plots_sent": true,
+  "other_errors": []
+ }
+}

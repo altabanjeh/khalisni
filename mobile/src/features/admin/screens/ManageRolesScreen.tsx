@@ -13,7 +13,8 @@ import { getDisplayError } from '../../../api/client';
 import { theme } from '../../../theme';
 
 export function ManageRolesScreen() {
-  const usersQuery = useQuery({ queryKey: ['admin-users'], queryFn: () => usersApi.getUsers() });
+  // Every page: a user is looked up by id, so none may be missing.
+  const usersQuery = useQuery({ queryKey: ['admin-users', 'all-pages'], queryFn: () => usersApi.getAllUsers() });
   const permissionsQuery = useQuery({ queryKey: ['available-permissions'], queryFn: () => usersApi.getAvailablePermissions() });
   const [selectedUserId, setSelectedUserId] = useState('');
   const [permissionsText, setPermissionsText] = useState('');

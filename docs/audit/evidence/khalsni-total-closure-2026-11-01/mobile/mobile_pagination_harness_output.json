@@ -1,0 +1,140 @@
+{
+ "generated": "2026-11-02T06:19:42.742Z",
+ "passed": 8,
+ "total": 8,
+ "results": [
+  {
+   "id": "PG-1",
+   "name": "services: page 1 shows 20 of 45 with more to load; load-more reaches pages 2 and 3; row 45 (page 3) is reachable; the internal-host next link is followed on the configured base URL",
+   "pass": true,
+   "evidence": {
+    "steps": [
+     {
+      "loaded": 20,
+      "hasNext": true
+     },
+     {
+      "loaded": 40,
+      "hasNext": true
+     },
+     {
+      "loaded": 45,
+      "hasNext": false
+     }
+    ],
+    "requests": [
+     "?page=1",
+     "?page=2",
+     "?page=3"
+    ]
+   }
+  },
+  {
+   "id": "PG-2",
+   "name": "footer text: «معروض 20 من 45» after page 1, «تم عرض كل السجلات (45)» at the end",
+   "pass": true,
+   "evidence": {
+    "first": "معروض 20 من 45",
+    "last": "تم عرض كل السجلات (45)"
+   }
+  },
+  {
+   "id": "PG-3",
+   "name": "users (25), admin/employee orders (30) and provider orders (22) all reach their page-2 rows",
+   "pass": true,
+   "evidence": {
+    "users": [
+     {
+      "loaded": 20,
+      "hasNext": true
+     },
+     {
+      "loaded": 25,
+      "hasNext": false
+     }
+    ],
+    "orders": [
+     {
+      "loaded": 20,
+      "hasNext": true
+     },
+     {
+      "loaded": 30,
+      "hasNext": false
+     }
+    ],
+    "provider": [
+     {
+      "loaded": 20,
+      "hasNext": true
+     },
+     {
+      "loaded": 22,
+      "hasNext": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "PG-4",
+   "name": "an unpaginated list (advertisements) is one complete page with no load-more",
+   "pass": true,
+   "evidence": {
+    "steps": [
+     {
+      "loaded": 3,
+      "hasNext": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "PG-5",
+   "name": "pickers read every page: prices (45 services), permissions (25 users), provider assignment (23 providers)",
+   "pass": true,
+   "evidence": {
+    "services": 45,
+    "users": 25,
+    "providers": 23
+   }
+  },
+  {
+   "id": "DEL-1",
+   "name": "deleted row shows reason, time and actor when the API returns them; missing facts are omitted; live rows show none",
+   "pass": true,
+   "evidence": {
+    "full": [
+     "السبب: خدمة متوقفة",
+     "تاريخ الحذف: T(2026-11-02T09:00:00Z)",
+     "حذفه: مدير الحذف"
+    ],
+    "partial": [
+     "السبب: مكرر"
+    ],
+    "live": []
+   }
+  },
+  {
+   "id": "SRC-1",
+   "name": "every paged admin/staff list screen uses usePagedList + LoadMoreFooter; the id pickers use the all-pages readers",
+   "pass": true,
+   "evidence": {
+    "wired": {
+     "services": true,
+     "users": true,
+     "ads": true,
+     "orders": true,
+     "tasks": true,
+     "review": true,
+     "assigned": true
+    }
+   }
+  },
+  {
+   "id": "SRC-2",
+   "name": "the three deleted views render DeletedBadge with the whole record (reason, time, actor)",
+   "pass": true,
+   "evidence": {}
+  }
+ ]
+}
